@@ -1,0 +1,976 @@
+.container {
+    padding: 0 2rem;
+    width: 100%;
+    position: relative;
+}
+
+/* ... existing styles ... */
+
+.title {
+    font-size: 1.7rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    margin: 0;
+    color: #FFD753;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+.topBar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    background: #84BCFF;
+    padding: 1rem 1.5rem 1rem 1.5rem;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    border-radius: 1rem;
+    border: 3px solid #333333;
+    border-bottom-width: 6px;
+    z-index: 60;
+}
+
+.headerTopRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-height: 36px;
+    /* Match CardGrid refresh button height */
+}
+
+/* ... existing intermediate styles ... */
+
+.activeFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.section {
+    margin-bottom: 3rem;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0;
+}
+
+.sectionTitle {
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    color: #1ABF9E;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    text-shadow: 1.5px 0 #000, -1.5px 0 #000, 0 1.5px #000, 0 -1.5px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+.count {
+    color: #1ABF9E;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    margin-left: 0.25rem;
+    text-shadow: 1.5px 0 #000, -1.5px 0 #000, 0 1.5px #000, 0 -1.5px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+.toggleButton {
+    background: none;
+    border: none;
+    color: #FFD753;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: transform 0.2s;
+}
+
+.toggleButton svg {
+    stroke-width: 4px;
+    filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
+}
+
+.toggleButton:hover {
+    transform: scale(1.1);
+}
+
+.searchInput {
+    background: #5097FF;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    color: #333333;
+    width: 250px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+.searchInput:hover,
+.searchInput:focus {
+    border: 1px solid #2673E8;
+    box-shadow: none;
+    outline: none;
+}
+
+.searchInput::placeholder {
+    color: #333333;
+}
+
+.nameWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.editButton {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    opacity: 0;
+    /* Hidden by default until hover */
+}
+
+.lineupHeader:hover .editButton {
+    opacity: 1;
+}
+
+.editButton:hover {
+    color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.favoriteButton {
+    background: none;
+    border: none;
+    color: #333333;
+    /* Black/Dark stroke */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+}
+
+.favoriteButton svg {
+    transition: fill 0.2s;
+    fill: none;
+}
+
+.favoriteButton:hover {
+    transform: scale(1.1);
+    color: #333333;
+    /* Keep stroke black */
+}
+
+.favoriteButton:hover svg {
+    fill: #FFD753;
+}
+
+.favoriteButton.isFavorite {
+    color: #333333;
+    /* Keep stroke black */
+}
+
+.favoriteButton.isFavorite svg {
+    fill: #FFD753;
+}
+
+/* ... existing grid ... */
+
+.deleteButton {
+    /* ... existing structure */
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 32px;
+    height: 32px;
+    background: #ef4444;
+    color: white;
+    /* Ensure icon is white */
+    border-radius: 50%;
+    border: 3px solid var(--color-bg-dark);
+    /* IMPORTANT: This needs to match the parent's actual background context if transparent, or use the card background if overlapping */
+    /* Since it overlaps the card corner, it should match the body background behind the card? No, usually the card background. */
+    border-color: var(--color-card-bg);
+    /* Match card background so it looks cut out from the card */
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    z-index: 20;
+    /* High z-index */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.deleteButton:hover {
+    transform: scale(1.1);
+    background-color: #ff4444;
+}
+
+/* Modal Title Wrapper to potentially add edit there too */
+.modalTitleWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 1rem 1rem 1rem;
+}
+
+.lineupCard {
+    background: #5097FF;
+    border: 3px solid #333333;
+    border-bottom-width: 8px;
+    /* Thick bottom border */
+    border-radius: 20px;
+    padding: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    /* For absolute delete button */
+    color: #333333;
+    /* Dark text for the whole card */
+    cursor: pointer;
+}
+
+.lineupCard:hover {
+    background: #84BCFF;
+}
+
+/* ... existing styles ... */
+
+.lineupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-right: 1.5rem;
+}
+
+.lineupName {
+    font-weight: 800;
+    font-size: 1.25rem;
+    font-family: 'Inter', sans-serif;
+    color: #FFFFFF;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 15ch;
+}
+
+.lineupDate {
+    font-size: 0.85rem;
+    color: #666666;
+    font-family: monospace;
+}
+
+.cardPreview {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.previewImage {
+    flex: 1;
+    width: auto;
+    height: auto;
+    aspect-ratio: 0.7;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    background: #000;
+    border: 2px solid var(--color-border);
+    transition: transform 0.2s;
+    min-width: 0;
+}
+
+.schemeImage {
+    border-color: #60a5fa;
+    box-shadow: 0 0 6px rgba(96, 165, 250, 0.4);
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    color: #333333;
+    background: #5097FF;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.75rem;
+}
+
+.emptyState h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    color: #333333;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.emptyState p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    color: #333333;
+    margin: 0;
+}
+
+.noResults {
+    text-align: center;
+    padding: 3rem;
+    color: #333333;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.75rem;
+    background: #5097FF;
+}
+
+.deleteButton {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 26px;
+    height: 26px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    border: 2px solid #000;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s;
+}
+
+/* ... existing hover ... */
+
+.ratingBadge {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    width: 26px;
+    height: 26px;
+    background: #FFD753;
+    border: 2px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #333333;
+    z-index: 10;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.deleteButton:hover {
+    transform: scale(1.1);
+    background-color: #ff4444;
+}
+
+.warningIcon {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 26px;
+    height: 26px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    border: 2px solid #000;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    cursor: help;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    padding: 2rem;
+}
+
+.modalContent {
+    background: #5097FF;
+    background-image: url('/modal-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #333333;
+    border-bottom-width: 8px;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    width: 1150px;
+    height: 600px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease-out;
+    color: #333333;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Background Switcher */
+.backgroundSwitcher {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    position: absolute;
+    bottom: 3.5rem;
+    left: 2rem;
+    z-index: 10;
+    margin: 0;
+}
+
+.bgOption {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    padding: 0;
+}
+
+.bgOption:hover {
+    transform: scale(1.1);
+}
+
+.bgOptionActive {
+    transform: scale(1.2);
+    border: 3px solid #333333;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Header Row - Flex container for download | title */
+.modalHeaderRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 0;
+    margin-bottom: 0.25rem;
+}
+
+.modalDownloadButton {
+    position: absolute;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    top: 10px;
+    background: #FF66CC;
+    border: 3px solid #333333;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, background 0.2s;
+    z-index: 5;
+    padding: 0;
+    /* Remove default padding */
+}
+
+.modalDownloadButton:hover {
+    transform: scale(1.1);
+    background: #FF99DD !important;
+    color: white !important;
+}
+
+.modalDownloadButton:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.modalDownloadButton svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    stroke-width: 3px;
+    filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+}
+
+.editInput {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333333;
+    background: #FFFFFF;
+    border: 2px solid #333333;
+    border-radius: 4px;
+    padding: 2px 8px;
+    width: 200px;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.editInput:focus {
+    border-color: #FF66CC;
+    box-shadow: 0 0 10px rgba(255, 102, 204, 0.3);
+}
+
+.modalHeader {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.modalTitleWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.modalTitleWrapper:hover .editButton {
+    opacity: 1;
+}
+
+.modalTitle {
+    font-family: 'Grand Arena', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-shadow:
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000;
+    line-height: 1.1;
+    height: auto;
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+}
+
+.modalEditInput {
+    font-family: 'Grand Arena', sans-serif !important;
+    font-size: 3rem !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    text-shadow:
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        2px 2px 0 #000 !important;
+    line-height: 1.1 !important;
+    height: auto !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 1rem !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    text-align: center !important;
+    width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+.modalGrid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.modalCard {
+    width: 200px;
+    aspect-ratio: 0.7;
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    border: 3px solid var(--color-border);
+    transition: transform 0.3s;
+}
+
+.modalCard:hover {
+    transform: scale(1.1);
+    z-index: 2;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modalCard img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modalEditInput {
+    font-size: 1.25rem;
+    font-weight: 700;
+    width: 300px;
+    text-align: center;
+    background: #FFFFFF;
+    color: #333333;
+    border: 2px solid #333333;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    outline: none;
+    font-family: inherit;
+    height: 40px;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+.modalEditInput:focus {
+    border-color: #FF66CC;
+    box-shadow: 0 0 10px rgba(255, 102, 204, 0.3);
+}
+
+
+
+/* Dropdown Styles */
+.orderByContainer {
+    position: relative;
+    z-index: 50;
+    /* Increased to ensure it's above cards */
+}
+
+.deleteAllContainer {
+    position: relative;
+    z-index: 50;
+}
+
+.orderByButton {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s;
+}
+
+.orderByButton:hover {
+    color: var(--color-text-main);
+}
+
+.deleteAllButton {
+    background: none;
+    border: none;
+    color: #EF6666;
+    font-size: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s;
+}
+
+.deleteAllButton:hover {
+    color: #EF4444;
+}
+
+
+
+.orderByButton {
+    background: none;
+    border: none;
+    color: #1ABF9E;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s;
+    text-transform: capitalize;
+    text-shadow: 1.5px 0 #000, -1.5px 0 #000, 0 1.5px #000, 0 -1.5px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+.orderByButton svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 3px;
+    stroke: #FFD753;
+    filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
+}
+
+.orderByButton:hover {
+    color: #1ABF9E;
+}
+
+.orderByMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #5097FF;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.75rem;
+    padding: 0.5rem 0;
+    min-width: 160px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    list-style: none;
+    margin: 8px 0 0 0;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.deleteConfirmationMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #5097FF;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    min-width: 150px;
+    width: 260px;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    list-style: none;
+    margin: 8px 0 0 0;
+    z-index: 100;
+}
+
+.deleteConfirmationText {
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    color: #333333;
+    font-family: 'Inter', sans-serif;
+}
+
+.deleteActions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.deleteConfirmBtn {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btnYes {
+    background: #ef4444;
+    color: white;
+}
+
+.btnNo {
+    background: var(--color-bg-darker);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+}
+
+.orderByMenu li {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    color: #333333;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    display: block;
+    text-align: left;
+}
+
+.orderByMenu li:hover {
+    background: rgba(255, 255, 255, 0.4);
+    color: #333333;
+    font-weight: 700;
+}
+
+.activeSort {
+    color: #333333 !important;
+    font-weight: 800;
+}
+
+/* Active Filters */
+/* Active Filters moved to topBar section */
+
+.filterChip {
+    display: flex;
+    align-items: center;
+    background: #FFD753;
+    /* User Requested Yellow */
+    border: 2px solid #000;
+    border-radius: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    padding-right: 0.3rem;
+    font-size: 0.75rem;
+    color: #232842;
+    gap: 0.4rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.filterLabel {
+    font-weight: 700;
+    color: #333333;
+    text-transform: uppercase;
+    opacity: 1;
+    font-family: 'Inter', sans-serif;
+}
+
+.filterValue {
+    font-weight: 800;
+    color: #000000;
+    font-family: 'Inter', sans-serif;
+}
+
+.removeFilterButton {
+    background: #ef4444;
+    color: white;
+    border: 2px solid #232842;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.2rem;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    line-height: 0;
+}
+
+.removeFilterButton svg {
+    display: block;
+}
+
+.removeFilterButton:hover {
+    transform: scale(1.1);
+}
+
+.modalDownloadButton:hover {
+    color: var(--color-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Scroll To Top Button */
+.scrollTopButton {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: #FF66CC;
+    border: 3px solid #333333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+.scrollTopButtonVisible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.scrollTopButton:hover {
+    transform: translateY(-5px);
+    background: #FF99DD;
+}
+
+.scrollTopButton svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 3px;
+    filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+}

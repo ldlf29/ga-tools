@@ -1,0 +1,420 @@
+.main {
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto 32px auto;
+  padding: 1rem 2rem;
+  background: linear-gradient(90deg, #0a0a0a 0%, #2673E8 100%);
+  border: 4px solid #000000;
+  border-bottom-width: 9px;
+  border-radius: 1.5rem;
+  max-width: 1600px;
+  position: relative;
+  z-index: 70;
+}
+
+.title {
+  font-family: var(--font-lilita), sans-serif;
+  font-size: 32px;
+  /* Checked from visual ref "SEASON 1" usually large */
+  font-weight: 400;
+  /* Titan One is 400 weight */
+  color: #fff;
+  /* Thick black outline simulation */
+  -webkit-text-stroke: 1.5px #000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  /* Removed the pink shadow to match "SEASON 1" style */
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+  display: block;
+}
+
+.authWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-right: 1.5rem;
+  /* Space between controls and wallet/connect */
+}
+
+.mokiButtonContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mokiButton {
+  width: 56px;
+  height: 56px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  padding: 0;
+  z-index: 2;
+}
+
+.mokiButton:hover {
+  transform: scale(1.1);
+}
+
+.mokiButton img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.mokiDropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  opacity: 0;
+  z-index: 100;
+  pointer-events: none;
+  background: transparent;
+  border: none;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mokiDropdown img {
+  width: 24px;
+  height: 24px;
+}
+
+.mokiDropdownOpen {
+  animation: dropAndFade 1.5s linear forwards;
+}
+
+@keyframes dropAndFade {
+  0% {
+    transform: translateX(-50%) translateY(-10px);
+    opacity: 1;
+  }
+
+  70% {
+    transform: translateX(-50%) translateY(70px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+  }
+}
+
+.toolsContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toolsDropdown {
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  border: 3px solid #333333;
+  border-radius: 1rem;
+  padding: 1rem;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 250px;
+  text-align: center;
+}
+
+.toolsDropdown p {
+  color: #fff;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.toolsLink {
+  color: #FFD753;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: transparent;
+  transition: background 0.2s;
+  display: block;
+  text-align: left;
+}
+
+.toolsLink:hover {
+  background: #333;
+  color: #FFD753;
+  /* Keep text yellow or maybe white? dropdownAction keeps text color. */
+  transform: none;
+  /* Remove animation */
+}
+
+.iconButton {
+  background: #FF66CC;
+  border: 3px solid #333333;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.iconButton svg {
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+}
+
+.iconButton:hover {
+  background: #ff99dd;
+  transform: scale(1.1);
+}
+
+.connectButton {
+  padding: 0.75rem 2rem;
+  background-color: var(--color-primary);
+  /* Pink */
+  color: white;
+  font-weight: 700;
+  border-radius: 9999px;
+  /* Rounded pill */
+  border: 3px solid #000;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.connectButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 #000;
+}
+
+
+.walletDropdownContainer {
+  position: relative;
+}
+
+.addressDisplay {
+  padding: 0.5rem 1.5rem;
+  background-color: #FF66CC;
+  color: white;
+  border-radius: 9999px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border: 3px solid #333333;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+.addressDisplay:hover {
+  background: #FF99DD;
+  transform: translateY(-2px);
+}
+
+.walletDropdownMenu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 260px;
+  background: #1a1a1a;
+  border: 3px solid #333333;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.walletItem {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #2a2a2a;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.walletBadge {
+  background: #2673E8;
+  color: white;
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.dropdownDivider {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 4px 0;
+}
+
+.dropdownAction {
+  background: transparent;
+  border: none;
+  padding: 0.75rem;
+  color: #FFD753;
+  text-align: left;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-weight: 600;
+}
+
+.dropdownAction:hover {
+  background: #333;
+}
+
+.dropdownActionDestructive {
+  background: transparent;
+  border: none;
+  padding: 0.75rem;
+  color: #ff4d4d;
+  text-align: left;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-weight: 600;
+}
+
+.dropdownActionDestructive:hover {
+  background: rgba(255, 77, 77, 0.1);
+}
+
+.content {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: var(--color-card-bg);
+  border-radius: 2rem;
+  padding: 4rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  border: 3px solid var(--color-border);
+}
+
+/* Nav Tabs */
+.navTabs {
+  display: flex;
+  gap: 32px;
+  margin-left: 32px;
+}
+
+.navTab {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  /* Initial white */
+  font-family: var(--font-display);
+  font-size: 29px;
+  /* Fixed px size */
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 4px;
+  position: relative;
+  transition: color 0.2s;
+  text-decoration: none;
+  /* No underline */
+  text-transform: none;
+  /* Override global button uppercase */
+}
+
+.navTab:hover {
+  color: #FF66CC;
+  /* Pink on hover */
+}
+
+.activeTab {
+  color: #FF66CC;
+  /* Pink when active */
+}
+
+/* Global Scroll To Top Button */
+.scrollTopButton {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  background: #FF66CC;
+  border: 3px solid #333333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.scrollTopButtonVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.scrollTopButton:hover {
+  transform: translateY(-5px);
+  background: #FF99DD;
+}
+
+.scrollTopButton svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 3px;
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+}

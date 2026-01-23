@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  web:
+    # Build from the current directory (uses Dockerfile)
+    build: .
+    # Map port 3000 on host to 3000 in container
+    ports:
+      - "3000:3000"
+    # Restart automatically if it crashes
+    restart: always
+    environment:
+      - NODE_ENV=production
+    # Optional: Give the container a custom name
+    container_name: grand-arena-app

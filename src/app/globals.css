@@ -1,0 +1,124 @@
+/* Local Fonts */
+@font-face {
+  font-family: 'Grand Arena';
+  src: url('/fonts/grand-arena.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Default Theme (Dark) defined in :root */
+/* Default Theme (Dark) defined in :root */
+:root {
+  --color-primary: #FF66CC;
+  --color-secondary: #FFD753;
+  --color-teal: #26C2A3;
+
+  --color-bg-dark: #232842;
+  --color-bg-darker: #1a1e32;
+
+  --color-card-bg: #1e2235;
+  --color-slot-bg: #151829;
+  --color-input-bg: #1a1e32;
+
+  --color-text-main: #ffffff;
+  --color-text-muted: #94a3b8;
+  --color-border: #333a55;
+
+  --rarity-bg-opacity: 0.1;
+  --color-toast-bg: rgba(35, 40, 66, 0.95);
+  --color-slot-empty-bg: rgba(26, 30, 50, 0.5);
+
+  --font-display: 'Grand Arena', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--color-bg-dark);
+  background-image: url('/bg-pattern.webp');
+  background-size: auto;
+  /* Use native resolution for best quality */
+  background-repeat: repeat;
+  background-position: top left;
+  background-attachment: fixed;
+  /* Pixelated usually good for this art style, but let's stick to default if it's high res webp, or keep if user wants hard edges. Safe to remove if 'auto' size is used. */
+  color: var(--color-text-main);
+  /* Updated to use variable */
+  font-family: var(--font-body);
+  font-weight: 400;
+  /* Regular */
+}
+
+/* Large Titles - Grand Arena */
+h1 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-weight: normal;
+  /* Font itself is bold/stylized */
+  letter-spacing: 1px;
+}
+
+/* Longer Headings - Inter ExtraBold */
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-body);
+  font-weight: 800;
+  /* ExtraBold */
+}
+
+button {
+  font-family: var(--font-display);
+  /* Or Heading? Usually buttons match display or bold body. Grand Arena might be too decorative for small buttons. Let's stick to user request imply Grand Arena for titles. I'll use Inter ExtraBold for UI buttons for readability, or Grand Arena if they want 'titles' style. Let's default to Inter Bold for Buttons for now as it's safer for UI text. */
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Override specific button classes if needed using Grand Arena */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Global Scrollbar Theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1ABF9E;
+  border-radius: 5px;
+  border: 2px solid var(--color-bg-darker);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #15A085;
+}

@@ -1,0 +1,153 @@
+.container {
+    position: relative;
+    width: 100%;
+    padding: 10px 0 25px;
+    /* Space for timestamps/values */
+}
+
+.slider {
+    position: relative;
+    width: 100%;
+    height: 6px;
+}
+
+.track {
+    position: absolute;
+    border-radius: 3px;
+    height: 80%;
+    background-color: #333333;
+    /* Dark gray track */
+    width: 100%;
+    z-index: 1;
+}
+
+.range {
+    position: absolute;
+    border-radius: 3px;
+    height: 80%;
+    background-color: #FFD753;
+    /* Yellow range */
+    z-index: 2;
+}
+
+.mark {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: var(--color-bg-dark);
+    /* or track color? */
+    border: 2px solid #333333;
+    /* Match track border or color */
+    border-radius: 50%;
+    z-index: 2;
+    /* Below thumbs (3), matching range (2)? actually range is 2. Marks should probably be above range but below thumb. range is 2. thumbs are 3/4/5. so marks can be 2.5? or just after range in DOM. */
+    /* Since marks are inside slider, after range, they naturally stack on top of range if z-index is same or auto. let's put z-index 2 and see. */
+    pointer-events: none;
+}
+
+.markActive {
+    border-color: #333333;
+    background-color: #FFD753;
+}
+
+.thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: none;
+    position: absolute;
+    height: 0;
+    width: calc(100% + 20px);
+    /* Compensate for browser thumb inset */
+    left: -10px;
+    /* Center the extended width */
+    outline: none;
+    z-index: 3;
+    background: transparent;
+    /* Invisible slider track */
+    top: 50%;
+    /* Center vertically over our visual track */
+    transform: translateY(-50%);
+    margin: 0;
+}
+
+/* Webkit Thumb */
+.thumb::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+    border: none;
+    height: 18px;
+    /* Reduced by 40% from 30px */
+    width: 18px;
+    border-radius: 0;
+    background-color: transparent;
+    background-image: url('/star-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: none;
+    margin-top: 0;
+    transform: translateY(0);
+    transition: transform 0.1s;
+}
+
+.thumb::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Firefox Thumb */
+.thumb::-moz-range-thumb {
+    border: none;
+    height: 18px;
+    width: 18px;
+    border-radius: 0;
+    background-color: transparent;
+    background-image: url('/star-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: none;
+}
+
+.thumb::-moz-range-thumb:hover {
+    transform: scale(1.1);
+}
+
+/* Z-index trick: if min > max - margin, we might need to adjust z-index to allow selecting both. 
+   But usually rendering min then max works. 
+   To allow crossing? No, min <= max.
+   To allow picking same value? Yes.
+   If values are same, thumbs stack.
+   We explicitly set z-index of left slider lower? Or dynamic.
+   If value > 50%, maybe flip?
+   React logic will handle z-index.
+*/
+.thumb--zindex-3 {
+    z-index: 3;
+}
+
+.thumb--zindex-4 {
+    z-index: 4;
+}
+
+.markLabel {
+    position: absolute;
+    top: 18px;
+    /* Position below the circular mark */
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    /* Bold */
+    color: #333333;
+    /* Dark gray */
+    pointer-events: none;
+    white-space: nowrap;
+}

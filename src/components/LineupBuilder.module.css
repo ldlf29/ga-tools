@@ -1,0 +1,611 @@
+.container {
+    width: 300px;
+    background-color: #84BCFF;
+    border: 3px solid #333333;
+    border-bottom-width: 8px;
+    /* Thicker bottom for shadow effect */
+    border-radius: 20px;
+    padding: 1.05rem 1.5rem 1.5rem;
+    height: 850px;
+    /* Adjust height */
+    overflow-y: auto;
+    /* Allow scrolling if needed */
+    position: sticky;
+    top: 0;
+    /* Add some top spacing */
+    display: flex;
+    flex-direction: column;
+    color: #333333;
+    /* Dark text */
+    scrollbar-width: none;
+    /* Hide scrollbar Firefox */
+    -ms-overflow-style: none;
+    /* Hide scrollbar IE/Edge */
+    margin-bottom: 20px;
+}
+
+/* Hide scrollbar Webkit */
+.container::-webkit-scrollbar {
+    display: none;
+}
+
+.header {
+    margin-bottom: 1.5rem;
+}
+
+.headerTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    /* Better text alignment */
+    margin-bottom: 0.4rem;
+}
+
+.label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-teal);
+    text-transform: uppercase;
+}
+
+.clearButton {
+    background: none;
+    border: none;
+    color: #EF6666;
+    /* Pastel Red */
+    font-size: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    /* Inter Bold */
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+    opacity: 1;
+    padding: 0;
+    margin-top: 0.25rem;
+}
+
+.clearButton:hover {
+    color: #EF4444;
+    /* Red */
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.clearButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+.secondaryActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 0.25rem;
+}
+
+.unlockAllButton {
+    background: none;
+    border: none;
+    color: #686868;
+    /* User Requested Grey */
+    font-size: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    /* Inter Bold */
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding-right: 0;
+    /* Keep alignment */
+}
+
+.unlockAllButton:hover {
+    color: #333333;
+    /* User Requested Dark Grey Hover */
+    font-weight: 700;
+}
+
+.input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    /* Matched to searchInput */
+    background: #5097FF;
+    border: 1px dashed var(--color-border);
+    /* No extra bottom width for this internal input */
+    border-radius: 0.75rem;
+    /* Matched to searchInput */
+    font-size: 0.9rem;
+    /* Matched to searchInput */
+    color: #333333;
+    font-family: 'Inter', sans-serif;
+    /* Inter Regular */
+    font-weight: 400;
+    transition: all 0.2s;
+}
+
+/* ... */
+
+/* ... */
+
+.input:hover,
+.input:focus {
+    border: 1px solid #2673E8;
+    outline: none;
+}
+
+.input::placeholder {
+    color: #333333;
+}
+
+.slotsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sectionTitle {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #1ABF9E;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.05em;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 1.5px 0 #000, -1.5px 0 #000, 0 1.5px #000, 0 -1.5px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+.mokiGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.slot {
+    height: 64px;
+    background: var(--color-slot-bg);
+    border: 1.5px solid var(--color-border);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.slot.empty {
+    border: 1px dashed var(--color-border);
+    justify-content: center;
+    background: #5097FF;
+    /* User Requested Blue */
+}
+
+.slot.mokiSlot:not(.empty) {
+    background: var(--color-slot-bg);
+    border-color: #4a5578;
+    cursor: grab;
+}
+
+.lockedSlot {
+    cursor: default !important;
+}
+
+.slot:not(.empty):not(.lockedSlot):active {
+    cursor: grabbing;
+    transform: scale(1.02);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.slot:not(.empty):has(.lockButton:active) {
+    transform: scale(1.02);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Dynamic Rarity Borders for Filled Slots */
+/* Dynamic Rarity Borders for Filled Slots */
+.slot.basicSlot {
+    border-color: #64748b !important;
+    background: rgba(148, 163, 184, 0.6) !important;
+}
+
+.slot.rareSlot {
+    border-color: #059669 !important;
+    background: rgba(38, 194, 163, 0.6) !important;
+}
+
+.slot.epicSlot {
+    border-color: #7e22ce !important;
+    background: rgba(168, 85, 247, 0.6) !important;
+}
+
+.slot.legendarySlot {
+    border-color: #db2777 !important;
+    background: rgba(244, 114, 182, 0.6) !important;
+}
+
+.slot.schemeSlot {
+    border-color: #2563eb;
+    background: rgba(96, 165, 250, 0.6);
+}
+
+.slot.schemeSlot.empty {
+    border: 1px dashed var(--color-border);
+    background: #5097FF;
+    /* User Requested Blue */
+    justify-content: center;
+    /* Ensure content centered like moki slot */
+    opacity: 1;
+    /* Remove opacity difference */
+}
+
+.emptyText {
+    font-size: 0.75rem;
+    color: #686868;
+    /* User Requested Grey */
+    font-style: italic;
+    font-family: 'Inter', sans-serif;
+}
+
+.slotImage {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.25rem;
+    object-fit: cover;
+    background: #000;
+    margin-right: 0.75rem;
+}
+
+.slotInfo {
+    flex: 1;
+    overflow: hidden;
+
+}
+
+.slotName {
+    font-size: 0.85rem;
+    font-weight: 700;
+    /* Inter Bold */
+    color: #000000;
+    /* User Requested Black */
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slotStars {
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-left: 0.15rem;
+}
+
+.starValue {
+    color: var(--color-secondary);
+    /* Fallback/Addition for better coverage */
+    text-shadow:
+        -0.5px -0.5px 0 #000,
+        0.5px -0.5px 0 #000,
+        -0.5px 0.5px 0 #000,
+        0.5px 0.5px 0 #000;
+    /* Main uniform border */
+    -webkit-text-stroke: 0.5px #000;
+    paint-order: stroke fill;
+}
+
+.slotClass {
+    margin-left: 6px;
+    color: #333333;
+    /* User Requested #333333 */
+    font-weight: 400;
+    /* Inter Regular */
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    /* Larger */
+    position: relative;
+    top: 1px;
+    /* Displace down slightly */
+}
+
+.slotSub {
+    display: none;
+    /* Deprecated in favor of slotStars, keeping for safety */
+}
+
+/* Default opacity 1 to ensure visibility based on user feedback to 're-add' it */
+.slot .removeButton {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 22px;
+    height: 22px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    border: 2px solid #151829;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    opacity: 1;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s;
+    line-height: 0;
+}
+
+.slot .removeButton svg {
+    display: block;
+}
+
+.slot .removeButton:hover {
+    transform: scale(1.1);
+}
+
+.slot .lockButton {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 22px;
+    height: 22px;
+    background: #334155;
+    /* Dark gray circle background */
+    color: #94a3b8;
+    /* Light gray icon */
+    border-radius: 50%;
+    border: 2px solid #151829;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s;
+}
+
+.slot .lockButton:hover {
+    background: #475569;
+    color: white;
+    transform: scale(1.1);
+}
+
+.slot .lockButton.locked {
+    background: #FFD753;
+    /* Yellow background */
+    color: #000;
+    /* Black icon */
+    border-color: #151829;
+}
+
+/* Default opacity 1 to ensure visibility based on user feedback to 're-add' it */
+.slot .removeButton {
+    opacity: 1;
+    transform: scale(1);
+    /* Ensure it acts as a notification badge style button */
+}
+
+.dragHandle {
+    color: #4a5578;
+    font-size: 1.2rem;
+    margin-right: 0.25rem;
+    cursor: grab;
+    opacity: 0.5;
+}
+
+.footer {
+    padding-top: 0.75rem;
+    /* Increased spacing */
+    margin-top: auto;
+    /* Keeps it pinned to bottom */
+    /* Balanced spacing as requested */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.saveButton {
+    width: 100%;
+    padding: 0.75rem;
+    background: #FFD753;
+    /* User Requested Yellow */
+    color: #000;
+    font-weight: 700;
+    /* Inter Bold */
+    font-family: 'Inter', sans-serif;
+    border: 2px solid #000;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.2s;
+}
+
+.saveButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.saveButton:disabled {
+    background: #333333;
+    /* User Requested Grey */
+    color: #686868;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* Scheme Wrapper */
+.schemeWrapper {
+    position: relative;
+    /* No margin needed */
+}
+
+.placeholder {
+    min-height: 45px;
+    /* Reserve space for button */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.secondaryActions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 24px;
+    margin-top: 0.25rem;
+}
+
+.lowerFooter {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+    text-align: center;
+}
+
+.madeBy {
+    font-size: 0.8rem;
+    color: #333333;
+    /* User Requested Dark Grey */
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+.creatorLink {
+    color: #FFD753;
+    /* User Requested Yellow */
+    text-decoration: none;
+    font-weight: 700;
+    /* Inter Bold */
+    font-family: 'Inter', sans-serif;
+    text-shadow: 1.5px 0 #000, -1.5px 0 #000, 0 1.5px #000, 0 -1.5px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+    transition: transform 0.1s;
+}
+
+.creatorLink:hover {
+    transform: scale(1.05);
+    /* Subtle grow instead regarding color change */
+    text-decoration: none;
+}
+
+.donateSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+    align-items: center;
+}
+
+.donateText {
+    font-size: 0.75rem;
+    color: #333333;
+    /* User Requested Dark Grey */
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+.donateButton {
+    background: var(--color-bg-input);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    color: #333333;
+    /* User Requested Dark Grey */
+    font-size: 0.65rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    /* Regular */
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.donateButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-secondary);
+    color: #333333;
+}
+
+.copyIcon {
+    font-size: 0.9rem;
+}
+
+.disclaimer {
+    font-size: 0.65rem;
+    color: #686868;
+    /* User Requested Grey */
+    line-height: 1.4;
+    max-width: 90%;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+/* Suggest Button */
+.suggestButton {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: #8B5CF6;
+    /* Violet */
+    color: white;
+    border: 2px solid #333;
+    border-radius: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: transform 0.2s, background-color 0.2s;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    animation: pulse 2s infinite;
+}
+
+.suggestButton:hover {
+    background: #7C3AED;
+    transform: translateY(-1px);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(139, 92, 246, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+    }
+}
+
+.suggestIcon {
+    width: 16px;
+    height: 16px;
+}
