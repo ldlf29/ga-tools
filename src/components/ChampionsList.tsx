@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { MokiData, fetchLiveData } from '@/utils/liveData';
 import styles from './ChampionsList.module.css';
 
@@ -21,11 +21,36 @@ export default function ChampionsList() {
     const [filterClass, setFilterClass] = useState<string | null>(null);
     const [showClassFilter, setShowClassFilter] = useState(false);
 
+    const [filterFur, setFilterFur] = useState<string | null>(null);
+    const [showFurFilter, setShowFurFilter] = useState(false);
+
     const classOptions = [
         "All Classes",
         "Anchor", "Bruiser", "Center", "Defender", "Flanker",
         "Forward", "Grinder", "Sprinter", "Striker", "Support"
     ];
+
+    const furOptions = [
+        "All Furs",
+        "Common", "Rainbow", "Gold", "Shadow", "Spirit", "1 of 1"
+    ];
+
+    const headerRef = useRef<HTMLTableSectionElement>(null);
+
+    // Click Outside Handler
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+                setShowClassFilter(false);
+                setShowFurFilter(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     useEffect(() => {
         loadData();
@@ -52,6 +77,11 @@ export default function ChampionsList() {
 
     const handleSort = (field: SortField) => {
         if (field === 'class') return; // Disable sorting for Class
+        if (field === 'fur') return;   // Disable sorting for Fur
+
+        // Close filters if open
+        setShowClassFilter(false);
+        setShowFurFilter(false);
 
         if (sortField === field) {
             setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -63,7 +93,14 @@ export default function ChampionsList() {
 
     const selectClass = (cls: string) => {
         setFilterClass(cls === "All Classes" ? null : cls);
+        setFilterFur(null); // Mutual exclusion
         setShowClassFilter(false);
+    };
+
+    const selectFur = (fur: string) => {
+        setFilterFur(fur === "All Furs" ? null : fur);
+        setFilterClass(null); // Mutual exclusion
+        setShowFurFilter(false);
     };
 
     const sortedData = useMemo(() => {
@@ -78,6 +115,11 @@ export default function ChampionsList() {
         // Filter Class
         if (filterClass) {
             items = items.filter(i => i.class === filterClass);
+        }
+
+        // Filter Fur
+        if (filterFur) {
+            items = items.filter(i => i.fur === filterFur);
         }
 
         // Sort
@@ -96,31 +138,49 @@ export default function ChampionsList() {
         });
 
         return items;
-    }, [data, search, sortField, sortDirection, filterClass]);
+    }, [data, search, sortField, sortDirection, filterClass, filterFur]);
 
     const renderHeader = (label: string, field: SortField, width?: string) => {
         const isClass = field === 'class';
+        const isFur = field === 'fur';
         const isActive = sortField === field;
+
+        const showFilter = isClass ? showClassFilter : (isFur ? showFurFilter : false);
+        const hasActiveFilter = isClass ? filterClass : (isFur ? filterFur : false);
+
+        const toggleFilter = () => {
+            if (isClass) {
+                const opening = !showClassFilter;
+                setShowClassFilter(opening);
+                if (opening) setShowFurFilter(false);
+            }
+            if (isFur) {
+                const opening = !showFurFilter;
+                setShowFurFilter(opening);
+                if (opening) setShowClassFilter(false);
+            }
+        };
 
         return (
             <th
                 className={styles.th}
-                onClick={() => isClass ? setShowClassFilter(!showClassFilter) : handleSort(field)}
-                style={{ width, cursor: 'pointer', zIndex: isClass && showClassFilter ? 50 : 10 }}
+                onClick={() => (isClass || isFur) ? toggleFilter() : handleSort(field)}
+                style={{ width, cursor: 'pointer', zIndex: (isClass || isFur) && showFilter ? 100 : 10 }}
             >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', position: 'relative' }}>
                     {label}
 
-                    {/* Filter Dropdown for Class */}
-                    {isClass && showClassFilter && (
+                    {/* Filter Dropdown for Class / Fur */}
+                    {(isClass || isFur) && showFilter && (
                         <div className={styles.dropdownMenu}>
-                            {classOptions.map(opt => (
+                            {(isClass ? classOptions : furOptions).map(opt => (
                                 <div
                                     key={opt}
                                     className={styles.dropdownItem}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        selectClass(opt);
+                                        if (isClass) selectClass(opt);
+                                        if (isFur) selectFur(opt);
                                     }}
                                 >
                                     {opt}
@@ -129,7 +189,7 @@ export default function ChampionsList() {
                         </div>
                     )}
 
-                    {!isClass && (
+                    {!isClass && !isFur && (
                         <span className={styles.sortIcon} style={{
                             opacity: isActive ? 1 : 0.3,
                             visibility: 'visible',
@@ -141,14 +201,14 @@ export default function ChampionsList() {
                             </svg>
                         </span>
                     )}
-                    {isClass && (
+                    {(isClass || isFur) && (
                         <span className={styles.sortIcon} style={{
-                            opacity: showClassFilter || filterClass ? 1 : 0.3,
+                            opacity: showFilter || hasActiveFilter ? 1 : 0.3,
                             visibility: 'visible',
-                            color: showClassFilter || filterClass ? 'inherit' : '#000',
+                            color: showFilter || hasActiveFilter ? 'inherit' : '#000',
                             display: 'flex', alignItems: 'center'
                         }}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showClassFilter ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showFilter ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
                         </span>
@@ -177,10 +237,11 @@ export default function ChampionsList() {
             <div className={styles.tableContainer}>
                 <div className={styles.tableWrapper}>
                     <table className={styles.table}>
-                        <thead>
+                        <thead ref={headerRef}>
                             <tr>
                                 {/* Identity */}
-                                {renderHeader("NAME", "name", "200px")}
+                                {renderHeader("NAME", "name")}
+                                {renderHeader("FUR", "fur")}
                                 {renderHeader("CLASS", "class")}
                                 {renderHeader("★", "stars")}
 
@@ -201,42 +262,69 @@ export default function ChampionsList() {
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedData.map((moki, idx) => (
-                                <tr key={moki.id || moki.name + idx} className={styles.tr}>
-                                    <td className={styles.td}>
-                                        <div className={styles.tdName}>
-                                            {moki.imageUrl && (
-                                                <img
-                                                    src={moki.imageUrl}
-                                                    alt={moki.name}
-                                                    className={styles.mokiImage}
-                                                    onError={(e) => {
-                                                        e.currentTarget.style.display = 'none';
-                                                    }}
-                                                />
-                                            )}
-                                            {moki.name}
+                            {sortedData.length > 0 ? (
+                                sortedData.map((moki, idx) => (
+                                    <tr key={moki.id || moki.name + idx} className={styles.tr}>
+                                        <td className={styles.td}>
+                                            <div className={styles.tdName}>
+                                                {moki.imageUrl && (
+                                                    <img
+                                                        src={moki.imageUrl}
+                                                        alt={moki.name}
+                                                        className={styles.mokiImage}
+                                                        onError={(e) => {
+                                                            e.currentTarget.style.display = 'none';
+                                                        }}
+                                                    />
+                                                )}
+                                                {moki.name}
+                                                {moki.marketLink && (
+                                                    <a
+                                                        href={moki.marketLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className={styles.linkButton}
+                                                        title="View on Market"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                            <polyline points="15 3 21 3 21 9"></polyline>
+                                                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                        </svg>
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className={styles.td}>{moki.fur}</td>
+                                        <td className={styles.td}>{moki.class}</td>
+                                        <td className={styles.td}>
+                                            {moki.stars}
+                                        </td>
+
+                                        <td className={styles.td}>{moki.strength?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.speed?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.defense?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.dexterity?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.fortitude?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
+
+                                        <td className={styles.td}>{moki.eliminations?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.wartDistance?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.score?.toFixed(2) || '-'}</td>
+                                        <td className={styles.td}>{moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={15}>
+                                        <div className={styles.noResults}>
+                                            No Moki found matching your filters.
                                         </div>
                                     </td>
-                                    <td className={styles.td}>{moki.class}</td>
-                                    <td className={styles.td}>
-                                        {moki.stars}
-                                    </td>
-
-                                    <td className={styles.td}>{moki.strength?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.speed?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.defense?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.dexterity?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.fortitude?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
-
-                                    <td className={styles.td}>{moki.eliminations?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.wartDistance?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.score?.toFixed(2) || '-'}</td>
-                                    <td className={styles.td}>{moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'}</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

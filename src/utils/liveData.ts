@@ -20,6 +20,7 @@ export interface MokiData {
     speed?: number;
     strength?: number;
     totalStats?: number; // New column
+    marketLink?: string;
 }
 
 // Map key: Moki Name (normalized) -> Data
@@ -88,6 +89,8 @@ const parseCSV = (csvText: string): LiveDataMap => {
     let idxTotal = getIndex('Total');
     if (idxTotal === -1) idxTotal = getIndex('Total Stats');
 
+    const idxLink = getIndex('Link');
+
     // Name is mandatory for our key map
     if (idxName === -1) {
         console.error("Live Data: 'Name' column not found in CSV.");
@@ -133,7 +136,8 @@ const parseCSV = (csvText: string): LiveDataMap => {
             fortitude: parseNum(cols[idxFort]),
             speed: parseNum(cols[idxSpd]),
             strength: parseNum(cols[idxStr]),
-            totalStats: parseNum(cols[idxTotal])
+            totalStats: parseNum(cols[idxTotal]),
+            marketLink: idxLink !== -1 ? cols[idxLink]?.trim() : undefined
         };
     }
     return map;

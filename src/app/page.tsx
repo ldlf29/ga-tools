@@ -666,7 +666,7 @@ export default function Home() {
                 </div>
 
                 {/* Champions Tab */}
-                <div style={{ flex: 1, height: 'calc(100vh - 180px)', display: activeTab === 'champions' ? 'block' : 'none' }}>
+                <div style={{ flex: 1, height: '850px', display: activeTab === 'champions' ? 'block' : 'none' }}>
                   <ChampionsList />
                 </div>
               </div>

@@ -59,7 +59,7 @@ const SPECIALIZATION_CONFIG: { key: string, label: string }[] = [
 export const TRAIT_GROUPS: { label: string, traits: string[] }[] = [
     { label: "Ronin or Samurai", traits: ["Ronin", "Samurai"] },
     { label: "Pink, Blue or Green Overalls", traits: ["Pink Overalls", "Blue Overalls", "Green Overalls"] },
-    { label: "Tonge Out", traits: ["Tonge Out"] },
+    { label: "Tongue Out", traits: ["Tongue Out"] },
     { label: "Tanuki, Kitsune or Cat Mask", traits: ["Tanuki", "Kitsune", "Cat Mask"] },
     { label: "Devious Mouth", traits: ["Devious Mouth"] },
     { label: "Oni, Tengu or Skull Mask", traits: ["Oni", "Tengu", "Skull Mask"] },
