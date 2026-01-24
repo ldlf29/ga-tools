@@ -97,8 +97,8 @@ export default function Home() {
     localStorage.setItem('grandArenaLineups', JSON.stringify(savedLineups));
   }, [savedLineups]);
 
-  const addToast = (text: string, type: 'error' | 'success' | 'warning') => {
-    if (!notificationsEnabled) return;
+  const addToast = (text: string, type: 'error' | 'success' | 'warning' | 'suggestion', force: boolean = false) => {
+    if (!notificationsEnabled && !force) return;
 
     // Debounce: Check if same message shown in last 5 seconds
     const now = Date.now();
@@ -115,6 +115,8 @@ export default function Home() {
   const removeToast = (id: number) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
+
+
 
   const [filters, setFilters] = useState<FilterState>({
     rarity: [],
@@ -410,9 +412,13 @@ export default function Home() {
   };
 
   const handleSuggestFilters = (newFilters: Partial<FilterState>) => {
+
+    // Check if "Only Epic/Legendary" is active
+    const preserveEpicLegendary = filters.onlyEpicLegendary;
+
     // Clear all filters then apply suggestion
     const cleared: FilterState = {
-      rarity: [],
+      rarity: preserveEpicLegendary ? ['Epic', 'Legendary'] : [], // Preserve if active
       cardType: 'ALL',
       category: [],
       schemeName: [],
@@ -422,7 +428,8 @@ export default function Home() {
       specialization: [],
       traits: [],
       series: [],
-      insertionOrder: []
+      insertionOrder: [],
+      onlyEpicLegendary: preserveEpicLegendary // Preserve flag
     };
 
     // Reconstruct insertionOrder from newFilters
@@ -644,6 +651,7 @@ export default function Home() {
                     onSave={handleSaveLineup}
                     onUpdate={setLineup}
                     onSuggestFilters={handleSuggestFilters}
+                    onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
                   />
                 </div>
 

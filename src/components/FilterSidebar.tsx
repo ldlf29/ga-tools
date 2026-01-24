@@ -17,6 +17,7 @@ export interface FilterState {
     traits: string[];
     series: string[];
     insertionOrder?: string[];
+    onlyEpicLegendary?: boolean;
 }
 
 interface FilterSidebarProps {
@@ -188,6 +189,23 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
                 </div>
             </div>
 
+            {/* Epic / Legendary Filter Button */}
+            <div className={styles.filterGroup}>
+                <button
+                    className={`${styles.epicLegendaryButton} ${filters.onlyEpicLegendary ? styles.active : ''}`}
+                    onClick={() => {
+                        const newState = !filters.onlyEpicLegendary;
+                        onFilterChange({
+                            ...filters,
+                            onlyEpicLegendary: newState,
+                            rarity: newState ? ['Epic', 'Legendary'] : [] // Clear on disable
+                        });
+                    }}
+                >
+                    ONLY EPIC / LEGENDARY
+                </button>
+            </div>
+
             {/* Filter Search Bar */}
             <div className={styles.filterGroup}>
                 <input
@@ -204,16 +222,28 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
                 {filters.cardType !== 'SCHEME' && (
                     <>
                         {/* Rarity */}
-                        {matchesSearch('Rarity', ['Basic', 'Rare', 'Epic', 'Legendary']) && (
-                            <FilterAccordion title="Rarity" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                {filterOptions(['Basic', 'Rare', 'Epic', 'Legendary']).map(r => (
-                                    <label key={r} className={styles.checkboxLabel}>
-                                        <input type="checkbox" checked={filters.rarity.includes(r)} onChange={() => handleRarityChange(r)} />
-                                        <span className={styles.labelText}>{r}</span>
-                                    </label>
-                                ))}
-                            </FilterAccordion>
-                        )}
+                        {(() => {
+                            const rarityOptions = filters.onlyEpicLegendary
+                                ? ['Epic', 'Legendary']
+                                : ['Basic', 'Rare', 'Epic', 'Legendary'];
+
+                            if (!matchesSearch('Rarity', rarityOptions)) return null;
+
+                            return (
+                                <FilterAccordion title="Rarity" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
+                                    {filterOptions(rarityOptions).map(r => (
+                                        <label key={r} className={styles.checkboxLabel}>
+                                            <input
+                                                type="checkbox"
+                                                checked={filters.rarity.includes(r)}
+                                                onChange={() => handleRarityChange(r)}
+                                            />
+                                            <span className={styles.labelText}>{r}</span>
+                                        </label>
+                                    ))}
+                                </FilterAccordion>
+                            );
+                        })()}
 
                         {/* Class */}
                         {matchesSearch('Class', CLASS_OPTIONS) && (

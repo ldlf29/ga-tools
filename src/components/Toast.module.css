@@ -37,6 +37,11 @@
     color: #fff;
 }
 
+.suggestion {
+    border-color: #6D28D9;
+    color: #333333;
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
