@@ -140,7 +140,7 @@
   top: 120%;
   left: 50%;
   transform: translateX(-50%);
-  background: #1a1a1a;
+  background: #2673E8;
   border: 3px solid #333333;
   border-radius: 1rem;
   padding: 1rem;
@@ -151,6 +151,24 @@
   gap: 0.5rem;
   width: 250px;
   text-align: center;
+}
+
+/* ... */
+
+.walletDropdownMenu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 260px;
+  background: #2673E8;
+  border: 3px solid #333333;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .toolsDropdown p {
@@ -173,7 +191,7 @@
 }
 
 .toolsLink:hover {
-  background: #333;
+  background: #5097FF;
   color: #FFD753;
   /* Keep text yellow or maybe white? dropdownAction keeps text color. */
   transform: none;
@@ -204,23 +222,34 @@
 }
 
 .connectButton {
-  padding: 0.75rem 2rem;
-  background-color: var(--color-primary);
-  /* Pink */
+  padding: 0.5rem 1.5rem;
+  background-color: #FF66CC;
   color: white;
-  font-weight: 700;
   border-radius: 9999px;
-  /* Rounded pill */
-  border: 3px solid #000;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border: 3px solid #333333;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  /* Keeping uppercase for consistency with button text */
+  letter-spacing: 0.05em;
+  /* Slight spacing for uppercase */
 }
 
 .connectButton:hover {
+  background: #FF99DD;
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 #000;
+  box-shadow: none;
+  /* Remove existing box-shadow if any */
 }
 
 
@@ -252,31 +281,25 @@
   transform: translateY(-2px);
 }
 
-.walletDropdownMenu {
-  position: absolute;
-  top: 120%;
-  right: 0;
-  width: 260px;
-  background: #1a1a1a;
-  border: 3px solid #333333;
-  border-radius: 1rem;
-  padding: 0.5rem;
-  z-index: 100;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
+
 
 .walletItem {
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: #2a2a2a;
+  background: #84BCFF;
   border-radius: 0.5rem;
   color: #fff;
-  font-family: monospace;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
   font-size: 14px;
+  transition: background 0.2s;
+  justify-content: space-between;
+  /* Space for the X button */
+}
+
+.walletItem:hover {
+  background: #5097FF;
 }
 
 .walletBadge {
@@ -291,6 +314,26 @@
   border-radius: 50%;
   margin-right: 8px;
   font-weight: bold;
+}
+
+.walletRemoveButton {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s, background 0.2s;
+  border-radius: 4px;
+}
+
+.walletRemoveButton:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ff4d4d;
 }
 
 .dropdownDivider {
@@ -312,7 +355,7 @@
 }
 
 .dropdownAction:hover {
-  background: #333;
+  background: #5097FF;
 }
 
 .dropdownActionDestructive {
@@ -328,7 +371,7 @@
 }
 
 .dropdownActionDestructive:hover {
-  background: rgba(255, 77, 77, 0.1);
+  background: #5097FF;
 }
 
 .content {

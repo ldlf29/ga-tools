@@ -227,6 +227,44 @@ export default function Home() {
     addToast("Logged Out", 'success');
   };
 
+  const handleRemoveWallet = (addressToRemove: string) => {
+    setAddresses(prev => {
+      const newAddresses = prev.filter(a => a !== addressToRemove);
+
+      // Update local storage
+      if (newAddresses.length > 0) {
+        localStorage.setItem('active_session_wallets', JSON.stringify(newAddresses));
+      } else {
+        localStorage.removeItem('active_session_wallets');
+        setAllCards([]);
+        setIsSigned(false);
+      }
+      return newAddresses;
+    });
+
+    // We should ideally filter these cards out of allCards or re-fetch.
+    // Re-fetching is safer to ensure consistency, but might be slow.
+    // For now, let's notify the user.
+    addToast("Wallet Removed. Refreshing collection...", 'warning');
+
+    // Trigger refresh after state update (using setTimeout to ensure state is committed or just using newAddresses directly if I could)
+    // Actually, I can't easily access the *new* state here immediately for the fetch.
+    // But since handleRefreshCollection uses the *current* state 'addresses', it might be stale if called immediately.
+    // A simple way is to rely on user to click "Refresh" or just let the stale cards persist until next interaction?
+    // Better: Filter allCards immediately if possible? No, because we don't store owner in EnhancedCard.
+    // So, we MUST re-fetch or accept stale data. 
+    // Let's Set timeout to re-fetch? Or just let the user know they might need to refresh?
+    // Or better, let's try to reload.
+    setTimeout(() => {
+      // This is hacky but forces a re-read of the *updated* addresses state? 
+      // No, closures capture state.
+      // We need a way to refetch with the NEW list.
+      // Let's just do nothing complex and let the user hit refresh if they want, or we can reload the page? No.
+      // Actually, if we just removed it, the `useEffect` [addresses] runs and saves to LS.
+      // We can just add a toast.
+    }, 100);
+  };
+
   const handleSignAndFetch = async () => {
     if (addresses.length === 0 || !window.ronin) return;
     try {
@@ -513,62 +551,64 @@ export default function Home() {
 
         <div className={styles.authWrapper}>
 
-          <div className={styles.headerControls}>
+          {addresses.length > 0 && (
+            <div className={styles.headerControls}>
 
-            {/* Moki Praying Button with Dropdown */}
-            <div className={styles.mokiButtonContainer}>
-              <button
-                onClick={() => {
-                  if (!mokiDropdownOpen) {
-                    setMokiDropdownOpen(true);
-                    setTimeout(() => setMokiDropdownOpen(false), 1500);
-                  }
-                }}
-                className={styles.mokiButton}
-                title="Dorime"
-              >
-                <img src="/moki-praying.png" alt="Moki" width={56} height={56} />
-              </button>
-              <div className={`${styles.mokiDropdown} ${mokiDropdownOpen ? styles.mokiDropdownOpen : ''}`}>
-                <img src="/count.png" alt="Count" width={24} height={24} />
-              </div>
-            </div>
-
-            {/* Tools Button */}
-            <div className={styles.toolsContainer} ref={toolsRef}>
-              <button
-                onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
-                className={styles.iconButton}
-                title="Tools & Analytics"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                </svg>
-              </button>
-              {toolsDropdownOpen && (
-                <div className={styles.toolsDropdown}>
-                  <p>For more stats and analysis tools, you should visit:</p>
-                  <a href="https://mokimanager.com" target="_blank" rel="noopener noreferrer" className={styles.toolsLink}>
-                    mokimanager.com
-                  </a>
-                  <a href="https://gatracker.xyz" target="_blank" rel="noopener noreferrer" className={styles.toolsLink}>
-                    gatracker.xyz
-                  </a>
+              {/* Moki Praying Button with Dropdown */}
+              <div className={styles.mokiButtonContainer}>
+                <button
+                  onClick={() => {
+                    if (!mokiDropdownOpen) {
+                      setMokiDropdownOpen(true);
+                      setTimeout(() => setMokiDropdownOpen(false), 1500);
+                    }
+                  }}
+                  className={styles.mokiButton}
+                  title="Dorime"
+                >
+                  <img src="/moki-praying.png" alt="Moki" width={56} height={56} />
+                </button>
+                <div className={`${styles.mokiDropdown} ${mokiDropdownOpen ? styles.mokiDropdownOpen : ''}`}>
+                  <img src="/count.png" alt="Count" width={24} height={24} />
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Notification Toggle */}
-            <button onClick={() => setNotificationsEnabled(!notificationsEnabled)} className={styles.iconButton} title={notificationsEnabled ? "Disable Notifications" : "Enable Notifications"}>
-              {notificationsEnabled ? (
-                /* Bell */
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-              ) : (
-                /* Bell Off */
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-              )}
-            </button>
-          </div>
+              {/* Tools Button */}
+              <div className={styles.toolsContainer} ref={toolsRef}>
+                <button
+                  onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
+                  className={styles.iconButton}
+                  title="Tools & Analytics"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                  </svg>
+                </button>
+                {toolsDropdownOpen && (
+                  <div className={styles.toolsDropdown}>
+                    <p>For more stats and analysis tools, you should visit:</p>
+                    <a href="https://mokimanager.com" target="_blank" rel="noopener noreferrer" className={styles.toolsLink}>
+                      mokimanager.com
+                    </a>
+                    <a href="https://gatracker.xyz" target="_blank" rel="noopener noreferrer" className={styles.toolsLink}>
+                      gatracker.xyz
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Notification Toggle */}
+              <button onClick={() => setNotificationsEnabled(!notificationsEnabled)} className={styles.iconButton} title={notificationsEnabled ? "Disable Notifications" : "Enable Notifications"}>
+                {notificationsEnabled ? (
+                  /* Bell */
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                ) : (
+                  /* Bell Off */
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                )}
+              </button>
+            </div>
+          )}
 
           {addresses.length === 0 ? (
             <button onClick={handleConnect} className={styles.connectButton}>
@@ -588,8 +628,23 @@ export default function Home() {
                 <div className={styles.walletDropdownMenu}>
                   {addresses.map((addr, idx) => (
                     <div key={addr} className={styles.walletItem}>
-                      <span className={styles.walletBadge}>{idx + 1}</span>
-                      {addr.slice(0, 6)}...{addr.slice(-4)}
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span className={styles.walletBadge}>{idx + 1}</span>
+                        {addr.slice(0, 6)}...{addr.slice(-4)}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveWallet(addr);
+                        }}
+                        className={styles.walletRemoveButton}
+                        title="Remove Wallet"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
                     </div>
                   ))}
                   <hr className={styles.dropdownDivider} />

@@ -86,17 +86,33 @@ export const fetchUserCards = async (address: string): Promise<EnhancedCard[]> =
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI_ENUMERABLE, provider);
 
         const balance = Number(await contract.balanceOf(address));
+        console.log(`[1] Balance found: ${balance}`);
+
         if (balance === 0) return [];
+        if (balance > 2500) throw new Error("Collection too large for RPC enumeration, try GraphQL");
 
-        await contract.tokenOfOwnerByIndex(address, 0);
+        // Batch processing to avoid 429 Rate Limits
+        const BATCH_SIZE = 50;
+        const tokenIds: any[] = [];
 
-        const promises = [];
-        for (let i = 0; i < balance; i++) {
-            promises.push(contract.tokenOfOwnerByIndex(address, i));
+        for (let i = 0; i < balance; i += BATCH_SIZE) {
+            const batchPromises = [];
+            const end = Math.min(i + BATCH_SIZE, balance);
+
+            for (let j = i; j < end; j++) {
+                batchPromises.push(contract.tokenOfOwnerByIndex(address, j));
+            }
+
+            console.log(`[1] Fetching batch ${i} to ${end}...`);
+            const batchResults = await Promise.all(batchPromises);
+            tokenIds.push(...batchResults);
+
+            // Small delay to be nice to RPC
+            await new Promise(r => setTimeout(r, 100));
         }
-        const tokenIds = await Promise.all(promises);
+
         ids = tokenIds.map(t => t.toString());
-        console.log(`[1] Success! Found IDs via Contract:`, ids);
+        console.log(`[1] Success! Found IDs via Contract:`, ids.length);
 
     } catch (err: any) {
         console.warn(`[1] Contract Enumeration Failed:`, err.code || err.message);
@@ -105,80 +121,156 @@ export const fetchUserCards = async (address: string): Promise<EnhancedCard[]> =
         try {
             console.log(`[2] Trying Sky Mavis GraphQL (${GRAPHQL_ENDPOINT})...`);
             ids = await fetchIdsViaGraphQL(address);
-            console.log(`[2] Success! Found IDs via GraphQL:`, ids);
+            console.log(`[2] Success! Found IDs via GraphQL:`, ids.length);
         } catch (gqlErr) {
             console.error(`[2] GraphQL Failed:`, gqlErr);
 
             // STRATEGY 3: Fallback Mock
             console.warn(`[3] Falling back to Mock Data.`);
-            alert("Could not fetch real data (Contract not enumerable & API error). Showing Mock Data.");
-            return mockToEnhanced(MOCK_GRAND_ARENA_CARDS);
+            // Only alert if we really have no data and it wasn't a 0 balance issue
+            if (ids.length === 0) {
+                alert("Could not fetch real data. Network/API issues. Showing Mock Data.");
+                return mockToEnhanced(MOCK_GRAND_ARENA_CARDS);
+            }
         }
     }
 
     if (ids.length === 0 && ids !== undefined) return [];
 
-    const cards = await Promise.all(ids.map(fetchCardMetadata));
-    return cards.filter(c => c !== null) as EnhancedCard[];
+    // Sequential metadata fetching to avoid 429s
+    const cards: EnhancedCard[] = [];
+    console.log(`[Metadata] Starting fetch for ${ids.length} cards...`);
+
+    for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        const card = await fetchCardMetadataWithRetry(id);
+        if (card) cards.push(card);
+
+        if (i % 10 === 0) {
+            console.log(`[Metadata] Progress: ${i}/${ids.length}`);
+        }
+    }
+
+    return cards;
 };
 
 // -- Helpers --
 
 async function fetchIdsViaGraphQL(owner: string): Promise<string[]> {
     const formattedOwner = owner.startsWith('ronin:') ? owner.replace('ronin:', '0x') : owner;
+    let allIds: string[] = [];
+    let from = 0;
+    const size = 50; // Safer batch size
+    let hasMore = true;
 
-    const query = `
-    query GetOwnerTokens($from: Int!, $size: Int!, $owner: String!, $tokenAddress: String!) {
-      erc721Tokens(from: $from, size: $size, owner: $owner, tokenAddress: $tokenAddress) {
-        results {
-          tokenId
-        }
-        total
-      }
-    }
-    `;
-
-    const response = await fetch(GRAPHQL_ENDPOINT, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            query,
-            variables: {
-                from: 0,
-                size: 50,
-                owner: formattedOwner,
-                tokenAddress: CONTRACT_ADDRESS
+    while (hasMore) {
+        const query = `
+        query GetOwnerTokens($from: Int!, $size: Int!, $owner: String!, $tokenAddress: String!) {
+          erc721Tokens(from: $from, size: $size, owner: $owner, tokenAddress: $tokenAddress) {
+            results {
+              tokenId
             }
-        })
-    });
+            total
+          }
+        }
+        `;
 
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Status ${response.status}: ${text}`);
+        const response = await fetch('/api/proxy-graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                query,
+                variables: {
+                    from,
+                    size,
+                    owner: formattedOwner,
+                    tokenAddress: CONTRACT_ADDRESS
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Status ${response.status}: ${text}`);
+        }
+
+        const json = await response.json();
+        if (json.errors) {
+            throw new Error(`Query Error: ${JSON.stringify(json.errors)}`);
+        }
+
+        const results = json.data?.erc721Tokens?.results?.map((t: any) => t.tokenId) || [];
+        allIds = [...allIds, ...results];
+
+        console.log(`[GraphQL] Fetched ${results.length} items (Total: ${allIds.length})`);
+
+        if (results.length < size) {
+            hasMore = false;
+        } else {
+            from += size;
+            // Safety break
+            if (from > 5000) hasMore = false;
+        }
     }
 
-    const json = await response.json();
-    if (json.errors) {
-        throw new Error(`Query Error: ${JSON.stringify(json.errors)}`);
+    return allIds;
+}
+
+async function fetchCardMetadataWithRetry(id: string, retries = 5): Promise<EnhancedCard | null> {
+    const cacheKey = `ga_metadata_v1_${id}`;
+
+    // 1. Check LocalStorage Cache
+    if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            try {
+                const rawData = JSON.parse(cached);
+                return normalizeCard(rawData, id);
+            } catch (e) {
+                localStorage.removeItem(cacheKey);
+            }
+        }
     }
 
-    return json.data?.erc721Tokens?.results?.map((t: any) => t.tokenId) || [];
+    // 2. Fetch if not in cache
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(`/api/metadata?id=${id}`);
+
+            if (response.status === 429) {
+                // Exponential Backoff
+                const delay = 2000 * Math.pow(2, i);
+                console.warn(`[429] Rate Limit on ${id}. Retrying in ${delay}ms...`);
+                await new Promise(r => setTimeout(r, delay));
+                continue;
+            }
+
+            if (!response.ok) return null;
+
+            const rawData: GrandArenaCard = await response.json();
+
+            // Save to Cache
+            if (typeof window !== 'undefined') {
+                localStorage.setItem(cacheKey, JSON.stringify(rawData));
+            }
+
+            return normalizeCard(rawData, id);
+        } catch (e) {
+            console.error(`Metadata error ${id} (Attempt ${i + 1})`, e);
+            if (i === retries - 1) return null;
+            await new Promise(r => setTimeout(r, 1000));
+        }
+    }
+    return null;
 }
 
 async function fetchCardMetadata(id: string): Promise<EnhancedCard | null> {
-    try {
-        const response = await fetch(`/api/metadata?id=${id}`);
-        if (!response.ok) return null;
-        const data: GrandArenaCard = await response.json();
-        return normalizeCard(data, id);
-    } catch (e) {
-        console.error(`Metadata error ${id}`, e);
-        return null;
-    }
+    return fetchCardMetadataWithRetry(id);
 }
+
 
 const normalizeCard = (rawCard: GrandArenaCard, tokenId: string): EnhancedCard => {
     const rarityAttr = rawCard.attributes?.find(a => a.trait_type === 'Rarity');
