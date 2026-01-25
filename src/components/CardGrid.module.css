@@ -170,32 +170,6 @@
     background: rgba(96, 165, 250, 0.6) !important;
 }
 
-.countBadge {
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    background-color: var(--color-secondary);
-    /* Yellow */
-    color: #232842;
-    /* Dark text for contrast on yellow */
-    font-weight: 800;
-    width: 1.8rem;
-    height: 1.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    border: 2px solid #232842;
-    z-index: 20;
-    font-size: 0.8rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.noneLeft {
-    background-color: #ef4444;
-    color: white;
-    border-color: #7f1d1d;
-}
 
 .starBadge {
     position: absolute;

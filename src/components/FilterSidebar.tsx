@@ -8,14 +8,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 export interface FilterState {
     rarity: string[];
     cardType: 'ALL' | 'MOKI' | 'SCHEME';
-    category: string[];
     schemeName: string[];
     fur: string[];
     stars: number[];
     customClass: string[];
     specialization: string[];
     traits: string[];
-    series: string[];
     insertionOrder?: string[];
     onlyEpicLegendary?: boolean;
 }
@@ -102,10 +100,8 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
     };
 
     const handleRarityChange = (val: string) => updateFilter('rarity', val);
-    const handleCategoryChange = (val: string) => updateFilter('category', val);
     const handleSchemeChange = (val: string) => updateFilter('schemeName', val);
     const handleFurChange = (val: string) => updateFilter('fur', val);
-    const handleSeriesChange = (val: string) => updateFilter('series', val);
     // handleStarChange is handled by slider now, but kept for safety if used elsewhere or if slider unmounts
     const handleStarChange = (val: number) => updateFilter('stars', val);
     const handleClassChange = (val: string) => updateFilter('customClass', val);
@@ -122,14 +118,12 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
         onFilterChange({
             ...filters,
             rarity: [],
-            category: [],
             schemeName: [],
             fur: [],
             stars: [],
             customClass: [],
             specialization: [],
             traits: [],
-            series: [],
             insertionOrder: [] // Ensure order is cleared
             // Preserve cardType
         });
@@ -137,21 +131,12 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
 
     const hasActiveFilters =
         filters.rarity.length > 0 ||
-        filters.category.length > 0 ||
         filters.schemeName.length > 0 ||
         filters.fur.length > 0 ||
         filters.customClass.length > 0 ||
         filters.specialization.length > 0 ||
-        filters.traits.length > 0 ||
-        filters.series.length > 0;
+        filters.traits.length > 0;
 
-    // Helper function to check if a filter section matches the search query
-    const matchesSearch = (sectionTitle: string, options: string[] = []): boolean => {
-        if (!filterSearch.trim()) return true; // Show all if no search
-        const query = filterSearch.toLowerCase();
-        if (sectionTitle.toLowerCase().includes(query)) return true;
-        return options.some(opt => opt.toLowerCase().includes(query));
-    };
 
     // Helper to filter options that match the search
     const filterOptions = (options: string[]): string[] => {
@@ -227,8 +212,6 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
                                 ? ['Epic', 'Legendary']
                                 : ['Basic', 'Rare', 'Epic', 'Legendary'];
 
-                            if (!matchesSearch('Rarity', rarityOptions)) return null;
-
                             return (
                                 <FilterAccordion title="Rarity" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
                                     {filterOptions(rarityOptions).map(r => (
@@ -246,122 +229,85 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
                         })()}
 
                         {/* Class */}
-                        {matchesSearch('Class', CLASS_OPTIONS) && (
-                            <FilterAccordion title="Class" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                {filterOptions(CLASS_OPTIONS).map(c => (
-                                    <label key={c} className={styles.checkboxLabel}>
-                                        <input type="checkbox" checked={filters.customClass.includes(c)} onChange={() => handleClassChange(c)} />
-                                        <span className={styles.labelText}>{c}</span>
-                                    </label>
-                                ))}
-                            </FilterAccordion>
-                        )}
+                        <FilterAccordion title="Class" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
+                            {filterOptions(CLASS_OPTIONS).map(c => (
+                                <label key={c} className={styles.checkboxLabel}>
+                                    <input type="checkbox" checked={filters.customClass.includes(c)} onChange={() => handleClassChange(c)} />
+                                    <span className={styles.labelText}>{c}</span>
+                                </label>
+                            ))}
+                        </FilterAccordion>
 
                         {/* Specialization */}
-                        {matchesSearch('Specialization', SPECIALIZATION_CONFIG.map(s => s.label)) && (
-                            <FilterAccordion title="Specialization" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                {SPECIALIZATION_CONFIG.filter(s => {
-                                    if (!filterSearch.trim()) return true;
-                                    return s.label.toLowerCase().includes(filterSearch.toLowerCase());
-                                }).map(s => (
-                                    <label key={s.key} className={styles.checkboxLabel}>
-                                        <input type="checkbox" checked={filters.specialization.includes(s.key)} onChange={() => handleSpecializationChange(s.key)} />
-                                        <span className={styles.labelText}>{s.label}</span>
-                                    </label>
-                                ))}
-                            </FilterAccordion>
-                        )}
+                        <FilterAccordion title="Specialization" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
+                            {SPECIALIZATION_CONFIG.filter(s => {
+                                if (!filterSearch.trim()) return true;
+                                return s.label.toLowerCase().includes(filterSearch.toLowerCase());
+                            }).map(s => (
+                                <label key={s.key} className={styles.checkboxLabel}>
+                                    <input type="checkbox" checked={filters.specialization.includes(s.key)} onChange={() => handleSpecializationChange(s.key)} />
+                                    <span className={styles.labelText}>{s.label}</span>
+                                </label>
+                            ))}
+                        </FilterAccordion>
 
                         {/* Stars */}
-                        {matchesSearch('Stars') && (
-                            <FilterAccordion title="Stars" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                <div style={{ padding: '0 10px' }}>
-                                    <StarRangeSlider
-                                        min={1}
-                                        max={8}
-                                        currentRange={{
-                                            min: filters.stars.length > 0 ? Math.min(...filters.stars) : 1,
-                                            max: filters.stars.length > 0 ? Math.max(...filters.stars) : 8
-                                        }}
-                                        onChange={({ min, max }) => {
-                                            const range = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-                                            let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
-                                            if (!newOrder.includes('stars:ACTIVE')) {
-                                                newOrder.push('stars:ACTIVE');
-                                            }
-                                            onFilterChange({ ...filters, stars: range, insertionOrder: newOrder });
-                                        }}
-                                    />
-                                </div>
-                            </FilterAccordion>
-                        )}
+                        <FilterAccordion title="Stars" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
+                            <div style={{ padding: '0 10px' }}>
+                                <StarRangeSlider
+                                    min={1}
+                                    max={8}
+                                    currentRange={{
+                                        min: filters.stars.length > 0 ? Math.min(...filters.stars) : 1,
+                                        max: filters.stars.length > 0 ? Math.max(...filters.stars) : 8
+                                    }}
+                                    onChange={({ min, max }) => {
+                                        const range = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+                                        let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
+                                        if (!newOrder.includes('stars:ACTIVE')) {
+                                            newOrder.push('stars:ACTIVE');
+                                        }
+                                        onFilterChange({ ...filters, stars: range, insertionOrder: newOrder });
+                                    }}
+                                />
+                            </div>
+                        </FilterAccordion>
 
                         {/* Fur */}
-                        {matchesSearch('Fur', FUR_OPTIONS) && (
-                            <FilterAccordion title="Fur" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                {filterOptions(FUR_OPTIONS).map(f => (
-                                    <label key={f} className={styles.checkboxLabel}>
-                                        <input type="checkbox" checked={filters.fur.includes(f)} onChange={() => handleFurChange(f)} />
-                                        <span className={styles.labelText}>{f}</span>
-                                    </label>
-                                ))}
-                            </FilterAccordion>
-                        )}
+                        <FilterAccordion title="Fur" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
+                            {filterOptions(FUR_OPTIONS).map(f => (
+                                <label key={f} className={styles.checkboxLabel}>
+                                    <input type="checkbox" checked={filters.fur.includes(f)} onChange={() => handleFurChange(f)} />
+                                    <span className={styles.labelText}>{f}</span>
+                                </label>
+                            ))}
+                        </FilterAccordion>
 
                         {/* Traits (Grouped) */}
-                        {matchesSearch('Traits', TRAIT_GROUPS.map(g => g.label)) && (
-                            <FilterAccordion title="Traits" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                {TRAIT_GROUPS.filter(group => {
-                                    if (!filterSearch.trim()) return true;
-                                    return group.label.toLowerCase().includes(filterSearch.toLowerCase());
-                                }).map(group => {
-                                    const isChecked = filters.traits.includes(group.label);
-                                    return (
-                                        <label key={group.label} className={styles.checkboxLabel}>
-                                            <input
-                                                type="checkbox"
-                                                checked={isChecked}
-                                                onChange={() => handleTraitGroupChange(group)}
-                                            />
-                                            <span className={styles.labelText}>{group.label}</span>
-                                        </label>
-                                    );
-                                })}
-                            </FilterAccordion>
-                        )}
-
-                        {/* Category */}
-                        {matchesSearch('Category', ['Full Art', 'Overlay', 'Border']) && (
-                            <FilterAccordion title="Category" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                {filterOptions(['Full Art', 'Overlay', 'Border']).map(c => (
-                                    <label key={c} className={styles.checkboxLabel}>
-                                        <input type="checkbox" checked={filters.category.includes(c)} onChange={() => handleCategoryChange(c)} />
-                                        <span className={styles.labelText}>{c}</span>
-                                    </label>
-                                ))}
-                            </FilterAccordion>
-                        )}
-
-                        {/* Series */}
-                        {matchesSearch('Series', SERIES_OPTIONS) && (
-                            <FilterAccordion title="Series" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                {filterOptions(SERIES_OPTIONS).map(s => (
-                                    <label key={s} className={styles.checkboxLabel}>
+                        <FilterAccordion title="Traits" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
+                            {TRAIT_GROUPS.filter(group => {
+                                if (!filterSearch.trim()) return true;
+                                return group.label.toLowerCase().includes(filterSearch.toLowerCase());
+                            }).map(group => {
+                                const isChecked = filters.traits.includes(group.label);
+                                return (
+                                    <label key={group.label} className={styles.checkboxLabel}>
                                         <input
                                             type="checkbox"
-                                            checked={filters.series.includes(s)}
-                                            onChange={() => handleSeriesChange(s)}
+                                            checked={isChecked}
+                                            onChange={() => handleTraitGroupChange(group)}
                                         />
-                                        <span className={styles.labelText}>{s}</span>
+                                        <span className={styles.labelText}>{group.label}</span>
                                     </label>
-                                ))}
-                            </FilterAccordion>
-                        )}
+                                );
+                            })}
+                        </FilterAccordion>
+
                     </>
                 )}
 
                 {/* --- SCHEME SECTION --- */}
-                {filters.cardType === 'SCHEME' && matchesSearch('Scheme Name', SCHEME_NAMES) && (
+                {filters.cardType === 'SCHEME' && (
                     <FilterAccordion title="Scheme Name" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
                         {filterOptions(SCHEME_NAMES).map(name => (
                             <label key={name} className={styles.checkboxLabel}>

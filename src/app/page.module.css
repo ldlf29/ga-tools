@@ -376,7 +376,24 @@
 
 .content {
   max-width: 1600px;
+  min-width: 1600px;
   margin: 0 auto;
+}
+
+.mainLayout {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 1.5rem;
+  padding: 0 2rem;
+  width: 100%;
+}
+
+.mainLayoutLineups {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 1.5rem;
+  padding: 0 2rem;
+  width: 100%;
 }
 
 .card {

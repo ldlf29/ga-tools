@@ -38,7 +38,7 @@ export const matchesFilter = (
         if (isSchemeMode) {
             return true; // Bypass all checks in Scheme Mode
         }
-        // If not Scheme Mode (meaning ALL), fall through and let Rarity/Category/Fur checks happen.
+        // If not Scheme Mode (meaning ALL), fall through and let Rarity/Fur checks happen.
         // Most Schemes will fail these checks (e.g. no Fur), which is desired behavior for "ALL" mode filtering.
     }
 
@@ -52,10 +52,6 @@ export const matchesFilter = (
     // 2. Rarity Filter (Moved here to exempt Schemes)
     if (filters.rarity.length > 0 && !filters.rarity.includes(card.rarity)) return false;
 
-    // 3. Category Filter (Moved here to exempt Schemes)
-    if (filters.category.length > 0) {
-        if (!card.category || !filters.category.includes(card.category)) return false;
-    }
 
     // FUR
     if (filters.fur.length > 0) {
@@ -102,100 +98,6 @@ export const matchesFilter = (
 
         const hasTrait = activeTraits.some(t => card.custom.traits?.includes(t));
         if (!hasTrait) return false;
-    }
-    // SERIES
-    if (filters.series.length > 0) {
-        if (!card.custom.series) return false;
-        // Logic: Check if card series explicitly matches selected Series Option or starts with it (for groupings)
-        // Options: "Long Moki", "Moki Parts", "Moki Madness", "Ice Cream", "Stickers", "Manga Stickers"
-        const cardSeries = card.custom.series;
-        const hasMatch = filters.series.some(filterOpt => {
-            // Exact Matches / Grouping Logic - Based on User Provided Metadata
-
-            if (filterOpt === "Long Moki") {
-                // "Long Moki (A, B...)" -> startsWith "Long Moki"
-                return cardSeries.startsWith("Long Moki");
-            }
-
-            if (filterOpt === "Moki Parts") {
-                // Exact List: Moki Parts, Middle Finger A, Middle Finger B, Peace, Wart Frame
-                const values = ["Moki Parts", "Middle Finger A", "Middle Finger B", "Peace", "Wart Frame"];
-                return values.includes(cardSeries);
-            }
-
-            if (filterOpt === "Moki Madness") {
-                // Exact List: Dune, Moki Lick, Lemon Grab
-                const values = ["Dune", "Moki Lick", "Lemon Grab"];
-                return values.includes(cardSeries);
-            }
-
-            if (filterOpt === "Ice Cream") {
-                // Exact List: Ice Cream Chocolate, Ice Cream Gold, Ice Cream Rainbow
-                // startsWith("Ice Cream") covers all and is safe
-                return cardSeries.startsWith("Ice Cream");
-            }
-
-            if (filterOpt === "Stickers") {
-                // "Stickers (A, B...)" -> startsWith "Stickers"
-                // Also handle singular "Sticker" if data varies
-                // Exclude "Manga Stickers"
-                return (cardSeries.startsWith("Stickers") || cardSeries.startsWith("Sticker")) && !cardSeries.startsWith("Manga");
-            }
-
-            if (filterOpt === "Manga Stickers") {
-                // "Manga Stickers (A, B...)"
-                return cardSeries.startsWith("Manga Stickers") || cardSeries.startsWith("Manga Sticker");
-            }
-
-            // Border Series
-            if (filterOpt === "Random") {
-                return cardSeries.startsWith("Random");
-            }
-            if (filterOpt === "Doodle") {
-                return cardSeries.startsWith("Doodle");
-            }
-            if (filterOpt === "Loopy Lines") {
-                return cardSeries.startsWith("Loopy Lines");
-            }
-            if (filterOpt === "Soft Noise") {
-                return cardSeries.startsWith("Soft Noise");
-            }
-
-            if (filterOpt === "Soft Noise") {
-                return cardSeries.startsWith("Soft Noise");
-            }
-
-            // Full Art Series
-            if (filterOpt === "Presale Promo") {
-                return cardSeries.startsWith("Presale Promo");
-            }
-            if (filterOpt === "Eggu Island") {
-                return cardSeries.startsWith("Eggu Island");
-            }
-            if (filterOpt === "Milky Way") {
-                return cardSeries.startsWith("Milky Way");
-            }
-            if (filterOpt === "Chibi Kawaii") {
-                return cardSeries.startsWith("Chibi Kawaii");
-            }
-            if (filterOpt === "Katai Beddo") {
-                return cardSeries.startsWith("Katai Beddo");
-            }
-            if (filterOpt === "Fruity") {
-                return cardSeries.startsWith("Fruity");
-            }
-            if (filterOpt === "Hatching Field") {
-                return cardSeries.startsWith("Hatching Field");
-            }
-            if (filterOpt === "1-of-1") {
-                return cardSeries.startsWith("1-of-1");
-            }
-
-            // Default fallback
-            return cardSeries === filterOpt;
-        });
-
-        if (!hasMatch) return false;
     }
 
     return true;

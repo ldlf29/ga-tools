@@ -366,9 +366,8 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                 <div className={styles.slotInfo}>
                                     <div className={styles.slotName}>{schemeCard.name}</div>
                                     <div className={styles.slotStars}>
-                                        <span className={styles.starValue} style={{ visibility: 'hidden' }}>0 ★</span>
                                         {schemeCard.custom.class && (
-                                            <span className={styles.slotClass}>
+                                            <span className={styles.slotClass} style={{ marginLeft: 0 }}>
                                                 {schemeCard.custom.class}
                                             </span>
                                         )}

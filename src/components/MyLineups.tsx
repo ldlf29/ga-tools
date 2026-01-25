@@ -8,6 +8,7 @@ import RatingSlider from './RatingSlider';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng } from 'html-to-image';
+import * as XLSX from 'xlsx';
 
 export interface SavedLineup {
     id: number;
@@ -31,24 +32,75 @@ interface MyLineupsProps {
     onError: (message: string) => void;
     filters?: FilterState;
     onRemoveFilter?: (key: keyof FilterState, value: string | number) => void;
-    usageMap?: Record<string, number>;
-    ownedMap?: Record<string, number>;
+    // Collapsible states passed from parent
+    favoritesOpen: boolean;
+    setFavoritesOpen: (open: boolean) => void;
+    allLineupsOpen: boolean;
+    setAllLineupsOpen: (open: boolean) => void;
 }
 
 type SortOption = 'default' | 'name_asc' | 'name_desc' | 'rating_desc' | 'rating_asc';
 
-export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorite, onRate, onUpdateBackground, onBulkDelete, onError, filters, onRemoveFilter, usageMap = {}, ownedMap = {} }: MyLineupsProps) {
+export default function MyLineups({
+    lineups, onDelete, onRename, onToggleFavorite, onRate,
+    onUpdateBackground, onBulkDelete, onError, filters, onRemoveFilter,
+    favoritesOpen, setFavoritesOpen, allLineupsOpen, setAllLineupsOpen
+}: MyLineupsProps) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
     const [tempName, setTempName] = useState('');
-    const [favoritesOpen, setFavoritesOpen] = useState(true);
-    const [allLineupsOpen, setAllLineupsOpen] = useState(true);
 
     const [favoritesSort, setFavoritesSort] = useState<SortOption>('default');
     const [othersSort, setOthersSort] = useState<SortOption>('default');
     const [activeDropdown, setActiveDropdown] = useState<'favorites' | 'others' | null>(null);
     const [activeBackground, setActiveBackground] = useState<string>('default');
+
+    const handleExportExcel = () => {
+        const favorites = favoriteLineups;
+        if (favorites.length === 0) return;
+
+        const data = favorites.map(l => {
+            const mokis = l.cards.filter(c => c.cardType !== 'SCHEME');
+            const scheme = l.cards.find(c => c.cardType === 'SCHEME');
+
+            return {
+                'Team Name': l.name,
+                'Moki 1': mokis[0]?.name || '',
+                'Class 1': mokis[0]?.custom?.class || '',
+                'Moki 2': mokis[1]?.name || '',
+                'Class 2': mokis[1]?.custom?.class || '',
+                'Moki 3': mokis[2]?.name || '',
+                'Class 3': mokis[2]?.custom?.class || '',
+                'Moki 4': mokis[3]?.name || '',
+                'Class 4': mokis[3]?.custom?.class || '',
+                'Scheme': scheme?.name || '',
+                'Rating': l.rating || 0
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Favorite Lineups");
+
+        // Set column widths
+        const wscols = [
+            { wch: 20 }, // Team Name
+            { wch: 15 }, // Moki 1
+            { wch: 12 }, // Class 1
+            { wch: 15 }, // Moki 2
+            { wch: 12 }, // Class 2
+            { wch: 15 }, // Moki 3
+            { wch: 12 }, // Class 3
+            { wch: 15 }, // Moki 4
+            { wch: 12 }, // Class 4
+            { wch: 15 }, // Scheme
+            { wch: 10 }, // Rating
+        ];
+        worksheet['!cols'] = wscols;
+
+        XLSX.writeFile(workbook, "Favorite_Lineups.xlsx");
+    };
 
     const BACKGROUND_OPTIONS = [
         { id: 'default', label: 'Default', color: '#5097FF', image: null },
@@ -77,7 +129,6 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
             // Fallback
             const defaultList: { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[] = filters ? [
                 ...filters.rarity.map(v => ({ key: 'rarity' as keyof FilterState, label: 'RARITY', value: v })),
-                ...filters.category.map(v => ({ key: 'category' as keyof FilterState, label: 'CATEGORY', value: v })),
                 ...filters.schemeName.map(v => ({ key: 'schemeName' as keyof FilterState, label: 'SCHEME', value: v })),
                 ...filters.fur.map(v => ({ key: 'fur' as keyof FilterState, label: 'FUR', value: v })),
                 // Combined Stars Logic for Fallback
@@ -93,7 +144,10 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                 }] : []),
                 ...filters.customClass.map(v => ({ key: 'customClass' as keyof FilterState, label: 'CLASS', value: v })),
                 ...filters.traits.map(v => ({ key: 'traits' as keyof FilterState, label: 'TRAIT', value: v })),
-            ] : [];
+            ].filter(f => {
+                if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
+                return true;
+            }) : [];
             return defaultList;
         }
 
@@ -127,7 +181,11 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                 label,
                 value,
             };
-        }).filter(Boolean) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
+        }).filter(f => {
+            if (!f) return false;
+            if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
+            return true;
+        }) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
     })();
 
 
@@ -305,14 +363,6 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
 
     const expandedLineup = lineups.find(l => l.id === expandedId);
 
-    const isLineupOverused = (lineup: SavedLineup) => {
-        return lineup.cards.some(card => {
-            const key = getCardGroupKey(card);
-            const used = usageMap[key] || 0;
-            const owned = ownedMap[key] || 0;
-            return used > owned;
-        });
-    };
 
     const renderLineupCard = (lineup: SavedLineup) => {
         const mokis = lineup.cards.filter(c => c.cardType !== 'SCHEME');
@@ -337,12 +387,6 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                 onClick={() => setExpandedId(lineup.id)}
                 style={bgStyle}
             >
-                {/* Overuse Warning */}
-                {isLineupOverused(lineup) && (
-                    <div className={styles.warningIcon} title="Warning: Contains overused cards (More used than owned)">
-                        !
-                    </div>
-                )}
 
                 <button
                     className={styles.deleteButton}
@@ -523,6 +567,17 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 )}
                             </button>
+                            {favoritesOpen && (
+                                <button
+                                    className={styles.exportButton}
+                                    onClick={handleExportExcel}
+                                    title="Export Favorites to Excel (.xlsx)"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="18" height="24" fill="currentColor">
+                                        <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
                         {favoritesOpen && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -535,7 +590,7 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                         {favoritesOpen && (
                             <motion.div
                                 key="favorites-content"
-                                initial={{ opacity: 0, height: 0 }}
+                                initial={false}
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -576,7 +631,7 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                         {allLineupsOpen && (
                             <motion.div
                                 key="others-content"
-                                initial={{ opacity: 0, height: 0 }}
+                                initial={false}
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -666,24 +721,6 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                             </div>
                         </div>
 
-                        {/* Background Switcher */}
-                        <div id="background-switcher" className={`${styles.backgroundSwitcher} ${styles.excludeFromCapture}`}>
-                            {BACKGROUND_OPTIONS.map((bg) => (
-                                <button
-                                    key={bg.id}
-                                    className={`${styles.bgOption} ${activeBackground === bg.id ? styles.bgOptionActive : ''}`}
-                                    style={{ backgroundColor: bg.color }}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setActiveBackground(bg.id);
-                                        if (expandedLineup) {
-                                            onUpdateBackground(expandedLineup.id, bg.id);
-                                        }
-                                    }}
-                                    title={bg.label}
-                                />
-                            ))}
-                        </div>
 
                         <div style={{ padding: '2rem', borderRadius: '1rem' }}>
 
@@ -695,19 +732,46 @@ export default function MyLineups({ lineups, onDelete, onRename, onToggleFavorit
                                     const sortedModalCards = scheme ? [...mokis, scheme] : mokis;
 
                                     return sortedModalCards.map((card, idx) => (
-                                        <div key={idx} className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`} style={{ flexShrink: 0 }}>
-                                            <img src={card.image} alt={card.name} />
+                                        <div key={idx} className={styles.modalCardWrapper}>
+                                            <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`} style={{ flexShrink: 0 }}>
+                                                <img src={card.image} alt={card.name} />
+                                            </div>
+                                            <div className={styles.modalCardClass}>{card.custom.class}</div>
                                         </div>
                                     ));
                                 })()}
                             </div>
                         </div>
 
-                        <div id="rating-slider-container" className={styles.excludeFromCapture} style={{ display: 'flex', justifyContent: 'center', marginTop: '0.5rem', paddingBottom: '0.5rem' }}>
-                            <RatingSlider
-                                value={expandedLineup.rating || 0}
-                                onChange={(val) => onRate(expandedLineup.id, val)}
-                            />
+                        <div className={`${styles.modalFooter} ${styles.excludeFromCapture}`}>
+                            {/* Dummy spacer for center alignment of slider */}
+                            <div style={{ width: '220px' }}></div>
+
+                            <div id="rating-slider-container" className={styles.ratingSliderContainer}>
+                                <RatingSlider
+                                    value={expandedLineup.rating || 0}
+                                    onChange={(val) => onRate(expandedLineup.id, val)}
+                                />
+                            </div>
+
+                            {/* Background Switcher - Right Aligned */}
+                            <div id="background-switcher" className={styles.backgroundSwitcher}>
+                                {BACKGROUND_OPTIONS.map((bg) => (
+                                    <button
+                                        key={bg.id}
+                                        className={`${styles.bgOption} ${activeBackground === bg.id ? styles.bgOptionActive : ''}`}
+                                        style={{ backgroundColor: bg.color }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setActiveBackground(bg.id);
+                                            if (expandedLineup) {
+                                                onUpdateBackground(expandedLineup.id, bg.id);
+                                            }
+                                        }}
+                                        title={bg.label}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

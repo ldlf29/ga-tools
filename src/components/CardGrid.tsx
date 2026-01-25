@@ -17,10 +17,9 @@ interface CardGridProps {
     filters: FilterState;
     onRemoveFilter: (key: keyof FilterState, value: string | number) => void;
     onRefresh?: () => Promise<void>;
-    usageMap?: Record<string, number>;
 }
 
-export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange, currentLineup, filters, onRemoveFilter, onRefresh, usageMap = {} }: CardGridProps) {
+export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange, currentLineup, filters, onRemoveFilter, onRefresh }: CardGridProps) {
     const [sortOption, setSortOption] = useState<SortOption>('default');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -53,7 +52,6 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
             // Fallback for when insertionOrder is missing (e.g. init state) or empty
             const defaultList: { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[] = [
                 ...filters.rarity.map(v => ({ key: 'rarity' as keyof FilterState, label: 'RARITY', value: v })),
-                ...filters.category.map(v => ({ key: 'category' as keyof FilterState, label: 'CATEGORY', value: v })),
                 ...filters.schemeName.map(v => ({ key: 'schemeName' as keyof FilterState, label: 'SCHEME', value: v })),
                 ...filters.fur.map(v => ({ key: 'fur' as keyof FilterState, label: 'FUR', value: v })),
                 // Combined Stars Logic for Fallback
@@ -69,7 +67,10 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                 }] : []),
                 ...filters.customClass.map(v => ({ key: 'customClass' as keyof FilterState, label: 'CLASS', value: v })),
                 ...filters.traits.map(v => ({ key: 'traits' as keyof FilterState, label: 'TRAIT', value: v })),
-            ];
+            ].filter(f => {
+                if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
+                return true;
+            });
             return defaultList;
         }
 
@@ -103,7 +104,11 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                 label,
                 value,
             };
-        }).filter(Boolean) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
+        }).filter(f => {
+            if (!f) return false;
+            if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
+            return true;
+        }) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
     })();
 
     // Grouping logic (Unique ID: Name + Rarity + Category + Series)
@@ -146,21 +151,6 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
         }
     });
 
-    const grouped = groupCards(sortedCards);
-
-    // Helper to calculate available count (Total owned - In Lineup - In UsageMap)
-    const getAvailableCount = (card: EnhancedCard, totalCount: number) => {
-        const key = getCardGroupKey(card);
-
-        // 1. Used in Current Lineup (Active Builder)
-        const inCurrentLineup = currentLineup.filter(l => getCardGroupKey(l) === key).length;
-
-        // 2. Used in Saved Lineups (from usageMap)
-        const inSavedLineups = usageMap[key] || 0;
-
-        const totalUsed = inCurrentLineup + inSavedLineups;
-        return totalCount - totalUsed;
-    };
 
     return (
         <div className={styles.gridContainer}>
@@ -169,7 +159,7 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                 <div className={styles.headerTopRow}>
                     <div className={styles.titleGroup}>
                         <h2 className={styles.resultsTitle}>
-                            COLLECTION ({cards.length})
+                            {filters.cardType === 'MOKI' ? 'MOKI' : filters.cardType === 'SCHEME' ? 'SCHEME' : 'ALL CARDS'} ({cards.length})
                         </h2>
                         {onRefresh && (
                             <button
@@ -243,28 +233,17 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
             </div>
 
             <div className={styles.grid}>
-                {grouped.length === 0 ? (
+                {sortedCards.length === 0 ? (
                     <div className={styles.noResults}>No cards found matching your filters.</div>
-                ) : grouped.map(({ card, count }) => (
+                ) : sortedCards.map((card, idx) => (
                     <div
-                        key={`${card.name}-${card.rarity}-${card.category || 'Standard'}-${card.custom?.series || 'None'}`}
+                        key={`${card.name}-${card.rarity}-${card.category || 'Standard'}-${card.custom?.series || 'None'}-${idx}`}
                         className={`${styles.cardItem} ${card.cardType === 'SCHEME'
                             ? styles.scheme
                             : (styles[card.rarity.toLowerCase()] || styles.basic)
                             }`}
                         onClick={() => onAddCard(card)}
                     >
-                        {(() => {
-                            const available = getAvailableCount(card, count);
-                            // Logic: Show badge ALWAYS to indicate remaining stock.
-                            const isNoneLeft = available <= 0;
-
-                            return (
-                                <div className={`${styles.countBadge} ${isNoneLeft ? styles.noneLeft : ''}`}>
-                                    {Math.max(0, available)}
-                                </div>
-                            );
-                        })()}
 
 
                         <div className={styles.imageWrapper}>

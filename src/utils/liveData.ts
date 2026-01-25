@@ -26,94 +26,76 @@ export interface MokiData {
 // Map key: Moki Name (normalized) -> Data
 export type LiveDataMap = Record<string, MokiData>;
 
-// Placeholder URL - User needs to replace this
-// We use a constant that can be easily found and replaced
-export const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAcXVDO4ylx4jU6KEjceneqnNYRyL6MB3R0myZE5bF1_Th8q4F79eUZsPZ-93pojf6UxUE1OiAGZEC/pub?gid=0&single=true&output=csv";
+// Stats Sheet (Specs, WinRate, etc)
+export const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAcXVDO4ylx4jU6KEjceneqnNYRyL6MB3R0myZE5bF1_Th8q4F79eUZsPZ-93pojf6UxUE1OiAGZEC/pub?output=csv";
+
+// Catalog Sheet (ID, Name, Rarity, ImageURL) - 720 entries
+export const CATALOG_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTmjgIeuIwV9vOzPUH8UNrIjxQfB_xP2_pPCS7qqT0PRE2GUssh6qJxdoWC0M5QW6XZrF1E29F1ZMDh/pub?output=csv";
 
 export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
-    if (!GOOGLE_SHEET_CSV_URL || GOOGLE_SHEET_CSV_URL.includes("PasteYour")) {
-        console.warn("Live Data: No valid Google Sheet URL provided.");
-        return null;
-    }
-
-    try {
-        // Add timestamp to prevent caching - CRITICAL for Google Sheets CSV
-        const url = `${GOOGLE_SHEET_CSV_URL}&t=${Date.now()}`;
-        const response = await fetch(url, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch CSV: ${response.status}`);
-        }
-        const text = await response.text();
-        return parseCSV(text);
-    } catch (e) {
-        console.error("Live Data Fetch Error:", e);
-        return null;
-    }
+    return fetchAndParseSheet(GOOGLE_SHEET_CSV_URL, parseStatsCSV);
 };
 
-const parseCSV = (csvText: string): LiveDataMap => {
+export const fetchCatalogData = async (): Promise<any[] | null> => {
+    return fetchAndParseSheet(CATALOG_SHEET_CSV_URL, parseCatalogCSV);
+};
+
+async function fetchAndParseSheet<T>(baseUrl: string, parser: (text: string) => T): Promise<T | null> {
+    if (!baseUrl) return null;
+    try {
+        const url = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+            console.error(`Sheet Fetch Failed [${baseUrl.substring(0, 40)}...]: ${response.status}`);
+            return null;
+        }
+        const text = await response.text();
+        return parser(text);
+    } catch (e) {
+        console.error("Sheet Fetch Error:", e);
+        return null;
+    }
+}
+
+const parseStatsCSV = (csvText: string): LiveDataMap => {
     const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-    if (lines.length < 2) return {}; // Need header + at least 1 row
-
+    if (lines.length < 2) return {};
     const map: LiveDataMap = {};
-
-    // 1. Parse Headers dynamically
-    const headerLine = lines[0];
-    const headers = headerLine.split(',').map(h => h.trim().toLowerCase());
-
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
     const getIndex = (colName: string) => headers.indexOf(colName.toLowerCase());
 
     const idxName = getIndex('Name');
-    const idxId = getIndex('ID'); // Optional but good to have
+    const idxId = getIndex('ID');
     const idxClass = getIndex('Class');
     const idxStars = getIndex('Stars');
     const idxFur = getIndex('Fur');
     const idxTraits = getIndex('Traits');
-
-    // New Stats (Round 1)
     const idxElim = getIndex('Eliminations');
     const idxDeposits = getIndex('Deposits');
     const idxWart = getIndex('WartDistance');
     const idxScore = getIndex('Score');
     const idxWinRate = getIndex('WinRate');
-
-    // New Stats (Round 2)
-    const idxImg = getIndex('ImageURL');
+    let idxImg = getIndex('cardImage');
+    if (idxImg === -1) idxImg = getIndex('ImageURL');
     const idxDef = getIndex('Defense');
     const idxDex = getIndex('Dexterity');
     const idxFort = getIndex('Fortitude');
     const idxSpd = getIndex('Speed');
     const idxStr = getIndex('Strength');
-
-    // Robust Total check: look for "Total" OR "Total Stats"
     let idxTotal = getIndex('Total');
     if (idxTotal === -1) idxTotal = getIndex('Total Stats');
-
     const idxLink = getIndex('Link');
 
-    // Name is mandatory for our key map
-    if (idxName === -1) {
-        console.error("Live Data: 'Name' column not found in CSV.");
-        return {};
-    }
+    if (idxName === -1) return {};
 
-    // 2. Parse Rows
     for (let i = 1; i < lines.length; i++) {
-        const line = lines[i];
-
-        // Robust CSV Line Parser that handles quotes
-        const cols = parseCSVLine(line);
-
+        const cols = parseCSVLine(lines[i]);
         const name = cols[idxName]?.trim();
         if (!name) continue;
 
-        const traitsRaw = idxTraits !== -1 ? cols[idxTraits]?.trim() : "";
-        const traits = traitsRaw ? traitsRaw.split('|').map(t => t.trim()) : [];
-
-        // Helper to safely parse number users might input "1,000" or "10"
         const parseNum = (val: string | undefined) => {
             if (!val) return undefined;
-            const cleaned = val.replace(/,/g, '').trim(); // Remove commas if any
+            const cleaned = val.replace(/,/g, '').trim();
             const num = parseFloat(cleaned);
             return isNaN(num) ? undefined : num;
         };
@@ -124,7 +106,7 @@ const parseCSV = (csvText: string): LiveDataMap => {
             class: idxClass !== -1 ? cols[idxClass]?.trim() || "" : "",
             stars: idxStars !== -1 ? (parseInt(cols[idxStars]?.trim()) || 0) : 0,
             fur: idxFur !== -1 ? cols[idxFur]?.trim() || "" : "",
-            traits,
+            traits: (idxTraits !== -1 && cols[idxTraits]) ? cols[idxTraits].split('|').map(t => t.trim()) : [],
             eliminations: parseNum(cols[idxElim]),
             deposits: parseNum(cols[idxDeposits]),
             wartDistance: parseNum(cols[idxWart]),
@@ -141,6 +123,35 @@ const parseCSV = (csvText: string): LiveDataMap => {
         };
     }
     return map;
+};
+
+const parseCatalogCSV = (csvText: string): any[] => {
+    const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l);
+    if (lines.length < 2) return [];
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const getIndex = (n: string) => headers.indexOf(n.toLowerCase());
+
+    const idxId = getIndex('ID');
+    const idxName = getIndex('Name');
+    const idxRarity = getIndex('Rarity');
+    let idxImg = getIndex('cardImage');
+    if (idxImg === -1) idxImg = getIndex('ImageURL');
+    const idxDesc = getIndex('Description');
+
+    const data: any[] = [];
+    for (let i = 1; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (!cols[idxName]) continue;
+        data.push({
+            id: idxId !== -1 ? cols[idxId]?.trim() : `item-${i}`,
+            name: cols[idxName]?.trim(),
+            rarity: idxRarity !== -1 ? cols[idxRarity]?.trim() : 'Basic',
+            image: idxImg !== -1 ? cols[idxImg]?.trim() : '',
+            description: idxDesc !== -1 ? cols[idxDesc]?.trim() : undefined
+        });
+    }
+    return data;
 };
 
 // Helper to parse CSV line respecting quotes
