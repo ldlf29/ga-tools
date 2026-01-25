@@ -21,6 +21,7 @@ interface CardGridProps {
 
 export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange, currentLineup, filters, onRemoveFilter, onRefresh }: CardGridProps) {
     const [sortOption, setSortOption] = useState<SortOption>('default');
+    const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -176,6 +177,7 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                             </button>
                         )}
                     </div>
+
                     <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                         <div className={styles.orderByContainer}>
                             <button
@@ -206,6 +208,31 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                             value={searchQuery}
                             onChange={(e) => onSearchChange(e.target.value)}
                         />
+                        <div className={styles.viewToggle}>
+                            <button
+                                className={`${styles.toggleIcon} ${viewMode === 'grid' ? styles.toggleActive : ''}`}
+                                onClick={() => setViewMode('grid')}
+                                title="Gallery View"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                            </button>
+                            <button
+                                className={`${styles.toggleIcon} ${viewMode === 'compact' ? styles.toggleActive : ''}`}
+                                onClick={() => setViewMode('compact')}
+                                title="Compact View"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -232,33 +259,47 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                 )}
             </div>
 
-            <div className={styles.grid}>
+            <div className={viewMode === 'grid' ? styles.grid : styles.compactGrid}>
                 {sortedCards.length === 0 ? (
                     <div className={styles.noResults}>No cards found matching your filters.</div>
                 ) : sortedCards.map((card, idx) => (
                     <div
                         key={`${card.name}-${card.rarity}-${card.category || 'Standard'}-${card.custom?.series || 'None'}-${idx}`}
-                        className={`${styles.cardItem} ${card.cardType === 'SCHEME'
-                            ? styles.scheme
-                            : (styles[card.rarity.toLowerCase()] || styles.basic)
-                            }`}
+                        className={viewMode === 'grid'
+                            ? `${styles.cardItem} ${card.cardType === 'SCHEME' ? styles.scheme : (styles[card.rarity.toLowerCase()] || styles.basic)}`
+                            : `${styles.compactCardItem} ${card.cardType === 'SCHEME' ? styles.compactScheme : (styles['compact' + (card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1).toLowerCase())] || styles.compactBasic)}`
+                        }
                         onClick={() => onAddCard(card)}
                     >
+                        {viewMode === 'grid' ? (
+                            <>
+                                <div className={styles.imageWrapper}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={card.image} alt={card.name} className={styles.cardImage} />
+                                </div>
 
-
-                        <div className={styles.imageWrapper}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={card.image} alt={card.name} className={styles.cardImage} />
-                        </div>
-
-                        <div className={styles.cardInfo}>
-                            <div className={styles.cardHeader}>
-                                <span className={styles.cardName}>{card.name}</span>
-                            </div>
-                            {card.custom.class && (
-                                <div className={styles.cardType}>{card.custom.class}</div>
-                            )}
-                        </div>
+                                <div className={styles.cardInfo}>
+                                    <div className={styles.cardHeader}>
+                                        <span className={styles.cardName}>{card.name}</span>
+                                    </div>
+                                    {card.custom.class && (
+                                        <div className={styles.cardType}>{card.custom.class}</div>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <img src={card.custom.characterImage || card.image} alt={card.name} className={styles.compactImage} />
+                                <div className={styles.compactInfo}>
+                                    <div className={styles.compactName}>{card.name}</div>
+                                    <div className={styles.compactSub}>
+                                        {card.custom.stars > 0 && <span className={styles.compactStars}>{card.custom.stars} ★</span>}
+                                        {card.custom.class && <span className={styles.compactClass}>{card.custom.class}</span>}
+                                    </div>
+                                </div>
+                                <div className={styles.compactRarityLabel}>{card.rarity}</div>
+                            </>
+                        )}
                     </div>
                 ))}
             </div>

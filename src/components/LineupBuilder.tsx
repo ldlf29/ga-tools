@@ -297,7 +297,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                             )}
                                         </button>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={card.image} alt={card.name} className={styles.slotImage} />
+                                        <img src={card.custom.characterImage || card.image} alt={card.name} className={styles.slotImage} />
                                         <div className={styles.slotInfo}>
                                             <div className={styles.slotName}>{card.name}</div>
                                             <div className={styles.slotStars}>
@@ -362,7 +362,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                         </svg>
                                     )}
                                 </button>
-                                <img src={schemeCard.image} alt={schemeCard.name} className={styles.slotImage} />
+                                <img src={schemeCard.custom.characterImage || schemeCard.image} alt={schemeCard.name} className={styles.slotImage} />
                                 <div className={styles.slotInfo}>
                                     <div className={styles.slotName}>{schemeCard.name}</div>
                                     <div className={styles.slotStars}>

@@ -31,6 +31,7 @@ export interface EnhancedCard extends GrandArenaCard {
         score?: number;
         winRate?: number;
         imageUrl?: string;
+        characterImage?: string;
         defense?: number;
         dexterity?: number;
         fortitude?: number;
@@ -122,6 +123,7 @@ const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: stri
             score: stats?.score,
             winRate: stats?.winRate,
             imageUrl: catalogItem.image || stats?.imageUrl,
+            characterImage: stats?.imageUrl || catalogItem.image,
             defense: stats?.defense,
             dexterity: stats?.dexterity,
             fortitude: stats?.fortitude,

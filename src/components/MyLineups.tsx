@@ -424,7 +424,7 @@ export default function MyLineups({
                     {sortedCards.map((card, idx) => (
                         <img
                             key={`${lineup.id}-${idx}`}
-                            src={card.image}
+                            src={card.custom.characterImage || card.image}
                             alt={card.name}
                             title={card.name}
                             className={`${styles.previewImage} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`}

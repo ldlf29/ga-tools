@@ -25,9 +25,10 @@
     position: sticky;
     top: 0;
     background: #84BCFF;
-    padding: 1rem 1.5rem 1rem 1.5rem;
+    padding: 1rem 1.5rem;
     margin-left: -1.5rem;
-    margin-right: 0;
+    margin-right: -1.5rem;
+    /* Match CardGrid */
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
@@ -39,8 +40,8 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    min-height: 36px;
-    /* Match CardGrid refresh button height */
+    min-height: 44px;
+    /* Match CardGrid */
 }
 
 /* ... existing intermediate styles ... */
