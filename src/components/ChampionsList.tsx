@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { MokiData, fetchLiveData } from '@/utils/liveData';
 import styles from './ChampionsList.module.css';
+import * as XLSX from 'xlsx';
 
 type SortField = keyof MokiData;
 type SortDirection = 'asc' | 'desc';
@@ -87,8 +88,54 @@ export default function ChampionsList() {
             setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
         } else {
             setSortField(field);
-            setSortDirection('desc'); // Default to high-to-low for stats usually
+            setSortDirection('asc'); // Default to ascending usually
         }
+    };
+
+    const handleExportExcel = () => {
+        if (sortedData.length === 0) return;
+
+        const exportData = sortedData.map(moki => ({
+            'NAME': moki.name,
+            'FUR': moki.fur || '-',
+            'CLASS': moki.class || '-',
+            'STR': moki.strength?.toFixed(2) || '0.00',
+            'SPD': moki.speed?.toFixed(2) || '0.00',
+            'DEF': moki.defense?.toFixed(2) || '0.00',
+            'DEX': moki.dexterity?.toFixed(2) || '0.00',
+            'FOR': moki.fortitude?.toFixed(2) || '0.00',
+            'TOTAL': moki.totalStats?.toFixed(2) || '0.00',
+            'ELIMS': moki.eliminations?.toFixed(2) || '0.00',
+            'BALLS': moki.deposits?.toFixed(2) || '0.00',
+            'WART': moki.wartDistance?.toFixed(2) || '0.00',
+            'SCORE': moki.score?.toFixed(2) || '0.00',
+            'W/R': moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Champions Stats");
+
+        // Simple column widths
+        const wscols = [
+            { wch: 20 }, // NAME
+            { wch: 12 }, // FUR
+            { wch: 12 }, // CLASS
+            { wch: 8 },  // STR
+            { wch: 8 },  // SPD
+            { wch: 8 },  // DEF
+            { wch: 8 },  // DEX
+            { wch: 8 },  // FOR
+            { wch: 10 }, // TOTAL
+            { wch: 10 }, // ELIMS
+            { wch: 10 }, // BALLS
+            { wch: 10 }, // WART
+            { wch: 10 }, // SCORE
+            { wch: 10 }, // W/R
+        ];
+        worksheet['!cols'] = wscols;
+
+        XLSX.writeFile(workbook, "Champions_Stats.xlsx");
     };
 
     const selectClass = (cls: string) => {
@@ -124,8 +171,14 @@ export default function ChampionsList() {
 
         // Sort
         items.sort((a, b) => {
-            const valA = a[sortField];
-            const valB = b[sortField];
+            let valA = a[sortField];
+            let valB = b[sortField];
+
+            // Case-insensitive sorting for strings
+            if (typeof valA === 'string' && typeof valB === 'string') {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+            }
 
             // Handle undefined
             if (valA === undefined && valB === undefined) return 0;
@@ -224,14 +277,30 @@ export default function ChampionsList() {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <div className={styles.title}>Champions</div>
-                <input
-                    type="text"
-                    placeholder="Search Moki..."
-                    className={styles.searchBar}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+                <div className={styles.headerTopRow}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div className={styles.title}>Champions</div>
+                        <button
+                            className={styles.exportButton}
+                            onClick={handleExportExcel}
+                            title="Export Champions Stats to Excel (.xlsx)"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="18" height="24" fill="currentColor">
+                                <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div className={styles.headerRight}>
+                        <div className={styles.updateInfo}>The data is updated every 12 hours.</div>
+                        <input
+                            type="text"
+                            placeholder="Search Moki..."
+                            className={styles.searchBar}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
 
             <div className={styles.tableContainer}>

@@ -32,12 +32,22 @@ export const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2P
 // Catalog Sheet (ID, Name, Rarity, ImageURL) - 720 entries
 export const CATALOG_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTmjgIeuIwV9vOzPUH8UNrIjxQfB_xP2_pPCS7qqT0PRE2GUssh6qJxdoWC0M5QW6XZrF1E29F1ZMDh/pub?output=csv";
 
+// In-memory cache to avoid redundant fetches within the same session
+let cachedLiveData: LiveDataMap | null = null;
+let cachedCatalogData: any[] | null = null;
+
 export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
-    return fetchAndParseSheet(GOOGLE_SHEET_CSV_URL, parseStatsCSV);
+    if (cachedLiveData) return cachedLiveData;
+    const data = await fetchAndParseSheet(GOOGLE_SHEET_CSV_URL, parseStatsCSV);
+    if (data) cachedLiveData = data;
+    return data;
 };
 
 export const fetchCatalogData = async (): Promise<any[] | null> => {
-    return fetchAndParseSheet(CATALOG_SHEET_CSV_URL, parseCatalogCSV);
+    if (cachedCatalogData) return cachedCatalogData;
+    const data = await fetchAndParseSheet(CATALOG_SHEET_CSV_URL, parseCatalogCSV);
+    if (data) cachedCatalogData = data;
+    return data;
 };
 
 async function fetchAndParseSheet<T>(baseUrl: string, parser: (text: string) => T): Promise<T | null> {

@@ -520,38 +520,54 @@ export default function MyLineups({
         <div className={styles.container}>
             <div className={styles.topBar}>
                 <div className={styles.headerTopRow}>
-                    <h2 className={styles.title}>My Lineups ({filteredLineups.length})</h2>
-                    <input
-                        type="text"
-                        placeholder="Search lineups..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className={styles.searchInput}
-                    />
-                </div>
-
-                {activeFilters.length > 0 && onRemoveFilter && (
-                    <div className={styles.activeFilters}>
-                        {activeFilters.map((f, i) => (
-                            <div key={`${f.key}-${f.value}-${i}`} className={styles.filterChip}>
-                                <span className={styles.filterLabel}>{f.label}: </span>
-                                <span className={styles.filterValue}>
-                                    {f.displayValue || f.value}
-                                </span>
-                                <button
-                                    onClick={() => onRemoveFilter(f.key, f.value)}
-                                    className={styles.removeFilterButton}
-                                >
-                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        ))}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <h2 className={styles.title}>My Lineups ({filteredLineups.length})</h2>
+                        <button
+                            className={styles.exportButton}
+                            onClick={handleExportExcel}
+                            title="Export Favorites to Excel (.xlsx)"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="18" height="24" fill="currentColor">
+                                <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
+                            </svg>
+                        </button>
+                        <div className={styles.storageWarning}>
+                            ⚠️ Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
+                        </div>
                     </div>
-                )}
+                    <div className={styles.headerRight}>
+                        <input
+                            type="text"
+                            placeholder="Search lineups..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className={styles.searchInput}
+                        />
+                    </div>
+                </div>
             </div>
+
+            {activeFilters.length > 0 && onRemoveFilter && (
+                <div className={styles.activeFilters}>
+                    {activeFilters.map((f, i) => (
+                        <div key={`${f.key}-${f.value}-${i}`} className={styles.filterChip}>
+                            <span className={styles.filterLabel}>{f.label}: </span>
+                            <span className={styles.filterValue}>
+                                {f.displayValue || f.value}
+                            </span>
+                            <button
+                                onClick={() => onRemoveFilter(f.key, f.value)}
+                                className={styles.removeFilterButton}
+                            >
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {favoriteLineups.length > 0 && (
                 <div className={styles.section}>
@@ -567,17 +583,6 @@ export default function MyLineups({
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 )}
                             </button>
-                            {favoritesOpen && (
-                                <button
-                                    className={styles.exportButton}
-                                    onClick={handleExportExcel}
-                                    title="Export Favorites to Excel (.xlsx)"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="18" height="24" fill="currentColor">
-                                        <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
-                                    </svg>
-                                </button>
-                            )}
                         </div>
                         {favoritesOpen && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -590,7 +595,7 @@ export default function MyLineups({
                         {favoritesOpen && (
                             <motion.div
                                 key="favorites-content"
-                                initial={false}
+                                initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -631,7 +636,7 @@ export default function MyLineups({
                         {allLineupsOpen && (
                             <motion.div
                                 key="others-content"
-                                initial={false}
+                                initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}

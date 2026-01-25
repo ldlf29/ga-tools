@@ -178,7 +178,7 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                         )}
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div className={styles.headerRight}>
                         <div className={styles.orderByContainer}>
                             <button
                                 className={styles.orderByButton}

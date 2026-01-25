@@ -1,31 +1,44 @@
 .container {
-    width: 1600px;
-    height: 100%;
+    width: 100%;
+    /* Fixed height to match sidebars and enable internal scroll */
+    height: 850px;
     display: flex;
     flex-direction: column;
     padding: 0;
     box-sizing: border-box;
-    overflow: hidden;
-    /* Ensures no outer scrollbar */
+    overflow: visible;
     margin: 0;
-    max-width: 100%;
-    /* Strict constraint */
 }
 
 .header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
     background: #84BCFF;
     padding: 1rem 1.5rem;
+    /* Removed negative margins to align with page content */
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
-    margin-bottom: 1.5rem;
-    z-index: 20;
+    /* Removed sticky to allow it to scroll away with the container */
+    z-index: 40;
 }
 
-/* ... title/searchBar unchanged ... */
+.headerTopRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    /* Unified height */
+}
+
+.headerRight {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
 
 .title {
     font-size: 1.7rem;
@@ -45,12 +58,51 @@
     border-radius: 0.75rem;
     padding: 0.5rem 1rem;
     color: #333333;
-    width: 300px;
+    width: 250px;
     font-size: 0.9rem;
     outline: none;
     transition: all 0.2s;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
+}
+
+.updateInfo {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #333333;
+    opacity: 0.6;
+    white-space: nowrap;
+}
+
+.exportButton {
+    background: #A855F7;
+    /* Purple background */
+    border: 2px solid #333333;
+    border-bottom-width: 4px;
+    border-radius: 12px;
+    color: white;
+    width: 37px;
+    height: 37px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.exportButton:hover {
+    transform: translateY(-2px);
+    background: #C084FC;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.exportButton:active {
+    transform: translateY(1px);
+    border-bottom-width: 2px;
 }
 
 .searchBar:hover,
@@ -67,24 +119,15 @@
 .tableContainer {
     flex: 1;
     overflow-y: scroll;
-    /* Always show scrollbar track to prevent layout shift */
     border: 3px solid #333333;
     border-bottom-width: 8px;
-    /* Thick bottom border like LineupCard */
     border-radius: 20px;
-    /* background-color: #FFFFFF; */
     background: linear-gradient(to bottom,
             #FFD753 0px,
             #FFD753 42px,
-            /* Yellow reaches 44px */
             #333333 42px,
-            /* Black border line starts */
             #333333 44px,
-            /* Black border line ends (2px height) */
-            #FFFFFF 44px
-            /* White continues */
-        );
-
+            #FFFFFF 44px);
 }
 
 .tableContainer::-webkit-scrollbar {
@@ -95,17 +138,13 @@
 .tableContainer::-webkit-scrollbar-track {
     background: transparent;
     margin-top: 46px;
-    /* Scroll starts right below the black line */
     margin-bottom: 20px;
-    /* Avoid overlap with bottom radius */
 }
 
 .tableContainer::-webkit-scrollbar-thumb {
     background-color: #1ABF9E;
-    /* Theme Green */
     border-radius: 9999px;
     border: 2px solid #333333;
-    /* Maintain component border style */
 }
 
 .tableContainer::-webkit-scrollbar-corner {
@@ -116,9 +155,7 @@
     width: 100%;
     min-height: 100%;
     background-color: white;
-
     border-radius: 16px;
-    /* Slightly less than container to fit */
 }
 
 .table {
@@ -133,12 +170,10 @@
     top: 0;
     z-index: 10;
     background-color: #FFD753;
-    /* Yellow */
     padding: 12px 14px;
     text-align: center;
     font-family: 'Inter', sans-serif;
     font-weight: 800;
-    /* Extra Bold */
     font-size: 0.9rem;
     color: white;
     -webkit-text-stroke: 2.25px black;
@@ -160,14 +195,12 @@
 
 .th:hover {
     background-color: #FFC220;
-    /* Softer yellow hover */
 }
 
 .th:last-child {
     border-right: none;
 }
 
-/* Fix width for FUR column */
 .th:nth-child(2),
 .td:nth-child(2) {
     width: 110px;
@@ -175,7 +208,6 @@
     max-width: 110px;
 }
 
-/* Fix width for CLASS column */
 .th:nth-child(3),
 .td:nth-child(3) {
     width: 110px;
@@ -183,9 +215,17 @@
     max-width: 110px;
 }
 
-/* Fix width for all remaining Stat columns (Indices 4-15, including Stars) */
-.th:nth-child(n+4),
-.td:nth-child(n+4) {
+.th:nth-child(n+4):nth-child(-n+9),
+.td:nth-child(n+4):nth-child(-n+9) {
+    width: 75px;
+    min-width: 75px;
+    max-width: 75px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.th:nth-child(n+10),
+.td:nth-child(n+10) {
     width: 90px;
     min-width: 90px;
     max-width: 90px;
@@ -195,11 +235,9 @@
     padding: 10px 16px;
     border-bottom: 1px solid #E5E7EB;
     border-right: 1px solid #E5E7EB;
-    /* Subtle divider for body */
     color: #333333;
     font-family: 'Inter', sans-serif;
     font-weight: 800;
-    /* Bold for stats/class/fur as requested */
     font-size: 0.95rem;
     text-align: center;
     vertical-align: middle;
@@ -209,26 +247,20 @@
     border-right: none;
 }
 
-
-
 .tdName {
     display: flex;
     align-items: center;
     gap: 10px;
     justify-content: flex-start;
     font-weight: 800;
-    /* Extra Bold */
     color: #333333;
-    /* Specific color */
     text-align: left;
 }
 
 .mokiImage {
     height: 40px;
     width: auto;
-    /* Preserve aspect ratio */
     border-radius: 4px;
-    /* Slight radius instead of circle */
     object-fit: contain;
     border: 1px solid #E5E7EB;
     background-color: #f3f4f6;
@@ -241,12 +273,10 @@
 
 .tr:nth-child(even) {
     background-color: #F0F7FF;
-    /* Light blue tint */
 }
 
 .tr:hover {
     background-color: #Dbeafe;
-    /* Hover blue */
 }
 
 .loading,
@@ -275,13 +305,11 @@
     filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
 }
 
-/* Dropdown Menu Styles */
 .dropdownMenu {
     position: absolute;
     top: 100%;
     left: 0;
     background-color: #FFD753;
-    /* Yellow */
     border: 1px dashed black;
     border-radius: 8px;
     padding: 5px 0;
@@ -297,7 +325,6 @@
     cursor: pointer;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
-    /* Regular */
     font-size: 0.9rem;
     color: #333333;
     text-align: left;
@@ -308,7 +335,6 @@
 .dropdownItem:hover {
     background-color: #FFC220;
     font-weight: 700;
-    /* Bold on hover */
 }
 
 .linkButton {
@@ -316,7 +342,6 @@
     align-items: center;
     justify-content: center;
     margin-left: auto;
-    /* Pushes button to right edge for vertical alignment */
     padding: 4px;
     background-color: #FFD753;
     border: 0.15rem solid #333;
@@ -347,5 +372,4 @@
     font-size: 1.2rem;
     color: #333333;
     width: 100%;
-    /* Ensure full width */
 }

@@ -355,7 +355,7 @@ export default function Home() {
       </header>
 
       <div className={styles.content}>
-        {activeTab === 'builder' && (
+        <div style={{ display: activeTab === 'builder' ? 'block' : 'none' }}>
           <div className={styles.mainLayout}>
             {/* Column 1: FilterSidebar */}
             <FilterSidebar filters={filters} onFilterChange={setFilters} />
@@ -382,9 +382,9 @@ export default function Home() {
               onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
             />
           </div>
-        )}
+        </div>
 
-        {activeTab === 'lineups' && (
+        <div style={{ display: activeTab === 'lineups' ? 'block' : 'none' }}>
           <div className={styles.mainLayoutLineups}>
             {/* Column 1: Sidebar */}
             <FilterSidebar filters={filters} onFilterChange={setFilters} />
@@ -409,13 +409,13 @@ export default function Home() {
               />
             </div>
           </div>
-        )}
+        </div>
 
-        {activeTab === 'champions' && (
+        <div style={{ display: activeTab === 'champions' ? 'block' : 'none' }}>
           <div style={{ padding: '0 2rem' }}>
             <ChampionsList />
           </div>
-        )}
+        </div>
       </div>
 
       <button
@@ -436,7 +436,6 @@ export default function Home() {
         </div>
       )}
 
-      <Toast messages={toasts} onClose={removeToast} />
     </main>
   );
 }

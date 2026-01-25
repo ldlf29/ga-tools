@@ -28,6 +28,12 @@
     /* Unified height */
 }
 
+.headerRight {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
 .resultsTitle {
     font-size: 1.7rem;
     font-family: var(--font-display);

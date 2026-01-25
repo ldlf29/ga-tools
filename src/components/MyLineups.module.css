@@ -17,6 +17,17 @@
         1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
 
+.storageWarning {
+    font-size: 0.75rem;
+    font-style: italic;
+    color: #333333;
+    opacity: 0.7;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+}
+
 .topBar {
     display: flex;
     flex-direction: column;
@@ -32,7 +43,7 @@
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
-    z-index: 60;
+    z-index: 40;
 }
 
 .headerTopRow {
@@ -42,6 +53,12 @@
     width: 100%;
     min-height: 44px;
     /* Match CardGrid */
+}
+
+.headerRight {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 /* ... existing intermediate styles ... */
@@ -1027,6 +1044,7 @@
     cursor: pointer;
     transition: all 0.2s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
 .exportButton:hover {
