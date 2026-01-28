@@ -483,7 +483,7 @@ export default function Home() {
       </header>
 
       <div className={styles.content}>
-        <div style={{ display: activeTab === 'builder' ? 'block' : 'none' }}>
+        <div style={{ display: activeTab === 'builder' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
 
           {/* Mobile Floating Action Buttons */}
           <div className={styles.fabContainer}>
@@ -504,7 +504,7 @@ export default function Home() {
             </div>
 
             {/* Column 2: CardGrid */}
-            <div style={{ width: '100%' }}>
+            <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
               <CardGrid
                 cards={filteredCards}
                 onAddCard={handleAddToLineup}
@@ -531,13 +531,23 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ display: activeTab === 'lineups' ? 'block' : 'none' }}>
+        <div style={{ display: activeTab === 'lineups' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+          {/* Mobile Floating Action Buttons */}
+          <div className={styles.fabContainer}>
+            <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
+              {/* Filter Icon */}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            </button>
+          </div>
+
           <div className={styles.mainLayoutLineups}>
             {/* Column 1: Sidebar */}
-            <FilterSidebar filters={filters} onFilterChange={setFilters} />
+            <div className={styles.desktopOnly}>
+              <FilterSidebar filters={filters} onFilterChange={setFilters} />
+            </div>
 
             {/* Column 2: Lineups List */}
-            <div style={{ gridColumn: '2 / span 2' }}>
+            <div style={{ gridColumn: '2 / span 2', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
               <MyLineups
                 lineups={savedLineups}
                 onDelete={handleDeleteLineup}
@@ -558,7 +568,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ display: activeTab === 'champions' ? 'block' : 'none' }}>
+        <div style={{ display: activeTab === 'champions' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
           <div style={{ padding: '0 2rem' }}>
             <ChampionsList />
           </div>

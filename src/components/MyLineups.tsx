@@ -525,7 +525,7 @@ export default function MyLineups({
         <div className={styles.container}>
             <div className={styles.topBar}>
                 <div className={styles.headerTopRow}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div className={styles.titleGroup}>
                         <h2 className={styles.title}>My Lineups ({filteredLineups.length})</h2>
                         <button
                             className={styles.exportButton}
@@ -540,7 +540,7 @@ export default function MyLineups({
                             ⚠️ Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
                         </div>
                     </div>
-                    <div className={styles.headerRight}>
+                    <div className={`${styles.headerRight} ${styles.desktopSearch}`}>
                         <input
                             type="text"
                             placeholder="Search lineups..."
@@ -549,6 +549,16 @@ export default function MyLineups({
                             className={styles.searchInput}
                         />
                     </div>
+                </div>
+
+                <div className={styles.searchRow}>
+                    <input
+                        type="text"
+                        placeholder="Search lineups..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className={styles.searchInput}
+                    />
                 </div>
             </div>
 

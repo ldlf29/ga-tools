@@ -233,7 +233,7 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
     });
 
     return (
-        <div className={styles.gridContainer} style={{ height: '90vh', display: 'flex', flexDirection: 'column' }}>
+        <div className={styles.gridContainer}>
 
             <div className={styles.headerContainer}>
                 <div className={styles.headerTopRow}>
@@ -363,19 +363,19 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                             // Calculate Items Per Row Based on Width
                             let itemsPerRow = 4;
                             if (viewMode === 'grid') {
-                                if (w < 480) itemsPerRow = 1;
-                                else if (w < 768) itemsPerRow = 2;
-                                else if (w < 850) itemsPerRow = 3;
+                                if (w < 600) itemsPerRow = 3;
+                                else if (w < 1200) itemsPerRow = 4;
+                                else itemsPerRow = 5; // Extra wide screens
                             } else {
                                 // Compact Mode
                                 if (w < 768) itemsPerRow = 1;
                                 else itemsPerRow = 2;
                             }
 
-                            const colGap = 16;
+                            const colGap = w < 600 ? 8 : 16;
                             const rowGap = 2;
 
-                            const availableWidth = w - 24;
+                            const availableWidth = w - (w < 600 ? 16 : 24);
                             const colWidth = Math.max(0, (availableWidth - (colGap * (itemsPerRow - 1))) / itemsPerRow);
 
                             const rowHeight = viewMode === 'grid'
