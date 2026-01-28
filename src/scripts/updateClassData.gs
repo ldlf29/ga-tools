@@ -1,17 +1,3 @@
-/**
- * Google Apps Script to Auto-Update Moki Classes (Optimized Batch Version)
- * 
- * INSTRUCTIONS:
- * 1. Ensure your Google Sheet has a column named "ID".
- * 2. Paste this code into Extensions > Apps Script (replace the old one).
- * 3. Run 'updateMokiClasses'.
- * 
- * OPTIMIZATIONS:
- * - Writes data in bulk at the end (orders of magnitude faster).
- * - Fetches APIs in parallel batches (UrlFetchApp.fetchAll).
- * - Checks for time limits to save safely before timeout.
- */
-
 const API_BASE_URL = "https://train.grandarena.gg/api/moki/";
 const BATCH_SIZE = 10; // Requests in parallel
 const MAX_EXEC_TIME_MS = 300 * 1000; // 5 minutes (limit is 6)

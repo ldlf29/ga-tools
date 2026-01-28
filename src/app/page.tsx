@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
+import useSWR from 'swr';
 import CardGrid from '@/components/CardGrid';
 import FilterSidebar, { FilterState } from '@/components/FilterSidebar';
 import LineupBuilder from '@/components/LineupBuilder';
@@ -8,39 +9,51 @@ import { fetchLiteCollection, EnhancedCard, getCardGroupKey } from '@/utils/card
 import styles from './page.module.css';
 import Toast, { ToastMessage } from '@/components/Toast';
 import MyLineups, { SavedLineup } from '@/components/MyLineups';
-import { matchesFilter } from '@/utils/filterUtils';
+// import { matchesFilter } from '@/utils/filterUtils'; // Moved to Worker
 import ChampionsList from '@/components/ChampionsList';
 
 export default function Home() {
   /* State */
   const [activeTab, setActiveTab] = useState<'builder' | 'lineups' | 'champions'>('builder');
   const [savedLineups, setSavedLineups] = useState<SavedLineup[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [allCards, setAllCards] = useState<EnhancedCard[]>([]);
   const [lineup, setLineup] = useState<EnhancedCard[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const lastToastTimeRef = useRef<{ [key: string]: number }>({});
 
+  // SWR for instant loading + background refresh
+  const { data: allCards = [], isLoading, mutate } = useSWR('liteCollection', fetchLiteCollection, {
+    revalidateOnFocus: false,
+    revalidateIfStale: true,
+    fallbackData: []
+  });
+
+  // Handle Hydration: Load cache only after mount
+  useEffect(() => {
+    const cached = localStorage.getItem('cachedCards');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.length > 0) {
+          mutate(parsed, false); // Update current data without re-fetching
+        }
+      } catch (e) {
+        console.error("Failed to load cached cards", e);
+      }
+    }
+  }, [mutate]);
+
+  // Keep localStorage in sync for next load
+  useEffect(() => {
+    if (allCards && allCards.length > 0) {
+      localStorage.setItem('cachedCards', JSON.stringify(allCards));
+    }
+  }, [allCards]);
+
   /* Controls */
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [mokiDropdownOpen, setMokiDropdownOpen] = useState(false);
-  const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-
-  // Refs for Dropdowns
-  const toolsRef = useRef<HTMLDivElement>(null);
-
-  // Click Outside Handler
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (toolsRef.current && !toolsRef.current.contains(event.target as Node)) {
-        setToolsDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   // Scroll to Top Logic
   useEffect(() => {
@@ -72,22 +85,11 @@ export default function Home() {
     localStorage.setItem('grandArenaLineups', JSON.stringify(savedLineups));
   }, [savedLineups]);
 
-  // Load Lite Collection
-  useEffect(() => {
-    const loadCollection = async () => {
-      setLoading(true);
-      try {
-        const cards = await fetchLiteCollection();
-        setAllCards(cards);
-      } catch (e) {
-        console.error("Failed to load collection", e);
-        addToast("Error loading cards", 'error', true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadCollection();
-  }, []);
+  // Handle Refresh explicitly
+  const handleRefresh = async () => {
+    await mutate();
+    addToast("Data updated!", 'success');
+  };
 
   const addToast = (text: string, type: 'error' | 'success' | 'warning' | 'suggestion', force: boolean = false) => {
     if (!notificationsEnabled && !force) return;
@@ -254,41 +256,189 @@ export default function Home() {
     addToast("Suggestion Applied!", 'success');
   };
 
-  const filteredCards = useMemo(() => {
-    return allCards.filter(card => matchesFilter(card, filters, searchQuery));
+  /* Web Worker for Filtering */
+  const [filteredCards, setFilteredCards] = useState<EnhancedCard[]>([]);
+  const workerRef = useRef<Worker | null>(null);
+
+  useEffect(() => {
+    // Initialize Worker
+    workerRef.current = new Worker(new URL('../workers/filter.worker.ts', import.meta.url));
+
+    // Listen for results
+    workerRef.current.onmessage = (event: MessageEvent) => {
+      setFilteredCards(event.data);
+    };
+
+    return () => {
+      workerRef.current?.terminate();
+    };
+  }, []);
+
+  // Post message to worker when inputs change
+  useEffect(() => {
+    if (workerRef.current) {
+      workerRef.current.postMessage({ allCards, filters, searchQuery });
+    }
   }, [allCards, filters, searchQuery]);
+
+  /* Drawer State */
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [mobileBuilderOpen, setMobileBuilderOpen] = useState(false);
+
+  /* Helper to close drawers */
+  const closeDrawers = () => {
+    setMobileFiltersOpen(false);
+    setMobileBuilderOpen(false);
+    setMobileMenuOpen(false);
+  };
 
   return (
     <main className={styles.main}>
-      <header className={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <img src="/ga-logo.png" alt="Grand Arena Builder" className={styles.logo} />
+      {/* Backdrop for Mobile Drawers & Menu */}
+      <div
+        className={`${styles.drawerOverlay} ${mobileFiltersOpen || mobileBuilderOpen || mobileMenuOpen ? styles.drawerOverlayVisible : ''}`}
+        onClick={closeDrawers}
+      />
 
-          <nav className={styles.navTabs}>
-            <button
-              className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('builder')}
-            >
-              Builder
-            </button>
-            <button
-              className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('lineups')}
-            >
-              My Lineups
-            </button>
-            <button
-              className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('champions')}
-            >
-              Champions
-            </button>
-          </nav>
+      {/* Mobile Navigation Drawer */}
+      <div className={`${styles.navContainer} ${styles.mobileOnly} ${mobileMenuOpen ? styles.navContainerVisible : ''}`}>
+        <div className={`${styles.drawerHeader} ${styles.mobileOnly}`}>
+          <img src="/ga-logo.png" alt="Grand Arena" className={styles.drawerLogo} />
+          <button
+            className={styles.closeMenuButton}
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close Menu"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
 
+        <nav className={styles.navTabs}>
+          <button
+            className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
+            onClick={() => { setActiveTab('builder'); closeDrawers(); }}
+          >
+            Builder
+          </button>
+          <button
+            className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
+            onClick={() => { setActiveTab('lineups'); closeDrawers(); }}
+          >
+            My Lineups
+          </button>
+          <button
+            className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
+            onClick={() => { setActiveTab('champions'); closeDrawers(); }}
+          >
+            Champions
+          </button>
+        </nav>
+
+        {/* Auth wrapper for mobile drawer - only contains connect wallet */}
         <div className={styles.authWrapper}>
-          <div className={styles.headerControls}>
-            {/* Moki Praying Button with Dropdown */}
+          <button
+            className={styles.connectButton}
+            style={{ opacity: 0.7, cursor: 'not-allowed' }}
+            onClick={handleConnect}
+            title="Coming soon!"
+          >
+            Connect Wallet
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Filters Drawer */}
+      <div className={`${styles.mobileDrawer} ${styles.filterDrawer} ${styles.mobileOnly} ${mobileFiltersOpen ? styles.filterDrawerOpen : ''}`}>
+        <FilterSidebar filters={filters} onFilterChange={setFilters} />
+      </div>
+
+      {/* Mobile Builder Drawer */}
+      <div className={`${styles.mobileDrawer} ${styles.builderDrawer} ${styles.mobileOnly} ${mobileBuilderOpen ? styles.builderDrawerOpen : ''}`}>
+        <LineupBuilder
+          lineup={lineup}
+          onRemove={handleRemoveFromLineup}
+          onClear={handleClearLineup}
+          onSave={handleSaveLineup}
+          onUpdate={setLineup}
+          onSuggestFilters={handleSuggestFilters}
+          onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
+        />
+      </div>
+
+      <header className={styles.header}>
+        <div className={styles.headerMain}>
+          <div className={styles.headerLeft}>
+            <img src="/ga-logo.png" alt="Grand Arena Builder" className={styles.logo} />
+
+            {/* Desktop Navigation */}
+            <nav className={`${styles.navContainer} ${styles.desktopOnly}`}>
+              <div className={styles.navTabs}>
+                <button
+                  className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
+                  onClick={() => setActiveTab('builder')}
+                >
+                  Builder
+                </button>
+                <button
+                  className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
+                  onClick={() => setActiveTab('lineups')}
+                >
+                  My Lineups
+                </button>
+                <button
+                  className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
+                  onClick={() => setActiveTab('champions')}
+                >
+                  Champions
+                </button>
+              </div>
+            </nav>
+          </div>
+
+          {/* Desktop Controls */}
+          <div className={`${styles.authWrapper} ${styles.desktopOnly}`}>
+            <div className={styles.headerControls}>
+              <div className={styles.mokiButtonContainer}>
+                <button
+                  onClick={() => {
+                    if (!mokiDropdownOpen) {
+                      setMokiDropdownOpen(true);
+                      setTimeout(() => setMokiDropdownOpen(false), 1500);
+                    }
+                  }}
+                  className={styles.mokiButton}
+                  title="Dorime"
+                >
+                  <img src="/moki-praying.png" alt="Moki" width={56} height={56} />
+                </button>
+                <div className={`${styles.mokiDropdown} ${mokiDropdownOpen ? styles.mokiDropdownOpen : ''}`}>
+                  <img src="/count.png" alt="Count" width={24} height={24} />
+                </div>
+              </div>
+
+
+              <button onClick={() => setNotificationsEnabled(!notificationsEnabled)} className={styles.iconButton} title={notificationsEnabled ? "Disable Notifications" : "Enable Notifications"}>
+                {notificationsEnabled ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                )}
+              </button>
+            </div>
+
+            <button
+              className={styles.connectButton}
+              style={{ opacity: 0.7, cursor: 'not-allowed' }}
+              onClick={handleConnect}
+              title="Coming soon!"
+            >
+              Connect Wallet
+            </button>
+          </div>
+
+          {/* Mobile Header Right Controls: Notifications + Toggle */}
+          <div className={`${styles.headerRightMobile} ${styles.mobileOnly}`}>
             <div className={styles.mokiButtonContainer}>
               <button
                 onClick={() => {
@@ -300,87 +450,84 @@ export default function Home() {
                 className={styles.mokiButton}
                 title="Dorime"
               >
-                <img src="/moki-praying.png" alt="Moki" width={56} height={56} />
+                <img src="/moki-praying.png" alt="Moki" width={44} height={44} />
               </button>
               <div className={`${styles.mokiDropdown} ${mokiDropdownOpen ? styles.mokiDropdownOpen : ''}`}>
-                <img src="/count.png" alt="Count" width={24} height={24} />
+                <img src="/count.png" alt="Count" width={20} height={20} />
               </div>
             </div>
 
-            {/* Tools Button */}
-            <div className={styles.toolsContainer} ref={toolsRef}>
-              <button
-                onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
-                className={styles.iconButton}
-                title="Tools & Analytics"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                </svg>
-              </button>
-              {toolsDropdownOpen && (
-                <div className={styles.toolsDropdown}>
-                  <p>For more stats and analysis tools, you should visit:</p>
-                  <a href="https://mokimanager.com" target="_blank" rel="noopener noreferrer" className={styles.toolsLink}>
-                    mokimanager.com
-                  </a>
-                  <a href="https://gatracker.xyz" target="_blank" rel="noopener noreferrer" className={styles.toolsLink}>
-                    gatracker.xyz
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Notification Toggle */}
-            <button onClick={() => setNotificationsEnabled(!notificationsEnabled)} className={styles.iconButton} title={notificationsEnabled ? "Disable Notifications" : "Enable Notifications"}>
+            <button
+              onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+              className={styles.iconButton}
+              aria-label="Toggle Notifications"
+            >
               {notificationsEnabled ? (
-                /* Bell */
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
               ) : (
-                /* Bell Off */
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
               )}
             </button>
-          </div>
 
-          <button
-            className={styles.connectButton}
-            style={{ opacity: 0.7, cursor: 'not-allowed' }}
-            onClick={handleConnect}
-            title="Coming soon!"
-          >
-            Connect Wallet
-          </button>
+            <button
+              className={`${styles.menuToggle} ${mobileMenuOpen ? styles.menuToggleActive : ''}`}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle Menu"
+            >
+              <div className={styles.hamburgerLine} />
+              <div className={styles.hamburgerLine} />
+              <div className={styles.hamburgerLine} />
+            </button>
+          </div>
         </div>
       </header>
 
       <div className={styles.content}>
         <div style={{ display: activeTab === 'builder' ? 'block' : 'none' }}>
+
+          {/* Mobile Floating Action Buttons */}
+          <div className={styles.fabContainer}>
+            <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
+              {/* Filter Icon */}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            </button>
+            <button className={`${styles.fabButton} ${styles.fabBuilder}`} onClick={() => setMobileBuilderOpen(true)}>
+              {/* Hammer Icon PNG from public */}
+              <img src="/hammer.png" alt="Hammer" width={32} height={32} style={{ filter: 'brightness(0) invert(1)' }} />
+            </button>
+          </div>
+
           <div className={styles.mainLayout}>
-            {/* Column 1: FilterSidebar */}
-            <FilterSidebar filters={filters} onFilterChange={setFilters} />
+            {/* Column 1: FilterSidebar (Desktop only) */}
+            <div className={styles.desktopOnly}>
+              <FilterSidebar filters={filters} onFilterChange={setFilters} />
+            </div>
 
             {/* Column 2: CardGrid */}
-            <CardGrid
-              cards={filteredCards}
-              onAddCard={handleAddToLineup}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              currentLineup={lineup}
-              filters={filters}
-              onRemoveFilter={handleRemoveFilter}
-            />
+            <div style={{ width: '100%' }}>
+              <CardGrid
+                cards={filteredCards}
+                onAddCard={handleAddToLineup}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                currentLineup={lineup}
+                filters={filters}
+                onRemoveFilter={handleRemoveFilter}
+              />
+            </div>
 
-            {/* Column 3: LineupBuilder */}
-            <LineupBuilder
-              lineup={lineup}
-              onRemove={handleRemoveFromLineup}
-              onClear={handleClearLineup}
-              onSave={handleSaveLineup}
-              onUpdate={setLineup}
-              onSuggestFilters={handleSuggestFilters}
-              onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
-            />
+            {/* Column 3: LineupBuilder (Desktop only) */}
+            <div className={styles.desktopOnly}>
+              <LineupBuilder
+                lineup={lineup}
+                onRemove={handleRemoveFromLineup}
+                onClear={handleClearLineup}
+                onSave={handleSaveLineup}
+                onUpdate={setLineup}
+                onSuggestFilters={handleSuggestFilters}
+                onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
+              />
+            </div>
           </div>
         </div>
 
@@ -429,13 +576,16 @@ export default function Home() {
         </svg>
       </button>
 
-      {loading && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div className={styles.spinner} style={{ width: '50px', height: '50px', border: '5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-          <p style={{ color: '#fff', marginLeft: '1rem' }}>Loading Cards Catalog...</p>
-        </div>
-      )}
+      {
+        isLoading && allCards.length === 0 && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+            <div className={styles.spinner} style={{ width: '50px', height: '50px', border: '5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+            <p style={{ color: '#fff', marginLeft: '1rem' }}>Loading Cards Catalog...</p>
+          </div>
+        )
+      }
 
-    </main>
+      <Toast messages={toasts} onClose={removeToast} />
+    </main >
   );
 }

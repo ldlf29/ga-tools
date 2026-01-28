@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import NextImage from 'next/image';
 import styles from './RatingSlider.module.css';
 
 interface RatingSliderProps {
@@ -126,8 +127,16 @@ const RatingSlider: React.FC<RatingSliderProps> = ({ value, onChange, disabled, 
                 style={{ left: `${percentage}%` }}
             >
                 {/* Image centered on knob */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/rating-character.png" alt="Rating Knob" className={styles.character} />
+                <div style={{ position: 'relative', width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <NextImage
+                        src="/rating-character.png"
+                        alt="Rating Knob"
+                        width={60}
+                        height={60}
+                        className={styles.character}
+                        style={{ objectFit: 'contain' }}
+                    />
+                </div>
 
                 {/* Floating Value Bubble (optional, but nice) */}
                 {/* <div className={styles.valueBubble}>{localValue}</div> */}

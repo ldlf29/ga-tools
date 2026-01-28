@@ -37,6 +37,7 @@ export interface EnhancedCard extends GrandArenaCard {
         fortitude?: number;
         speed?: number;
         strength?: number;
+        totalStats?: number;
         marketLink?: string;
     };
 }
@@ -100,6 +101,48 @@ const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: stri
     const isScheme = catalogItem.id.toLowerCase().startsWith('scheme') || (normalizedName.includes(' ') && !stats);
     const cardType = isScheme ? 'SCHEME' : 'MOKI';
 
+    // Local overrides for minimized version (characterImage) of specific Scheme cards
+    const localSchemeImages: { [key: string]: string } = {
+        'AGGRESSIVE SPECIALIZATION': '/scheme/aggressive specialization.png',
+        'BAITING THE TRAP': '/scheme/baiting the trap.png',
+        'BEAT THE BUZZER': '/scheme/beat the buzzer.png',
+        'BIG GAME HUNT': '/scheme/big game hunt.png',
+        'CAGE MATCH': '/scheme/cage match.png',
+        'CALL TO ARMS': '/scheme/call to arms.png',
+        'COLLECT EM ALL': '/scheme/collect em all.png',
+        'COLLECT \'EM ALL': '/scheme/collect em all.png',
+        'COLLECTIVE SPECIALIZATION': '/scheme/collective specialization.png',
+        'COSTUME PARTY': '/scheme/costume party.png',
+        'CURSED DINNER': '/scheme/cursed dinner.png',
+        'DIVINE INTERVENTION': '/scheme/divine intervention.png',
+        'DRESS TO IMPRESS': '/scheme/dress to impress.png',
+        'DUNGAREE DUEL': '/scheme/dungaree duel.png',
+        'ENFORCING THE NAUGHTY LIST': '/scheme/enforcing the naughty list.png',
+        'FINAL BLOW': '/scheme/final blow.png',
+        'FLEXING': '/scheme/flexing.png',
+        'GACHA GOUGING': '/scheme/gacha gouging.png',
+        'GACHA HOARDING': '/scheme/gacha hoarding.png',
+        'GOLDEN SHOWER': '/scheme/golden shower.png',
+        'GRABBING BALLS': '/scheme/grabbing balls.png',
+        'HOUSEKEEPING': '/scheme/housekeeping.png',
+        'LITTER COLLECTION': '/scheme/litter collection.png',
+        'MALICIOUS INTENT': '/scheme/malicious intent.png',
+        'MIDNIGHT STRIKE': '/scheme/midnight strike.png',
+        'MOKI SMASH': '/scheme/moki smash.png',
+        'RAINBOW RIOT': '/scheme/rainbow riot.png',
+        'RUNNING INTERFERENCE': '/scheme/running interference.png',
+        'SACCING': '/scheme/saccing.png',
+        'SHAPESHIFTING': '/scheme/shapeshifting.png',
+        'TAKING A DIVE': '/scheme/taking a dive.png',
+        'TEAR JERKING': '/scheme/tear jerking.png',
+        'TOUCHING THE WART': '/scheme/touching the wart.png',
+        'VICTORY LAP': '/scheme/victory lap.png',
+        'WART RODEO': '/scheme/wart rodeo.png',
+        'WHALE WATCHING': '/scheme/whale watching.png'
+    };
+
+    const characterImage = localSchemeImages[normalizedName] || stats?.imageUrl || catalogItem.image;
+
     return {
         id: catalogItem.id,
         name: catalogItem.name,
@@ -123,12 +166,13 @@ const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: stri
             score: stats?.score,
             winRate: stats?.winRate,
             imageUrl: catalogItem.image || stats?.imageUrl,
-            characterImage: stats?.imageUrl || catalogItem.image,
+            characterImage: characterImage,
             defense: stats?.defense,
             dexterity: stats?.dexterity,
             fortitude: stats?.fortitude,
             speed: stats?.speed,
             strength: stats?.strength,
+            totalStats: stats?.totalStats,
             marketLink: stats?.marketLink
         }
     };

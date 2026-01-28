@@ -3,6 +3,7 @@
 import { EnhancedCard } from '@/utils/cardService';
 import styles from './LineupBuilder.module.css';
 import { useState } from 'react';
+import NextImage from 'next/image';
 import { FilterState } from './FilterSidebar';
 
 interface LineupBuilderProps {
@@ -296,8 +297,16 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                                 </svg>
                                             )}
                                         </button>
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={card.custom.characterImage || card.image} alt={card.name} className={styles.slotImage} />
+                                        <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0, marginRight: '0.75rem' }}>
+                                            <NextImage
+                                                src={card.custom.characterImage || card.image}
+                                                alt={card.name}
+                                                width={48}
+                                                height={48}
+                                                className={styles.slotImage}
+                                                style={{ objectFit: 'cover', borderRadius: '0.25rem' }}
+                                            />
+                                        </div>
                                         <div className={styles.slotInfo}>
                                             <div className={styles.slotName}>{card.name}</div>
                                             <div className={styles.slotStars}>
@@ -362,7 +371,16 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                         </svg>
                                     )}
                                 </button>
-                                <img src={schemeCard.custom.characterImage || schemeCard.image} alt={schemeCard.name} className={styles.slotImage} />
+                                <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0, marginRight: '0.75rem' }}>
+                                    <NextImage
+                                        src={schemeCard.custom.characterImage || schemeCard.image}
+                                        alt={schemeCard.name}
+                                        width={48}
+                                        height={48}
+                                        className={styles.slotImage}
+                                        style={{ objectFit: 'cover', borderRadius: '0.25rem' }}
+                                    />
+                                </div>
                                 <div className={styles.slotInfo}>
                                     <div className={styles.slotName}>{schemeCard.name}</div>
                                     <div className={styles.slotStars}>

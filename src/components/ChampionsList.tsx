@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { MokiData, fetchLiveData } from '@/utils/liveData';
+import NextImage from 'next/image';
 import styles from './ChampionsList.module.css';
 import * as XLSX from 'xlsx';
 
@@ -337,14 +338,16 @@ export default function ChampionsList() {
                                         <td className={styles.td}>
                                             <div className={styles.tdName}>
                                                 {moki.imageUrl && (
-                                                    <img
-                                                        src={moki.imageUrl}
-                                                        alt={moki.name}
-                                                        className={styles.mokiImage}
-                                                        onError={(e) => {
-                                                            e.currentTarget.style.display = 'none';
-                                                        }}
-                                                    />
+                                                    <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
+                                                        <NextImage
+                                                            src={moki.imageUrl}
+                                                            alt={moki.name}
+                                                            width={40}
+                                                            height={40}
+                                                            className={styles.mokiImage}
+                                                            style={{ objectFit: 'contain' }}
+                                                        />
+                                                    </div>
                                                 )}
                                                 {moki.name}
                                                 {moki.marketLink && (

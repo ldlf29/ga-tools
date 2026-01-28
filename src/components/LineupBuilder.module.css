@@ -178,6 +178,24 @@
     transition: all 0.2s;
 }
 
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.slot:not(.empty) {
+    animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
 .slot.empty {
     border: 1px dashed var(--color-border);
     justify-content: center;
@@ -467,8 +485,8 @@
 }
 
 .lowerFooter {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
     border-top: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;

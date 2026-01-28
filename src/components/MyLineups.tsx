@@ -4,6 +4,7 @@ import { EnhancedCard, getCardGroupKey } from '@/utils/cardService';
 import { matchesFilter } from '@/utils/filterUtils';
 import { FilterState } from './FilterSidebar';
 import styles from './MyLineups.module.css';
+import NextImage from 'next/image';
 import RatingSlider from './RatingSlider';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -422,13 +423,17 @@ export default function MyLineups({
 
                 <div className={styles.cardPreview}>
                     {sortedCards.map((card, idx) => (
-                        <img
-                            key={`${lineup.id}-${idx}`}
-                            src={card.custom.characterImage || card.image}
-                            alt={card.name}
-                            title={card.name}
-                            className={`${styles.previewImage} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`}
-                        />
+                        <div key={`${lineup.id}-${idx}`} className={styles.previewImageContainer} style={{ position: 'relative', flex: 1, aspectRatio: '0.7' }}>
+                            <NextImage
+                                src={card.custom.characterImage || card.image}
+                                alt={card.name}
+                                title={card.name}
+                                fill
+                                sizes="(max-width: 400px) 20vw, 50px"
+                                className={`${styles.previewImage} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`}
+                                style={{ objectFit: 'cover', borderRadius: '0.5rem' }}
+                            />
+                        </div>
                     ))}
                 </div>
 
@@ -738,8 +743,14 @@ export default function MyLineups({
 
                                     return sortedModalCards.map((card, idx) => (
                                         <div key={idx} className={styles.modalCardWrapper}>
-                                            <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`} style={{ flexShrink: 0 }}>
-                                                <img src={card.image} alt={card.name} />
+                                            <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`} style={{ flexShrink: 0, position: 'relative' }}>
+                                                <NextImage
+                                                    src={card.image}
+                                                    alt={card.name}
+                                                    fill
+                                                    sizes="200px"
+                                                    style={{ objectFit: 'cover' }}
+                                                />
                                             </div>
                                             <div className={styles.modalCardClass}>{card.custom.class}</div>
                                         </div>

@@ -1,0 +1,4532 @@
+[
+  {
+    "id": "2",
+    "name": "Two",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/710904d4044f5ab4_full.webp"
+  },
+  {
+    "id": "2",
+    "name": "Two",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/72381549a00082a2_full.webp"
+  },
+  {
+    "id": "2",
+    "name": "Two",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/648e424f67afa073_full.webp"
+  },
+  {
+    "id": "2",
+    "name": "Two",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/24586529a8e2341a_full.webp"
+  },
+  {
+    "id": "73",
+    "name": "Trippy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/56c8f683112fda5e_full.webp"
+  },
+  {
+    "id": "73",
+    "name": "Trippy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/082640d811e2c5e7_full.webp"
+  },
+  {
+    "id": "73",
+    "name": "Trippy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e654462250c3952f_full.webp"
+  },
+  {
+    "id": "73",
+    "name": "Trippy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b0a21acd2d02c53b_full.webp"
+  },
+  {
+    "id": "227",
+    "name": "The Golden Boy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6618bd154d38d63d_full.webp"
+  },
+  {
+    "id": "227",
+    "name": "The Golden Boy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f476986149ca6cec_full.webp"
+  },
+  {
+    "id": "227",
+    "name": "The Golden Boy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bcd5cb619401805e_full.webp"
+  },
+  {
+    "id": "227",
+    "name": "The Golden Boy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/05f0bb09b9732f75_full.webp"
+  },
+  {
+    "id": "235",
+    "name": "SuperMagus",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ab42a6a8c121f506_full.webp"
+  },
+  {
+    "id": "235",
+    "name": "SuperMagus",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/93467d4afa095352_full.webp"
+  },
+  {
+    "id": "235",
+    "name": "SuperMagus",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/895cfd76507d888c_full.webp"
+  },
+  {
+    "id": "235",
+    "name": "SuperMagus",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/158ff40ddbf24e1b_full.webp"
+  },
+  {
+    "id": "298",
+    "name": "Defrankong",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/132fe20bf3f4a748_full.webp"
+  },
+  {
+    "id": "298",
+    "name": "Defrankong",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/65eb6c6223fece09_full.webp"
+  },
+  {
+    "id": "298",
+    "name": "Defrankong",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/cc6eeba231ddef23_full.webp"
+  },
+  {
+    "id": "298",
+    "name": "Defrankong",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bc3134a398b94022_full.webp"
+  },
+  {
+    "id": "316",
+    "name": "Maid of Coins",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/31e0baae7681c295_full.webp"
+  },
+  {
+    "id": "316",
+    "name": "Maid of Coins",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/95bd6f7ad44bbf5f_full.webp"
+  },
+  {
+    "id": "316",
+    "name": "Maid of Coins",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d0871c83b0f6fdb8_full.webp"
+  },
+  {
+    "id": "316",
+    "name": "Maid of Coins",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/feaf1b5839193e44_full.webp"
+  },
+  {
+    "id": "368",
+    "name": "DUNG SHOGUN",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2cf4c7551bcdc451_full.webp"
+  },
+  {
+    "id": "368",
+    "name": "DUNG SHOGUN",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/af97351f65cf071a_full.webp"
+  },
+  {
+    "id": "368",
+    "name": "DUNG SHOGUN",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f6bc25ce6cbf881b_full.webp"
+  },
+  {
+    "id": "368",
+    "name": "DUNG SHOGUN",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e7b3d3cccedab686_full.webp"
+  },
+  {
+    "id": "392",
+    "name": "Teardrop",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/446ecf84c2f4b72f_full.webp"
+  },
+  {
+    "id": "392",
+    "name": "Teardrop",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a7a9e59cbc803045_full.webp"
+  },
+  {
+    "id": "392",
+    "name": "Teardrop",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/418aaa760f12e624_full.webp"
+  },
+  {
+    "id": "392",
+    "name": "Teardrop",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4910f4c3cbb1170c_full.webp"
+  },
+  {
+    "id": "446",
+    "name": "Sir Brew",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/33efca968d188923_full.webp"
+  },
+  {
+    "id": "446",
+    "name": "Sir Brew",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/431708587c3ebe23_full.webp"
+  },
+  {
+    "id": "446",
+    "name": "Sir Brew",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5a8af9a20639ea02_full.webp"
+  },
+  {
+    "id": "446",
+    "name": "Sir Brew",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7ce232cd06aaa91c_full.webp"
+  },
+  {
+    "id": "467",
+    "name": "Salvador Dali",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f44e7d21db263682_full.webp"
+  },
+  {
+    "id": "467",
+    "name": "Salvador Dali",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d052f490aabf3129_full.webp"
+  },
+  {
+    "id": "467",
+    "name": "Salvador Dali",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/10b9536c876687c1_full.webp"
+  },
+  {
+    "id": "467",
+    "name": "Salvador Dali",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/130bb2770a255bc8_full.webp"
+  },
+  {
+    "id": "523",
+    "name": "Goldilocks",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a850a13a576c6258_full.webp"
+  },
+  {
+    "id": "523",
+    "name": "Goldilocks",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d5ef19dc449deabe_full.webp"
+  },
+  {
+    "id": "523",
+    "name": "Goldilocks",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/dc5e3075ffd47a01_full.webp"
+  },
+  {
+    "id": "523",
+    "name": "Goldilocks",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/265a564ffb47b15f_full.webp"
+  },
+  {
+    "id": "539",
+    "name": "Bloodmoon",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9423b2d2a7921046_full.webp"
+  },
+  {
+    "id": "539",
+    "name": "Bloodmoon",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e7587624445b0339_full.webp"
+  },
+  {
+    "id": "539",
+    "name": "Bloodmoon",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/cf3845f941c3dd84_full.webp"
+  },
+  {
+    "id": "539",
+    "name": "Bloodmoon",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7f12bd10aa650635_full.webp"
+  },
+  {
+    "id": "561",
+    "name": "Eggsy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fa8351113078d750_full.webp"
+  },
+  {
+    "id": "561",
+    "name": "Eggsy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a2f6f77784a96111_full.webp"
+  },
+  {
+    "id": "561",
+    "name": "Eggsy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/49d18596c010f481_full.webp"
+  },
+  {
+    "id": "561",
+    "name": "Eggsy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e4b83ada7d62b5ac_full.webp"
+  },
+  {
+    "id": "670",
+    "name": "Tea Bone",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9de7b74c3d61c6bf_full.webp"
+  },
+  {
+    "id": "670",
+    "name": "Tea Bone",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/05ee0ab4492b07bb_full.webp"
+  },
+  {
+    "id": "670",
+    "name": "Tea Bone",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3fd0902f4c86f10c_full.webp"
+  },
+  {
+    "id": "670",
+    "name": "Tea Bone",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b1b22923345a21b2_full.webp"
+  },
+  {
+    "id": "807",
+    "name": "Banana Mogger",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4705681468f0257a_full.webp"
+  },
+  {
+    "id": "807",
+    "name": "Banana Mogger",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4a8a3843cf018789_full.webp"
+  },
+  {
+    "id": "807",
+    "name": "Banana Mogger",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bad12c6596b50d5d_full.webp"
+  },
+  {
+    "id": "807",
+    "name": "Banana Mogger",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c17b0db0e7a681cc_full.webp"
+  },
+  {
+    "id": "818",
+    "name": "POOtaTurd",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5c54ea27a70fd159_full.webp"
+  },
+  {
+    "id": "818",
+    "name": "POOtaTurd",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/501ed21cba9f34a7_full.webp"
+  },
+  {
+    "id": "818",
+    "name": "POOtaTurd",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/df28d3a3cb6a87c2_full.webp"
+  },
+  {
+    "id": "818",
+    "name": "POOtaTurd",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f8d7b8793acdf4ce_full.webp"
+  },
+  {
+    "id": "857",
+    "name": "Shine",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8cdf47edc76a857a_full.webp"
+  },
+  {
+    "id": "857",
+    "name": "Shine",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/37f6edcc42b5ae6a_full.webp"
+  },
+  {
+    "id": "857",
+    "name": "Shine",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3a993b73ac5828e2_full.webp"
+  },
+  {
+    "id": "857",
+    "name": "Shine",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/505cb78fead0e081_full.webp"
+  },
+  {
+    "id": "939",
+    "name": "Pengu",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/53c5352ffe727473_full.webp"
+  },
+  {
+    "id": "939",
+    "name": "Pengu",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7f49c4298c049d10_full.webp"
+  },
+  {
+    "id": "939",
+    "name": "Pengu",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/764a7c5bff7e81b1_full.webp"
+  },
+  {
+    "id": "939",
+    "name": "Pengu",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/24c8eb4102918db0_full.webp"
+  },
+  {
+    "id": "962",
+    "name": "Mokiwitch",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/47f7b048fe1e31d6_full.webp"
+  },
+  {
+    "id": "962",
+    "name": "Mokiwitch",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e62a40c51389998c_full.webp"
+  },
+  {
+    "id": "962",
+    "name": "Mokiwitch",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/626e8f57eec47834_full.webp"
+  },
+  {
+    "id": "962",
+    "name": "Mokiwitch",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/107af96bd7cd8c1b_full.webp"
+  },
+  {
+    "id": "964",
+    "name": "Shady",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/80710d6d3e71d795_full.webp"
+  },
+  {
+    "id": "964",
+    "name": "Shady",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2a1594c9f390c158_full.webp"
+  },
+  {
+    "id": "964",
+    "name": "Shady",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5cecc12a7493f2f9_full.webp"
+  },
+  {
+    "id": "964",
+    "name": "Shady",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/910e0aeb3938cde5_full.webp"
+  },
+  {
+    "id": "984",
+    "name": "Mr Carrot",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7124c27a626a46c8_full.webp"
+  },
+  {
+    "id": "984",
+    "name": "Mr Carrot",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f2749f2cc8353758_full.webp"
+  },
+  {
+    "id": "984",
+    "name": "Mr Carrot",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d7fe8b8ffc7b7913_full.webp"
+  },
+  {
+    "id": "984",
+    "name": "Mr Carrot",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fe68c8892e56da75_full.webp"
+  },
+  {
+    "id": "987",
+    "name": "sweet90s",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e97b0749dd950ef1_full.webp"
+  },
+  {
+    "id": "987",
+    "name": "sweet90s",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8c656d3bb55b2376_full.webp"
+  },
+  {
+    "id": "987",
+    "name": "sweet90s",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/aa7b1950be21bca8_full.webp"
+  },
+  {
+    "id": "987",
+    "name": "sweet90s",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e53abba9de49fae2_full.webp"
+  },
+  {
+    "id": "1001",
+    "name": "Burns Wenipee",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8e2073513a7ac29b_full.webp"
+  },
+  {
+    "id": "1001",
+    "name": "Burns Wenipee",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/70b6c71686466a0d_full.webp"
+  },
+  {
+    "id": "1001",
+    "name": "Burns Wenipee",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ad2744209ca385a4_full.webp"
+  },
+  {
+    "id": "1001",
+    "name": "Burns Wenipee",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b3ff259f55d9ec02_full.webp"
+  },
+  {
+    "id": "1029",
+    "name": "Midnight",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/574f544cca488794_full.webp"
+  },
+  {
+    "id": "1029",
+    "name": "Midnight",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ef65ded425c93c85_full.webp"
+  },
+  {
+    "id": "1029",
+    "name": "Midnight",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/768cbf1ffbbfd9c1_full.webp"
+  },
+  {
+    "id": "1029",
+    "name": "Midnight",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/966063759a021e39_full.webp"
+  },
+  {
+    "id": "1055",
+    "name": "THANK U 4 PLAYIN",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/950dbeb51f90ef8f_full.webp"
+  },
+  {
+    "id": "1055",
+    "name": "THANK U 4 PLAYIN",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8ef34eabaac2e1c0_full.webp"
+  },
+  {
+    "id": "1055",
+    "name": "THANK U 4 PLAYIN",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/68f154bd777b077f_full.webp"
+  },
+  {
+    "id": "1055",
+    "name": "THANK U 4 PLAYIN",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ba8a565a5f7879af_full.webp"
+  },
+  {
+    "id": "1071",
+    "name": "Lil Tomato",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/201a4aeaf17ee1b5_full.webp"
+  },
+  {
+    "id": "1071",
+    "name": "Lil Tomato",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/368bab987c146240_full.webp"
+  },
+  {
+    "id": "1071",
+    "name": "Lil Tomato",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/45df71fb882c0196_full.webp"
+  },
+  {
+    "id": "1071",
+    "name": "Lil Tomato",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9f6ae77bbf226458_full.webp"
+  },
+  {
+    "id": "1095",
+    "name": "Nakimushi",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8bef621bb949d589_full.webp"
+  },
+  {
+    "id": "1095",
+    "name": "Nakimushi",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/105dc99afa14d770_full.webp"
+  },
+  {
+    "id": "1095",
+    "name": "Nakimushi",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/32d96b9d01721a45_full.webp"
+  },
+  {
+    "id": "1095",
+    "name": "Nakimushi",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1c027bb59fd37c1a_full.webp"
+  },
+  {
+    "id": "1105",
+    "name": "Golden Purps",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e421c8633e50e052_full.webp"
+  },
+  {
+    "id": "1105",
+    "name": "Golden Purps",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4fbb1701ad9d728a_full.webp"
+  },
+  {
+    "id": "1105",
+    "name": "Golden Purps",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d3a05f7e206c8b87_full.webp"
+  },
+  {
+    "id": "1105",
+    "name": "Golden Purps",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/65f4ec7660609717_full.webp"
+  },
+  {
+    "id": "1133",
+    "name": "Bearish",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/450487772fd353c8_full.webp"
+  },
+  {
+    "id": "1133",
+    "name": "Bearish",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9aa747b18f8c200c_full.webp"
+  },
+  {
+    "id": "1133",
+    "name": "Bearish",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/243bee6301199b39_full.webp"
+  },
+  {
+    "id": "1133",
+    "name": "Bearish",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2c5aa2e04484824e_full.webp"
+  },
+  {
+    "id": "1173",
+    "name": "BadAss",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b2a0489f403b9604_full.webp"
+  },
+  {
+    "id": "1173",
+    "name": "BadAss",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/97740cbc3b877003_full.webp"
+  },
+  {
+    "id": "1173",
+    "name": "BadAss",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d843fa2f2914d289_full.webp"
+  },
+  {
+    "id": "1173",
+    "name": "BadAss",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8c0ba16f43d09614_full.webp"
+  },
+  {
+    "id": "1176",
+    "name": "Fortune Gobbler",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0ccc4ebdcb3d1530_full.webp"
+  },
+  {
+    "id": "1176",
+    "name": "Fortune Gobbler",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c3b45d38ec0eda77_full.webp"
+  },
+  {
+    "id": "1176",
+    "name": "Fortune Gobbler",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9a3198059695bba9_full.webp"
+  },
+  {
+    "id": "1176",
+    "name": "Fortune Gobbler",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/04fffc87cd42c06b_full.webp"
+  },
+  {
+    "id": "1235",
+    "name": "Bio Phantom",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/05eaec2ec954ec38_full.webp"
+  },
+  {
+    "id": "1235",
+    "name": "Bio Phantom",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9954fc246e09e6b2_full.webp"
+  },
+  {
+    "id": "1235",
+    "name": "Bio Phantom",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7f0515b90ea84707_full.webp"
+  },
+  {
+    "id": "1235",
+    "name": "Bio Phantom",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/369d4b457fb0db6b_full.webp"
+  },
+  {
+    "id": "1270",
+    "name": "Low Tier Phenom",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/191405ef5da1228f_full.webp"
+  },
+  {
+    "id": "1270",
+    "name": "Low Tier Phenom",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fd641c6234ad49ba_full.webp"
+  },
+  {
+    "id": "1270",
+    "name": "Low Tier Phenom",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/54911c003cbaca8b_full.webp"
+  },
+  {
+    "id": "1270",
+    "name": "Low Tier Phenom",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5b1f3c0d1682d017_full.webp"
+  },
+  {
+    "id": "1418",
+    "name": "PNLS",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2f115f465c874c33_full.webp"
+  },
+  {
+    "id": "1418",
+    "name": "PNLS",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/dcc03978f1503416_full.webp"
+  },
+  {
+    "id": "1418",
+    "name": "PNLS",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/de9d6005f1731ba9_full.webp"
+  },
+  {
+    "id": "1418",
+    "name": "PNLS",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a944dcb2bd0df9ce_full.webp"
+  },
+  {
+    "id": "1444",
+    "name": "Zombina",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9d789f878a3c5e2f_full.webp"
+  },
+  {
+    "id": "1444",
+    "name": "Zombina",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2cd9223456f81283_full.webp"
+  },
+  {
+    "id": "1444",
+    "name": "Zombina",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/209817eae0670ef3_full.webp"
+  },
+  {
+    "id": "1444",
+    "name": "Zombina",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/49f5dbfc1ebb67b5_full.webp"
+  },
+  {
+    "id": "1454",
+    "name": "Peelbert Grumps",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/49ea2d68b8bfb033_full.webp"
+  },
+  {
+    "id": "1454",
+    "name": "Peelbert Grumps",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/52787453ccfdca91_full.webp"
+  },
+  {
+    "id": "1454",
+    "name": "Peelbert Grumps",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e2a6fc9903d429fd_full.webp"
+  },
+  {
+    "id": "1454",
+    "name": "Peelbert Grumps",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c8cd99a67969778e_full.webp"
+  },
+  {
+    "id": "1494",
+    "name": "Spartacus",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/46052bdcb4889f6e_full.webp"
+  },
+  {
+    "id": "1494",
+    "name": "Spartacus",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7825970b7c054957_full.webp"
+  },
+  {
+    "id": "1494",
+    "name": "Spartacus",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8a18a54a1b0a575b_full.webp"
+  },
+  {
+    "id": "1494",
+    "name": "Spartacus",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f1919d009aa914a9_full.webp"
+  },
+  {
+    "id": "1521",
+    "name": "UlquiorrA",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/522d0810e65afd64_full.webp"
+  },
+  {
+    "id": "1521",
+    "name": "UlquiorrA",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b0c5d30e2780f2f4_full.webp"
+  },
+  {
+    "id": "1521",
+    "name": "UlquiorrA",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fdbe65853052aa8c_full.webp"
+  },
+  {
+    "id": "1521",
+    "name": "UlquiorrA",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/95bfb17fc459b5d7_full.webp"
+  },
+  {
+    "id": "1569",
+    "name": "Sir Carrotstein",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/12695c293cea6359_full.webp"
+  },
+  {
+    "id": "1569",
+    "name": "Sir Carrotstein",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9374e034466a8d5c_full.webp"
+  },
+  {
+    "id": "1569",
+    "name": "Sir Carrotstein",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/becfbafe78edcc10_full.webp"
+  },
+  {
+    "id": "1569",
+    "name": "Sir Carrotstein",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/16dd9a7ea6dd1488_full.webp"
+  },
+  {
+    "id": "1600",
+    "name": "Not Nisheep",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b1c1c0f0fe34cb6b_full.webp"
+  },
+  {
+    "id": "1600",
+    "name": "Not Nisheep",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/43eb06a6435b0e9a_full.webp"
+  },
+  {
+    "id": "1600",
+    "name": "Not Nisheep",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7d0396d51a959308_full.webp"
+  },
+  {
+    "id": "1600",
+    "name": "Not Nisheep",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6400c08a5a0fb442_full.webp"
+  },
+  {
+    "id": "1749",
+    "name": "Stone of David",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8591084a7f18072e_full.webp"
+  },
+  {
+    "id": "1749",
+    "name": "Stone of David",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ba18e232a1f1c147_full.webp"
+  },
+  {
+    "id": "1749",
+    "name": "Stone of David",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2fad8b6633484bdd_full.webp"
+  },
+  {
+    "id": "1749",
+    "name": "Stone of David",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8cfa784938928745_full.webp"
+  },
+  {
+    "id": "1787",
+    "name": "KOHI",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/656a151b82527c32_full.webp"
+  },
+  {
+    "id": "1787",
+    "name": "KOHI",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/75ec2006e6c70d5c_full.webp"
+  },
+  {
+    "id": "1787",
+    "name": "KOHI",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/eed8cc39a802f25a_full.webp"
+  },
+  {
+    "id": "1787",
+    "name": "KOHI",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/200c22b9b4455ef0_full.webp"
+  },
+  {
+    "id": "1826",
+    "name": "Mokington",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5b35e0107eb6003a_full.webp"
+  },
+  {
+    "id": "1826",
+    "name": "Mokington",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ec7413daf8703938_full.webp"
+  },
+  {
+    "id": "1826",
+    "name": "Mokington",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f7f44fc6a5d61955_full.webp"
+  },
+  {
+    "id": "1826",
+    "name": "Mokington",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4e89446a3f72c066_full.webp"
+  },
+  {
+    "id": "1863",
+    "name": "Mr Teabag",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/62decd08ef7ab786_full.webp"
+  },
+  {
+    "id": "1863",
+    "name": "Mr Teabag",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f451b08f8c04a0e6_full.webp"
+  },
+  {
+    "id": "1863",
+    "name": "Mr Teabag",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8c9a21d66da8eab0_full.webp"
+  },
+  {
+    "id": "1863",
+    "name": "Mr Teabag",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3849ac0605e7aa77_full.webp"
+  },
+  {
+    "id": "1868",
+    "name": "Angrybread",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c017ad8e44b2fe33_full.webp"
+  },
+  {
+    "id": "1868",
+    "name": "Angrybread",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/60d261577a6792ff_full.webp"
+  },
+  {
+    "id": "1868",
+    "name": "Angrybread",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4278b5cc56e5897d_full.webp"
+  },
+  {
+    "id": "1868",
+    "name": "Angrybread",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/903fc698e692b5d6_full.webp"
+  },
+  {
+    "id": "2188",
+    "name": "MOSE",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0d72861fe9a040fb_full.webp"
+  },
+  {
+    "id": "2188",
+    "name": "MOSE",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/641f9260e826f308_full.webp"
+  },
+  {
+    "id": "2188",
+    "name": "MOSE",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c2134cb15411a058_full.webp"
+  },
+  {
+    "id": "2188",
+    "name": "MOSE",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6a014726f627b7ed_full.webp"
+  },
+  {
+    "id": "2284",
+    "name": "67",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/60f477e7165681fb_full.webp"
+  },
+  {
+    "id": "2284",
+    "name": "67",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b1d38d1ffaa259ea_full.webp"
+  },
+  {
+    "id": "2284",
+    "name": "67",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c8148f5fafa01141_full.webp"
+  },
+  {
+    "id": "2284",
+    "name": "67",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0daa7d8f21241bd2_full.webp"
+  },
+  {
+    "id": "2288",
+    "name": "MOKIPACK",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/90c0fc3140dd7171_full.webp"
+  },
+  {
+    "id": "2288",
+    "name": "MOKIPACK",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4f4954d6a137e36b_full.webp"
+  },
+  {
+    "id": "2288",
+    "name": "MOKIPACK",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a0517509f937d32d_full.webp"
+  },
+  {
+    "id": "2288",
+    "name": "MOKIPACK",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6629102c87960dad_full.webp"
+  },
+  {
+    "id": "2485",
+    "name": "SinTank",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d69cb925ed668bd6_full.webp"
+  },
+  {
+    "id": "2485",
+    "name": "SinTank",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/65d75dcdfd442526_full.webp"
+  },
+  {
+    "id": "2485",
+    "name": "SinTank",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ac30d13e11d00352_full.webp"
+  },
+  {
+    "id": "2485",
+    "name": "SinTank",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8ee58fab52e2a0c6_full.webp"
+  },
+  {
+    "id": "2575",
+    "name": "Peeltergeist",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0e7c275d10ca94c2_full.webp"
+  },
+  {
+    "id": "2575",
+    "name": "Peeltergeist",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1898cd27ef014bc4_full.webp"
+  },
+  {
+    "id": "2575",
+    "name": "Peeltergeist",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c0b1ba03e6204b2f_full.webp"
+  },
+  {
+    "id": "2575",
+    "name": "Peeltergeist",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a909fae174069709_full.webp"
+  },
+  {
+    "id": "2660",
+    "name": "Samurai Boi",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/df635522417fd261_full.webp"
+  },
+  {
+    "id": "2660",
+    "name": "Samurai Boi",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7bff53562dc71f83_full.webp"
+  },
+  {
+    "id": "2660",
+    "name": "Samurai Boi",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5313084c47822c8b_full.webp"
+  },
+  {
+    "id": "2660",
+    "name": "Samurai Boi",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d98c70695719a4c3_full.webp"
+  },
+  {
+    "id": "2661",
+    "name": "Mokuhadely",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7eca4b38cb51ea70_full.webp"
+  },
+  {
+    "id": "2661",
+    "name": "Mokuhadely",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/90a977270456b7c3_full.webp"
+  },
+  {
+    "id": "2661",
+    "name": "Mokuhadely",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/87e4e260d2e00a67_full.webp"
+  },
+  {
+    "id": "2661",
+    "name": "Mokuhadely",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5e288232131e00cc_full.webp"
+  },
+  {
+    "id": "2730",
+    "name": "Valkyrie",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f1515244f72703b0_full.webp"
+  },
+  {
+    "id": "2730",
+    "name": "Valkyrie",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f4808cfe0a5c576e_full.webp"
+  },
+  {
+    "id": "2730",
+    "name": "Valkyrie",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e841017c77b0f068_full.webp"
+  },
+  {
+    "id": "2730",
+    "name": "Valkyrie",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c62eb0454b07b480_full.webp"
+  },
+  {
+    "id": "2755",
+    "name": "Dracumoki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a8ae4149469f46f0_full.webp"
+  },
+  {
+    "id": "2755",
+    "name": "Dracumoki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/da2d8cd578936fb3_full.webp"
+  },
+  {
+    "id": "2755",
+    "name": "Dracumoki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/29586d296d0511d0_full.webp"
+  },
+  {
+    "id": "2755",
+    "name": "Dracumoki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ff4475b108f23201_full.webp"
+  },
+  {
+    "id": "2828",
+    "name": "Joy Boy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e103ac8981c4f221_full.webp"
+  },
+  {
+    "id": "2828",
+    "name": "Joy Boy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4edd30513d2fbf81_full.webp"
+  },
+  {
+    "id": "2828",
+    "name": "Joy Boy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/70e739c7d3df18f1_full.webp"
+  },
+  {
+    "id": "2828",
+    "name": "Joy Boy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/559c30ce18703b90_full.webp"
+  },
+  {
+    "id": "2906",
+    "name": "soda",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b2f8bdd0ec28b220_full.webp"
+  },
+  {
+    "id": "2906",
+    "name": "soda",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1cebaac883af0ee5_full.webp"
+  },
+  {
+    "id": "2906",
+    "name": "soda",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/15c527074de33957_full.webp"
+  },
+  {
+    "id": "2906",
+    "name": "soda",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b647faaabd29a280_full.webp"
+  },
+  {
+    "id": "3015",
+    "name": "Gambit",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/64f3a95478eed83c_full.webp"
+  },
+  {
+    "id": "3015",
+    "name": "Gambit",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9d4c4e90ec520e72_full.webp"
+  },
+  {
+    "id": "3015",
+    "name": "Gambit",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/19716cb6df1edad6_full.webp"
+  },
+  {
+    "id": "3015",
+    "name": "Gambit",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9a379d26210d2963_full.webp"
+  },
+  {
+    "id": "3080",
+    "name": "Shadrel Kagekin",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f4fb0ba781b20d34_full.webp"
+  },
+  {
+    "id": "3080",
+    "name": "Shadrel Kagekin",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ccbbcf19c06782fa_full.webp"
+  },
+  {
+    "id": "3080",
+    "name": "Shadrel Kagekin",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d74ba598ae8bf29d_full.webp"
+  },
+  {
+    "id": "3080",
+    "name": "Shadrel Kagekin",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/566b1ca6b3dfb49e_full.webp"
+  },
+  {
+    "id": "3145",
+    "name": "FizzyTwinTails",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a0e673c052ac363f_full.webp"
+  },
+  {
+    "id": "3145",
+    "name": "FizzyTwinTails",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0340c5e4381a9e3d_full.webp"
+  },
+  {
+    "id": "3145",
+    "name": "FizzyTwinTails",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4009ff1137daf90b_full.webp"
+  },
+  {
+    "id": "3145",
+    "name": "FizzyTwinTails",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/69b71cc1da2149a6_full.webp"
+  },
+  {
+    "id": "3185",
+    "name": "Lucid",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d7023f89b2edb83e_full.webp"
+  },
+  {
+    "id": "3185",
+    "name": "Lucid",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/886c87b791707dbc_full.webp"
+  },
+  {
+    "id": "3185",
+    "name": "Lucid",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4812a418225f95cd_full.webp"
+  },
+  {
+    "id": "3185",
+    "name": "Lucid",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a668021ba485aea5_full.webp"
+  },
+  {
+    "id": "3186",
+    "name": "The Last Samurai",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/cf11143b72b34e2a_full.webp"
+  },
+  {
+    "id": "3186",
+    "name": "The Last Samurai",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ef4790229e532e12_full.webp"
+  },
+  {
+    "id": "3186",
+    "name": "The Last Samurai",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/140898478343faf1_full.webp"
+  },
+  {
+    "id": "3186",
+    "name": "The Last Samurai",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8aa2784a6e550dd9_full.webp"
+  },
+  {
+    "id": "3246",
+    "name": "Kroni",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c6e234c9af399e9a_full.webp"
+  },
+  {
+    "id": "3246",
+    "name": "Kroni",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8d72a24b2c25209e_full.webp"
+  },
+  {
+    "id": "3246",
+    "name": "Kroni",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ccafa49a76e56c0f_full.webp"
+  },
+  {
+    "id": "3246",
+    "name": "Kroni",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8fb4b85defb330b2_full.webp"
+  },
+  {
+    "id": "3284",
+    "name": "Cammyyy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d4badcadb6c5660c_full.webp"
+  },
+  {
+    "id": "3284",
+    "name": "Cammyyy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/da5f1e5e4cb24537_full.webp"
+  },
+  {
+    "id": "3284",
+    "name": "Cammyyy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f544b1571b2f70a2_full.webp"
+  },
+  {
+    "id": "3284",
+    "name": "Cammyyy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/57ceb3f0651ecc7d_full.webp"
+  },
+  {
+    "id": "3320",
+    "name": "Specter",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/47bfa68339869405_full.webp"
+  },
+  {
+    "id": "3320",
+    "name": "Specter",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/099833f4b09b44b3_full.webp"
+  },
+  {
+    "id": "3320",
+    "name": "Specter",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c451196000c16c8e_full.webp"
+  },
+  {
+    "id": "3320",
+    "name": "Specter",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4dfcf2e0f4c4d971_full.webp"
+  },
+  {
+    "id": "3340",
+    "name": "SweetPotato",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8aaf29b5315cd28f_full.webp"
+  },
+  {
+    "id": "3340",
+    "name": "SweetPotato",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a0ce486736999dd2_full.webp"
+  },
+  {
+    "id": "3340",
+    "name": "SweetPotato",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0edeeec0fc3875c8_full.webp"
+  },
+  {
+    "id": "3340",
+    "name": "SweetPotato",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/21b6a80904a3eb5f_full.webp"
+  },
+  {
+    "id": "3432",
+    "name": "Long Dinger",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0c72363f68b99239_full.webp"
+  },
+  {
+    "id": "3432",
+    "name": "Long Dinger",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d26fc5cda5fe72dc_full.webp"
+  },
+  {
+    "id": "3432",
+    "name": "Long Dinger",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/721068f7e8eb2f05_full.webp"
+  },
+  {
+    "id": "3432",
+    "name": "Long Dinger",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1a210789b87288b4_full.webp"
+  },
+  {
+    "id": "3527",
+    "name": "69",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b89dfa4a58629883_full.webp"
+  },
+  {
+    "id": "3527",
+    "name": "69",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/82f61680f8a2f7c9_full.webp"
+  },
+  {
+    "id": "3527",
+    "name": "69",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0b816cdac8ae2615_full.webp"
+  },
+  {
+    "id": "3527",
+    "name": "69",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/11cb94fd30000776_full.webp"
+  },
+  {
+    "id": "3563",
+    "name": "Cry Bunny",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7e772569bb232dc2_full.webp"
+  },
+  {
+    "id": "3563",
+    "name": "Cry Bunny",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/748b6971de42c5d1_full.webp"
+  },
+  {
+    "id": "3563",
+    "name": "Cry Bunny",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/becdb5157d96d615_full.webp"
+  },
+  {
+    "id": "3563",
+    "name": "Cry Bunny",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9558e1e1e4ec079e_full.webp"
+  },
+  {
+    "id": "3582",
+    "name": "Mushi",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e7f6e357a8cf1ff4_full.webp"
+  },
+  {
+    "id": "3582",
+    "name": "Mushi",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fdd8c0e3ac21d2f1_full.webp"
+  },
+  {
+    "id": "3582",
+    "name": "Mushi",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9d28f20d82bbbabe_full.webp"
+  },
+  {
+    "id": "3582",
+    "name": "Mushi",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6c7685da8d87fc9e_full.webp"
+  },
+  {
+    "id": "3624",
+    "name": "Animo",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/360e3aeb8dfb3fcc_full.webp"
+  },
+  {
+    "id": "3624",
+    "name": "Animo",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/63bac3430c87597e_full.webp"
+  },
+  {
+    "id": "3624",
+    "name": "Animo",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a1cf131f26cd317d_full.webp"
+  },
+  {
+    "id": "3624",
+    "name": "Animo",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a9e2aa077f6865e0_full.webp"
+  },
+  {
+    "id": "3672",
+    "name": "Yishu",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/36e0acc13c9aeedf_full.webp"
+  },
+  {
+    "id": "3672",
+    "name": "Yishu",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2d60d1414331661d_full.webp"
+  },
+  {
+    "id": "3672",
+    "name": "Yishu",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2525f3c5c142700f_full.webp"
+  },
+  {
+    "id": "3672",
+    "name": "Yishu",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4ee1050ce3d4ea0f_full.webp"
+  },
+  {
+    "id": "3715",
+    "name": "Scabbers",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c1c95e1ef428b1f6_full.webp"
+  },
+  {
+    "id": "3715",
+    "name": "Scabbers",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c0ce2d408f931e75_full.webp"
+  },
+  {
+    "id": "3715",
+    "name": "Scabbers",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c6edcc7f809b56d8_full.webp"
+  },
+  {
+    "id": "3715",
+    "name": "Scabbers",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5016d0330b1051e0_full.webp"
+  },
+  {
+    "id": "3717",
+    "name": "Artist Moki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/47e11bfe51c1b40e_full.webp"
+  },
+  {
+    "id": "3717",
+    "name": "Artist Moki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bed6c6ec679c5e08_full.webp"
+  },
+  {
+    "id": "3717",
+    "name": "Artist Moki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f820e21c0146139a_full.webp"
+  },
+  {
+    "id": "3717",
+    "name": "Artist Moki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/93390809b9a38ffc_full.webp"
+  },
+  {
+    "id": "3722",
+    "name": "Moki Fanatic",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a65ea1383c7ab522_full.webp"
+  },
+  {
+    "id": "3722",
+    "name": "Moki Fanatic",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/eca4724ed4213f61_full.webp"
+  },
+  {
+    "id": "3722",
+    "name": "Moki Fanatic",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/14bf82e4f4d8f1df_full.webp"
+  },
+  {
+    "id": "3722",
+    "name": "Moki Fanatic",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e23caeba96149321_full.webp"
+  },
+  {
+    "id": "3836",
+    "name": "Amber",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/17a426d4bb417d38_full.webp"
+  },
+  {
+    "id": "3836",
+    "name": "Amber",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/19a0cf888e1c23eb_full.webp"
+  },
+  {
+    "id": "3836",
+    "name": "Amber",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/89e16c9e1cbfe5db_full.webp"
+  },
+  {
+    "id": "3836",
+    "name": "Amber",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9487fc9981cdd743_full.webp"
+  },
+  {
+    "id": "3841",
+    "name": "SMG Loves You",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f4cfe41f8cb4cf8c_full.webp"
+  },
+  {
+    "id": "3841",
+    "name": "SMG Loves You",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0727705309e68852_full.webp"
+  },
+  {
+    "id": "3841",
+    "name": "SMG Loves You",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ff4ecef2c2d6127d_full.webp"
+  },
+  {
+    "id": "3841",
+    "name": "SMG Loves You",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/23f2d0cc96dc3482_full.webp"
+  },
+  {
+    "id": "3847",
+    "name": "Stark",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ceb7e45446813974_full.webp"
+  },
+  {
+    "id": "3847",
+    "name": "Stark",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/75a40a14abc7e613_full.webp"
+  },
+  {
+    "id": "3847",
+    "name": "Stark",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0f75025e37ab6ae9_full.webp"
+  },
+  {
+    "id": "3847",
+    "name": "Stark",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d2888aa1079ac208_full.webp"
+  },
+  {
+    "id": "3932",
+    "name": "Citrus",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a8c9f2d95cba1179_full.webp"
+  },
+  {
+    "id": "3932",
+    "name": "Citrus",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c1674e340c63318a_full.webp"
+  },
+  {
+    "id": "3932",
+    "name": "Citrus",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7b288be87c68432b_full.webp"
+  },
+  {
+    "id": "3932",
+    "name": "Citrus",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d1ee5397432b1845_full.webp"
+  },
+  {
+    "id": "4011",
+    "name": "Shadowstorm",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/efa378841346416e_full.webp"
+  },
+  {
+    "id": "4011",
+    "name": "Shadowstorm",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0320aba32ed1350e_full.webp"
+  },
+  {
+    "id": "4011",
+    "name": "Shadowstorm",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/31de877590fbf2aa_full.webp"
+  },
+  {
+    "id": "4011",
+    "name": "Shadowstorm",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/572e895ffe2faec5_full.webp"
+  },
+  {
+    "id": "4137",
+    "name": "Clutch",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a12d6729e240fbf9_full.webp"
+  },
+  {
+    "id": "4137",
+    "name": "Clutch",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/65db3d4e7b5f0f6f_full.webp"
+  },
+  {
+    "id": "4137",
+    "name": "Clutch",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9310aed5a33f9031_full.webp"
+  },
+  {
+    "id": "4137",
+    "name": "Clutch",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e7ca87330485c89b_full.webp"
+  },
+  {
+    "id": "4177",
+    "name": "Ronin Spirit",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/76ecb126493a94c2_full.webp"
+  },
+  {
+    "id": "4177",
+    "name": "Ronin Spirit",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b2b41e3db8ebc34b_full.webp"
+  },
+  {
+    "id": "4177",
+    "name": "Ronin Spirit",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0fd8deb378eac45b_full.webp"
+  },
+  {
+    "id": "4177",
+    "name": "Ronin Spirit",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/eda632cf364e1c62_full.webp"
+  },
+  {
+    "id": "4193",
+    "name": "MahoShojo",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/20f6ca2c95c92f94_full.webp"
+  },
+  {
+    "id": "4193",
+    "name": "MahoShojo",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/71887ffb4a3f9d0d_full.webp"
+  },
+  {
+    "id": "4193",
+    "name": "MahoShojo",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9d6fa1e7ed6415ab_full.webp"
+  },
+  {
+    "id": "4193",
+    "name": "MahoShojo",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ce7961dcf9ac5be6_full.webp"
+  },
+  {
+    "id": "4246",
+    "name": "deadlykitten",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6009d34dbfa6ff51_full.webp"
+  },
+  {
+    "id": "4246",
+    "name": "deadlykitten",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/120d8d39e6758c5a_full.webp"
+  },
+  {
+    "id": "4246",
+    "name": "deadlykitten",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/66440cd7fce4472e_full.webp"
+  },
+  {
+    "id": "4246",
+    "name": "deadlykitten",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/33c28cb251b387a9_full.webp"
+  },
+  {
+    "id": "4258",
+    "name": "Starfluff",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a5d4f9d15d9210bc_full.webp"
+  },
+  {
+    "id": "4258",
+    "name": "Starfluff",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/92e0e696ecf40516_full.webp"
+  },
+  {
+    "id": "4258",
+    "name": "Starfluff",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/47f9e1d5a000bd68_full.webp"
+  },
+  {
+    "id": "4258",
+    "name": "Starfluff",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ce58a5dcc96169fd_full.webp"
+  },
+  {
+    "id": "4341",
+    "name": "Mushroom Glasses",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/47178f1e97df7855_full.webp"
+  },
+  {
+    "id": "4341",
+    "name": "Mushroom Glasses",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e577b2d324c622a7_full.webp"
+  },
+  {
+    "id": "4341",
+    "name": "Mushroom Glasses",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f8e15c4f4e378865_full.webp"
+  },
+  {
+    "id": "4341",
+    "name": "Mushroom Glasses",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d08eb0c952a32e6d_full.webp"
+  },
+  {
+    "id": "4407",
+    "name": "BenDan",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0e3af01845d51e9a_full.webp"
+  },
+  {
+    "id": "4407",
+    "name": "BenDan",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9bd09a83a7302da1_full.webp"
+  },
+  {
+    "id": "4407",
+    "name": "BenDan",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4789ed7edb85a24a_full.webp"
+  },
+  {
+    "id": "4407",
+    "name": "BenDan",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7761fe7a263542e0_full.webp"
+  },
+  {
+    "id": "4434",
+    "name": "Sweatin Simmons",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6a395772245f2aef_full.webp"
+  },
+  {
+    "id": "4434",
+    "name": "Sweatin Simmons",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ed865e4023cc9154_full.webp"
+  },
+  {
+    "id": "4434",
+    "name": "Sweatin Simmons",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/eae86c77b9167caa_full.webp"
+  },
+  {
+    "id": "4434",
+    "name": "Sweatin Simmons",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/642c84d04d45a544_full.webp"
+  },
+  {
+    "id": "4437",
+    "name": "Numbskull",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3c23418be53687aa_full.webp"
+  },
+  {
+    "id": "4437",
+    "name": "Numbskull",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4ed77fa359aa62ce_full.webp"
+  },
+  {
+    "id": "4437",
+    "name": "Numbskull",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e6f5ef7d2d3f2481_full.webp"
+  },
+  {
+    "id": "4437",
+    "name": "Numbskull",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2d74b9c63316038f_full.webp"
+  },
+  {
+    "id": "4509",
+    "name": "KingOfRatz",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f9dadd64c80df0ee_full.webp"
+  },
+  {
+    "id": "4509",
+    "name": "KingOfRatz",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a66de0e6061e2d11_full.webp"
+  },
+  {
+    "id": "4509",
+    "name": "KingOfRatz",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/83290afbc4b7b4bc_full.webp"
+  },
+  {
+    "id": "4509",
+    "name": "KingOfRatz",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e92fabb58484f439_full.webp"
+  },
+  {
+    "id": "4597",
+    "name": "Dr Shroom",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5e002a315e22dee7_full.webp"
+  },
+  {
+    "id": "4597",
+    "name": "Dr Shroom",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/aadd3eddc9f70164_full.webp"
+  },
+  {
+    "id": "4597",
+    "name": "Dr Shroom",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6be50e002626b182_full.webp"
+  },
+  {
+    "id": "4597",
+    "name": "Dr Shroom",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d9f9796b212d1fdb_full.webp"
+  },
+  {
+    "id": "4602",
+    "name": "Wizard Boi",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a96ee206162acea4_full.webp"
+  },
+  {
+    "id": "4602",
+    "name": "Wizard Boi",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ca8047902c945f29_full.webp"
+  },
+  {
+    "id": "4602",
+    "name": "Wizard Boi",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6c0790ccbfc4f6fc_full.webp"
+  },
+  {
+    "id": "4602",
+    "name": "Wizard Boi",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ab2eff5fc51056b7_full.webp"
+  },
+  {
+    "id": "4642",
+    "name": "Neuty",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e853b26a776c2311_full.webp"
+  },
+  {
+    "id": "4642",
+    "name": "Neuty",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6c7347e3b320f9be_full.webp"
+  },
+  {
+    "id": "4642",
+    "name": "Neuty",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d6737fdd76beb67e_full.webp"
+  },
+  {
+    "id": "4642",
+    "name": "Neuty",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/36662f89c71d254d_full.webp"
+  },
+  {
+    "id": "4819",
+    "name": "akuma",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2f3ad32b94d6f740_full.webp"
+  },
+  {
+    "id": "4819",
+    "name": "akuma",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9e7e2643bf9067b4_full.webp"
+  },
+  {
+    "id": "4819",
+    "name": "akuma",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8169f49aeaa056d8_full.webp"
+  },
+  {
+    "id": "4819",
+    "name": "akuma",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/604f5bec9f7f9d51_full.webp"
+  },
+  {
+    "id": "4772",
+    "name": "Milky",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0852bfc7308854d2_full.webp"
+  },
+  {
+    "id": "4772",
+    "name": "Milky",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8818d72a0599eb3c_full.webp"
+  },
+  {
+    "id": "4772",
+    "name": "Milky",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3c89a4c2f7f103f1_full.webp"
+  },
+  {
+    "id": "4772",
+    "name": "Milky",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b5067cdd910c21d3_full.webp"
+  },
+  {
+    "id": "4784",
+    "name": "Poop Digger",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ef5a9a1b912224a0_full.webp"
+  },
+  {
+    "id": "4784",
+    "name": "Poop Digger",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4934ade910e43946_full.webp"
+  },
+  {
+    "id": "4784",
+    "name": "Poop Digger",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fd5d9e362e681c40_full.webp"
+  },
+  {
+    "id": "4784",
+    "name": "Poop Digger",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7cf0d9ec210a90a6_full.webp"
+  },
+  {
+    "id": "4813",
+    "name": "Milo Thatch",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fbd88836c48b140c_full.webp"
+  },
+  {
+    "id": "4813",
+    "name": "Milo Thatch",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/42dc2fca5655167f_full.webp"
+  },
+  {
+    "id": "4813",
+    "name": "Milo Thatch",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e6efd9cf96d0340f_full.webp"
+  },
+  {
+    "id": "4813",
+    "name": "Milo Thatch",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/19ea331038789d07_full.webp"
+  },
+  {
+    "id": "4816",
+    "name": "Vagabond",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/77acc162508f6f36_full.webp"
+  },
+  {
+    "id": "4816",
+    "name": "Vagabond",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bca9e034037dfc01_full.webp"
+  },
+  {
+    "id": "4816",
+    "name": "Vagabond",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c4f3dcc3e6479dc0_full.webp"
+  },
+  {
+    "id": "4816",
+    "name": "Vagabond",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/14deb19dee0f75f8_full.webp"
+  },
+  {
+    "id": "4919",
+    "name": "Moki Pochi Moki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8a9da7b8773ae76b_full.webp"
+  },
+  {
+    "id": "4919",
+    "name": "Moki Pochi Moki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2a677c68fdf2687c_full.webp"
+  },
+  {
+    "id": "4919",
+    "name": "Moki Pochi Moki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ff7e5f4615078182_full.webp"
+  },
+  {
+    "id": "4919",
+    "name": "Moki Pochi Moki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e4642a05c635befb_full.webp"
+  },
+  {
+    "id": "5031",
+    "name": "BADSPEED",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6a467b692078d9a8_full.webp"
+  },
+  {
+    "id": "5031",
+    "name": "BADSPEED",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9dbdfdbfbd58baf5_full.webp"
+  },
+  {
+    "id": "5031",
+    "name": "BADSPEED",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/83894157ba8d2c36_full.webp"
+  },
+  {
+    "id": "5031",
+    "name": "BADSPEED",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/26d761a4391d4800_full.webp"
+  },
+  {
+    "id": "5050",
+    "name": "Sleepy Gary",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7cb7016437508de5_full.webp"
+  },
+  {
+    "id": "5050",
+    "name": "Sleepy Gary",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4f79f17e28e1d742_full.webp"
+  },
+  {
+    "id": "5050",
+    "name": "Sleepy Gary",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e1481462948357d7_full.webp"
+  },
+  {
+    "id": "5050",
+    "name": "Sleepy Gary",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/90e6f9a9eb14cd5b_full.webp"
+  },
+  {
+    "id": "5078",
+    "name": "CAPOEIRA",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a9028c476cd6bef3_full.webp"
+  },
+  {
+    "id": "5078",
+    "name": "CAPOEIRA",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/855c271abeabd485_full.webp"
+  },
+  {
+    "id": "5078",
+    "name": "CAPOEIRA",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d13a79135813e1b5_full.webp"
+  },
+  {
+    "id": "5078",
+    "name": "CAPOEIRA",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4895d655e676c9e1_full.webp"
+  },
+  {
+    "id": "5110",
+    "name": "Mugsy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/838964d2d263222c_full.webp"
+  },
+  {
+    "id": "5110",
+    "name": "Mugsy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ad4b79e4a164c09e_full.webp"
+  },
+  {
+    "id": "5110",
+    "name": "Mugsy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1617216a5b072ec6_full.webp"
+  },
+  {
+    "id": "5110",
+    "name": "Mugsy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/41bf8298010ac849_full.webp"
+  },
+  {
+    "id": "5125",
+    "name": "Fire Moki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3728e9cf9d0a62eb_full.webp"
+  },
+  {
+    "id": "5125",
+    "name": "Fire Moki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5e9637963f0b1da9_full.webp"
+  },
+  {
+    "id": "5125",
+    "name": "Fire Moki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4ae6ff6ed1bfd187_full.webp"
+  },
+  {
+    "id": "5125",
+    "name": "Fire Moki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6eac6d9409fcf2a6_full.webp"
+  },
+  {
+    "id": "5168",
+    "name": "Nisheep",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/768c8d7b8ff2142a_full.webp"
+  },
+  {
+    "id": "5168",
+    "name": "Nisheep",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1588eed2113b6b71_full.webp"
+  },
+  {
+    "id": "5168",
+    "name": "Nisheep",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/edaf29d13366a175_full.webp"
+  },
+  {
+    "id": "5168",
+    "name": "Nisheep",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a48561230f5d3652_full.webp"
+  },
+  {
+    "id": "5193",
+    "name": "Red Whine",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6737a365c94b36ba_full.webp"
+  },
+  {
+    "id": "5193",
+    "name": "Red Whine",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4abe48b3f0d93df5_full.webp"
+  },
+  {
+    "id": "5193",
+    "name": "Red Whine",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/03d551f7eeaeb089_full.webp"
+  },
+  {
+    "id": "5193",
+    "name": "Red Whine",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6ce9a029ea0d7506_full.webp"
+  },
+  {
+    "id": "5232",
+    "name": "The Destroyer",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1eafe4bdb2975758_full.webp"
+  },
+  {
+    "id": "5232",
+    "name": "The Destroyer",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d95b420c4e62b9dd_full.webp"
+  },
+  {
+    "id": "5232",
+    "name": "The Destroyer",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/129cf0544a646edd_full.webp"
+  },
+  {
+    "id": "5232",
+    "name": "The Destroyer",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/56a929ec9fc88b41_full.webp"
+  },
+  {
+    "id": "5249",
+    "name": "One",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9093145d6d226f96_full.webp"
+  },
+  {
+    "id": "5249",
+    "name": "One",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/666872e83c2766cc_full.webp"
+  },
+  {
+    "id": "5249",
+    "name": "One",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7c7eb58e7c55310d_full.webp"
+  },
+  {
+    "id": "5249",
+    "name": "One",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3bcf4eb7b59bf339_full.webp"
+  },
+  {
+    "id": "5256",
+    "name": "Golden Nugget",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8d0c0027d845f357_full.webp"
+  },
+  {
+    "id": "5256",
+    "name": "Golden Nugget",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6a7109808936603a_full.webp"
+  },
+  {
+    "id": "5256",
+    "name": "Golden Nugget",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6b465645fff62bf2_full.webp"
+  },
+  {
+    "id": "5256",
+    "name": "Golden Nugget",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/da234e2a8fa20370_full.webp"
+  },
+  {
+    "id": "5504",
+    "name": "JOEHNINGUS",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3c8658d343660f27_full.webp"
+  },
+  {
+    "id": "5504",
+    "name": "JOEHNINGUS",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/435383805d4fd347_full.webp"
+  },
+  {
+    "id": "5504",
+    "name": "JOEHNINGUS",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bb925e1cc572f0d4_full.webp"
+  },
+  {
+    "id": "5504",
+    "name": "JOEHNINGUS",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/22aae88aeb0a1e2e_full.webp"
+  },
+  {
+    "id": "5534",
+    "name": "Mozy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/277a6785ed2f7ed0_full.webp"
+  },
+  {
+    "id": "5534",
+    "name": "Mozy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d6e1edbc38cc18d7_full.webp"
+  },
+  {
+    "id": "5534",
+    "name": "Mozy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e23db36fc60f264c_full.webp"
+  },
+  {
+    "id": "5534",
+    "name": "Mozy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fbe7d24ea89be5d4_full.webp"
+  },
+  {
+    "id": "5705",
+    "name": "Fenrir",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bb32ad2f408ceb5a_full.webp"
+  },
+  {
+    "id": "5705",
+    "name": "Fenrir",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d92a3671a1cb7b64_full.webp"
+  },
+  {
+    "id": "5705",
+    "name": "Fenrir",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4862fb4d320c1014_full.webp"
+  },
+  {
+    "id": "5705",
+    "name": "Fenrir",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/78d897a4b9e5a304_full.webp"
+  },
+  {
+    "id": "5710",
+    "name": "Fernecito",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/22b471df56acd7d1_full.webp"
+  },
+  {
+    "id": "5710",
+    "name": "Fernecito",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2b2b636bb87fdeef_full.webp"
+  },
+  {
+    "id": "5710",
+    "name": "Fernecito",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/552d37557c9ee6f6_full.webp"
+  },
+  {
+    "id": "5710",
+    "name": "Fernecito",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0400d85959751026_full.webp"
+  },
+  {
+    "id": "5755",
+    "name": "Keanu",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8d252510b535efe6_full.webp"
+  },
+  {
+    "id": "5755",
+    "name": "Keanu",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/803c525f0c4e6352_full.webp"
+  },
+  {
+    "id": "5755",
+    "name": "Keanu",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b422484a51778a70_full.webp"
+  },
+  {
+    "id": "5755",
+    "name": "Keanu",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a5042d6b322b6b5d_full.webp"
+  },
+  {
+    "id": "5809",
+    "name": "The Champ MoTZ",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/cc9b7d43c43ba902_full.webp"
+  },
+  {
+    "id": "5809",
+    "name": "The Champ MoTZ",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e7c5c618e15cce2f_full.webp"
+  },
+  {
+    "id": "5809",
+    "name": "The Champ MoTZ",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6b4af3e122d25a33_full.webp"
+  },
+  {
+    "id": "5809",
+    "name": "The Champ MoTZ",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bce11e96db921f80_full.webp"
+  },
+  {
+    "id": "5885",
+    "name": "Smiley",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9ce064b4d21fae26_full.webp"
+  },
+  {
+    "id": "5885",
+    "name": "Smiley",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/39c43dbfb6e11fdf_full.webp"
+  },
+  {
+    "id": "5885",
+    "name": "Smiley",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/dc6490b494dea16a_full.webp"
+  },
+  {
+    "id": "5885",
+    "name": "Smiley",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0d93d518ffa7b945_full.webp"
+  },
+  {
+    "id": "5890",
+    "name": "Uni",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/79bd7d2e186af2a8_full.webp"
+  },
+  {
+    "id": "5890",
+    "name": "Uni",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8eaa0ae5940851a4_full.webp"
+  },
+  {
+    "id": "5890",
+    "name": "Uni",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4a2da3678b1a3ed5_full.webp"
+  },
+  {
+    "id": "5890",
+    "name": "Uni",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f793bf8f54d17a75_full.webp"
+  },
+  {
+    "id": "5925",
+    "name": "Rae",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bc07825c8dcd4c5d_full.webp"
+  },
+  {
+    "id": "5925",
+    "name": "Rae",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5a95bdefffad3ba4_full.webp"
+  },
+  {
+    "id": "5925",
+    "name": "Rae",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/67e1683a810c307b_full.webp"
+  },
+  {
+    "id": "5925",
+    "name": "Rae",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8dedefdfdd60785d_full.webp"
+  },
+  {
+    "id": "5960",
+    "name": "Its Madam",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f201fd084f54f644_full.webp"
+  },
+  {
+    "id": "5960",
+    "name": "Its Madam",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/196d69bba4e97ec0_full.webp"
+  },
+  {
+    "id": "5960",
+    "name": "Its Madam",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1e644cec8c2795ae_full.webp"
+  },
+  {
+    "id": "5960",
+    "name": "Its Madam",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/04b91a11953c758f_full.webp"
+  },
+  {
+    "id": "6009",
+    "name": "Filthy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3cd9b840adb95280_full.webp"
+  },
+  {
+    "id": "6009",
+    "name": "Filthy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9192b043114e7142_full.webp"
+  },
+  {
+    "id": "6009",
+    "name": "Filthy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/984e53bf03f110f9_full.webp"
+  },
+  {
+    "id": "6009",
+    "name": "Filthy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e41fb837019fa4a1_full.webp"
+  },
+  {
+    "id": "6014",
+    "name": "YP The Fearless",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1ba1beebb28c8f43_full.webp"
+  },
+  {
+    "id": "6014",
+    "name": "YP The Fearless",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/23f88dec17e87517_full.webp"
+  },
+  {
+    "id": "6014",
+    "name": "YP The Fearless",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/66f9e98f26b7223e_full.webp"
+  },
+  {
+    "id": "6014",
+    "name": "YP The Fearless",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6f35e6bb1ecb543e_full.webp"
+  },
+  {
+    "id": "6025",
+    "name": "Kuroshi",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/59017709a7811d55_full.webp"
+  },
+  {
+    "id": "6025",
+    "name": "Kuroshi",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e6e9d4d546fb0651_full.webp"
+  },
+  {
+    "id": "6025",
+    "name": "Kuroshi",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/919e27bcbc7733ff_full.webp"
+  },
+  {
+    "id": "6025",
+    "name": "Kuroshi",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c0d77b7d975cd45c_full.webp"
+  },
+  {
+    "id": "6066",
+    "name": "Zaris",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9d3a3acc44f36943_full.webp"
+  },
+  {
+    "id": "6066",
+    "name": "Zaris",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5ec3c18b61672092_full.webp"
+  },
+  {
+    "id": "6066",
+    "name": "Zaris",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f6ccc4d32ff9bc0c_full.webp"
+  },
+  {
+    "id": "6066",
+    "name": "Zaris",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c58b9aae6e1d660c_full.webp"
+  },
+  {
+    "id": "6100",
+    "name": "Sir Pochington",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d920dc5c83c45478_full.webp"
+  },
+  {
+    "id": "6100",
+    "name": "Sir Pochington",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e2c2d88c2cdecae5_full.webp"
+  },
+  {
+    "id": "6100",
+    "name": "Sir Pochington",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c443c2354ce3f23b_full.webp"
+  },
+  {
+    "id": "6100",
+    "name": "Sir Pochington",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/56d0f09b5f589d0e_full.webp"
+  },
+  {
+    "id": "6142",
+    "name": "Garrison",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9eb1667433069325_full.webp"
+  },
+  {
+    "id": "6142",
+    "name": "Garrison",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c6c32ed0428839d3_full.webp"
+  },
+  {
+    "id": "6142",
+    "name": "Garrison",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5789e775a7f632d7_full.webp"
+  },
+  {
+    "id": "6142",
+    "name": "Garrison",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/97c8a94a2847770e_full.webp"
+  },
+  {
+    "id": "6191",
+    "name": "Antithei",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5adcf7534878ba1d_full.webp"
+  },
+  {
+    "id": "6191",
+    "name": "Antithei",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7e41e44d250f56e2_full.webp"
+  },
+  {
+    "id": "6191",
+    "name": "Antithei",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a7b1dd2c56f249f2_full.webp"
+  },
+  {
+    "id": "6191",
+    "name": "Antithei",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/545fc52ff293daad_full.webp"
+  },
+  {
+    "id": "6221",
+    "name": "UnderdogByDesign",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/dc43ed9e4f475b5e_full.webp"
+  },
+  {
+    "id": "6221",
+    "name": "UnderdogByDesign",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/694b71ff3b0fe2f2_full.webp"
+  },
+  {
+    "id": "6221",
+    "name": "UnderdogByDesign",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/cbb543041f2a8f07_full.webp"
+  },
+  {
+    "id": "6221",
+    "name": "UnderdogByDesign",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d300c498f665bc5d_full.webp"
+  },
+  {
+    "id": "6259",
+    "name": "BLAZIN ACE",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ec06f62e870ae176_full.webp"
+  },
+  {
+    "id": "6259",
+    "name": "BLAZIN ACE",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5b8f9f845e372efd_full.webp"
+  },
+  {
+    "id": "6259",
+    "name": "BLAZIN ACE",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/15582fb1fc51b32f_full.webp"
+  },
+  {
+    "id": "6259",
+    "name": "BLAZIN ACE",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9ec25142f6f3f968_full.webp"
+  },
+  {
+    "id": "6293",
+    "name": "Karpathy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c40d48399e7d10d6_full.webp"
+  },
+  {
+    "id": "6293",
+    "name": "Karpathy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f5edca5560f1915d_full.webp"
+  },
+  {
+    "id": "6293",
+    "name": "Karpathy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/771b0e94648dfa82_full.webp"
+  },
+  {
+    "id": "6293",
+    "name": "Karpathy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2e6fbfd98e526b2f_full.webp"
+  },
+  {
+    "id": "6300",
+    "name": "Dango",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a04a326b97abab12_full.webp"
+  },
+  {
+    "id": "6300",
+    "name": "Dango",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/90aece81b4f88f0c_full.webp"
+  },
+  {
+    "id": "6300",
+    "name": "Dango",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c60cb95e36686496_full.webp"
+  },
+  {
+    "id": "6300",
+    "name": "Dango",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9c17e38a9b98273b_full.webp"
+  },
+  {
+    "id": "6414",
+    "name": "APPLE",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1ee19ad93b2df8f0_full.webp"
+  },
+  {
+    "id": "6414",
+    "name": "APPLE",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3b8e21a5808724b1_full.webp"
+  },
+  {
+    "id": "6414",
+    "name": "APPLE",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/32803c4d69e5a991_full.webp"
+  },
+  {
+    "id": "6414",
+    "name": "APPLE",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/aafe36abe4ae3484_full.webp"
+  },
+  {
+    "id": "6536",
+    "name": "Rainbow Queen",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a0f94f479eca2999_full.webp"
+  },
+  {
+    "id": "6536",
+    "name": "Rainbow Queen",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bf45cb48399ede77_full.webp"
+  },
+  {
+    "id": "6536",
+    "name": "Rainbow Queen",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7e0dffa651c65479_full.webp"
+  },
+  {
+    "id": "6536",
+    "name": "Rainbow Queen",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4f12bc55ece1ee17_full.webp"
+  },
+  {
+    "id": "6602",
+    "name": "Miyamoto Musashi",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6ea014d8dc2053a8_full.webp"
+  },
+  {
+    "id": "6602",
+    "name": "Miyamoto Musashi",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2409fbd1013ac366_full.webp"
+  },
+  {
+    "id": "6602",
+    "name": "Miyamoto Musashi",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e7c812d6b2cba232_full.webp"
+  },
+  {
+    "id": "6602",
+    "name": "Miyamoto Musashi",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3153ec2ee05b734e_full.webp"
+  },
+  {
+    "id": "6606",
+    "name": "Dark Lord Moki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e847aca923341c49_full.webp"
+  },
+  {
+    "id": "6606",
+    "name": "Dark Lord Moki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b5a6955700c53ea2_full.webp"
+  },
+  {
+    "id": "6606",
+    "name": "Dark Lord Moki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/06d5643653675df7_full.webp"
+  },
+  {
+    "id": "6606",
+    "name": "Dark Lord Moki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/18cd67bfaf6a80c6_full.webp"
+  },
+  {
+    "id": "6769",
+    "name": "Not a Raccoon",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d45a777721df0eef_full.webp"
+  },
+  {
+    "id": "6769",
+    "name": "Not a Raccoon",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2fb293202f145b99_full.webp"
+  },
+  {
+    "id": "6769",
+    "name": "Not a Raccoon",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d5c4b3641a728288_full.webp"
+  },
+  {
+    "id": "6769",
+    "name": "Not a Raccoon",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/de2a0c94bbecc529_full.webp"
+  },
+  {
+    "id": "6777",
+    "name": "Roninku",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7da7cdf1db1ce15a_full.webp"
+  },
+  {
+    "id": "6777",
+    "name": "Roninku",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f8767ee1f886e1ed_full.webp"
+  },
+  {
+    "id": "6777",
+    "name": "Roninku",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/637d9fa462351ba3_full.webp"
+  },
+  {
+    "id": "6777",
+    "name": "Roninku",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0cd194ed1fa70a9a_full.webp"
+  },
+  {
+    "id": "6820",
+    "name": "Mononoku",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f06583536ced61b7_full.webp"
+  },
+  {
+    "id": "6820",
+    "name": "Mononoku",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/07c13c96d2b7c033_full.webp"
+  },
+  {
+    "id": "6820",
+    "name": "Mononoku",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/39e6a9a82f9e9b19_full.webp"
+  },
+  {
+    "id": "6820",
+    "name": "Mononoku",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ede80581fb6011aa_full.webp"
+  },
+  {
+    "id": "6821",
+    "name": "24K",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/57f4f7bdfe970d25_full.webp"
+  },
+  {
+    "id": "6821",
+    "name": "24K",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a35533a711cb88a3_full.webp"
+  },
+  {
+    "id": "6821",
+    "name": "24K",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/264ccb2b813f3de1_full.webp"
+  },
+  {
+    "id": "6821",
+    "name": "24K",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/31e721addf04e2d2_full.webp"
+  },
+  {
+    "id": "6824",
+    "name": "Ryu Ganken",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/cbdbcdbcb8925c90_full.webp"
+  },
+  {
+    "id": "6824",
+    "name": "Ryu Ganken",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9b7d932e821291d5_full.webp"
+  },
+  {
+    "id": "6824",
+    "name": "Ryu Ganken",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5a3feccb6766bd5e_full.webp"
+  },
+  {
+    "id": "6824",
+    "name": "Ryu Ganken",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0e34f0e5622e2645_full.webp"
+  },
+  {
+    "id": "6882",
+    "name": "Fuoco Fatuo",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0a1809961ac8f857_full.webp"
+  },
+  {
+    "id": "6882",
+    "name": "Fuoco Fatuo",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/50a4bfeb5883d39a_full.webp"
+  },
+  {
+    "id": "6882",
+    "name": "Fuoco Fatuo",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/809c1e79b37cfe37_full.webp"
+  },
+  {
+    "id": "6882",
+    "name": "Fuoco Fatuo",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/702747599bc4a095_full.webp"
+  },
+  {
+    "id": "6913",
+    "name": "Butthole Moki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/393af55da897e80c_full.webp"
+  },
+  {
+    "id": "6913",
+    "name": "Butthole Moki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9b124519080979a9_full.webp"
+  },
+  {
+    "id": "6913",
+    "name": "Butthole Moki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/149fe87001dc0b01_full.webp"
+  },
+  {
+    "id": "6913",
+    "name": "Butthole Moki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c2aa2749ecfc1563_full.webp"
+  },
+  {
+    "id": "7008",
+    "name": "Chef Maki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/36e8a1ee35acb4cc_full.webp"
+  },
+  {
+    "id": "7008",
+    "name": "Chef Maki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e5e8bd6bcfa3823f_full.webp"
+  },
+  {
+    "id": "7008",
+    "name": "Chef Maki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8a22cfecf12fe61b_full.webp"
+  },
+  {
+    "id": "7008",
+    "name": "Chef Maki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/590387f0b26d48ea_full.webp"
+  },
+  {
+    "id": "7021",
+    "name": "Poo Licker",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/24611b1fbe42e5da_full.webp"
+  },
+  {
+    "id": "7021",
+    "name": "Poo Licker",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5a974bf9d4e7777c_full.webp"
+  },
+  {
+    "id": "7021",
+    "name": "Poo Licker",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/70498b6c03eacb93_full.webp"
+  },
+  {
+    "id": "7021",
+    "name": "Poo Licker",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/526b068743820d97_full.webp"
+  },
+  {
+    "id": "7181",
+    "name": "Gruyere",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f019ed244a0d83a4_full.webp"
+  },
+  {
+    "id": "7181",
+    "name": "Gruyere",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/92336dc6e8278f35_full.webp"
+  },
+  {
+    "id": "7181",
+    "name": "Gruyere",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/73f7e2b35bee6461_full.webp"
+  },
+  {
+    "id": "7181",
+    "name": "Gruyere",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fd67fdea2ca1f3e0_full.webp"
+  },
+  {
+    "id": "7215",
+    "name": "Krampy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/23a4b41297071498_full.webp"
+  },
+  {
+    "id": "7215",
+    "name": "Krampy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/303f5a5217492836_full.webp"
+  },
+  {
+    "id": "7215",
+    "name": "Krampy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3cecfd2288d8d695_full.webp"
+  },
+  {
+    "id": "7215",
+    "name": "Krampy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bc98939cccb4e7c7_full.webp"
+  },
+  {
+    "id": "7247",
+    "name": "Sam Nielbyyy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7085963901b9a44c_full.webp"
+  },
+  {
+    "id": "7247",
+    "name": "Sam Nielbyyy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/73a88a3b6b7c7c9b_full.webp"
+  },
+  {
+    "id": "7247",
+    "name": "Sam Nielbyyy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2fe0b57332d68d42_full.webp"
+  },
+  {
+    "id": "7247",
+    "name": "Sam Nielbyyy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3a439393b9d6471e_full.webp"
+  },
+  {
+    "id": "7254",
+    "name": "Nomad",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/02cd3d01e18f360e_full.webp"
+  },
+  {
+    "id": "7254",
+    "name": "Nomad",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f24dd2901611ae12_full.webp"
+  },
+  {
+    "id": "7254",
+    "name": "Nomad",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ca3d04af82645afa_full.webp"
+  },
+  {
+    "id": "7254",
+    "name": "Nomad",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1c5fc6e03021e734_full.webp"
+  },
+  {
+    "id": "7302",
+    "name": "MK Ultra 8888",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/691bcef738156ac0_full.webp"
+  },
+  {
+    "id": "7302",
+    "name": "MK Ultra 8888",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4d5022942d41542b_full.webp"
+  },
+  {
+    "id": "7302",
+    "name": "MK Ultra 8888",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8c6c2fd5650540d6_full.webp"
+  },
+  {
+    "id": "7302",
+    "name": "MK Ultra 8888",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e1751cf7ceee1ddf_full.webp"
+  },
+  {
+    "id": "7303",
+    "name": "Straw Barry",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f3f19ed04aee73ed_full.webp"
+  },
+  {
+    "id": "7303",
+    "name": "Straw Barry",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/da700ff8acbf3f02_full.webp"
+  },
+  {
+    "id": "7303",
+    "name": "Straw Barry",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ddfbf60a442a1cf8_full.webp"
+  },
+  {
+    "id": "7303",
+    "name": "Straw Barry",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6ff8da6506373936_full.webp"
+  },
+  {
+    "id": "7338",
+    "name": "Mokuna",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b056fb2260e5d387_full.webp"
+  },
+  {
+    "id": "7338",
+    "name": "Mokuna",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a1da0d224b291408_full.webp"
+  },
+  {
+    "id": "7338",
+    "name": "Mokuna",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f42342a2bd3f566a_full.webp"
+  },
+  {
+    "id": "7338",
+    "name": "Mokuna",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bcede372f0200bd6_full.webp"
+  },
+  {
+    "id": "7360",
+    "name": "Kintama",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/aa0617ac483b25e4_full.webp"
+  },
+  {
+    "id": "7360",
+    "name": "Kintama",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/377ee41b442cca73_full.webp"
+  },
+  {
+    "id": "7360",
+    "name": "Kintama",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2b7c8452a728e250_full.webp"
+  },
+  {
+    "id": "7360",
+    "name": "Kintama",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/486ed892ca9b58a3_full.webp"
+  },
+  {
+    "id": "7370",
+    "name": "Hoppi",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/85ec0efa516f63bd_full.webp"
+  },
+  {
+    "id": "7370",
+    "name": "Hoppi",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/709fc7f7a077da9e_full.webp"
+  },
+  {
+    "id": "7370",
+    "name": "Hoppi",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c77c8caed1ee8b56_full.webp"
+  },
+  {
+    "id": "7370",
+    "name": "Hoppi",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/efc8f64f27ad7fc3_full.webp"
+  },
+  {
+    "id": "7405",
+    "name": "Somber",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/82d2d8d460c24a01_full.webp"
+  },
+  {
+    "id": "7405",
+    "name": "Somber",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/955e329ec1bc938e_full.webp"
+  },
+  {
+    "id": "7405",
+    "name": "Somber",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/17ecd6bdff916578_full.webp"
+  },
+  {
+    "id": "7405",
+    "name": "Somber",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b4f312bfaf8576e6_full.webp"
+  },
+  {
+    "id": "7608",
+    "name": "Sydney",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/75311d136b5de276_full.webp"
+  },
+  {
+    "id": "7608",
+    "name": "Sydney",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/81d085b0976b3ae3_full.webp"
+  },
+  {
+    "id": "7608",
+    "name": "Sydney",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5613d09cad72787e_full.webp"
+  },
+  {
+    "id": "7608",
+    "name": "Sydney",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/772d55895dda9c7c_full.webp"
+  },
+  {
+    "id": "7691",
+    "name": "Ruddy",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/65899a135987be86_full.webp"
+  },
+  {
+    "id": "7691",
+    "name": "Ruddy",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e5a510cd0260be07_full.webp"
+  },
+  {
+    "id": "7691",
+    "name": "Ruddy",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5c4c74fdb956afb9_full.webp"
+  },
+  {
+    "id": "7691",
+    "name": "Ruddy",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/72937b2d4657b8f1_full.webp"
+  },
+  {
+    "id": "7804",
+    "name": "Oniki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d2c8a35cede88811_full.webp"
+  },
+  {
+    "id": "7804",
+    "name": "Oniki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/906c0a5e0614afe3_full.webp"
+  },
+  {
+    "id": "7804",
+    "name": "Oniki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2c2dbf79688bcd53_full.webp"
+  },
+  {
+    "id": "7804",
+    "name": "Oniki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1babb13ee0dc7194_full.webp"
+  },
+  {
+    "id": "7858",
+    "name": "Maomao",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e8db116a4ad82424_full.webp"
+  },
+  {
+    "id": "7858",
+    "name": "Maomao",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e6798c56a75db0d5_full.webp"
+  },
+  {
+    "id": "7858",
+    "name": "Maomao",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5e98d38bdd01a198_full.webp"
+  },
+  {
+    "id": "7858",
+    "name": "Maomao",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/83a1ba2ea5f8af72_full.webp"
+  },
+  {
+    "id": "7942",
+    "name": "Extra Onions",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2cb1e132814cc9b0_full.webp"
+  },
+  {
+    "id": "7942",
+    "name": "Extra Onions",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1ec719d632d9296b_full.webp"
+  },
+  {
+    "id": "7942",
+    "name": "Extra Onions",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e13b9a0467893961_full.webp"
+  },
+  {
+    "id": "7942",
+    "name": "Extra Onions",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/05fe9ed53ff299ab_full.webp"
+  },
+  {
+    "id": "7947",
+    "name": "CitraVale",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/25b0e82ea212bd01_full.webp"
+  },
+  {
+    "id": "7947",
+    "name": "CitraVale",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8ad2450b1d811e68_full.webp"
+  },
+  {
+    "id": "7947",
+    "name": "CitraVale",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2ce5788269e7e64e_full.webp"
+  },
+  {
+    "id": "7947",
+    "name": "CitraVale",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/24ef85fa6a246308_full.webp"
+  },
+  {
+    "id": "7958",
+    "name": "Borealis",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a2e2036ef70b6ce5_full.webp"
+  },
+  {
+    "id": "7958",
+    "name": "Borealis",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f5768968d85911b5_full.webp"
+  },
+  {
+    "id": "7958",
+    "name": "Borealis",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/33df4967f25672f0_full.webp"
+  },
+  {
+    "id": "7958",
+    "name": "Borealis",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/11489e9907b4bc82_full.webp"
+  },
+  {
+    "id": "8016",
+    "name": "Lil MC Moki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/75b4c649c3f45238_full.webp"
+  },
+  {
+    "id": "8016",
+    "name": "Lil MC Moki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/aacece7272820f29_full.webp"
+  },
+  {
+    "id": "8016",
+    "name": "Lil MC Moki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f6f809c33bf3b647_full.webp"
+  },
+  {
+    "id": "8016",
+    "name": "Lil MC Moki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4f4baa1daf15efb0_full.webp"
+  },
+  {
+    "id": "8044",
+    "name": "Mad Scientist",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4115e50eb694e533_full.webp"
+  },
+  {
+    "id": "8044",
+    "name": "Mad Scientist",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bc7ad8500777a5da_full.webp"
+  },
+  {
+    "id": "8044",
+    "name": "Mad Scientist",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/05acbda2dc2c7780_full.webp"
+  },
+  {
+    "id": "8044",
+    "name": "Mad Scientist",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1f0f7eb5d26685bf_full.webp"
+  },
+  {
+    "id": "8086",
+    "name": "Maid of Shadows",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/04d428ed6004276b_full.webp"
+  },
+  {
+    "id": "8086",
+    "name": "Maid of Shadows",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7b60d462c8cde419_full.webp"
+  },
+  {
+    "id": "8086",
+    "name": "Maid of Shadows",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c5ee5da2f653ddba_full.webp"
+  },
+  {
+    "id": "8086",
+    "name": "Maid of Shadows",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b39918580cc39459_full.webp"
+  },
+  {
+    "id": "8097",
+    "name": "Guppy93Allan",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/66c967ee87f52fb1_full.webp"
+  },
+  {
+    "id": "8097",
+    "name": "Guppy93Allan",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4c1d73861e209cd0_full.webp"
+  },
+  {
+    "id": "8097",
+    "name": "Guppy93Allan",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fc124539e66a2b9e_full.webp"
+  },
+  {
+    "id": "8097",
+    "name": "Guppy93Allan",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4c960d39e0e5e48d_full.webp"
+  },
+  {
+    "id": "8180",
+    "name": "Dheu",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/111f89a0b8bc25f2_full.webp"
+  },
+  {
+    "id": "8180",
+    "name": "Dheu",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/83b12a3b4b3840da_full.webp"
+  },
+  {
+    "id": "8180",
+    "name": "Dheu",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1ba292b08ae1c4de_full.webp"
+  },
+  {
+    "id": "8180",
+    "name": "Dheu",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a3f21e099ab66c38_full.webp"
+  },
+  {
+    "id": "8260",
+    "name": "BIN Diesel",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/72e0220f4c5fe070_full.webp"
+  },
+  {
+    "id": "8260",
+    "name": "BIN Diesel",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7e3ca63c952574b9_full.webp"
+  },
+  {
+    "id": "8260",
+    "name": "BIN Diesel",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/62033722c01b9602_full.webp"
+  },
+  {
+    "id": "8260",
+    "name": "BIN Diesel",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8a8da3b08a344403_full.webp"
+  },
+  {
+    "id": "8277",
+    "name": "Palmer",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4b5606d9ab08b681_full.webp"
+  },
+  {
+    "id": "8277",
+    "name": "Palmer",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b89a79adc5f4bb86_full.webp"
+  },
+  {
+    "id": "8277",
+    "name": "Palmer",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/31a107867e048fd6_full.webp"
+  },
+  {
+    "id": "8277",
+    "name": "Palmer",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2fda780fe841a482_full.webp"
+  },
+  {
+    "id": "8316",
+    "name": "Fishoo",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b17cc062774e9f1d_full.webp"
+  },
+  {
+    "id": "8316",
+    "name": "Fishoo",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/f0e4432cfc424a2d_full.webp"
+  },
+  {
+    "id": "8316",
+    "name": "Fishoo",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/298b9662278cfd27_full.webp"
+  },
+  {
+    "id": "8316",
+    "name": "Fishoo",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/979cbf7a58908fc6_full.webp"
+  },
+  {
+    "id": "8401",
+    "name": "I WILL FARM U",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/888da76183c2da04_full.webp"
+  },
+  {
+    "id": "8401",
+    "name": "I WILL FARM U",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/151dfbc09717c65f_full.webp"
+  },
+  {
+    "id": "8401",
+    "name": "I WILL FARM U",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/12e03ba955f694b7_full.webp"
+  },
+  {
+    "id": "8401",
+    "name": "I WILL FARM U",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c7a705eb38a8777c_full.webp"
+  },
+  {
+    "id": "8411",
+    "name": "Bun Bun",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ff0636df01013c5e_full.webp"
+  },
+  {
+    "id": "8411",
+    "name": "Bun Bun",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/516d704e1b5fa35b_full.webp"
+  },
+  {
+    "id": "8411",
+    "name": "Bun Bun",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4aa0f1d9419f4649_full.webp"
+  },
+  {
+    "id": "8411",
+    "name": "Bun Bun",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/44e031bc712eae20_full.webp"
+  },
+  {
+    "id": "8415",
+    "name": "Golden Delicious",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1561e1d6ff4a2619_full.webp"
+  },
+  {
+    "id": "8415",
+    "name": "Golden Delicious",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/228b2e9b7b5551ff_full.webp"
+  },
+  {
+    "id": "8415",
+    "name": "Golden Delicious",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/55e13929a897199a_full.webp"
+  },
+  {
+    "id": "8415",
+    "name": "Golden Delicious",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5bcf95f6207937c9_full.webp"
+  },
+  {
+    "id": "8509",
+    "name": "Rynnie",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/7216f6343b3926c1_full.webp"
+  },
+  {
+    "id": "8509",
+    "name": "Rynnie",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3376ae7b71382dcb_full.webp"
+  },
+  {
+    "id": "8509",
+    "name": "Rynnie",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9dbfeae39632e561_full.webp"
+  },
+  {
+    "id": "8509",
+    "name": "Rynnie",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/57ca09908398c7cb_full.webp"
+  },
+  {
+    "id": "8530",
+    "name": "Toast",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ca178d9641acd148_full.webp"
+  },
+  {
+    "id": "8530",
+    "name": "Toast",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ff89c71f4ff62e6d_full.webp"
+  },
+  {
+    "id": "8530",
+    "name": "Toast",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2e21c44e66d60a5e_full.webp"
+  },
+  {
+    "id": "8530",
+    "name": "Toast",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/31c1a9bbdac990c0_full.webp"
+  },
+  {
+    "id": "8575",
+    "name": "Migatte Seishin",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a65c365919432b79_full.webp"
+  },
+  {
+    "id": "8575",
+    "name": "Migatte Seishin",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9a1219ac462a054f_full.webp"
+  },
+  {
+    "id": "8575",
+    "name": "Migatte Seishin",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d2749724d9880361_full.webp"
+  },
+  {
+    "id": "8575",
+    "name": "Migatte Seishin",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8f46dca732ecbde6_full.webp"
+  },
+  {
+    "id": "8579",
+    "name": "Tamanuki",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/9f4be91d2a88b0a9_full.webp"
+  },
+  {
+    "id": "8579",
+    "name": "Tamanuki",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c88acc60f109e49e_full.webp"
+  },
+  {
+    "id": "8579",
+    "name": "Tamanuki",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c96474003dd5965f_full.webp"
+  },
+  {
+    "id": "8579",
+    "name": "Tamanuki",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/8b867a24137a1f03_full.webp"
+  },
+  {
+    "id": "8587",
+    "name": "The Peelomancer",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6019af93404fd61e_full.webp"
+  },
+  {
+    "id": "8587",
+    "name": "The Peelomancer",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/fe71354a09cd79a9_full.webp"
+  },
+  {
+    "id": "8587",
+    "name": "The Peelomancer",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/a8b959dfd8aafc90_full.webp"
+  },
+  {
+    "id": "8587",
+    "name": "The Peelomancer",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b5b34c06aab85c2c_full.webp"
+  },
+  {
+    "id": "8642",
+    "name": "MAKE",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b183b42ca03ab7da_full.webp"
+  },
+  {
+    "id": "8642",
+    "name": "MAKE",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/861aa2c0a1b82d9b_full.webp"
+  },
+  {
+    "id": "8642",
+    "name": "MAKE",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/66d5cf7942ddec7f_full.webp"
+  },
+  {
+    "id": "8642",
+    "name": "MAKE",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4f980c2cf3a425f3_full.webp"
+  },
+  {
+    "id": "8717",
+    "name": "Caipirinha Time",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3e0b29ffd1de6122_full.webp"
+  },
+  {
+    "id": "8717",
+    "name": "Caipirinha Time",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4aae2ff197fc47b3_full.webp"
+  },
+  {
+    "id": "8717",
+    "name": "Caipirinha Time",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e460f0b9fcef5486_full.webp"
+  },
+  {
+    "id": "8717",
+    "name": "Caipirinha Time",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b86bfe71152e83e8_full.webp"
+  },
+  {
+    "id": "8759",
+    "name": "WillOfD",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/97b631ab4bb31bb0_full.webp"
+  },
+  {
+    "id": "8759",
+    "name": "WillOfD",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1378f39b7421c7ef_full.webp"
+  },
+  {
+    "id": "8759",
+    "name": "WillOfD",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/51778ac60cabbd08_full.webp"
+  },
+  {
+    "id": "8759",
+    "name": "WillOfD",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3ba33544c47880a0_full.webp"
+  },
+  {
+    "id": "8833",
+    "name": "MINOZ",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/62b769726513cd54_full.webp"
+  },
+  {
+    "id": "8833",
+    "name": "MINOZ",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/686e460d6db44b2d_full.webp"
+  },
+  {
+    "id": "8833",
+    "name": "MINOZ",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/c8dc5a25804a89fd_full.webp"
+  },
+  {
+    "id": "8833",
+    "name": "MINOZ",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/ad7e639c18f8e3b4_full.webp"
+  },
+  {
+    "id": "8887",
+    "name": "Shado",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/18baa7d727c58810_full.webp"
+  },
+  {
+    "id": "8887",
+    "name": "Shado",
+    "rarity": "Rare",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/023fe45c302b770d_full.webp"
+  },
+  {
+    "id": "8887",
+    "name": "Shado",
+    "rarity": "Epic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/04953c08e98ff3cb_full.webp"
+  },
+  {
+    "id": "8887",
+    "name": "Shado",
+    "rarity": "Legendary",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d82a03342585272d_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Aggressive Specialization",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/58d5d565c88ca234_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Baiting the Trap",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/efb43a106f8c0036_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Beat the Buzzer",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/418e10647ccda26d_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Big Game Hunt",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5635af4141885dbd_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Cage Match",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d5390638db6d8ed8_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Call to Arms",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/45bafbe0cdb1b01d_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Collect 'Em All",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/3662992bbbdd9a87_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Collective Specialization",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/1e6f2a0f7c1c92bf_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Costume Party",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/26acbc31a528641f_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Cursed Dinner",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/59fba1d6542d9031_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Divine Intervention",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/99bd4af35bde86b8_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Dress to Impress",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5ee7a12692a36f42_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Dungaree Duel",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e899d8a7f52e83a0_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Enforcing the Naughty List",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/adcdbe13a078e5a5_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Final Blow",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/5719ee72f25a38ce_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Flexing",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d0e74a3596319952_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Gacha Gouging",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/196735d7715b31f6_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Gacha Hoarding",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2a6b498a9d8874e3_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Golden Shower",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bca495212f57b177_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Grabbing Balls",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bdd3bb3ddde2f1b8_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Housekeeping",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6861be88484320b5_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Litter Collection",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/64b9e0a49c248f5d_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Malicious Intent",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/2755e03aa270e778_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Midnight Strike",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/acffc3a5d6fd2c9a_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Moki Smash",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e17539754b87dc15_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Rainbow Riot",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/20674e268f90df5c_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Running Interference",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/4025dede8d36dc69_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Saccing",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/b86bf206a76a44bc_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Shapeshifting",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/d39ef1ed43230d7e_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Taking a Dive",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/6ccc6e11c8974e03_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Tear Jerking",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/bca0fa33492568cc_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Touching the Wart",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/e7f08425655128ca_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Victory Lap",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/abfd53b2d90a78ef_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Wart Rodeo",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/af8600cbec19efd9_full.webp"
+  },
+  {
+    "id": "Scheme",
+    "name": "Whale Watching",
+    "rarity": "Basic",
+    "image": "https://fhs9t4t52f1kkfmo.public.blob.vercel-storage.com/season1-launch/0a5c9350312c8967_full.webp"
+  }
+]

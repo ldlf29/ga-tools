@@ -3,42 +3,355 @@
   padding: 2rem;
 }
 
+@media (max-width: 1024px) {
+  .main {
+    padding: 0;
+  }
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 auto 32px auto;
-  padding: 1rem 2rem;
+  margin: 0 auto 20px auto;
+  padding: 0.75rem 1.5rem;
   background: linear-gradient(90deg, #0a0a0a 0%, #2673E8 100%);
   border: 4px solid #000000;
   border-bottom-width: 9px;
   border-radius: 1.5rem;
+  width: 100%;
   max-width: 1600px;
-  min-width: 1600px;
-  /* Prevent deformation on zoom */
   position: relative;
-  z-index: 70;
+  z-index: 210;
+  min-height: 100px;
 }
 
-.title {
-  font-family: var(--font-lilita), sans-serif;
-  font-size: 32px;
-  /* Checked from visual ref "SEASON 1" usually large */
-  font-weight: 400;
-  /* Titan One is 400 weight */
-  color: #fff;
-  /* Thick black outline simulation */
-  -webkit-text-stroke: 1.5px #000;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0;
-  /* Removed the pink shadow to match "SEASON 1" style */
+.headerMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.mobileActions {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.desktopOnly {
+  display: flex;
+}
+
+.mobileOnly {
+  display: none !important;
+}
+
+/* Mobile Menu Toggle */
+.menuToggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 110;
+}
+
+.hamburgerLine {
+  width: 100%;
+  height: 3px;
+  background: white;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  border: 1px solid #000;
+}
+
+.menuToggleActive .hamburgerLine:nth-child(1) {
+  transform: translateY(8.5px) rotate(45deg);
+}
+
+.menuToggleActive .hamburgerLine:nth-child(2) {
+  opacity: 0;
+}
+
+.menuToggleActive .hamburgerLine:nth-child(3) {
+  transform: translateY(-8.5px) rotate(-45deg);
+}
+
+.navContainer {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 2rem;
+}
+
+.navTabs {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navTab {
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navTab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FF66CC;
+}
+
+.activeTab {
+  color: #FF66CC;
+  background: rgba(255, 102, 204, 0.1);
+}
+
+/* Drawer-specific elements should be hidden on desktop */
+.drawerHeader,
+.drawerLogo,
+.closeMenuButton,
+.drawerFooter {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    border-bottom: 4px solid #000;
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    overflow: visible;
+    position: sticky;
+    top: 0;
+  }
+
+  .mobileOnly {
+    display: flex !important;
+  }
+
+  .desktopOnly {
+    display: none !important;
+  }
+
+  .menuToggle {
+    display: flex;
+    z-index: 220;
+  }
+
+  .headerMain {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .headerLeft {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+  }
+
+  .mobileActions {
+    display: none !important;
+  }
+
+  .headerRightMobile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .mokiButtonContainer {
+    display: flex;
+    align-items: center;
+  }
+
+  .mokiButton {
+    padding: 0;
+    background: none;
+    border: none;
+  }
+
+  /* Drawer Container */
+
+  /* Drawer Container */
+  .navContainer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 280px;
+    background: linear-gradient(180deg, #0a0a0a 0%, #2673E8 100%);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    /* Remove padding to handle header background */
+    z-index: 1000;
+    transform: translateX(110%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    border-left: 4px solid #000;
+    overflow-y: auto;
+    /* Allow scroll if content is long */
+  }
+
+  .navContainerVisible {
+    transform: translateX(0);
+    display: flex !important;
+  }
+
+  .drawerHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    /* Unified background */
+    width: 100%;
+    margin-bottom: 2rem;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* Subtle separator */
+  }
+
+  .drawerLogo {
+    display: block;
+    height: 44px;
+    width: auto;
+  }
+
+  .closeMenuButton {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+  }
+
+  .closeMenuButton:hover {
+    opacity: 0.7;
+  }
+
+  .navTabs {
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+    padding: 0 1.5rem;
+    /* Re-add padding here */
+    gap: 1.5rem;
+    flex: 1;
+  }
+
+  .navTab {
+    width: 100%;
+    text-align: left;
+    padding: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    background: transparent;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    transition: color 0.2s;
+  }
+
+  .navTab:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .activeTab {
+    color: #FF66CC !important;
+    /* Keep active color pink or white as requested */
+  }
+
+  .authWrapper {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    /* Add horizontal padding too */
+  }
+
+  .headerControls {
+    display: none;
+    /* Hide Dorime/Tools/Notifications in mobile drawer as per requested */
+  }
+
+  .connectButton {
+    width: 100%;
+    background: #5097FF;
+    border: 3px solid #232842;
+    border-radius: 1rem;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.95rem;
+    /* Smaller to fit in one line */
+    font-weight: 800;
+    white-space: nowrap;
+    color: white;
+    text-shadow: 1px 1px 0 #000;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+
+  .drawerFooter {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    font-family: 'Inter', sans-serif;
+  }
 }
 
 .logo {
   height: 60px;
   width: auto;
   display: block;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    height: 45px;
+  }
 }
 
 .authWrapper {
@@ -126,31 +439,6 @@
     transform: translateX(-50%) translateY(100px);
     opacity: 0;
   }
-}
-
-.toolsContainer {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.toolsDropdown {
-  position: absolute;
-  top: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #2673E8;
-  border: 3px solid #333333;
-  border-radius: 1rem;
-  padding: 1rem;
-  z-index: 100;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 250px;
-  text-align: center;
 }
 
 /* ... */
@@ -375,25 +663,200 @@
 }
 
 .content {
+  width: 100%;
   max-width: 1600px;
-  min-width: 1600px;
+  /* Max width instead of fixed/min width */
   margin: 0 auto;
 }
 
 .mainLayout {
   display: grid;
-  grid-template-columns: 320px 1fr 320px;
+  grid-template-columns: 300px 1fr 300px;
+  /* Reduced sidebars slightly to fit more screens */
   gap: 1.5rem;
-  padding: 0 2rem;
+  padding: 0;
   width: 100%;
 }
 
 .mainLayoutLineups {
   display: grid;
-  grid-template-columns: 320px 1fr 320px;
+  grid-template-columns: 300px 1fr 300px;
   gap: 1.5rem;
-  padding: 0 2rem;
+  padding: 0;
   width: 100%;
+}
+
+/* Tablet / Small Desktop Breakpoint */
+@media (max-width: 1200px) {
+
+  .mainLayout,
+  .mainLayoutLineups {
+    grid-template-columns: 280px 1fr;
+    /* Hide Builder to drawer later, for now just adjust columns */
+  }
+}
+
+@media (max-width: 1300px) {
+  .mainLayout {
+    grid-template-columns: 260px 1fr 280px;
+    gap: 1rem;
+  }
+}
+
+/* Base Drawer Styles (Hidden by default on mobile) */
+.mobileDrawer {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 200;
+  /* Above everything */
+}
+
+/* Floating Action Buttons (FAB) for Mobile */
+.fabContainer {
+  display: none;
+  position: fixed;
+  top: 55%;
+  /* Middle of the screen */
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  /* Allow clicks through container */
+  z-index: 150;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0;
+  transform: translateY(-50%);
+}
+
+.fabButton {
+  pointer-events: auto;
+  /* Enable clicks on buttons */
+  width: 54px;
+  height: 54px;
+  border-radius: 0 1.5rem 1.5rem 0;
+  /* Sticky to side */
+  border: 3px solid #333;
+  border-left: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s, background 0.2s;
+  color: white;
+}
+
+.fabBuilder {
+  border-radius: 1.5rem 0 0 1.5rem;
+  /* Sticky to side */
+  border-left: 3px solid #333;
+  border-right: none;
+  box-shadow: -4px 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.fabButton:active {
+  transform: scale(0.95);
+}
+
+.fabFilters {
+  background: #FFD753;
+  /* Yellow */
+  color: #333;
+}
+
+.fabBuilder {
+  background: #FF66CC;
+  /* Pink */
+  color: white;
+}
+
+/* Overlay Backdrop */
+.drawerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 900;
+  /* Above header (210), below drawer (1000) */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.drawerOverlayVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Responsive Drawer Logic */
+@media (max-width: 1024px) {
+  .mainLayout {
+    display: block;
+    /* Remove grid */
+    position: relative;
+  }
+
+  .mainLayoutLineups {
+    display: block;
+    position: relative;
+  }
+
+  /* Show FABs */
+  .fabContainer {
+    display: flex;
+  }
+
+  /* Filter Sidebar Drawer */
+  .filterDrawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 320px;
+    /* Fixed width */
+    max-width: 85vw;
+    height: 100vh;
+    transform: translateX(-110%);
+    /* Hide off-screen left */
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+
+  .filterDrawerOpen {
+    transform: translateX(0);
+  }
+
+  /* Builder Drawer */
+  .builderDrawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    max-width: 85vw;
+    height: 100vh;
+    transform: translateX(110%);
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    overflow-y: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+  }
+
+  .builderDrawer::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari/Webkit */
+  }
+
+  .builderDrawerOpen {
+    transform: translateX(0);
+  }
 }
 
 .card {
