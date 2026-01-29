@@ -671,13 +671,19 @@
     box-shadow: none !important;
 }
 
+.modalGridContainer {
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
 .modalGrid {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-bottom: 1rem;
+    padding: 0.25rem;
 }
 
 .modalCard {
@@ -1146,5 +1152,140 @@
     .grid {
         padding: 1rem 0.5rem;
         gap: 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+
+    /* Modal Responsive Styles */
+    .modalOverlay {
+        z-index: 2000;
+        align-items: flex-start;
+        /* Start from top to avoid header overlap */
+        padding: 4rem 1rem 1rem 1rem;
+    }
+
+    .modalContent {
+        width: 95% !important;
+        height: auto !important;
+        max-height: 600px;
+        /* Altura fija para evitar zoom del fondo con el teclado */
+        overflow-y: auto;
+        padding: 1.5rem 1rem !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modalTitleWrapper {
+        width: 100%;
+        overflow: hidden;
+        display: block;
+        padding: 0 40px;
+        box-sizing: border-box;
+    }
+
+    .modalTitle {
+        font-size: 1.5rem;
+        padding: 0 !important;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+        width: 100%;
+        display: block;
+    }
+
+    .modalGridContainer {
+        padding: 1.5rem 0;
+        /* Increased to lower the switcher from the cards */
+    }
+
+    .modalEditInput {
+        font-size: 1.5rem !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        text-align: center;
+    }
+
+    .modalGrid {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+        padding: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    .modalCardWrapper {
+        width: 48%;
+        gap: 0.25rem;
+    }
+
+    .modalCard {
+        width: 100%;
+        border-radius: 0.75rem;
+    }
+
+    .modalCard:hover {
+        transform: scale(1.03) !important;
+    }
+
+    .modalCardClass {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+    }
+
+    .modalFooter {
+        position: static;
+        flex-direction: column-reverse;
+        gap: 2rem;
+        /* Increased to separate switcher and slider significantly */
+        padding: 1rem 0 0 0;
+        /* Added top padding to lower the entire group */
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .modalFooter>div:first-child {
+        display: none;
+    }
+
+    .ratingSliderContainer {
+        width: 85%;
+        margin: 0 auto;
+        justify-content: center;
+    }
+
+    .backgroundSwitcher {
+        margin: 0;
+        gap: 0.35rem;
+    }
+
+    .bgOption {
+        width: 26px;
+        height: 26px;
+    }
+
+    .modalHeaderRow {
+        margin-bottom: 0.5rem;
+        justify-content: center;
+        position: relative;
+        /* Allow absolute positioning of children */
+    }
+
+    .modalDownloadButton {
+        width: 32px;
+        height: 32px;
+        top: 0;
+        left: 0;
+        position: absolute;
+        /* Move to the corner */
+        margin: 0;
+    }
+
+    .modalDownloadButton svg {
+        width: 18px;
+        height: 18px;
     }
 }

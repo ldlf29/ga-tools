@@ -742,10 +742,8 @@ export default function MyLineups({
                         </div>
 
 
-                        <div style={{ padding: '2rem', borderRadius: '1rem' }}>
-
-
-                            <div className={styles.modalGrid} style={{ flexWrap: 'nowrap', padding: '0.25rem' }}>
+                        <div className={styles.modalGridContainer}>
+                            <div className={styles.modalGrid}>
                                 {(() => {
                                     const mokis = expandedLineup.cards.filter(c => c.cardType !== 'SCHEME');
                                     const scheme = expandedLineup.cards.find(c => c.cardType === 'SCHEME');

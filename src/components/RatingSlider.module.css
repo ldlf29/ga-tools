@@ -118,3 +118,28 @@
 .small:hover .character {
     transform: translateY(-9px) scale(1.1);
 }
+@media (max-width: 600px) {
+    .container {
+        height: 30px;
+    }
+
+    .trackBackground,
+    .trackFill {
+        height: 4px;
+    }
+
+    .mark {
+        width: 6px;
+        height: 6px;
+        border-width: 1px;
+    }
+
+    .character {
+        width: 35px;
+        transform: translateY(-7px);
+    }
+
+    .container:hover .character {
+        transform: translateY(-9px) scale(1.1);
+    }
+}
