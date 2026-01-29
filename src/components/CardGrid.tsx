@@ -239,7 +239,7 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                 <div className={styles.headerTopRow}>
                     <div className={styles.titleGroup}>
                         <h2 className={styles.resultsTitle}>
-                            {filters.cardType === 'MOKI' ? 'MOKI' : filters.cardType === 'SCHEME' ? 'SCHEME' : 'ALL CARDS'} ({cards.length})
+                            {filters.cardType === 'MOKI' ? 'MOKIS' : filters.cardType === 'SCHEME' ? 'SCHEME' : 'ALL CARDS'}
                         </h2>
                         {onRefresh && (
                             <button

@@ -319,10 +319,6 @@ export default function MyLineups({
                 cacheBust: true,
                 pixelRatio: 2, // Better quality
                 backgroundColor: undefined,
-                // Actually if ref is modalContent, it has a background.
-                // But wait, the user wants "Background actual".
-                // If I capture modalContent, it has the background image/color.
-                // I should NOT set backgroundColor here, or set it to null to respect the element's style.
                 filter: (node) => {
                     // Exclude elements with specific classes or IDs
                     if (node.classList && node.classList.contains(styles.excludeFromCapture)) {
@@ -526,7 +522,7 @@ export default function MyLineups({
             <div className={styles.topBar}>
                 <div className={styles.headerTopRow}>
                     <div className={styles.titleGroup}>
-                        <h2 className={styles.title}>My Lineups ({filteredLineups.length})</h2>
+                        <h2 className={styles.title}>My Lineups</h2>
                         <button
                             className={styles.exportButton}
                             onClick={handleExportExcel}
@@ -589,7 +585,7 @@ export default function MyLineups({
                     <div className={styles.sectionHeader}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <h3 className={styles.sectionTitle}>
-                                FAVORITES <span className={styles.count}>({favoriteLineups.length})</span>
+                                FAVORITES
                             </h3>
                             <button className={styles.toggleButton} onClick={() => setFavoritesOpen(!favoritesOpen)}>
                                 {favoritesOpen ? (
@@ -630,7 +626,7 @@ export default function MyLineups({
                     <div className={styles.sectionHeader}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <h3 className={styles.sectionTitle}>
-                                {favoriteLineups.length > 0 ? 'OTHERS' : 'ALL LINEUPS'} <span className={styles.count}>({recentLineups.length})</span>
+                                {favoriteLineups.length > 0 ? 'OTHERS' : 'ALL LINEUPS'}
                             </h3>
                             <button className={styles.toggleButton} onClick={() => setAllLineupsOpen(!allLineupsOpen)}>
                                 {allLineupsOpen ? (
@@ -698,7 +694,6 @@ export default function MyLineups({
                             backgroundPosition: 'center'
                         }}
                     >
-
 
                         {/* Header Row: Download | Title */}
                         <div className={styles.modalHeaderRow}>

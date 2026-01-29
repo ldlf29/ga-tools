@@ -480,7 +480,7 @@
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.85);
-    z-index: 100;
+    z-index: 500;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1178,15 +1178,16 @@
 
     .modalTitleWrapper {
         width: 100%;
-        overflow: hidden;
-        display: block;
-        padding: 0 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5px 15px;
         box-sizing: border-box;
     }
 
     .modalTitle {
-        font-size: 1.5rem;
-        padding: 0 !important;
+        font-size: 1.85rem;
+        padding: 5px 10px !important;
         margin: 0;
         white-space: nowrap;
         overflow: hidden;
@@ -1194,6 +1195,8 @@
         text-align: center;
         width: 100%;
         display: block;
+        line-height: 1.2;
+        box-sizing: border-box;
     }
 
     .modalGridContainer {
@@ -1202,12 +1205,14 @@
     }
 
     .modalEditInput {
-        font-size: 1.5rem !important;
+        font-size: 1.85rem !important;
         width: 100% !important;
         height: auto !important;
         margin: 0 auto !important;
-        padding: 0 !important;
+        padding: 5px 10px !important;
         text-align: center;
+        line-height: 1.2 !important;
+        box-sizing: border-box;
     }
 
     .modalGrid {
@@ -1275,17 +1280,6 @@
     }
 
     .modalDownloadButton {
-        width: 32px;
-        height: 32px;
-        top: 0;
-        left: 0;
-        position: absolute;
-        /* Move to the corner */
-        margin: 0;
-    }
-
-    .modalDownloadButton svg {
-        width: 18px;
-        height: 18px;
+        display: none !important;
     }
 }

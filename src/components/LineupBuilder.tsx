@@ -420,7 +420,14 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
             </div>
 
             <div className={styles.footer}>
-                <button className={styles.saveButton} disabled={mokiCards.length !== 4 || !schemeCard} onClick={() => onSave(lineupName)}>
+                <button
+                    className={styles.saveButton}
+                    disabled={mokiCards.length !== 4 || !schemeCard}
+                    onClick={() => {
+                        onSave(lineupName);
+                        setLineupName('');
+                    }}
+                >
                     Save Lineup
                 </button>
                 <div className={styles.secondaryActions}>

@@ -168,7 +168,7 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
                                 cardType: filters.cardType === type ? 'ALL' : type as 'MOKI' | 'SCHEME'
                             })}
                         >
-                            {type}
+                            {type === 'MOKI' ? 'MOKIS' : type}
                         </button>
                     ))}
                 </div>
