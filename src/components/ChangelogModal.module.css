@@ -1,0 +1,155 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+    background: #FFFFFF;
+    border-radius: 1.5rem;
+    width: 100%;
+    max-width: 750px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border: 4px solid #333333;
+    animation: slideUp 0.3s ease-out;
+}
+
+.header {
+    padding: 0.75rem 1.25rem;
+    background: #84BCFF;
+    color: #333333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #333333;
+    flex-shrink: 0;
+}
+
+.titleArea {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    color: #FFD753;
+    text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+    letter-spacing: 0.5px;
+}
+
+.searchWrapper {
+    flex: 1;
+    max-width: 200px;
+    margin-left: 1rem;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px dashed #333333;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    /* Regular */
+    outline: none;
+    background: #5097FF;
+    /* Consistent input blue */
+    color: #333333;
+}
+
+.searchInput::placeholder {
+    color: rgba(51, 51, 51, 0.6);
+}
+
+.listContainer {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    background: #FFFFFF;
+}
+
+.changeLine {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #333333;
+    line-height: 1.5;
+    padding: 0.2rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.changeLine:last-child {
+    border-bottom: none;
+}
+
+.date {
+    font-weight: 400;
+    /* Regular */
+    color: #64748b;
+}
+
+.mokiName {
+    font-weight: 700;
+    /* Bold */
+    color: #2673E8;
+    font-style: italic;
+}
+
+.classHighlight {
+    font-weight: 700;
+    /* Bold */
+    color: #333333;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.noResults {
+    text-align: center;
+    padding: 3rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+}

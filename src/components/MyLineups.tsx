@@ -556,29 +556,29 @@ export default function MyLineups({
                         className={styles.searchInput}
                     />
                 </div>
-            </div>
 
-            {activeFilters.length > 0 && onRemoveFilter && (
-                <div className={styles.activeFilters}>
-                    {activeFilters.map((f, i) => (
-                        <div key={`${f.key}-${f.value}-${i}`} className={styles.filterChip}>
-                            <span className={styles.filterLabel}>{f.label}: </span>
-                            <span className={styles.filterValue}>
-                                {f.displayValue || f.value}
-                            </span>
-                            <button
-                                onClick={() => onRemoveFilter(f.key, f.value)}
-                                className={styles.removeFilterButton}
-                            >
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            )}
+                {activeFilters.length > 0 && onRemoveFilter && (
+                    <div className={styles.activeFilters}>
+                        {activeFilters.map((f, i) => (
+                            <div key={`${f.key}-${f.value}-${i}`} className={styles.filterChip}>
+                                <span className={styles.filterLabel}>{f.label}: </span>
+                                <span className={styles.filterValue}>
+                                    {f.displayValue || f.value}
+                                </span>
+                                <button
+                                    onClick={() => onRemoveFilter(f.key, f.value)}
+                                    className={styles.removeFilterButton}
+                                >
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             {favoriteLineups.length > 0 && (
                 <div className={styles.section}>

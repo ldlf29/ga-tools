@@ -569,9 +569,7 @@ export default function Home() {
         </div>
 
         <div style={{ display: activeTab === 'champions' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-          <div style={{ padding: '0 2rem' }}>
-            <ChampionsList />
-          </div>
+          <ChampionsList />
         </div>
       </div>
 
