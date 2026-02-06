@@ -1,5 +1,7 @@
 import catalogData from '../data/catalog.json';
-import mokiImages from '../data/mokiImages.json';
+import mokiMetadataRaw from '../data/mokiMetadata.json';
+
+const mokiMetadata = mokiMetadataRaw as Record<string, any>;
 
 export interface MokiData {
     id?: string;
@@ -45,34 +47,49 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
 
         const data = await response.json();
 
-        // Merge with static mokiImages (Our Source of Truth for portraits)
-        const statsWithImages: LiveDataMap = { ...data };
+        // Merge with our Local Source of Truth (mokiMetadata)
+        const statsWithIdentity: LiveDataMap = { ...data };
 
-        // Ensure every Moki in our static image map is present and has its photo
-        Object.entries(mokiImages).forEach(([name, imgUrl]) => {
-            if (statsWithImages[name]) {
-                statsWithImages[name].imageUrl = imgUrl;
+        // Ensure every Moki in our identity map is present and has its correct visual data
+        Object.keys(mokiMetadata).forEach((name) => {
+            const identity = mokiMetadata[name];
+            if (statsWithIdentity[name]) {
+                // Overwrite with local identity data for consistency
+                statsWithIdentity[name].imageUrl = identity.portraitUrl || statsWithIdentity[name].imageUrl;
+                statsWithIdentity[name].fur = identity.fur || statsWithIdentity[name].fur || "";
+                statsWithIdentity[name].traits = (identity.traits && identity.traits.length > 0) ? identity.traits : (statsWithIdentity[name].traits || []);
+                statsWithIdentity[name].marketLink = identity.marketLink || statsWithIdentity[name].marketLink;
             } else {
-                // If a Moki exists in our image database but isn't in the stats sheet yet
-                statsWithImages[name] = {
-                    name,
-                    imageUrl: imgUrl,
+                // If a Moki exists in our identity database but isn't in the stats sheet yet
+                statsWithIdentity[name] = {
+                    name: identity.name,
+                    imageUrl: identity.portraitUrl || "",
                     class: '',
                     stars: 0,
-                    fur: '',
-                    traits: []
+                    fur: identity.fur || "",
+                    traits: identity.traits || [],
+                    marketLink: identity.marketLink || ""
                 };
             }
         });
 
-        cachedLiveData = statsWithImages;
-        return statsWithImages;
+        cachedLiveData = statsWithIdentity;
+        return statsWithIdentity;
     } catch (e) {
         console.error("[LiveData] Error fetching stats:", e);
-        // Fallback Mode: return at least the names and images so the UI doesn't break
+        // Fallback Mode: return at least the names and identity from our local source
         const fallbackData: LiveDataMap = {};
-        Object.entries(mokiImages).forEach(([name, imgUrl]) => {
-            fallbackData[name] = { name, imageUrl: imgUrl, class: '', stars: 0, fur: '', traits: [] };
+        Object.keys(mokiMetadata).forEach((name) => {
+            const identity = mokiMetadata[name];
+            fallbackData[name] = {
+                name: identity.name,
+                imageUrl: identity.portraitUrl || "",
+                class: '',
+                stars: 0,
+                fur: identity.fur || "",
+                traits: identity.traits || [],
+                marketLink: identity.marketLink || ""
+            };
         });
         return fallbackData;
     }

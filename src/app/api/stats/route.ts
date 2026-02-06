@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// Revalidate every 1 hour (3600s) instead of 12h, since DB is faster/cheaper to query
+// Revalidate every 1 hour (3600s)
 export const revalidate = 3600;
 
 export async function GET() {
     try {
-        console.log("[API Stats] Fetching from Supabase...");
+        console.log("[API Stats] Fetching from Supabase moki_stats...");
 
-        // Fetch all cards that have stats
-        // We only want the 'stats' column to mimic the previous CSV-to-JSON behavior
+        // Fetch all Moki stats from the new minimal table
         const { data, error } = await supabase
-            .from('cards')
-            .select('stats')
-            .not('stats', 'is', null);
+            .from('moki_stats')
+            .select('*');
 
         if (error) {
             throw error;
@@ -27,13 +25,27 @@ export async function GET() {
         const statsMap: Record<string, any> = {};
 
         for (const row of data) {
-            const stats = row.stats as any;
-            if (stats && stats.name) {
-                statsMap[stats.name.toUpperCase()] = stats;
+            if (row.name) {
+                statsMap[row.name.toUpperCase()] = {
+                    name: row.name,
+                    class: row.class || "",
+                    stars: row.stars || 0,
+                    eliminations: row.eliminations,
+                    deposits: row.deposits,
+                    wartDistance: row.wart_distance,
+                    score: row.score,
+                    winRate: row.win_rate,
+                    defense: row.defense,
+                    dexterity: row.dexterity,
+                    fortitude: row.fortitude,
+                    speed: row.speed,
+                    strength: row.strength,
+                    totalStats: row.total_stats
+                };
             }
         }
 
-        console.log(`[API Stats] Returned ${Object.keys(statsMap).length} records from DB.`);
+        console.log(`[API Stats] Returned ${Object.keys(statsMap).length} records from moki_stats.`);
 
         return NextResponse.json(statsMap);
 

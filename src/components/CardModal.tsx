@@ -163,7 +163,7 @@ export default function CardModal({ card, onClose }: CardModalProps) {
                                                 <span className={styles.statValue}>{card.custom.fortitude?.toFixed(1) || '0.0'}</span>
                                             </div>
                                             <div className={styles.statItem}>
-                                                <span className={styles.statLabel}>Total Stats</span>
+                                                <span className={styles.statLabel}>Total</span>
                                                 <span className={styles.totalValue}>{card.custom.totalStats?.toFixed(1) || '0.0'}</span>
                                             </div>
                                         </div>

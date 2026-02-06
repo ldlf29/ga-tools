@@ -698,4 +698,9 @@
     .updateInfo {
         display: none !important;
     }
+
+    .linkButton {
+        color: #000 !important;
+        font-weight: 700 !important;
+    }
 }

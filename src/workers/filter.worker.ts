@@ -131,7 +131,12 @@ const matchesFilter = (
             return group ? group.traits : [];
         });
 
-        const hasTrait = activeTraits.some(t => card.custom.traits?.includes(t));
+        const hasTrait = activeTraits.some(t =>
+            card.custom.traits?.some(ct => {
+                const regex = new RegExp(`\\b${t}\\b`, 'i');
+                return regex.test(ct);
+            })
+        );
         if (!hasTrait) return false;
     }
 

@@ -79,7 +79,7 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                                 <div className={styles.cardHeader}>
                                     <span className={styles.cardName}>{card.name}</span>
                                 </div>
-                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', position: 'relative', width: '100%', justifyContent: 'center', minHeight: '26px' }}>
+                                <div className={styles.cardActions}>
                                     {card.custom.class && card.cardType !== 'SCHEME' && (
                                         <div className={styles.cardType}>{card.custom.class}</div>
                                     )}
@@ -161,15 +161,6 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
         }
     };
 
-    // Mobile View Optimization: Default to 'compact' on mobile
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setViewMode(prev => prev === 'grid' ? 'compact' : prev);
-            }
-        };
-        handleResize();
-    }, []);
 
     // Click outside to close menu
     useEffect(() => {
@@ -252,18 +243,25 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
         }
     };
 
-    const sortedCards = [...cards].sort((a, b) => {
-        switch (sortOption) {
-            case 'default': return 0;
-            case 'name_asc': return a.name.localeCompare(b.name);
-            case 'name_desc': return b.name.localeCompare(a.name);
-            case 'rarity_desc': return getRarityValue(b.rarity) - getRarityValue(a.rarity);
-            case 'rarity_asc': return getRarityValue(a.rarity) - getRarityValue(b.rarity);
-            case 'stars_desc': return (b.custom?.stars || 0) - (a.custom?.stars || 0);
-            case 'stars_asc': return (a.custom?.stars || 0) - (b.custom?.stars || 0);
-            default: return 0;
-        }
-    });
+    const sortedCards = [...cards]
+        .filter(c => {
+            if (sortOption === 'stars_asc' || sortOption === 'stars_desc') {
+                return c.cardType !== 'SCHEME';
+            }
+            return true;
+        })
+        .sort((a, b) => {
+            switch (sortOption) {
+                case 'default': return 0;
+                case 'name_asc': return a.name.localeCompare(b.name);
+                case 'name_desc': return b.name.localeCompare(a.name);
+                case 'rarity_desc': return getRarityValue(b.rarity) - getRarityValue(a.rarity);
+                case 'rarity_asc': return getRarityValue(a.rarity) - getRarityValue(b.rarity);
+                case 'stars_desc': return (b.custom?.stars || 0) - (a.custom?.stars || 0);
+                case 'stars_asc': return (a.custom?.stars || 0) - (b.custom?.stars || 0);
+                default: return 0;
+            }
+        });
 
     return (
         <div className={styles.gridContainer}>

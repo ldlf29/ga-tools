@@ -12,9 +12,6 @@
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 0.5rem;
-    /* Reduced from 1.5rem for tighter fit */
-    position: sticky;
-    top: 0;
     background: #84BCFF;
     padding: 1rem 1.5rem;
     margin-left: -1.5rem;
@@ -23,7 +20,6 @@
     border: 3px solid #333333;
     border-bottom-width: 6px;
     z-index: 20;
-    /* Adjusted to avoid overlapping main header dropdowns */
 }
 
 .headerTopRow {
@@ -270,19 +266,43 @@
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
-    position: absolute;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
     z-index: 10;
     pointer-events: auto;
     font-family: 'Inter', sans-serif;
+    flex-shrink: 0;
+}
+
+@media (max-width: 1200px) {
+    .infoButton {
+        width: 20px;
+        height: 20px;
+        box-shadow: 1.5px 1.5px 0 rgba(0, 0, 0, 1);
+    }
+
+    .infoButton svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .infoButton {
+        width: 18px;
+        height: 18px;
+        border-width: 1.5px;
+        box-shadow: 1px 1px 0 rgba(0, 0, 0, 1);
+    }
+
+    .infoButton svg {
+        width: 10px;
+        height: 10px;
+    }
 }
 
 .infoButton:hover {
     background: #EAB308;
-    transform: translateY(calc(-50% - 3px));
-    box-shadow: 2px 4px 0 rgba(0, 0, 0, 1);
+    transform: translateY(-2px);
+    box-shadow: 2px 3px 0 rgba(0, 0, 0, 1);
 }
 
 /* Rarity Accents (Subtle glow instead of background) */
@@ -361,7 +381,7 @@
 /* Card Info */
 .cardInfo {
     position: absolute;
-    bottom: 1rem;
+    bottom: 0.75rem;
     left: 0;
     width: 100%;
     display: flex;
@@ -371,6 +391,27 @@
     z-index: 2;
     pointer-events: none;
     min-height: 24px;
+}
+
+.cardActions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    pointer-events: none;
+}
+
+@media (max-width: 1200px) {
+    .cardActions {
+        gap: 0.25rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .cardActions {
+        gap: 2px;
+    }
 }
 
 .cardName {
@@ -386,7 +427,7 @@
     background: #FFD753;
     border: 2px solid #000;
     color: #000;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 800;
     padding: 0.2rem 0.6rem;
     border-radius: 6px;
@@ -396,6 +437,29 @@
     white-space: nowrap;
     text-align: center;
     margin: 0;
+    pointer-events: auto;
+}
+
+@media (max-width: 1200px) {
+    .cardType {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.35rem;
+        box-shadow: 1.5px 1.5px 0 rgba(0, 0, 0, 1);
+    }
+}
+
+@media (max-width: 600px) {
+    .cardType {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.25rem;
+        border-width: 1.5px;
+        box-shadow: 1px 1px 0 rgba(0, 0, 0, 1);
+    }
+
+    .cardInfo {
+        padding: 0 0.25rem;
+        bottom: 0.5rem;
+    }
 }
 
 /* Active Filters */

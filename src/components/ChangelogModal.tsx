@@ -1,6 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import styles from './ChangelogModal.module.css';
-import { mockChangelogData } from '../data/changelogData';
+
+interface ClassChange {
+    id: string;
+    moki_name: string;
+    old_class: string;
+    new_class: string;
+    changed_at: string;
+    image_url?: string;
+}
 
 interface ChangelogModalProps {
     onClose: () => void;
@@ -8,6 +16,26 @@ interface ChangelogModalProps {
 
 const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [changes, setChanges] = useState<ClassChange[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Fetch real changelog data from API
+    useEffect(() => {
+        const fetchChangelog = async () => {
+            try {
+                const response = await fetch('/api/changelog');
+                if (!response.ok) throw new Error('Failed to fetch changelog');
+                const data = await response.json();
+                setChanges(data);
+            } catch (err: any) {
+                setError(err.message || 'Error loading changelog');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchChangelog();
+    }, []);
 
     // Keyboard listener for ESC key only (as requested)
     useEffect(() => {
@@ -21,17 +49,20 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
     }, [onClose]);
 
     const filteredChanges = useMemo(() => {
-        if (!searchQuery.trim()) return mockChangelogData;
+        if (!searchQuery.trim()) return changes;
 
         const lowerQuery = searchQuery.toLowerCase();
-        return mockChangelogData.filter(item =>
-            item.mokiName.toLowerCase().includes(lowerQuery)
+        return changes.filter(item =>
+            item.moki_name.toLowerCase().includes(lowerQuery)
         );
-    }, [searchQuery]);
+    }, [searchQuery, changes]);
 
-    // Format date from YYYY-MM-DD to DD/MM/YYYY
+    // Format date from ISO to DD/MM/YYYY
     const formatDate = (dateStr: string) => {
-        const [year, month, day] = dateStr.split('-');
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
 
@@ -61,21 +92,25 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
                 </div>
 
                 <div className={styles.listContainer}>
-                    {filteredChanges.length > 0 ? (
+                    {isLoading ? (
+                        <div className={styles.noResults}>Loading changelog...</div>
+                    ) : error ? (
+                        <div className={styles.noResults}>Error: {error}</div>
+                    ) : filteredChanges.length > 0 ? (
                         filteredChanges.map((change) => (
                             <div key={change.id} className={styles.changeLine}>
-                                <span className={styles.date}>{formatDate(change.date)}</span>
+                                <span className={styles.date}>{formatDate(change.changed_at)}</span>
                                 {" - "}
-                                <span className={styles.mokiName}>{change.mokiName}</span>
+                                <span className={styles.mokiName}>{change.moki_name}</span>
                                 {" changed his class from "}
-                                <span className={styles.classHighlight}>{change.oldClass}</span>
+                                <span className={styles.classHighlight}>{change.old_class}</span>
                                 {" to "}
-                                <span className={styles.classHighlight}>{change.newClass}</span>
+                                <span className={styles.classHighlight}>{change.new_class}</span>
                             </div>
                         ))
                     ) : (
                         <div className={styles.noResults}>
-                            No changes found matching "{searchQuery}"
+                            {searchQuery ? `No changes found matching "${searchQuery}"` : "No class changes recorded yet."}
                         </div>
                     )}
                 </div>

@@ -333,6 +333,13 @@ export default function Home() {
           >
             Champions
           </button>
+          <button
+            className={`${styles.navTab} ${styles.disabledTab}`}
+            disabled
+            title="Coming soon!"
+          >
+            Analytics
+          </button>
         </nav>
 
         {/* Auth wrapper for mobile drawer - only contains connect wallet */}
@@ -391,6 +398,13 @@ export default function Home() {
                   onClick={() => setActiveTab('champions')}
                 >
                   Champions
+                </button>
+                <button
+                  className={`${styles.navTab} ${styles.disabledTab}`}
+                  disabled
+                  title="Coming soon!"
+                >
+                  Analytics
                 </button>
               </div>
             </nav>

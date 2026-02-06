@@ -129,6 +129,16 @@
   background: rgba(255, 102, 204, 0.1);
 }
 
+.disabledTab {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.disabledTab:hover {
+  color: white !important;
+  background: transparent !important;
+}
+
 /* Drawer-specific elements should be hidden on desktop */
 .drawerHeader,
 .drawerLogo,
