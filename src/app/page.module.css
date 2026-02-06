@@ -299,7 +299,8 @@
   }
 
   .navTab:hover {
-    color: rgba(255, 255, 255, 0.8);
+    color: #FF66CC;
+    background: transparent;
   }
 
   .activeTab {
@@ -911,7 +912,7 @@
 
 .navTab:hover {
   color: #FF66CC;
-  /* Pink on hover */
+  background: transparent;
 }
 
 .activeTab {

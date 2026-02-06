@@ -39,6 +39,7 @@ export interface EnhancedCard extends GrandArenaCard {
         strength?: number;
         totalStats?: number;
         marketLink?: string;
+        catalogMarketLink?: string;
     };
 }
 
@@ -88,7 +89,7 @@ export const fetchLiteCollection = async (): Promise<EnhancedCard[]> => {
  * Normalizes a row from the Catalog Sheet into an EnhancedCard
  * Merges with stats from the Stats Sheet using the card Name.
  */
-const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: string, image: string, description?: string }): EnhancedCard => {
+const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: string, image: string, description?: string, market?: string }): EnhancedCard => {
     const normalizedName = catalogItem.name.trim().toUpperCase();
 
     // Determine Card Type (Moki vs Scheme)
@@ -173,7 +174,8 @@ const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: stri
             speed: stats?.speed,
             strength: stats?.strength,
             totalStats: stats?.totalStats,
-            marketLink: stats?.marketLink
+            marketLink: stats?.marketLink,
+            catalogMarketLink: catalogItem.market
         }
     };
 };

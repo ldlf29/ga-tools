@@ -3,8 +3,8 @@
 import { EnhancedCard, getCardGroupKey } from '@/utils/cardService';
 import styles from './CardGrid.module.css';
 import NextImage from 'next/image';
-
 import { FilterState } from './FilterSidebar';
+import CardModal from './CardModal';
 import { useState, useEffect, useMemo, CSSProperties } from 'react';
 import { List } from 'react-window';
 import { AutoSizer as _AutoSizer, Size } from 'react-virtualized-auto-sizer';
@@ -29,10 +29,11 @@ interface CardRowProps {
     colGap: number;
     viewMode: 'grid' | 'compact';
     onAddCard: (card: EnhancedCard) => void;
+    setSelectedModalCard: (card: EnhancedCard | null) => void;
 }
 
 // CardRow defined to accept props directly (merged rowProps)
-const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard }: { index: number; style: CSSProperties } & CardRowProps) => {
+const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard, setSelectedModalCard }: { index: number; style: CSSProperties } & CardRowProps) => {
     const startIndex = index * itemsPerRow;
     const rowCards = cards.slice(startIndex, startIndex + itemsPerRow);
 
@@ -44,7 +45,7 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                 display: 'grid',
                 gridTemplateColumns: `repeat(${itemsPerRow}, 1fr)`,
                 columnGap: `${colGap}px`,
-                width: 'calc(100% - 24px)', // Buffer for scaling matching AutoSizer buffer
+                width: 'calc(100% - 24px)',
                 marginLeft: '12px',
                 height: (style.height as number),
                 alignItems: 'flex-start',
@@ -53,7 +54,7 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
         >
             {rowCards.map((card, colIndex) => (
                 <div
-                    key={`${card.name}-${card.rarity}-${colIndex}`}
+                    key={`${viewMode}-${card.name}-${card.id || index}-${colIndex}`}
                     className={viewMode === 'grid'
                         ? `${styles.cardItem} ${card.cardType === 'SCHEME' ? styles.scheme : (styles[card.rarity.toLowerCase()] || styles.basic)}`
                         : `${styles.compactCardItem} ${card.cardType === 'SCHEME' ? styles.compactScheme : (styles['compact' + (card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1).toLowerCase())] || styles.compactBasic)}`
@@ -62,7 +63,7 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                 >
                     {viewMode === 'grid' ? (
                         <>
-                            <div className={styles.imageWrapper} style={{ position: 'relative' }}>
+                            <div className={styles.imageWrapper}>
                                 <NextImage
                                     src={card.image}
                                     alt={card.name}
@@ -78,16 +79,33 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                                 <div className={styles.cardHeader}>
                                     <span className={styles.cardName}>{card.name}</span>
                                 </div>
-                                {card.custom.class && (
-                                    <div className={styles.cardType}>{card.custom.class}</div>
-                                )}
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', position: 'relative', width: '100%', justifyContent: 'center', minHeight: '26px' }}>
+                                    {card.custom.class && card.cardType !== 'SCHEME' && (
+                                        <div className={styles.cardType}>{card.custom.class}</div>
+                                    )}
+
+                                    <button
+                                        className={styles.infoButton}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setSelectedModalCard(card);
+                                        }}
+                                        title="View details"
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </>
                     ) : (
                         <>
                             <div className={styles.compactImageWrapper} style={{ position: 'relative', width: 60, height: 60, flexShrink: 0, marginRight: '1rem' }}>
                                 <NextImage
-                                    src={card.custom.characterImage || card.image}
+                                    src={card.custom.characterImage || card.custom.imageUrl || card.image}
                                     alt={card.name}
                                     width={60}
                                     height={60}
@@ -100,9 +118,23 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                                 <div className={styles.compactName}>{card.name}</div>
                                 <div className={styles.compactSub}>
                                     {card.custom.stars > 0 && <span className={styles.compactStars}>{card.custom.stars} ★</span>}
-                                    {card.custom.class && <span className={styles.compactClass}>{card.custom.class}</span>}
+                                    {card.custom.class && card.cardType !== 'SCHEME' && <span className={styles.compactClass}>{card.custom.class}</span>}
                                 </div>
                             </div>
+                            <button
+                                className={styles.compactInfoButton}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setSelectedModalCard(card);
+                                }}
+                                title="View details"
+                            >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </button>
                             <div className={styles.compactRarityLabel}>{card.rarity}</div>
                         </>
                     )}
@@ -114,6 +146,7 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
 
 export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange, currentLineup, filters, onRemoveFilter, onRefresh }: CardGridProps) {
     const [sortOption, setSortOption] = useState<SortOption>('default');
+    const [selectedModalCard, setSelectedModalCard] = useState<EnhancedCard | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -360,21 +393,18 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                     <AutoSizer
                         renderProp={({ height, width }: { height: number | undefined; width: number | undefined }) => {
                             const w = width || 0;
-                            // Calculate Items Per Row Based on Width
                             let itemsPerRow = 4;
                             if (viewMode === 'grid') {
                                 if (w < 600) itemsPerRow = 3;
                                 else if (w < 1200) itemsPerRow = 4;
-                                else itemsPerRow = 5; // Extra wide screens
+                                else itemsPerRow = 5;
                             } else {
-                                // Compact Mode
                                 if (w < 768) itemsPerRow = 1;
                                 else itemsPerRow = 2;
                             }
 
                             const colGap = w < 600 ? 8 : 16;
                             const rowGap = 2;
-
                             const availableWidth = w - (w < 600 ? 16 : 24);
                             const colWidth = Math.max(0, (availableWidth - (colGap * (itemsPerRow - 1))) / itemsPerRow);
 
@@ -400,7 +430,8 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                                         onAddCard,
                                         itemsPerRow,
                                         colGap,
-                                        viewMode
+                                        viewMode,
+                                        setSelectedModalCard
                                     }}
                                     rowComponent={CardRow}
                                     overscanCount={2}
@@ -410,6 +441,11 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                     />
                 )}
             </div>
-        </div >
+
+            <CardModal
+                card={selectedModalCard}
+                onClose={() => setSelectedModalCard(null)}
+            />
+        </div>
     );
 }

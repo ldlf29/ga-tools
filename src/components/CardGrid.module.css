@@ -186,82 +186,145 @@
 }
 
 .cardItem {
-    background: rgba(255, 255, 255, 0.7);
+    /* Crystal/Glass Container Base */
+    background: #000;
     border-radius: 1.5rem;
-    padding: 0.5rem;
+    padding: 0;
     position: relative;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
-    border: 3px solid var(--color-border);
-    overflow: visible;
-    backdrop-filter: blur(5px);
-    will-change: transform;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    /* Rim light */
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease-out forwards;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    aspect-ratio: 3/4;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Crystal Overlay (Always visible glass reflection) */
+.cardItem::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.25) 0%,
+            rgba(255, 255, 255, 0.05) 20%,
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.2) 100%);
+    pointer-events: none;
+    z-index: 10;
+    border-radius: 1.5rem;
+    transition: opacity 0.3s ease;
+}
+
+/* Shine Effect (Sweep) */
+.cardItem::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0s;
+    /* Instant reset on leave */
+    pointer-events: none;
+    z-index: 11;
+}
+
+.cardItem:hover::before {
+    left: 100%;
+    transition: 0.6s ease;
+    /* Animate only on enter */
 }
 
 .cardRow {
     overflow: visible !important;
     z-index: 1;
-    transition: z-index 0s;
-}
-
-.cardRow:hover {
-    z-index: 100;
-    /* Ensure hovered row is on top of neighbors */
 }
 
 .cardItem:hover {
-    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
     z-index: 10;
 }
 
-/* Rarity Borders */
-.basic {
-    border-color: #94a3b8;
-    background: rgba(148, 163, 184, 0.6) !important;
+.infoButton {
+    background: #FFD753;
+    border: 2px solid #000;
+    color: #000;
+    width: 24px;
+    height: 24px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    pointer-events: auto;
+    font-family: 'Inter', sans-serif;
 }
 
-.cardItem.basic:hover {
-    box-shadow: 0 0 15px rgba(148, 163, 184, 0.5);
+.infoButton:hover {
+    background: #EAB308;
+    transform: translateY(calc(-50% - 3px));
+    box-shadow: 2px 4px 0 rgba(0, 0, 0, 1);
+}
+
+/* Rarity Accents (Subtle glow instead of background) */
+.basic {
+    border-color: rgba(148, 163, 184, 0.3);
 }
 
 .rare {
-    border-color: #26C2A3;
-    background: rgba(38, 194, 163, 0.6) !important;
-}
-
-.cardItem.rare:hover {
-    box-shadow: 0 0 15px rgba(38, 194, 163, 0.6);
+    border-color: rgba(38, 194, 163, 0.3);
 }
 
 .epic {
-    border-color: #a855f7;
-    background: rgba(168, 85, 247, 0.6) !important;
+    border-color: rgba(168, 85, 247, 0.3);
+}
+
+.legendary {
+    border-color: rgba(244, 114, 182, 0.3);
+}
+
+.scheme {
+    border-color: rgba(96, 165, 250, 0.3) !important;
+}
+
+.cardItem.basic:hover {
+    box-shadow: 0 0 20px rgba(148, 163, 184, 0.2);
+}
+
+.cardItem.rare:hover {
+    box-shadow: 0 0 20px rgba(38, 194, 163, 0.2);
 }
 
 .cardItem.epic:hover {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
-}
-
-/* Purple/Pink for Legendary */
-.legendary {
-    border-color: #F472B6;
-    /* Light Pink */
-    box-shadow: 0 0 15px rgba(244, 114, 182, 0.4);
-    background: rgba(244, 114, 182, 0.6) !important;
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
 }
 
 .cardItem.legendary:hover {
-    box-shadow: 0 0 25px rgba(244, 114, 182, 0.9);
+    box-shadow: 0 0 30px rgba(244, 114, 182, 0.4);
 }
 
-/* Light Blue for Scheme */
-.scheme {
-    border-color: #60a5fa !important;
-    /* Force override */
-    box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
-    background: rgba(96, 165, 250, 0.6) !important;
+.cardItem.scheme:hover {
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
 }
-
 
 .starBadge {
     position: absolute;
@@ -273,19 +336,19 @@
     color: var(--color-secondary);
     font-weight: 700;
     font-size: 0.85rem;
-    z-index: 5;
+    z-index: 15;
+    /* Above crystal */
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .imageWrapper {
     width: 100%;
-    aspect-ratio: 3/4;
-    border-radius: 1rem;
-    overflow: hidden;
-    margin-bottom: 0.5rem;
-    /* Reduced from 0.75rem */
-    background: #000;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
 }
 
 .cardImage {
@@ -293,40 +356,46 @@
     height: 100%;
     object-fit: cover;
     image-rendering: -webkit-optimize-contrast;
-    /* Improve sharpness in some browsers */
 }
 
+/* Card Info */
 .cardInfo {
-    text-align: left;
-    padding: 0 0.25rem;
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 0.5rem;
+    z-index: 2;
+    pointer-events: none;
+    min-height: 24px;
 }
 
 .cardName {
     display: none;
-    /* Hide Name */
 }
 
 .cardRarity {
-    display: block;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-    letter-spacing: 0.5px;
+    display: none;
 }
 
+/* New Class Label Style (Copied from MyLineups modal) */
 .cardType {
-    margin-top: 0.1rem;
-    display: block;
+    background: #FFD753;
+    border: 2px solid #000;
+    color: #000;
     font-size: 0.8rem;
-    /* Slightly larger */
-    color: #000000;
-    /* Dark Gray */
-    font-family: 'Inter', sans-serif;
     font-weight: 800;
-    /* Extra Bold */
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
     text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+    white-space: nowrap;
     text-align: center;
-    /* Centered */
+    margin: 0;
 }
 
 /* Active Filters */
@@ -548,23 +617,51 @@
 }
 
 .compactCardItem {
-    height: 72px;
-    border-radius: 1rem;
     display: flex;
     align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
     padding: 0.5rem;
-    border: 3px solid #333333;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.2s;
     position: relative;
     overflow: hidden;
+    height: 80px;
     backdrop-filter: blur(5px);
-    will-change: transform;
 }
 
 .compactCardItem:hover {
-    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     z-index: 10;
+}
+
+.compactInfoButton {
+    background: #FFD753;
+    border: 2px solid #000;
+    color: #000;
+    width: 24px;
+    height: 24px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+    font-family: 'Inter', sans-serif;
+}
+
+.compactInfoButton:hover {
+    background: #EAB308;
+    transform: translateY(calc(-50% - 3px));
+    box-shadow: 2px 4px 0 rgba(0, 0, 0, 1);
 }
 
 .compactImage {
