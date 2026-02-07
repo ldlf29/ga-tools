@@ -11,7 +11,7 @@ export async function GET() {
         // Fetch all Moki stats from the new minimal table
         const { data, error } = await supabase
             .from('moki_stats')
-            .select('*');
+            .select('name, class, stars, eliminations, deposits, wart_distance, score, win_rate, defense, dexterity, fortitude, speed, strength, total_stats');
 
         if (error) {
             throw error;
@@ -49,8 +49,9 @@ export async function GET() {
 
         return NextResponse.json(statsMap);
 
-    } catch (error: any) {
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Database error';
         console.error("[API Stats] DB Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

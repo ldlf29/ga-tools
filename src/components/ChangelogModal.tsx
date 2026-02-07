@@ -28,8 +28,9 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
                 if (!response.ok) throw new Error('Failed to fetch changelog');
                 const data = await response.json();
                 setChanges(data);
-            } catch (err: any) {
-                setError(err.message || 'Error loading changelog');
+            } catch (err) {
+                const message = err instanceof Error ? err.message : 'Error loading changelog';
+                setError(message);
             } finally {
                 setIsLoading(false);
             }

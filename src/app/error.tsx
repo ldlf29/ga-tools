@@ -28,7 +28,7 @@ export default function Error({
                 Something went wrong!
             </h2>
             <p style={{ marginBottom: '2rem', color: '#666' }}>
-                {error.message || "An unexpected error occurred."}
+                An unexpected error occurred. Please try again later.
             </p>
             <button
                 onClick={

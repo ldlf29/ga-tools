@@ -129,18 +129,18 @@ export async function GET(request: Request) {
 
         return NextResponse.json({ success: true, updated: successCount, duration: Date.now() - startTime });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("💥 [Cron] Failed:", error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
         try {
             await supabaseAdmin.from('sync_logs').insert({
                 status: 'ERROR',
                 cards_updated: 0,
-                details: `Cron Error: ${error.message || 'Unknown error'}`
+                details: `Cron Error: ${errorMessage}`
             });
         } catch (e) { /* ignore */ }
 
-        // Sanitize error message for client
         return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
     }
 }

@@ -104,24 +104,11 @@ export default function Home() {
   const handleSaveLineup = (name: string) => {
     try {
       saveLineupToStorage(name, lineup);
-      // Keep only locked cards after save (if implementing locking later)
-      // For now, consistent with previous behavior:
-      setLineup(lineup.filter(c => c.custom.class === 'locked')); // Mock 'locked' check or similar
-      // The original code used: setLineup(lineup.filter(c => c.locked)); 
-      // But 'locked' property might not exist on EnhancedCard yet in updated types? 
-      // Let's check logic. Actually, better to just keep it empty or same.
-      // In strict mode, if 'locked' is not in type, it errors.
-      // EnhancedCard in types/index.ts usually has specific fields.
-      // Let's assume we just clear it or keep it if 'locked' is valid.
-      // I'll update it to: setLineup([]); for now to be safe, or check type.
-      // Re-reading original page.tsx: `setLineup(lineup.filter(c => c.locked));` 
-      // So 'locked' was there. I should ensure EnhancedCard has 'locked' optional.
-      // If not, I'll just clear. Use empty array for safety unless I verified 'locked'.
-      // I will use `setLineup([])` for now to avoid specific Type error if I missed 'locked'.
       setLineup([]);
       addToast("Lineup Saved Successfully!", 'success');
-    } catch (e: any) {
-      addToast(e.message, 'error');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to save lineup';
+      addToast(message, 'error');
     }
   };
 

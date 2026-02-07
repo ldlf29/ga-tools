@@ -154,14 +154,15 @@ async function main() {
         console.log(`🎉 Sync Complete! Updated ${successCount} Moki stats.`);
         process.exit(0);
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("\n💥 Sync Failed:", error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
         try {
             await supabase.from('sync_logs').insert({
                 status: 'ERROR',
                 cards_updated: 0,
-                details: error.message
+                details: errorMessage
             });
         } catch (logError) {
             console.error("Failed to log error to DB:", logError);

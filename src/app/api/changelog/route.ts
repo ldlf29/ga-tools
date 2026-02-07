@@ -10,7 +10,7 @@ export async function GET() {
     try {
         const { data, error } = await supabase
             .from('class_changes')
-            .select('*')
+            .select('id, moki_name, old_class, new_class, changed_at, image_url')
             .order('changed_at', { ascending: false })
             .limit(100);
 
@@ -20,7 +20,7 @@ export async function GET() {
         }
 
         return NextResponse.json(data || []);
-    } catch (err: any) {
+    } catch (err) {
         console.error('Changelog API error:', err);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
