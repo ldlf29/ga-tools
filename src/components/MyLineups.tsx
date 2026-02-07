@@ -105,7 +105,7 @@ export default function MyLineups({
 
     const BACKGROUND_OPTIONS = [
         { id: 'default', label: 'Default', color: '#5097FF', image: null },
-        { id: 'egg_field', label: 'Egg Field', color: '#7BCF5C', image: '/backgrounds/Egg_field .jpg' },
+        { id: 'egg_field', label: 'Egg Field', color: '#7BCF5C', image: '/backgrounds/Egg_field.jpg' },
         { id: 'eggu_island', label: 'Eggu Island', color: '#FF4D88', image: '/backgrounds/Eggu_Island.jpg' },
         { id: 'colorful_stars', label: 'Colorful Stars', color: '#4BE3F5', image: '/backgrounds/Colorful_Stars.png' },
         { id: 'moki_universe', label: 'Moki Universe', color: '#6A3DE8', image: '/backgrounds/Moki_Universe.jpg' }
