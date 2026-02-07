@@ -6,6 +6,7 @@ import ChangelogModal from './ChangelogModal';
 import NextImage from 'next/image';
 import styles from './ChampionsList.module.css';
 import * as XLSX from 'xlsx';
+import { MOKI_CLASSES, MOKI_FURS } from '@/utils/constants';
 
 type SortField = keyof MokiData;
 type SortDirection = 'asc' | 'desc';
@@ -24,6 +25,8 @@ export default function ChampionsList() {
     const [filterClass, setFilterClass] = useState<string | null>(null);
     const [showClassFilter, setShowClassFilter] = useState(false);
 
+
+
     const [filterFur, setFilterFur] = useState<string | null>(null);
     const [showFurFilter, setShowFurFilter] = useState(false);
 
@@ -33,16 +36,8 @@ export default function ChampionsList() {
     const [openMobileDropdown, setOpenMobileDropdown] = useState<'sort' | 'class' | 'fur' | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
 
-    const classOptions = [
-        "All Classes",
-        "Anchor", "Bruiser", "Center", "Defender", "Flanker",
-        "Forward", "Grinder", "Sprinter", "Striker", "Support"
-    ];
-
-    const furOptions = [
-        "All Furs",
-        "Common", "Rainbow", "Gold", "Shadow", "Spirit", "1 of 1"
-    ];
+    const classOptions = ["All Classes", ...MOKI_CLASSES];
+    const furOptions = ["All Furs", ...MOKI_FURS];
 
     const headerRef = useRef<HTMLTableSectionElement>(null);
 

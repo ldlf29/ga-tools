@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { EnhancedCard } from '@/utils/cardService';
+import { EnhancedCard } from '@/types';
 import styles from './CardModal.module.css';
 import NextImage from 'next/image';
 import { useEffect } from 'react';

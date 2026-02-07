@@ -1,47 +1,5 @@
 import { fetchLiveData, fetchCatalogData, LiveDataMap } from './liveData';
-
-export interface CardAttribute {
-    trait_type: string;
-    value: string | number;
-}
-
-export interface GrandArenaCard {
-    name: string;
-    description: string;
-    image: string;
-    external_url: string;
-    attributes: CardAttribute[];
-}
-
-export interface EnhancedCard extends GrandArenaCard {
-    id: string;
-    rarity: string;
-    cardType: 'MOKI' | 'SCHEME';
-    category?: string;
-    locked?: boolean;
-    custom: {
-        stars: number;
-        class?: string;
-        fur?: string;
-        series?: string;
-        traits?: string[];
-        eliminations?: number;
-        deposits?: number;
-        wartDistance?: number;
-        score?: number;
-        winRate?: number;
-        imageUrl?: string;
-        characterImage?: string;
-        defense?: number;
-        dexterity?: number;
-        fortitude?: number;
-        speed?: number;
-        strength?: number;
-        totalStats?: number;
-        marketLink?: string;
-        catalogMarketLink?: string;
-    };
-}
+import { EnhancedCard } from '@/types';
 
 // Cache live data in memory
 let cachedLiveData: LiveDataMap | null = null;
@@ -72,10 +30,10 @@ export const fetchLiteCollection = async (): Promise<EnhancedCard[]> => {
         const catalog = await fetchCatalogData();
         if (!catalog) throw new Error("Catalog fetch empty");
 
-        const normalized = catalog.map(item => normalizeLiteCard(item));
+        const normalized = catalog.map(item => normalizeLiteCard(item as any));
 
         const matched = normalized.filter(c => c.custom.class).length;
-        console.log(`[LiteFetch] Successfully matched stats for ${matched}/${catalog.length} cards.`);
+
 
         return normalized;
     } catch (e) {

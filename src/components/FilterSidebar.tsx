@@ -4,34 +4,16 @@ import { useState } from 'react';
 import styles from './FilterSidebar.module.css';
 import StarRangeSlider from './StarRangeSlider';
 import { motion, AnimatePresence } from 'framer-motion';
-
-export interface FilterState {
-    rarity: string[];
-    cardType: 'ALL' | 'MOKI' | 'SCHEME';
-    schemeName: string[];
-    fur: string[];
-    stars: number[];
-    customClass: string[];
-    specialization: string[];
-    traits: string[];
-    insertionOrder?: string[];
-    onlyEpicLegendary?: boolean;
-}
+import { FilterState, TRAIT_GROUPS } from '@/types';
 
 interface FilterSidebarProps {
     filters: FilterState;
     onFilterChange: (newFilters: FilterState) => void;
 }
 
-const SCHEME_NAMES = [
-    "Aggressive Specialization", "Baiting the Trap", "Beat the Buzzer", "Big Game Hunt", "Cage Match",
-    "Call to Arms", "Collect 'Em All", "Collective Specialization", "Costume Party", "Cursed Dinner",
-    "Divine Intervention", "Dress to Impress", "Dungaree Duel", "Enforcing the Naughty List", "Final Blow",
-    "Flexing", "Gacha Gouging", "Gacha Hoarding", "Golden Shower", "Grabbing Balls",
-    "Housekeeping", "Litter Collection", "Malicious Intent", "Midnight Strike", "Moki Smash",
-    "Rainbow Riot", "Running Interference", "Saccing", "Shapeshifting", "Taking a Dive",
-    "Tear Jerking", "Touching the Wart", "Victory Lap", "Wart Rodeo", "Whale Watching"
-];
+import { SCHEME_NAMES } from '@/data/schemes';
+
+import { MOKI_CLASSES, MOKI_FURS } from '@/utils/constants';
 
 const SERIES_OPTIONS = [
     "Long Moki", "Moki Parts", "Moki Madness", "Ice Cream",
@@ -39,9 +21,9 @@ const SERIES_OPTIONS = [
     "Random", "Doodle", "Loopy Lines", "Soft Noise",
     "Presale Promo", "Eggu Island", "Milky Way", "Chibi Kawaii", "Katai Beddo", "Fruity", "Hatching Field", "1-of-1"
 ];
-const FUR_OPTIONS = ["Common", "Rainbow", "Gold", "Shadow", "Spirit", "1 of 1"];
+const FUR_OPTIONS = [...MOKI_FURS];
 const STAR_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
-const CLASS_OPTIONS = ["Striker", "Grinder", "Bruiser", "Defender", "Sprinter", "Foward", "Anchor", "Center", "Flanker", "Support"];
+const CLASS_OPTIONS = [...MOKI_CLASSES];
 
 const SPECIALIZATION_CONFIG: { key: string, label: string }[] = [
     { key: "Gacha", label: "Gacha (+4.75)" },
@@ -49,24 +31,6 @@ const SPECIALIZATION_CONFIG: { key: string, label: string }[] = [
     { key: "Wart Rider", label: "Wart Rider (+170)" },
     { key: "Winner", label: "Winner (+53.50%)" },
     { key: "Loser", label: "Loser (-47.50%)" }
-];
-
-// Grouped Traits Mapping
-// Label -> Array of individual traits it includes
-// Grouped Traits Mapping
-// Label -> Array of individual traits it includes
-export const TRAIT_GROUPS: { label: string, traits: string[] }[] = [
-    { label: "Ronin or Samurai", traits: ["Ronin", "Samurai"] },
-    { label: "Pink, Blue or Green Overalls", traits: ["Pink Overalls", "Blue Overalls", "Green Overalls"] },
-    { label: "Tongue Out", traits: ["Tongue Out"] },
-    { label: "Tanuki, Kitsune or Cat Mask", traits: ["Tanuki", "Kitsune", "Cat Mask"] },
-    { label: "Devious Mouth", traits: ["Devious Mouth"] },
-    { label: "Oni, Tengu or Skull Mask", traits: ["Oni", "Tengu", "Skull Mask"] },
-    { label: "Apron, Garbage/Gold Can or Toilet Paper", traits: ["Apron", "Garbage Can", "Gold Can", "Toilet Paper"] },
-    { label: "Crying Eye", traits: ["Crying Eye"] },
-    { label: "Onesie", traits: ["Onesie"] },
-    { label: "Lemon, Kappa, Tomato, Bear, Frog or Blob Head", traits: ["Lemon", "Kappa", "Tomato", "Bear", "Frog", "Blob Head"] },
-    { label: "Kimono", traits: ["Kimono"] }
 ];
 
 export default function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {

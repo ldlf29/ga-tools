@@ -1,26 +1,16 @@
 'use client';
 
-import { EnhancedCard, getCardGroupKey } from '@/utils/cardService';
+import { EnhancedCard, SavedLineup, FilterState } from '@/types';
+import { getCardGroupKey } from '@/utils/cardService';
 import { matchesFilter } from '@/utils/filterUtils';
-import { FilterState } from './FilterSidebar';
+import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 import styles from './MyLineups.module.css';
 import NextImage from 'next/image';
 import RatingSlider from './RatingSlider';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng } from 'html-to-image';
 import * as XLSX from 'xlsx';
-
-export interface SavedLineup {
-    id: number;
-    name: string;
-    cards: EnhancedCard[];
-    createdAt: number;
-    isFavorite?: boolean;
-    favoritedAt?: number;
-    rating?: number;
-    backgroundId?: string;
-}
 
 interface MyLineupsProps {
     lineups: SavedLineup[];
@@ -61,7 +51,7 @@ export default function MyLineups({
         const favorites = favoriteLineups;
         if (favorites.length === 0) return;
 
-        const data = favorites.map(l => {
+        const data = favorites.map((l: SavedLineup) => {
             const mokis = l.cards.filter(c => c.cardType !== 'SCHEME');
             const scheme = l.cards.find(c => c.cardType === 'SCHEME');
 
@@ -125,69 +115,7 @@ export default function MyLineups({
     }, [expandedId, lineups]);
 
 
-    const activeFilters = (() => {
-        if (!filters || !filters.insertionOrder || filters.insertionOrder.length === 0) {
-            // Fallback
-            const defaultList: { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[] = filters ? [
-                ...filters.rarity.map(v => ({ key: 'rarity' as keyof FilterState, label: 'RARITY', value: v })),
-                ...filters.schemeName.map(v => ({ key: 'schemeName' as keyof FilterState, label: 'SCHEME', value: v })),
-                ...filters.fur.map(v => ({ key: 'fur' as keyof FilterState, label: 'FUR', value: v })),
-                // Combined Stars Logic for Fallback
-                ...(filters.stars.length > 0 ? [{
-                    key: 'stars' as keyof FilterState,
-                    label: 'STARS',
-                    value: 'ACTIVE',
-                    displayValue: filters.stars.length > 0
-                        ? (Math.min(...filters.stars) === Math.max(...filters.stars)
-                            ? `${Math.min(...filters.stars)}`
-                            : `${Math.min(...filters.stars)} - ${Math.max(...filters.stars)}`)
-                        : ''
-                }] : []),
-                ...filters.customClass.map(v => ({ key: 'customClass' as keyof FilterState, label: 'CLASS', value: v })),
-                ...filters.traits.map(v => ({ key: 'traits' as keyof FilterState, label: 'TRAIT', value: v })),
-            ].filter(f => {
-                if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
-                return true;
-            }) : [];
-            return defaultList;
-        }
-
-        return filters.insertionOrder.map(orderKey => {
-            // Special handling for Stars group
-            if (orderKey === 'stars:ACTIVE') {
-                if (filters.stars.length === 0) return null;
-                const min = Math.min(...filters.stars);
-                const max = Math.max(...filters.stars);
-                return {
-                    key: 'stars' as keyof FilterState,
-                    label: 'STARS',
-                    value: 'ACTIVE',
-                    displayValue: min === max ? `${min}` : `${min} - ${max}`
-                };
-            }
-
-            const [group, valStr] = orderKey.split(':');
-            const key = group as keyof FilterState;
-            // numeric conversion check
-            const isNumeric = ['stars'].includes(key); // Should not really hit stars here anymore with new logic
-            const value: string | number = isNumeric ? parseInt(valStr) : valStr;
-
-            let label = key.toUpperCase();
-            if (key === 'schemeName') label = 'SCHEME';
-            if (key === 'customClass') label = 'CLASS';
-            if (key === 'traits') label = 'TRAIT';
-
-            return {
-                key,
-                label,
-                value,
-            };
-        }).filter(f => {
-            if (!f) return false;
-            if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
-            return true;
-        }) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
-    })();
+    const activeFilters = filters ? getActiveFiltersDisplay(filters) : [];
 
 
 
@@ -230,23 +158,29 @@ export default function MyLineups({
         });
     };
 
-    const filteredLineups = lineups.filter(l => {
-        const nameMatch = l.name.toLowerCase().includes(searchQuery.toLowerCase());
-        if (!nameMatch) return false;
+    const filteredLineups = useMemo(() => {
+        return lineups.filter(l => {
+            const nameMatch = l.name.toLowerCase().includes(searchQuery.toLowerCase());
+            if (!nameMatch) return false;
 
-        if (filters) {
-            const hasMatchingCard = l.cards.some(card => matchesFilter(card, filters, ''));
-            if (!hasMatchingCard) return false;
-        }
+            if (filters) {
+                const hasMatchingCard = l.cards.some(card => matchesFilter(card, filters, ''));
+                if (!hasMatchingCard) return false;
+            }
 
-        return true;
-    });
+            return true;
+        });
+    }, [lineups, searchQuery, filters]);
 
-    const rawFavorites = filteredLineups.filter(l => l.isFavorite);
-    const rawRecent = filteredLineups.filter(l => !l.isFavorite);
+    const favoriteLineups = useMemo(() => {
+        const rawFavorites = filteredLineups.filter(l => l.isFavorite);
+        return sortLineups(rawFavorites, favoritesSort, true);
+    }, [filteredLineups, favoritesSort]);
 
-    const favoriteLineups = sortLineups(rawFavorites, favoritesSort, true);
-    const recentLineups = sortLineups(rawRecent, othersSort, false);
+    const recentLineups = useMemo(() => {
+        const rawRecent = filteredLineups.filter(l => !l.isFavorite);
+        return sortLineups(rawRecent, othersSort, false);
+    }, [filteredLineups, othersSort]);
 
 
     const startEditing = (e: React.MouseEvent, id: number, currentName: string) => {

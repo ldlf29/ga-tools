@@ -331,10 +331,7 @@
     /* Displace down slightly */
 }
 
-.slotSub {
-    display: none;
-    /* Deprecated in favor of slotStars, keeping for safety */
-}
+
 
 /* Default opacity 1 to ensure visibility based on user feedback to 're-add' it */
 .slot .removeButton {

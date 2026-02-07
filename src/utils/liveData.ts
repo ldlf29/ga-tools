@@ -1,7 +1,15 @@
 import catalogData from '../data/catalog.json';
 import mokiMetadataRaw from '../data/mokiMetadata.json';
 
-const mokiMetadata = mokiMetadataRaw as Record<string, any>;
+interface MokiMetadata {
+    name: string;
+    portraitUrl?: string;
+    fur?: string;
+    traits?: string[];
+    marketLink?: string;
+}
+
+const mokiMetadata = mokiMetadataRaw as Record<string, MokiMetadata>;
 
 export interface MokiData {
     id?: string;
@@ -99,7 +107,7 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
  * Returns the card catalog (Identity, Rarity, Base Image).
  * Now static and fixed in the bundle for instant loading.
  */
-export const fetchCatalogData = async (): Promise<any[] | null> => {
+export const fetchCatalogData = async (): Promise<unknown[] | null> => {
     return catalogData;
 };
 

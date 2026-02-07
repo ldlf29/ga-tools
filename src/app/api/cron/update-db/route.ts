@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 // Force dynamic to prevent static generation
 export const dynamic = 'force-dynamic';
@@ -25,24 +25,16 @@ interface MokiStats {
 }
 
 export async function GET(request: Request) {
-    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const CRON_SECRET = process.env.CRON_SECRET;
 
     // 🔒 Security Check
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${CRON_SECRET}`) {
         return NextResponse.json(
-            { success: false, error: 'Unauthorized: Invalid or missing CRON_SECRET' },
+            { success: false, error: 'Unauthorized' },
             { status: 401 }
         );
     }
-
-    if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
-        return NextResponse.json({ error: "Missing Supabase Credentials" }, { status: 500 });
-    }
-
-    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
     try {
         console.log("🚀 [Cron] Starting Synchronization Job...");
@@ -56,7 +48,7 @@ export async function GET(request: Request) {
         console.log(`✅ [Cron] Loaded stats for ${statsRecords.length} Mokis.`);
 
         // 2. Detect Class Changes
-        const { data: existingStats } = await supabase
+        const { data: existingStats } = await supabaseAdmin
             .from('moki_stats')
             .select('name, class');
 
@@ -91,7 +83,7 @@ export async function GET(request: Request) {
         // Insert class changes (avoiding duplicates)
         if (classChanges.length > 0) {
             const mokiNames = classChanges.map(c => c.moki_name);
-            const { data: existingChanges } = await supabase
+            const { data: existingChanges } = await supabaseAdmin
                 .from('class_changes')
                 .select('moki_name, new_class')
                 .in('moki_name', mokiNames)
@@ -112,7 +104,7 @@ export async function GET(request: Request) {
             });
 
             if (newChanges.length > 0) {
-                await supabase.from('class_changes').insert(newChanges);
+                await supabaseAdmin.from('class_changes').insert(newChanges);
                 console.log(`✅ [Cron] Logged ${newChanges.length} class change(s).`);
             }
         }
@@ -123,13 +115,13 @@ export async function GET(request: Request) {
 
         for (let i = 0; i < statsRecords.length; i += CHUNK_SIZE) {
             const chunk = statsRecords.slice(i, i + CHUNK_SIZE);
-            const { error } = await supabase.from('moki_stats').upsert(chunk, { onConflict: 'name' });
+            const { error } = await supabaseAdmin.from('moki_stats').upsert(chunk, { onConflict: 'name' });
             if (error) throw error;
             successCount += chunk.length;
         }
 
         // 4. Log Success
-        await supabase.from('sync_logs').insert({
+        await supabaseAdmin.from('sync_logs').insert({
             status: 'SUCCESS',
             cards_updated: successCount,
             details: `Cron: Synced ${successCount} Moki stats in ${(Date.now() - startTime)}ms`
@@ -140,17 +132,16 @@ export async function GET(request: Request) {
     } catch (error: any) {
         console.error("💥 [Cron] Failed:", error);
 
-        if (SUPABASE_URL && SERVICE_ROLE_KEY) {
-            try {
-                await supabase.from('sync_logs').insert({
-                    status: 'ERROR',
-                    cards_updated: 0,
-                    details: `Cron Error: ${error.message}`
-                });
-            } catch (e) { /* ignore */ }
-        }
+        try {
+            await supabaseAdmin.from('sync_logs').insert({
+                status: 'ERROR',
+                cards_updated: 0,
+                details: `Cron Error: ${error.message || 'Unknown error'}`
+            });
+        } catch (e) { /* ignore */ }
 
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        // Sanitize error message for client
+        return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
     }
 }
 

@@ -1,13 +1,14 @@
 'use client';
 
-import { EnhancedCard, getCardGroupKey } from '@/utils/cardService';
+import { EnhancedCard, FilterState } from '@/types';
+import { getCardGroupKey } from '@/utils/cardService';
 import styles from './CardGrid.module.css';
 import NextImage from 'next/image';
-import { FilterState } from './FilterSidebar';
 import CardModal from './CardModal';
 import { useState, useEffect, useMemo, CSSProperties } from 'react';
 import { List } from 'react-window';
 import { AutoSizer as _AutoSizer, Size } from 'react-virtualized-auto-sizer';
+import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 const AutoSizer = _AutoSizer as any;
 
 type SortOption = 'default' | 'name_asc' | 'name_desc' | 'rarity_desc' | 'rarity_asc' | 'stars_desc' | 'stars_asc';
@@ -71,7 +72,7 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                                     sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1400px) 33vw, 25vw"
                                     className={styles.cardImage}
                                     style={{ objectFit: 'cover' }}
-                                    priority={index < 2}
+                                    priority={index < 10}
                                 />
                             </div>
 
@@ -111,7 +112,7 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                                     height={60}
                                     className={styles.compactImage}
                                     style={{ objectFit: 'cover', borderRadius: '0.5rem' }}
-                                    priority={index < 5}
+                                    priority={index < 10}
                                 />
                             </div>
                             <div className={styles.compactInfo}>
@@ -243,25 +244,27 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
         }
     };
 
-    const sortedCards = [...cards]
-        .filter(c => {
-            if (sortOption === 'stars_asc' || sortOption === 'stars_desc') {
-                return c.cardType !== 'SCHEME';
-            }
-            return true;
-        })
-        .sort((a, b) => {
-            switch (sortOption) {
-                case 'default': return 0;
-                case 'name_asc': return a.name.localeCompare(b.name);
-                case 'name_desc': return b.name.localeCompare(a.name);
-                case 'rarity_desc': return getRarityValue(b.rarity) - getRarityValue(a.rarity);
-                case 'rarity_asc': return getRarityValue(a.rarity) - getRarityValue(b.rarity);
-                case 'stars_desc': return (b.custom?.stars || 0) - (a.custom?.stars || 0);
-                case 'stars_asc': return (a.custom?.stars || 0) - (b.custom?.stars || 0);
-                default: return 0;
-            }
-        });
+    const sortedCards = useMemo(() => {
+        return [...cards]
+            .filter(c => {
+                if (sortOption === 'stars_asc' || sortOption === 'stars_desc') {
+                    return c.cardType !== 'SCHEME';
+                }
+                return true;
+            })
+            .sort((a, b) => {
+                switch (sortOption) {
+                    case 'default': return 0;
+                    case 'name_asc': return a.name.localeCompare(b.name);
+                    case 'name_desc': return b.name.localeCompare(a.name);
+                    case 'rarity_desc': return getRarityValue(b.rarity) - getRarityValue(a.rarity);
+                    case 'rarity_asc': return getRarityValue(a.rarity) - getRarityValue(b.rarity);
+                    case 'stars_desc': return (b.custom?.stars || 0) - (a.custom?.stars || 0);
+                    case 'stars_asc': return (a.custom?.stars || 0) - (b.custom?.stars || 0);
+                    default: return 0;
+                }
+            });
+    }, [cards, sortOption]);
 
     return (
         <div className={styles.gridContainer}>

@@ -1,5 +1,4 @@
-import { EnhancedCard } from './cardService';
-import { FilterState, TRAIT_GROUPS } from '@/components/FilterSidebar';
+import { EnhancedCard, FilterState, TRAIT_GROUPS } from '@/types';
 
 /**
  * Checks if a card matches the given filter criteria and search query.
@@ -98,8 +97,18 @@ export const matchesFilter = (
 
         const hasTrait = activeTraits.some(t =>
             card.custom.traits?.some(ct => {
+                const isTargetOnesie = t.toLowerCase() === 'onesie';
+                const isActualOnesie = ct.toLowerCase().includes('onesie');
+
                 const regex = new RegExp(`\\b${t}\\b`, 'i');
-                return regex.test(ct);
+                const matches = regex.test(ct);
+
+                // If it matches but we're looking for a name (like Kappa) 
+                // and the physical trait is an Onesie, we skip to avoid false positive.
+                if (matches && !isTargetOnesie && isActualOnesie) {
+                    return false;
+                }
+                return matches;
             })
         );
         if (!hasTrait) return false;
