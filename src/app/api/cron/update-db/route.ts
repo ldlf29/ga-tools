@@ -27,6 +27,16 @@ interface MokiStats {
 export async function GET(request: Request) {
     const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const CRON_SECRET = process.env.CRON_SECRET;
+
+    // 🔒 Security Check
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${CRON_SECRET}`) {
+        return NextResponse.json(
+            { success: false, error: 'Unauthorized: Invalid or missing CRON_SECRET' },
+            { status: 401 }
+        );
+    }
 
     if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
         return NextResponse.json({ error: "Missing Supabase Credentials" }, { status: 500 });

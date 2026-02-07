@@ -60,7 +60,7 @@ export const fetchLiteCollection = async (): Promise<EnhancedCard[]> => {
             if (live) {
                 cachedLiveData = live;
                 lastFetchTime = now;
-                console.log(`[LiteFetch] Loaded stats for ${Object.keys(live).length} champions.`);
+                // console.log(`[LiteFetch] Loaded stats for ${Object.keys(live).length} champions.`);
             }
         } catch (e) {
             console.warn("Live Config Fetch Failed:", e);
@@ -72,7 +72,6 @@ export const fetchLiteCollection = async (): Promise<EnhancedCard[]> => {
         const catalog = await fetchCatalogData();
         if (!catalog) throw new Error("Catalog fetch empty");
 
-        console.log(`[LiteFetch] Found ${catalog.length} cards in catalog.`);
         const normalized = catalog.map(item => normalizeLiteCard(item));
 
         const matched = normalized.filter(c => c.custom.class).length;

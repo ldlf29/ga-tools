@@ -41,7 +41,7 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
     if (cachedLiveData) return cachedLiveData;
 
     try {
-        console.log("[LiveData] Fetching cached stats from backend...");
+        // console.log("[LiveData] Fetching cached stats from backend...");
         const response = await fetch(STATS_API_URL);
         if (!response.ok) throw new Error("Backend stats fetch failed");
 
@@ -76,7 +76,7 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
         cachedLiveData = statsWithIdentity;
         return statsWithIdentity;
     } catch (e) {
-        console.error("[LiveData] Error fetching stats:", e);
+        console.error("[LiveData] Error fetching stats (using local metadata only):", e);
         // Fallback Mode: return at least the names and identity from our local source
         const fallbackData: LiveDataMap = {};
         Object.keys(mokiMetadata).forEach((name) => {

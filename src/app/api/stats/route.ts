@@ -6,7 +6,7 @@ export const revalidate = 3600;
 
 export async function GET() {
     try {
-        console.log("[API Stats] Fetching from Supabase moki_stats...");
+        // console.log("[API Stats] Fetching from Supabase moki_stats...");
 
         // Fetch all Moki stats from the new minimal table
         const { data, error } = await supabase
@@ -45,7 +45,7 @@ export async function GET() {
             }
         }
 
-        console.log(`[API Stats] Returned ${Object.keys(statsMap).length} records from moki_stats.`);
+        // console.log(`[API Stats] Returned ${Object.keys(statsMap).length} records from moki_stats.`);
 
         return NextResponse.json(statsMap);
 
