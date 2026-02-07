@@ -67,7 +67,7 @@ async function main() {
         }
 
         // Compare and log class changes
-        const classChanges: { moki_name: string, old_class: string, new_class: string, image_url: string }[] = [];
+        const classChanges: { moki_name: string, old_class: string, new_class: string }[] = [];
         const loggedMokis = new Set<string>();
 
         for (const stat of statsRecords) {
@@ -82,8 +82,7 @@ async function main() {
                 classChanges.push({
                     moki_name: stat.name,
                     old_class: existingClass,
-                    new_class: newClass,
-                    image_url: "" // We don't store images in DB anymore
+                    new_class: newClass
                 });
                 loggedMokis.add(normalizedName);
             }

@@ -59,7 +59,7 @@ export async function GET(request: Request) {
             }
         }
 
-        const classChanges: { moki_name: string, old_class: string, new_class: string, image_url: string }[] = [];
+        const classChanges: { moki_name: string, old_class: string, new_class: string }[] = [];
         const loggedMokis = new Set<string>();
 
         for (const stat of statsRecords) {
@@ -73,8 +73,7 @@ export async function GET(request: Request) {
                 classChanges.push({
                     moki_name: stat.name,
                     old_class: existingClass,
-                    new_class: newClass,
-                    image_url: ""
+                    new_class: newClass
                 });
                 loggedMokis.add(normalizedName);
             }

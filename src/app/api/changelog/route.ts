@@ -10,7 +10,7 @@ export async function GET() {
     try {
         const { data, error } = await supabase
             .from('class_changes')
-            .select('id, moki_name, old_class, new_class, changed_at, image_url')
+            .select('id, moki_name, old_class, new_class, changed_at')
             .order('changed_at', { ascending: false })
             .limit(100);
 
