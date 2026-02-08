@@ -10,27 +10,33 @@ export function useCards() {
         fallbackData: []
     });
 
-    // Handle Hydration: Load cache only after mount
+    // Handle Hydration: Load cache only if SWR hasn't fetched yet
+    // AND validate cached data has required fields (like train)
     useEffect(() => {
         if (typeof window === 'undefined') return;
+        if (allCards.length > 0) return; // SWR already has data, don't overwrite
 
-        const cached = localStorage.getItem('cachedCards');
+        const cached = localStorage.getItem('cachedCards_v3');
         if (cached) {
             try {
                 const parsed = JSON.parse(cached);
-                if (parsed && parsed.length > 0) {
-                    mutate(parsed, false); // Update current data without re-fetching
+                // Validate cache has train field (added recently)
+                const hasTrainField = parsed.length > 0 && parsed.some((c: any) =>
+                    c.cardType === 'MOKI' && c.custom?.train !== undefined
+                );
+                if (parsed.length > 0 && hasTrainField) {
+                    mutate(parsed, false);
                 }
             } catch (e) {
                 console.error("Failed to load cached cards", e);
             }
         }
-    }, [mutate]);
+    }, [mutate, allCards.length]);
 
     // Keep localStorage in sync for next load
     useEffect(() => {
         if (allCards && allCards.length > 0) {
-            localStorage.setItem('cachedCards', JSON.stringify(allCards));
+            localStorage.setItem('cachedCards_v3', JSON.stringify(allCards));
         }
     }, [allCards]);
 

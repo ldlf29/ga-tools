@@ -10,7 +10,7 @@ import RatingSlider from './RatingSlider';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng } from 'html-to-image';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 interface MyLineupsProps {
     lineups: SavedLineup[];
@@ -47,50 +47,59 @@ export default function MyLineups({
     const [activeDropdown, setActiveDropdown] = useState<'favorites' | 'others' | null>(null);
     const [activeBackground, setActiveBackground] = useState<string>('default');
 
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
         const favorites = favoriteLineups;
         if (favorites.length === 0) return;
 
-        const data = favorites.map((l: SavedLineup) => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Favorite Lineups');
+
+        // Define columns
+        worksheet.columns = [
+            { header: 'Team Name', key: 'name', width: 20 },
+            { header: 'Moki 1', key: 'moki1', width: 15 },
+            { header: 'Class 1', key: 'class1', width: 12 },
+            { header: 'Moki 2', key: 'moki2', width: 15 },
+            { header: 'Class 2', key: 'class2', width: 12 },
+            { header: 'Moki 3', key: 'moki3', width: 15 },
+            { header: 'Class 3', key: 'class3', width: 12 },
+            { header: 'Moki 4', key: 'moki4', width: 15 },
+            { header: 'Class 4', key: 'class4', width: 12 },
+            { header: 'Scheme', key: 'scheme', width: 15 },
+            { header: 'Rating', key: 'rating', width: 10 },
+        ];
+
+        // Add rows
+        favorites.forEach((l: SavedLineup) => {
             const mokis = l.cards.filter(c => c.cardType !== 'SCHEME');
             const scheme = l.cards.find(c => c.cardType === 'SCHEME');
 
-            return {
-                'Team Name': l.name,
-                'Moki 1': mokis[0]?.name || '',
-                'Class 1': mokis[0]?.custom?.class || '',
-                'Moki 2': mokis[1]?.name || '',
-                'Class 2': mokis[1]?.custom?.class || '',
-                'Moki 3': mokis[2]?.name || '',
-                'Class 3': mokis[2]?.custom?.class || '',
-                'Moki 4': mokis[3]?.name || '',
-                'Class 4': mokis[3]?.custom?.class || '',
-                'Scheme': scheme?.name || '',
-                'Rating': l.rating || 0
-            };
+            worksheet.addRow({
+                name: l.name,
+                moki1: mokis[0]?.name || '',
+                class1: mokis[0]?.custom?.class || '',
+                moki2: mokis[1]?.name || '',
+                class2: mokis[1]?.custom?.class || '',
+                moki3: mokis[2]?.name || '',
+                class3: mokis[2]?.custom?.class || '',
+                moki4: mokis[3]?.name || '',
+                class4: mokis[3]?.custom?.class || '',
+                scheme: scheme?.name || '',
+                rating: l.rating || 0
+            });
         });
 
-        const worksheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Favorite Lineups");
+        // Generate buffer
+        const buffer = await workbook.xlsx.writeBuffer();
 
-        // Set column widths
-        const wscols = [
-            { wch: 20 }, // Team Name
-            { wch: 15 }, // Moki 1
-            { wch: 12 }, // Class 1
-            { wch: 15 }, // Moki 2
-            { wch: 12 }, // Class 2
-            { wch: 15 }, // Moki 3
-            { wch: 12 }, // Class 3
-            { wch: 15 }, // Moki 4
-            { wch: 12 }, // Class 4
-            { wch: 15 }, // Scheme
-            { wch: 10 }, // Rating
-        ];
-        worksheet['!cols'] = wscols;
-
-        XLSX.writeFile(workbook, "Favorite_Lineups.xlsx");
+        // Trigger download
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = 'Favorite_Lineups.xlsx';
+        anchor.click();
+        window.URL.revokeObjectURL(url);
     };
 
     const BACKGROUND_OPTIONS = [
@@ -213,15 +222,14 @@ export default function MyLineups({
             document.body.style.overflow = 'hidden';
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
-                    // Copied from saveName validation to ensure consistency
-                    if (editingId !== null && tempName.length > 20) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                        onError("Maximum 20 characters.");
-                        return;
-                    }
-
+                    // If we are editing, we must validate and save first
                     if (editingId !== null) {
+                        if (tempName.length > 20) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            onError("Maximum 20 characters.");
+                            return;
+                        }
                         saveName(editingId);
                     }
                     setExpandedId(null);
@@ -281,14 +289,14 @@ export default function MyLineups({
         if (e.key === 'Enter') {
             saveName(id);
         } else if (e.key === 'Escape') {
-            // Add validation here too so input focus ESC doesn't bypass it
             if (tempName.length > 20) {
                 e.preventDefault();
                 e.stopPropagation();
                 onError("Maximum 20 characters.");
                 return;
             }
-            cancelEditing();
+            saveName(id);
+            setExpandedId(null);
         }
     };
 

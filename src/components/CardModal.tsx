@@ -118,24 +118,24 @@ export default function CardModal({ card, onClose }: CardModalProps) {
                                     {card.cardType === 'MOKI' && (
                                         <div className={styles.performanceGrid}>
                                             <div className={styles.perfItem}>
-                                                <span className={styles.statLabel}>Elims</span>
+                                                <span className={styles.perfLabel}>ELIMS</span>
                                                 <span className={styles.perfValue}>{card.custom.eliminations || '0'}</span>
                                             </div>
                                             <div className={styles.perfItem}>
-                                                <span className={styles.statLabel}>Balls</span>
+                                                <span className={styles.perfLabel}>BALLS</span>
                                                 <span className={styles.perfValue}>{card.custom.deposits || '0'}</span>
                                             </div>
                                             <div className={styles.perfItem}>
-                                                <span className={styles.statLabel}>Wart</span>
+                                                <span className={styles.perfLabel}>WART</span>
                                                 <span className={styles.perfValue}>{card.custom.wartDistance || '0'}</span>
                                             </div>
                                             <div className={styles.perfItem}>
-                                                <span className={styles.statLabel}>Score</span>
+                                                <span className={styles.perfLabel}>SCORE</span>
                                                 <span className={styles.perfValue}>{card.custom.score || '0'}</span>
                                             </div>
                                             <div className={styles.perfItem}>
-                                                <span className={styles.statLabel}>Win Rate</span>
-                                                <span className={styles.perfValue}>{card.custom.winRate ? `${card.custom.winRate.toFixed(1)}%` : '-'}</span>
+                                                <span className={styles.perfLabel}>W/R</span>
+                                                <span className={styles.perfValue}>{card.custom.winRate ? `${card.custom.winRate.toFixed(1)}%` : '0%'}</span>
                                             </div>
                                         </div>
                                     )}
@@ -143,28 +143,32 @@ export default function CardModal({ card, onClose }: CardModalProps) {
                                     {card.cardType === 'MOKI' && (
                                         <div className={styles.statsGrid}>
                                             <div className={styles.statItem}>
-                                                <span className={styles.statLabel}>Strength</span>
+                                                <span className={styles.statLabel}>STR</span>
                                                 <span className={styles.statValue}>{card.custom.strength?.toFixed(1) || '0.0'}</span>
                                             </div>
                                             <div className={styles.statItem}>
-                                                <span className={styles.statLabel}>Speed</span>
+                                                <span className={styles.statLabel}>SPD</span>
                                                 <span className={styles.statValue}>{card.custom.speed?.toFixed(1) || '0.0'}</span>
                                             </div>
                                             <div className={styles.statItem}>
-                                                <span className={styles.statLabel}>Defense</span>
+                                                <span className={styles.statLabel}>DEF</span>
                                                 <span className={styles.statValue}>{card.custom.defense?.toFixed(1) || '0.0'}</span>
                                             </div>
                                             <div className={styles.statItem}>
-                                                <span className={styles.statLabel}>Dexterity</span>
+                                                <span className={styles.statLabel}>DEX</span>
                                                 <span className={styles.statValue}>{card.custom.dexterity?.toFixed(1) || '0.0'}</span>
                                             </div>
                                             <div className={styles.statItem}>
-                                                <span className={styles.statLabel}>Fortitude</span>
+                                                <span className={styles.statLabel}>FOR</span>
                                                 <span className={styles.statValue}>{card.custom.fortitude?.toFixed(1) || '0.0'}</span>
                                             </div>
-                                            <div className={styles.statItem}>
-                                                <span className={styles.statLabel}>Total</span>
+                                            <div className={`${styles.statItem} ${styles.mainStatItem}`}>
+                                                <span className={styles.statLabel}>TOTAL</span>
                                                 <span className={styles.totalValue}>{card.custom.totalStats?.toFixed(1) || '0.0'}</span>
+                                            </div>
+                                            <div className={`${styles.statItem} ${styles.mainStatItem}`}>
+                                                <span className={styles.statLabel}>TRAIN</span>
+                                                <span className={styles.totalValue}>{card.custom.train?.toFixed(1) || '0.0'}</span>
                                             </div>
                                         </div>
                                     )}
@@ -183,8 +187,9 @@ export default function CardModal({ card, onClose }: CardModalProps) {
                             </div>
                         )}
                     </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
+                </div >
+            )
+            }
+        </AnimatePresence >
     );
 }

@@ -18,6 +18,17 @@
     margin-bottom: 20px;
 }
 
+@media (max-width: 1024px) {
+    .sidebar {
+        height: 100%;
+        max-height: none;
+        border-radius: 0;
+        border: none;
+        margin-bottom: 0;
+        position: static;
+    }
+}
+
 .scrollableContent {
     flex: 1;
     overflow-y: auto;

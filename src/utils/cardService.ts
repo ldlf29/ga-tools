@@ -131,6 +131,7 @@ const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: stri
             speed: stats?.speed,
             strength: stats?.strength,
             totalStats: stats?.totalStats,
+            train: stats?.train,
             marketLink: stats?.marketLink,
             catalogMarketLink: catalogItem.market
         }

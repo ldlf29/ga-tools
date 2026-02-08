@@ -11,7 +11,7 @@ export async function GET() {
         // Fetch all Moki stats from the new minimal table
         const { data, error } = await supabase
             .from('moki_stats')
-            .select('name, class, stars, eliminations, deposits, wart_distance, score, win_rate, defense, dexterity, fortitude, speed, strength, total_stats');
+            .select('name, class, stars, eliminations, deposits, wart_distance, score, win_rate, defense, dexterity, fortitude, speed, strength, total_stats, train');
 
         if (error) {
             throw error;
@@ -40,7 +40,8 @@ export async function GET() {
                     fortitude: row.fortitude,
                     speed: row.speed,
                     strength: row.strength,
-                    totalStats: row.total_stats
+                    totalStats: row.total_stats,
+                    train: row.train
                 };
             }
         }

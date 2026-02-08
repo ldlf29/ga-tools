@@ -33,6 +33,7 @@ interface MokiStats {
     speed: number;
     strength: number;
     total_stats: number;
+    train: number;
 }
 
 async function main() {
@@ -244,7 +245,8 @@ function parseStatsCSV(csvText: string): MokiStats[] {
             fortitude: parseNum(row['fortitude']),
             speed: parseNum(row['speed']),
             strength: parseNum(row['strength']),
-            total_stats: parseNum(row['total stats'] || row['totalstats'] || row['total'])
+            total_stats: parseNum(row['total stats'] || row['totalstats'] || row['total']),
+            train: parseNum(row['train'])
         });
     }
 

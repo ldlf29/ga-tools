@@ -87,7 +87,6 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
                             className={styles.searchInput}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            autoFocus
                         />
                     </div>
                 </div>

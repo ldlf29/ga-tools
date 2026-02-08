@@ -99,6 +99,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                     onChange={(e) => setLineupName(e.target.value)}
                     className={styles.input}
                     placeholder="Name your lineup..."
+                    maxLength={20}
                 />
             </div>
 

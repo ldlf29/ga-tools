@@ -102,9 +102,15 @@ export default function Home() {
   };
 
   const handleSaveLineup = (name: string) => {
+    if (name.length > 20) {
+      addToast("Maximum 20 characters for lineup name.", 'error');
+      return;
+    }
     try {
       saveLineupToStorage(name, lineup);
-      setLineup([]);
+      // Keep only locked cards after save, remove unlocked ones
+      const lockedCards = lineup.filter(card => card.locked);
+      setLineup(lockedCards);
       addToast("Lineup Saved Successfully!", 'success');
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Failed to save lineup';

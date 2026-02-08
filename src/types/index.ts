@@ -36,6 +36,7 @@ export interface EnhancedCard extends GrandArenaCard {
         speed?: number;
         strength?: number;
         totalStats?: number;
+        train?: number;
         marketLink?: string;
         catalogMarketLink?: string;
     };

@@ -5,7 +5,7 @@ import { fetchLiveData, MokiData } from '../utils/liveData';
 import ChangelogModal from './ChangelogModal';
 import NextImage from 'next/image';
 import styles from './ChampionsList.module.css';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { MOKI_CLASSES, MOKI_FURS } from '@/utils/constants';
 
 type SortField = keyof MokiData;
@@ -123,6 +123,7 @@ export default function ChampionsList() {
         { label: "DEX", value: "dexterity" },
         { label: "FOR", value: "fortitude" },
         { label: "Total", value: "totalStats" },
+        { label: "Train", value: "train" },
         { label: "Elims", value: "eliminations" },
         { label: "Balls", value: "deposits" },
         { label: "Wart", value: "wartDistance" },
@@ -130,38 +131,63 @@ export default function ChampionsList() {
         { label: "Win Rate", value: "winRate" }
     ];
 
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
         if (sortedData.length === 0) return;
 
-        const exportData = sortedData.map(moki => ({
-            'NAME': moki.name,
-            'FUR': moki.fur || '-',
-            'CLASS': moki.class || '-',
-            'STR': moki.strength?.toFixed(2) || '0.00',
-            'SPD': moki.speed?.toFixed(2) || '0.00',
-            'DEF': moki.defense?.toFixed(2) || '0.00',
-            'DEX': moki.dexterity?.toFixed(2) || '0.00',
-            'FOR': moki.fortitude?.toFixed(2) || '0.00',
-            'TOTAL': moki.totalStats?.toFixed(2) || '0.00',
-            'ELIMS': moki.eliminations?.toFixed(2) || '0.00',
-            'BALLS': moki.deposits?.toFixed(2) || '0.00',
-            'WART': moki.wartDistance?.toFixed(2) || '0.00',
-            'SCORE': moki.score?.toFixed(2) || '0.00',
-            'W/R': moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'
-        }));
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Champions Stats');
 
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Champions Stats");
-
-        const wscols = [
-            { wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 8 }, { wch: 8 },
-            { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 },
-            { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 },
+        // Define columns
+        worksheet.columns = [
+            { header: 'NAME', key: 'name', width: 20 },
+            { header: 'FUR', key: 'fur', width: 12 },
+            { header: 'CLASS', key: 'class', width: 12 },
+            { header: 'STR', key: 'str', width: 8 },
+            { header: 'SPD', key: 'spd', width: 8 },
+            { header: 'DEF', key: 'def', width: 8 },
+            { header: 'DEX', key: 'dex', width: 8 },
+            { header: 'FOR', key: 'for', width: 8 },
+            { header: 'TOTAL', key: 'total', width: 10 },
+            { header: 'TRAIN', key: 'train', width: 10 },
+            { header: 'ELIMS', key: 'elims', width: 10 },
+            { header: 'BALLS', key: 'balls', width: 10 },
+            { header: 'WART', key: 'wart', width: 10 },
+            { header: 'SCORE', key: 'score', width: 10 },
+            { header: 'W/R', key: 'wr', width: 10 },
         ];
-        worksheet['!cols'] = wscols;
 
-        XLSX.writeFile(workbook, "Champions_Stats.xlsx");
+        // Add rows
+        sortedData.forEach(moki => {
+            worksheet.addRow({
+                name: moki.name,
+                fur: moki.fur || '-',
+                class: moki.class || '-',
+                str: moki.strength?.toFixed(2) || '0.00',
+                spd: moki.speed?.toFixed(2) || '0.00',
+                def: moki.defense?.toFixed(2) || '0.00',
+                dex: moki.dexterity?.toFixed(2) || '0.00',
+                for: moki.fortitude?.toFixed(2) || '0.00',
+                total: moki.totalStats?.toFixed(2) || '0.00',
+                train: moki.train?.toFixed(2) || '0.00',
+                elims: moki.eliminations?.toFixed(2) || '0.00',
+                balls: moki.deposits?.toFixed(2) || '0.00',
+                wart: moki.wartDistance?.toFixed(2) || '0.00',
+                score: moki.score?.toFixed(2) || '0.00',
+                wr: moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'
+            });
+        });
+
+        // Generate buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        // Trigger download
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = 'Champions_Stats.xlsx';
+        anchor.click();
+        window.URL.revokeObjectURL(url);
     };
 
     const selectClass = (cls: string) => {
@@ -245,19 +271,25 @@ export default function ChampionsList() {
 
                     {(isClass || isFur) && showFilter && (
                         <div className={styles.dropdownMenu}>
-                            {(isClass ? classOptions : furOptions).map(opt => (
-                                <div
-                                    key={opt}
-                                    className={styles.dropdownItem}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (isClass) selectClass(opt);
-                                        if (isFur) selectFur(opt);
-                                    }}
-                                >
-                                    {opt}
-                                </div>
-                            ))}
+                            {(isClass ? classOptions : furOptions).map(opt => {
+                                const isActive = isClass
+                                    ? (filterClass === opt || (!filterClass && opt === "All Classes"))
+                                    : (filterFur === opt || (!filterFur && opt === "All Furs"));
+
+                                return (
+                                    <div
+                                        key={opt}
+                                        className={`${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ''}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (isClass) selectClass(opt);
+                                            if (isFur) selectFur(opt);
+                                        }}
+                                    >
+                                        {opt}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
 
@@ -444,6 +476,7 @@ export default function ChampionsList() {
                                     {renderHeader("DEX", "dexterity")}
                                     {renderHeader("FOR", "fortitude")}
                                     {renderHeader("TOTAL", "totalStats")}
+                                    {renderHeader("TRAIN", "train")}
                                     {renderHeader("ELIMS", "eliminations")}
                                     {renderHeader("BALLS", "deposits")}
                                     {renderHeader("WART", "wartDistance")}
@@ -497,6 +530,7 @@ export default function ChampionsList() {
                                             <td className={styles.td}>{moki.dexterity?.toFixed(2) || '-'}</td>
                                             <td className={styles.td}>{moki.fortitude?.toFixed(2) || '-'}</td>
                                             <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
+                                            <td className={styles.td}>{moki.train?.toFixed(2) || '-'}</td>
                                             <td className={styles.td}>{moki.eliminations?.toFixed(2) || '-'}</td>
                                             <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
                                             <td className={styles.td}>{moki.wartDistance?.toFixed(2) || '-'}</td>
@@ -559,15 +593,15 @@ export default function ChampionsList() {
                                             <div className={styles.statBlock} style={{ marginBottom: '1rem' }}>
                                                 <div className={styles.statTitle}>Identity</div>
                                                 <div className={styles.statRow}>
-                                                    <span className={styles.statLabel}>Class</span>
+                                                    <span className={styles.statLabel}>CLASS</span>
                                                     <span className={styles.statValue}>{moki.class}</span>
                                                 </div>
                                                 <div className={styles.statRow}>
-                                                    <span className={styles.statLabel}>Fur</span>
+                                                    <span className={styles.statLabel}>FUR</span>
                                                     <span className={styles.statValue}>{moki.fur}</span>
                                                 </div>
                                                 <div className={styles.statRow}>
-                                                    <span className={styles.statLabel}>Stars</span>
+                                                    <span className={styles.statLabel}>STARS</span>
                                                     <span className={styles.statValue}>{moki.stars} ★</span>
                                                 </div>
                                                 {moki.marketLink && (
@@ -575,8 +609,8 @@ export default function ChampionsList() {
                                                         href={moki.marketLink}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className={styles.linkButton}
-                                                        style={{ width: '100%', marginTop: '0.75rem', marginLeft: 0 }}
+                                                        className={styles.marketButton}
+                                                        style={{ marginTop: '0.75rem' }}
                                                         onClick={(e) => e.stopPropagation()}
                                                     >
                                                         View on Market
@@ -608,32 +642,36 @@ export default function ChampionsList() {
                                                         <span className={styles.statValue}>{moki.fortitude?.toFixed(1)}</span>
                                                     </div>
                                                     <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>Total</span>
-                                                        <span className={`${styles.statValue} ${styles.mainStat}`}>{moki.totalStats?.toFixed(1)}</span>
+                                                        <span className={styles.statLabel}>TOTAL</span>
+                                                        <span className={styles.statValue}>{moki.totalStats?.toFixed(1)}</span>
+                                                    </div>
+                                                    <div className={styles.statRow}>
+                                                        <span className={styles.statLabel}>TRAIN</span>
+                                                        <span className={styles.statValue}>{moki.train?.toFixed(1) || '0.0'}</span>
                                                     </div>
                                                 </div>
 
                                                 <div className={styles.statBlock}>
                                                     <div className={styles.statTitle}>Performance</div>
                                                     <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>Score</span>
-                                                        <span className={styles.statValue}>{moki.score?.toFixed(0)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>Elims</span>
+                                                        <span className={styles.statLabel}>ELIMS</span>
                                                         <span className={styles.statValue}>{moki.eliminations?.toFixed(1)}</span>
                                                     </div>
                                                     <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>Balls</span>
+                                                        <span className={styles.statLabel}>BALLS</span>
                                                         <span className={styles.statValue}>{moki.deposits?.toFixed(1)}</span>
                                                     </div>
                                                     <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>Wart</span>
+                                                        <span className={styles.statLabel}>WART</span>
                                                         <span className={styles.statValue}>{moki.wartDistance?.toFixed(0)}</span>
                                                     </div>
                                                     <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>Win Rate</span>
-                                                        <span className={`${styles.statValue} ${styles.mainStat}`}>
+                                                        <span className={styles.statLabel}>SCORE</span>
+                                                        <span className={styles.statValue}>{moki.score?.toFixed(0)}</span>
+                                                    </div>
+                                                    <div className={styles.statRow}>
+                                                        <span className={styles.statLabel}>W/R</span>
+                                                        <span className={styles.statValue}>
                                                             {moki.winRate ? moki.winRate.toFixed(1) + '%' : '-'}
                                                         </span>
                                                     </div>

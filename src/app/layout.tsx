@@ -22,8 +22,20 @@ export const metadata: Metadata = {
   title: "Grand Arena Tools",
   description: "Advanced Lineup Builder Tools, Champions, Stats and Analytics for Grand Arena",
   icons: {
-    icon: "/count.png",
+    icon: [
+      { url: "/count.png" },
+      { url: "/count.png", sizes: "32x32" },
+      { url: "/count.png", sizes: "16x16" },
+    ],
+    apple: "/count.png",
+    shortcut: "/count.png",
   },
+  appleWebApp: {
+    title: "Grand Arena Tools",
+    statusBarStyle: "default",
+    capable: true,
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
