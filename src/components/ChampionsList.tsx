@@ -373,7 +373,7 @@ export default function ChampionsList() {
                             className={styles.mobileFilterButton}
                             onClick={() => setOpenMobileDropdown(openMobileDropdown === 'sort' ? null : 'sort')}
                         >
-                            {sortField === 'name' ? "SORT BY..." : (sortOptionsList.find(o => o.value === sortField)?.label?.toUpperCase() || "SORT BY...")}
+                            SORT BY...
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ transform: openMobileDropdown === 'sort' ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -399,7 +399,7 @@ export default function ChampionsList() {
                             className={styles.mobileFilterButton}
                             onClick={() => setOpenMobileDropdown(openMobileDropdown === 'class' ? null : 'class')}
                         >
-                            {filterClass ? filterClass.toUpperCase() : "CLASSES"}
+                            CLASSES
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ transform: openMobileDropdown === 'class' ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
@@ -431,7 +431,7 @@ export default function ChampionsList() {
                             className={styles.mobileFilterButton}
                             onClick={() => setOpenMobileDropdown(openMobileDropdown === 'fur' ? null : 'fur')}
                         >
-                            {filterFur ? filterFur.toUpperCase() : "FURS"}
+                            FURS
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ transform: openMobileDropdown === 'fur' ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
