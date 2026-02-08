@@ -89,6 +89,12 @@
     flex-direction: column;
     gap: 0.2rem;
     background: #FFFFFF;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.listContainer::-webkit-scrollbar {
+    display: none;
 }
 
 .changeLine {

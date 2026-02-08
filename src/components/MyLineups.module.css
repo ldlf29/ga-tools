@@ -505,6 +505,12 @@
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.3s ease-out;
     color: #333333;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.modalContent::-webkit-scrollbar {
+    display: none;
 }
 
 @keyframes fadeIn {
@@ -1189,6 +1195,12 @@
         padding: 1.5rem 1rem !important;
         display: flex;
         flex-direction: column;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .modalContent::-webkit-scrollbar {
+        display: none;
     }
 
     .modalTitleWrapper {

@@ -28,6 +28,12 @@
     flex-direction: column;
     color: #333333;
     font-family: 'Inter', sans-serif;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.modalContent::-webkit-scrollbar {
+    display: none;
 }
 
 .closeButton {
