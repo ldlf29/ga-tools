@@ -9,6 +9,7 @@ import { FilterState, TRAIT_GROUPS } from '@/types';
 interface FilterSidebarProps {
     filters: FilterState;
     onFilterChange: (newFilters: FilterState) => void;
+    onCardTypeChange?: (newCardType: 'MOKI' | 'SCHEME') => void;
 }
 
 import { SCHEME_NAMES } from '@/data/schemes';
@@ -33,9 +34,39 @@ const SPECIALIZATION_CONFIG: { key: string, label: string }[] = [
     { key: "Loser", label: "Loser (-47.50%)" }
 ];
 
-export default function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {
+export default function FilterSidebar({ filters, onFilterChange, onCardTypeChange }: FilterSidebarProps) {
 
-    const [filterSearch, setFilterSearch] = useState('');
+    // Independent search state for each card type tab
+    const [mokiSearch, setMokiSearch] = useState('');
+    const [schemeSearch, setSchemeSearch] = useState('');
+
+    // Use the appropriate search based on current tab
+    const filterSearch = filters.cardType === 'MOKI' ? mokiSearch : schemeSearch;
+    const setFilterSearch = filters.cardType === 'MOKI' ? setMokiSearch : setSchemeSearch;
+
+    // -- Helpers --
+    const filterOptions = (options: string[]): string[] => {
+        if (!filterSearch.trim()) return options;
+        const query = filterSearch.toLowerCase();
+        return options.filter(opt => opt.toLowerCase().includes(query));
+    };
+
+    // Check if search matches any option in the list
+    const hasMatches = (options: string[]): boolean => {
+        if (!filterSearch.trim()) return false;
+        return filterOptions(options).length > 0;
+    };
+
+    // Special matching for Stars filter (matches "star", "stars", or numbers 1-8)
+    const starsHasMatch = (): boolean => {
+        if (!filterSearch.trim()) return false;
+        const q = filterSearch.toLowerCase().trim();
+        if (q.includes('star')) return true;
+        // Check if search is a number 1-8
+        const num = parseInt(q, 10);
+        if (!isNaN(num) && num >= 1 && num <= 8) return true;
+        return false;
+    };
 
     // -- Handlers --
     const updateFilter = (key: keyof FilterState, value: string | number) => {
@@ -66,17 +97,13 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
     const handleRarityChange = (val: string) => updateFilter('rarity', val);
     const handleSchemeChange = (val: string) => updateFilter('schemeName', val);
     const handleFurChange = (val: string) => updateFilter('fur', val);
-    // handleStarChange is handled by slider now, but kept for safety if used elsewhere or if slider unmounts
     const handleStarChange = (val: number) => updateFilter('stars', val);
     const handleClassChange = (val: string) => updateFilter('customClass', val);
     const handleSpecializationChange = (val: string) => updateFilter('specialization', val);
 
-    // Trait Group Logic
     const handleTraitGroupChange = (group: { label: string, traits: string[] }) => {
-        // Traits are stored as strings in filters.traits
         updateFilter('traits', group.label);
     };
-
 
     const handleClearFilters = () => {
         onFilterChange({
@@ -88,8 +115,7 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
             customClass: [],
             specialization: [],
             traits: [],
-            insertionOrder: [] // Ensure order is cleared
-            // Preserve cardType
+            insertionOrder: []
         });
     };
 
@@ -99,15 +125,20 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
         filters.fur.length > 0 ||
         filters.customClass.length > 0 ||
         filters.specialization.length > 0 ||
-        filters.traits.length > 0;
+        filters.traits.length > 0 ||
+        filters.stars.length > 0;
 
-
-    // Helper to filter options that match the search
-    const filterOptions = (options: string[]): string[] => {
-        if (!filterSearch.trim()) return options;
-        const query = filterSearch.toLowerCase();
-        return options.filter(opt => opt.toLowerCase().includes(query));
-    };
+    // Pre-compute matches for each accordion
+    const rarityOptions = ['Basic', 'Rare', 'Epic', 'Legendary'];
+    const rarityMatches = hasMatches(rarityOptions);
+    const classMatches = hasMatches(CLASS_OPTIONS);
+    const specLabels = SPECIALIZATION_CONFIG.map(s => s.label);
+    const specMatches = hasMatches(specLabels);
+    const starsMatches = starsHasMatch();
+    const furMatches = hasMatches(FUR_OPTIONS);
+    const traitLabels = TRAIT_GROUPS.map(g => g.label);
+    const traitsMatches = hasMatches(traitLabels);
+    const schemeMatches = hasMatches(SCHEME_NAMES);
 
     return (
         <aside className={styles.sidebar}>
@@ -127,32 +158,21 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
                         <button
                             key={type}
                             className={`${styles.toggleButton} ${filters.cardType === type ? styles.active : ''}`}
-                            onClick={() => onFilterChange({
-                                ...filters,
-                                cardType: filters.cardType === type ? 'ALL' : type as 'MOKI' | 'SCHEME'
-                            })}
+                            onClick={() => {
+                                if (onCardTypeChange) {
+                                    onCardTypeChange(type as 'MOKI' | 'SCHEME');
+                                } else {
+                                    onFilterChange({
+                                        ...filters,
+                                        cardType: type as 'MOKI' | 'SCHEME'
+                                    });
+                                }
+                            }}
                         >
                             {type === 'MOKI' ? 'MOKIS' : type}
                         </button>
                     ))}
                 </div>
-            </div>
-
-            {/* Epic / Legendary Filter Button */}
-            <div className={styles.filterGroup}>
-                <button
-                    className={`${styles.epicLegendaryButton} ${filters.onlyEpicLegendary ? styles.active : ''}`}
-                    onClick={() => {
-                        const newState = !filters.onlyEpicLegendary;
-                        onFilterChange({
-                            ...filters,
-                            onlyEpicLegendary: newState,
-                            rarity: newState ? ['Epic', 'Legendary'] : [] // Clear on disable
-                        });
-                    }}
-                >
-                    ONLY EPIC / LEGENDARY
-                </button>
             </div>
 
             {/* Filter Search Bar */}
@@ -170,120 +190,128 @@ export default function FilterSidebar({ filters, onFilterChange }: FilterSidebar
                 {/* --- MOKI SECTION --- */}
                 {filters.cardType !== 'SCHEME' && (
                     <>
-                        {/* Rarity */}
-                        {(() => {
-                            const rarityOptions = filters.onlyEpicLegendary
-                                ? ['Epic', 'Legendary']
-                                : ['Basic', 'Rare', 'Epic', 'Legendary'];
-
-                            return (
-                                <FilterAccordion title="Rarity" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                                    {filterOptions(rarityOptions).map(r => (
-                                        <label key={r} className={styles.checkboxLabel}>
-                                            <input
-                                                type="checkbox"
-                                                checked={filters.rarity.includes(r)}
-                                                onChange={() => handleRarityChange(r)}
-                                            />
-                                            <span className={styles.labelText}>{r}</span>
-                                        </label>
-                                    ))}
-                                </FilterAccordion>
-                            );
-                        })()}
-
-                        {/* Class */}
-                        <FilterAccordion title="Class" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                            {filterOptions(CLASS_OPTIONS).map(c => (
-                                <label key={c} className={styles.checkboxLabel}>
-                                    <input type="checkbox" checked={filters.customClass.includes(c)} onChange={() => handleClassChange(c)} />
-                                    <span className={styles.labelText}>{c}</span>
-                                </label>
-                            ))}
-                        </FilterAccordion>
-
-                        {/* Specialization */}
-                        <FilterAccordion title="Specialization" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                            {SPECIALIZATION_CONFIG.filter(s => {
-                                if (!filterSearch.trim()) return true;
-                                return s.label.toLowerCase().includes(filterSearch.toLowerCase());
-                            }).map(s => (
-                                <label key={s.key} className={styles.checkboxLabel}>
-                                    <input type="checkbox" checked={filters.specialization.includes(s.key)} onChange={() => handleSpecializationChange(s.key)} />
-                                    <span className={styles.labelText}>{s.label}</span>
-                                </label>
-                            ))}
-                        </FilterAccordion>
-
-                        {/* Stars */}
-                        <FilterAccordion title="Stars" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                            <div style={{ padding: '0 10px' }}>
-                                <StarRangeSlider
-                                    min={1}
-                                    max={8}
-                                    currentRange={{
-                                        min: filters.stars.length > 0 ? Math.min(...filters.stars) : 1,
-                                        max: filters.stars.length > 0 ? Math.max(...filters.stars) : 8
-                                    }}
-                                    onChange={({ min, max }) => {
-                                        const range = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-                                        let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
-                                        if (!newOrder.includes('stars:ACTIVE')) {
-                                            newOrder.push('stars:ACTIVE');
-                                        }
-                                        onFilterChange({ ...filters, stars: range, insertionOrder: newOrder });
-                                    }}
-                                />
-                            </div>
-                        </FilterAccordion>
-
-                        {/* Fur */}
-                        <FilterAccordion title="Fur" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                            {filterOptions(FUR_OPTIONS).map(f => (
-                                <label key={f} className={styles.checkboxLabel}>
-                                    <input type="checkbox" checked={filters.fur.includes(f)} onChange={() => handleFurChange(f)} />
-                                    <span className={styles.labelText}>{f}</span>
-                                </label>
-                            ))}
-                        </FilterAccordion>
-
-                        {/* Traits (Grouped) */}
-                        <FilterAccordion title="Traits" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                            {TRAIT_GROUPS.filter(group => {
-                                if (!filterSearch.trim()) return true;
-                                return group.label.toLowerCase().includes(filterSearch.toLowerCase());
-                            }).map(group => {
-                                const isChecked = filters.traits.includes(group.label);
-                                return (
-                                    <label key={group.label} className={styles.checkboxLabel}>
+                        {/* Rarity - only show if no search or has matches */}
+                        {(!filterSearch.trim() || rarityMatches) && (
+                            <FilterAccordion title="Rarity" isOpenDefault={false} forceOpen={rarityMatches}>
+                                {filterOptions(rarityOptions).map(r => (
+                                    <label key={r} className={styles.checkboxLabel}>
                                         <input
                                             type="checkbox"
-                                            checked={isChecked}
-                                            onChange={() => handleTraitGroupChange(group)}
+                                            checked={filters.rarity.includes(r)}
+                                            onChange={() => handleRarityChange(r)}
                                         />
-                                        <span className={styles.labelText}>{group.label}</span>
+                                        <span className={styles.labelText}>{r}</span>
                                     </label>
-                                );
-                            })}
-                        </FilterAccordion>
+                                ))}
+                            </FilterAccordion>
+                        )}
+
+                        {/* Class */}
+                        {(!filterSearch.trim() || classMatches) && (
+                            <FilterAccordion title="Class" isOpenDefault={false} forceOpen={classMatches}>
+                                {filterOptions(CLASS_OPTIONS).map(c => (
+                                    <label key={c} className={styles.checkboxLabel}>
+                                        <input type="checkbox" checked={filters.customClass.includes(c)} onChange={() => handleClassChange(c)} />
+                                        <span className={styles.labelText}>{c}</span>
+                                    </label>
+                                ))}
+                            </FilterAccordion>
+                        )}
+
+                        {/* Specialization */}
+                        {(!filterSearch.trim() || specMatches) && (
+                            <FilterAccordion title="Specialization" isOpenDefault={false} forceOpen={specMatches}>
+                                {SPECIALIZATION_CONFIG.filter(s => {
+                                    if (!filterSearch.trim()) return true;
+                                    return s.label.toLowerCase().includes(filterSearch.toLowerCase());
+                                }).map(s => (
+                                    <label key={s.key} className={styles.checkboxLabel}>
+                                        <input type="checkbox" checked={filters.specialization.includes(s.key)} onChange={() => handleSpecializationChange(s.key)} />
+                                        <span className={styles.labelText}>{s.label}</span>
+                                    </label>
+                                ))}
+                            </FilterAccordion>
+                        )}
+
+                        {/* Stars - only show if no search or matches "star" or number 1-8 */}
+                        {(!filterSearch.trim() || starsMatches) && (
+                            <FilterAccordion title="Stars" isOpenDefault={false} forceOpen={starsMatches}>
+                                <div style={{ padding: '0 10px' }}>
+                                    <StarRangeSlider
+                                        min={1}
+                                        max={8}
+                                        currentRange={{
+                                            min: filters.stars.length > 0 ? Math.min(...filters.stars) : 1,
+                                            max: filters.stars.length > 0 ? Math.max(...filters.stars) : 8
+                                        }}
+                                        onChange={({ min, max }) => {
+                                            const range = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+                                            let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
+                                            if (!newOrder.includes('stars:ACTIVE')) {
+                                                newOrder.push('stars:ACTIVE');
+                                            }
+                                            onFilterChange({ ...filters, stars: range, insertionOrder: newOrder });
+                                        }}
+                                    />
+                                </div>
+                            </FilterAccordion>
+                        )}
+
+                        {/* Fur */}
+                        {(!filterSearch.trim() || furMatches) && (
+                            <FilterAccordion title="Fur" isOpenDefault={false} forceOpen={furMatches}>
+                                {filterOptions(FUR_OPTIONS).map(f => (
+                                    <label key={f} className={styles.checkboxLabel}>
+                                        <input type="checkbox" checked={filters.fur.includes(f)} onChange={() => handleFurChange(f)} />
+                                        <span className={styles.labelText}>{f}</span>
+                                    </label>
+                                ))}
+                            </FilterAccordion>
+                        )}
+
+                        {/* Traits (Grouped) */}
+                        {(!filterSearch.trim() || traitsMatches) && (
+                            <FilterAccordion title="Traits" isOpenDefault={false} forceOpen={traitsMatches}>
+                                {TRAIT_GROUPS.filter(group => {
+                                    if (!filterSearch.trim()) return true;
+                                    return group.label.toLowerCase().includes(filterSearch.toLowerCase());
+                                }).map(group => {
+                                    const isChecked = filters.traits.includes(group.label);
+                                    return (
+                                        <label key={group.label} className={styles.checkboxLabel}>
+                                            <input
+                                                type="checkbox"
+                                                checked={isChecked}
+                                                onChange={() => handleTraitGroupChange(group)}
+                                            />
+                                            <span className={styles.labelText}>{group.label}</span>
+                                        </label>
+                                    );
+                                })}
+                            </FilterAccordion>
+                        )}
 
                     </>
                 )}
 
                 {/* --- SCHEME SECTION --- */}
                 {filters.cardType === 'SCHEME' && (
-                    <FilterAccordion title="Scheme Name" isOpenDefault={false} forceOpen={!!filterSearch.trim()}>
-                        {filterOptions(SCHEME_NAMES).map(name => (
-                            <label key={name} className={styles.checkboxLabel}>
-                                <input
-                                    type="checkbox"
-                                    checked={filters.schemeName.includes(name)}
-                                    onChange={() => handleSchemeChange(name)}
-                                />
-                                <span className={styles.labelText}>{name}</span>
-                            </label>
-                        ))}
-                    </FilterAccordion>
+                    <>
+                        {(!filterSearch.trim() || schemeMatches) && (
+                            <FilterAccordion title="Scheme Name" isOpenDefault={false} forceOpen={schemeMatches}>
+                                {filterOptions(SCHEME_NAMES).map(name => (
+                                    <label key={name} className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            checked={filters.schemeName.includes(name)}
+                                            onChange={() => handleSchemeChange(name)}
+                                        />
+                                        <span className={styles.labelText}>{name}</span>
+                                    </label>
+                                ))}
+                            </FilterAccordion>
+                        )}
+                    </>
                 )}
             </div>
 

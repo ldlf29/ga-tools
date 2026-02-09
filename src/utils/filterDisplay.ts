@@ -30,11 +30,7 @@ export function getActiveFiltersDisplay(filters: FilterState): DisplayFilter[] {
             ...filters.specialization.map(v => ({ key: 'specialization' as keyof FilterState, label: 'SPEC', value: v })),
             ...filters.traits.map(v => ({ key: 'traits' as keyof FilterState, label: 'TRAIT', value: v })),
         ];
-
-        return list.filter(f => {
-            if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
-            return true;
-        });
+        return list;
     }
 
     const mappedInfo: (DisplayFilter | null)[] = filters.insertionOrder.map((orderKey) => {
@@ -69,11 +65,7 @@ export function getActiveFiltersDisplay(filters: FilterState): DisplayFilter[] {
         return { key, label, value };
     });
 
-    const result: DisplayFilter[] = mappedInfo.filter((f): f is DisplayFilter => {
-        if (!f) return false;
-        if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
-        return true;
-    });
+    const result: DisplayFilter[] = mappedInfo.filter((f): f is DisplayFilter => f !== null);
 
     return result;
 }

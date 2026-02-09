@@ -367,6 +367,35 @@
     box-shadow: 0 0 6px rgba(96, 165, 250, 0.4);
 }
 
+.previewImage.schemeImage {
+    border-width: 3px !important;
+}
+
+.rarityBasic {
+    border-color: #94a3b8 !important;
+    border-width: 3px !important;
+}
+
+.rarityRare {
+    border-color: #26c2a3 !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 8px rgba(38, 194, 163, 0.4);
+}
+
+.rarityEpic {
+    border-color: #a855f7 !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+}
+
+.rarityLegendary {
+    border-color: #f472b6 !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 10px rgba(244, 114, 182, 0.5);
+}
+
+
+
 .emptyState {
     text-align: center;
     padding: 2.5rem 1.5rem;

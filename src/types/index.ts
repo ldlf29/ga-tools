@@ -44,7 +44,7 @@ export interface EnhancedCard extends GrandArenaCard {
 
 export interface FilterState {
     rarity: string[];
-    cardType: 'ALL' | 'MOKI' | 'SCHEME';
+    cardType: 'MOKI' | 'SCHEME';
     schemeName: string[];
     fur: string[];
     stars: number[];
@@ -52,7 +52,6 @@ export interface FilterState {
     specialization: string[];
     traits: string[];
     insertionOrder?: string[];
-    onlyEpicLegendary?: boolean;
 }
 
 export const TRAIT_GROUPS = [

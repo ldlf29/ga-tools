@@ -195,10 +195,7 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                 }] : []),
                 ...filters.customClass.map(v => ({ key: 'customClass' as keyof FilterState, label: 'CLASS', value: v })),
                 ...filters.traits.map(v => ({ key: 'traits' as keyof FilterState, label: 'TRAIT', value: v })),
-            ].filter(f => {
-                if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
-                return true;
-            });
+            ].filter(f => f);
             return defaultList;
         }
 
@@ -225,11 +222,7 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
             if (key === 'traits') label = 'TRAIT';
 
             return { key, label, value };
-        }).filter(f => {
-            if (!f) return false;
-            if (filters.onlyEpicLegendary && f.key === 'rarity' && (f.value === 'Epic' || f.value === 'Legendary')) return false;
-            return true;
-        }) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
+        }).filter(f => f !== null) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
     })();
 
     // Sorting Logic

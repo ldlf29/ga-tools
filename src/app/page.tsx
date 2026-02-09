@@ -77,18 +77,107 @@ export default function Home() {
     addToast("Data updated!", 'success');
   };
 
-  /* Filters State */
+  /* Filters State - Separate states for MOKI and SCHEME */
+  const emptyFilters = {
+    rarity: [] as string[],
+    schemeName: [] as string[],
+    fur: [] as string[],
+    stars: [] as number[],
+    customClass: [] as string[],
+    specialization: [] as string[],
+    traits: [] as string[],
+    insertionOrder: [] as string[]
+  };
+
   const [filters, setFilters] = useState<FilterState>({
-    rarity: [],
-    cardType: 'ALL',
-    schemeName: [],
-    fur: [],
-    stars: [],
-    customClass: [],
-    specialization: [],
-    traits: [],
-    insertionOrder: []
+    ...emptyFilters,
+    cardType: 'MOKI'
   });
+
+  // Stored filters for each card type (MOKI/SCHEME) within current main tab
+  const mokiFiltersRef = useRef({ filters: emptyFilters, search: '' });
+  const schemeFiltersRef = useRef({ filters: emptyFilters, search: '' });
+
+  // Stored filters for each main tab (Builder vs My Lineups)
+  const builderStateRef = useRef<{
+    filters: FilterState;
+    search: string;
+    mokiFilters: { filters: typeof emptyFilters; search: string };
+    schemeFilters: { filters: typeof emptyFilters; search: string };
+  }>({
+    filters: { ...emptyFilters, cardType: 'MOKI' },
+    search: '',
+    mokiFilters: { filters: emptyFilters, search: '' },
+    schemeFilters: { filters: emptyFilters, search: '' }
+  });
+  const lineupsStateRef = useRef<{
+    filters: FilterState;
+    search: string;
+    mokiFilters: { filters: typeof emptyFilters; search: string };
+    schemeFilters: { filters: typeof emptyFilters; search: string };
+  }>({
+    filters: { ...emptyFilters, cardType: 'MOKI' },
+    search: '',
+    mokiFilters: { filters: emptyFilters, search: '' },
+    schemeFilters: { filters: emptyFilters, search: '' }
+  });
+
+  // Handle main tab switching (Builder <-> My Lineups)
+  const handleMainTabChange = (newTab: 'builder' | 'lineups' | 'champions') => {
+    if (newTab === activeTab || newTab === 'champions') {
+      setActiveTab(newTab);
+      return;
+    }
+
+    // Save current main tab's state
+    const currentState = {
+      filters: filters,
+      search: searchQuery,
+      mokiFilters: { ...mokiFiltersRef.current },
+      schemeFilters: { ...schemeFiltersRef.current }
+    };
+
+    if (activeTab === 'builder') {
+      builderStateRef.current = currentState;
+    } else if (activeTab === 'lineups') {
+      lineupsStateRef.current = currentState;
+    }
+
+    // Restore target tab's state
+    const targetState = newTab === 'builder' ? builderStateRef.current : lineupsStateRef.current;
+    setFilters(targetState.filters);
+    setSearchQuery(targetState.search);
+    mokiFiltersRef.current = targetState.mokiFilters;
+    schemeFiltersRef.current = targetState.schemeFilters;
+
+    setActiveTab(newTab);
+  };
+
+  // Handle tab switching with filter preservation
+  const handleCardTypeChange = (newCardType: 'MOKI' | 'SCHEME') => {
+    if (newCardType === filters.cardType) return;
+
+    // Save current tab's filters and search
+    if (filters.cardType === 'MOKI') {
+      mokiFiltersRef.current = {
+        filters: { ...filters, cardType: undefined } as any,
+        search: searchQuery
+      };
+    } else {
+      schemeFiltersRef.current = {
+        filters: { ...filters, cardType: undefined } as any,
+        search: searchQuery
+      };
+    }
+
+    // Restore target tab's filters and search
+    const targetState = newCardType === 'MOKI' ? mokiFiltersRef.current : schemeFiltersRef.current;
+    setFilters({
+      ...targetState.filters,
+      cardType: newCardType
+    });
+    setSearchQuery(targetState.search);
+  };
 
   /* Worker Filter Integration */
   const filteredCards = useWorkerFilter(allCards, filters, searchQuery);
@@ -135,24 +224,47 @@ export default function Home() {
   };
 
   const handleSuggestFilters = (newFilters: Partial<FilterState>) => {
-    const preserveEpicLegendary = filters.onlyEpicLegendary;
+    // When on SCHEME tab, get preserved filters from mokiFiltersRef
+    // When on MOKI tab, use current filters
+    const sourceFilters = filters.cardType === 'SCHEME'
+      ? mokiFiltersRef.current.filters
+      : filters;
+
+    // Preserve rarity always, stars only if suggestion doesn't include stars
+    const preservedRarity = sourceFilters.rarity || [];
+    // Only preserve stars if the suggestion doesn't specify stars (e.g., Running Interference)
+    const suggestionHasStars = newFilters.stars && newFilters.stars.length > 0;
+    const preservedStars = suggestionHasStars ? [] : (sourceFilters.stars || []);
+
     const cleared: FilterState = {
-      rarity: preserveEpicLegendary ? ['Epic', 'Legendary'] : [],
-      cardType: 'ALL',
+      rarity: preservedRarity, // Preserve rarity filter
+      cardType: 'MOKI', // Always switch to MOKI mode
       schemeName: [],
       fur: [],
-      stars: [],
+      stars: preservedStars, // Preserve stars filter only if suggestion doesn't override
       customClass: [],
       specialization: [],
       traits: [],
-      insertionOrder: [],
-      onlyEpicLegendary: preserveEpicLegendary
+      insertionOrder: []
     };
+
+    // Build insertion order: first preserved rarity/stars, then new filters
     const newOrder: string[] = [];
+    preservedRarity.forEach(r => newOrder.push(`rarity:${r}`));
+    if (preservedStars.length > 0) newOrder.push('stars:ACTIVE');
     Object.entries(newFilters).forEach(([key, value]) => {
-      if (Array.isArray(value)) value.forEach(val => newOrder.push(`${key}:${val}`));
+      if (Array.isArray(value)) {
+        value.forEach(val => {
+          const orderKey = key === 'stars' ? 'stars:ACTIVE' : `${key}:${val}`;
+          if (!newOrder.includes(orderKey)) {
+            newOrder.push(orderKey);
+          }
+        });
+      }
     });
+
     setFilters({ ...cleared, ...newFilters, insertionOrder: newOrder });
+    setSearchQuery(''); // Clear search bar when suggesting
     addToast("Suggestion Applied!", 'success');
   };
 
@@ -214,13 +326,13 @@ export default function Home() {
         <nav className={styles.navTabs}>
           <button
             className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
-            onClick={() => { setActiveTab('builder'); closeDrawers(); }}
+            onClick={() => { handleMainTabChange('builder'); closeDrawers(); }}
           >
             Builder
           </button>
           <button
             className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
-            onClick={() => { setActiveTab('lineups'); closeDrawers(); }}
+            onClick={() => { handleMainTabChange('lineups'); closeDrawers(); }}
           >
             My Lineups
           </button>
@@ -253,7 +365,7 @@ export default function Home() {
 
       {/* Mobile Filters Drawer */}
       <div className={`${styles.mobileDrawer} ${styles.filterDrawer} ${styles.mobileOnly} ${mobileFiltersOpen ? styles.filterDrawerOpen : ''}`}>
-        <FilterSidebar filters={filters} onFilterChange={setFilters} />
+        <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
       </div>
 
       {/* Mobile Builder Drawer */}
@@ -279,13 +391,13 @@ export default function Home() {
               <div className={styles.navTabs}>
                 <button
                   className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
-                  onClick={() => setActiveTab('builder')}
+                  onClick={() => handleMainTabChange('builder')}
                 >
                   Builder
                 </button>
                 <button
                   className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
-                  onClick={() => setActiveTab('lineups')}
+                  onClick={() => handleMainTabChange('lineups')}
                 >
                   My Lineups
                 </button>
@@ -407,7 +519,7 @@ export default function Home() {
           <div className={styles.mainLayout}>
             {/* Column 1: FilterSidebar (Desktop only) */}
             <div className={styles.desktopOnly}>
-              <FilterSidebar filters={filters} onFilterChange={setFilters} />
+              <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
             </div>
 
             {/* Column 2: CardGrid */}
@@ -450,7 +562,7 @@ export default function Home() {
           <div className={styles.mainLayoutLineups}>
             {/* Column 1: Sidebar */}
             <div className={styles.desktopOnly}>
-              <FilterSidebar filters={filters} onFilterChange={setFilters} />
+              <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
             </div>
 
             {/* Column 2: Lineups List */}

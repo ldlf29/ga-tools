@@ -15,10 +15,8 @@ export const matchesFilter = (
         if (!cardName.includes(query)) return false;
     }
 
-    // 1. Card Type Filter
-    if (filters.cardType !== 'ALL') {
-        if (card.cardType !== filters.cardType) return false;
-    }
+    // 1. Card Type Filter (always applied)
+    if (card.cardType !== filters.cardType) return false;
 
     // 4. Scheme Name Filter
     if (filters.schemeName.length > 0) {
@@ -27,28 +25,21 @@ export const matchesFilter = (
     }
 
     // 5. Custom Filters (Moki)
-    // User Request: General filters (Rarity, Class, Fur, etc.) do NOT apply to Scheme cards IF we are in SCHEME Mode.
-    // If we are in ALL Mode, we want general filters to APPLY (so if I filter "Rainbow", schemes - which aren't rainbow - hide).
+    // General filters (Rarity, Class, Fur, etc.) do NOT apply to Scheme cards when in SCHEME mode.
 
-    // Check if we are in strict Scheme mode
+    // Check if we are in Scheme mode
     const isSchemeMode = filters.cardType === 'SCHEME';
 
     if (card.cardType === 'SCHEME') {
         if (isSchemeMode) {
-            return true; // Bypass all checks in Scheme Mode
+            return true; // Bypass all Moki-specific checks in Scheme Mode
         }
-        // If not Scheme Mode (meaning ALL), fall through and let Rarity/Fur checks happen.
-        // Most Schemes will fail these checks (e.g. no Fur), which is desired behavior for "ALL" mode filtering.
+        // In MOKI mode, Scheme cards are filtered out by the Card Type Filter (line 19)
     }
 
     // --- EVERYTHING BELOW APPLIES ONLY TO MOKI CARDS ---
 
-    // 1.5 Enforce Epic/Legendary Universe if "Only Epic/Legendary" is active
-    if (filters.onlyEpicLegendary) {
-        if (card.rarity !== 'Epic' && card.rarity !== 'Legendary') return false;
-    }
-
-    // 2. Rarity Filter (Moved here to exempt Schemes)
+    // 2. Rarity Filter
     if (filters.rarity.length > 0 && !filters.rarity.includes(card.rarity)) return false;
 
 

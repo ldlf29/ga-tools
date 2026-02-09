@@ -368,7 +368,11 @@ export default function MyLineups({
                                 title={card.name}
                                 fill
                                 sizes="(max-width: 400px) 20vw, 50px"
-                                className={`${styles.previewImage} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`}
+                                className={`
+                                    ${styles.previewImage} 
+                                    ${card.cardType === 'MOKI' ? (styles[`rarity${card.rarity}`] || '') : ''} 
+                                    ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}
+                                `}
                                 style={{ objectFit: 'cover', borderRadius: '0.5rem' }}
                             />
                         </div>
