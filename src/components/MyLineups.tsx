@@ -46,6 +46,7 @@ export default function MyLineups({
     const [othersSort, setOthersSort] = useState<SortOption>('default');
     const [activeDropdown, setActiveDropdown] = useState<'favorites' | 'others' | null>(null);
     const [activeBackground, setActiveBackground] = useState<string>('default');
+    const [showInfo, setShowInfo] = useState(false);
 
     const handleExportExcel = async () => {
         const favorites = favoriteLineups;
@@ -358,7 +359,10 @@ export default function MyLineups({
                 transition={{ duration: 0.3 }}
                 key={lineup.id}
                 className={styles.lineupCard}
-                onClick={() => setExpandedId(lineup.id)}
+                onClick={() => {
+                    setExpandedId(lineup.id);
+                    setShowInfo(false);
+                }}
                 style={bgStyle}
             >
 
@@ -875,14 +879,53 @@ export default function MyLineups({
                             <div style={{ width: '220px' }}></div>
 
                             <div id="rating-slider-container" className={styles.ratingSliderContainer}>
-                                <RatingSlider
-                                    value={expandedLineup.rating || 0}
-                                    onChange={(val) => onRate(expandedLineup.id, val)}
-                                />
+                                <div className={styles.ratingSliderWrapper}>
+                                    <div className={styles.infoContainerDesktop}>
+                                        <div className={`${styles.infoMessage} ${showInfo ? styles.infoMessageVisible : ''}`}>
+                                            BuffMoki rates your lineup
+                                        </div>
+                                        <div
+                                            className={styles.infoButtonIcon}
+                                            onClick={() => setShowInfo(!showInfo)}
+                                            style={{
+                                                backgroundColor: showInfo ? 'rgba(255, 215, 83, 0.3)' : '',
+                                                borderColor: showInfo ? '#FFD753' : '',
+                                                color: showInfo ? '#FFD753' : ''
+                                            }}
+                                            title="Click for info"
+                                        >
+                                            i
+                                        </div>
+                                    </div>
+                                    <RatingSlider
+                                        value={expandedLineup.rating || 0}
+                                        onChange={(val) => {
+                                            onRate(expandedLineup.id, val);
+                                            if (showInfo) setShowInfo(false);
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             {/* Background Switcher - Right Aligned */}
                             <div id="background-switcher" className={styles.backgroundSwitcher}>
+                                <div className={styles.infoContainerMobile}>
+                                    <div
+                                        className={styles.infoButtonIcon}
+                                        onClick={() => setShowInfo(!showInfo)}
+                                        style={{
+                                            backgroundColor: showInfo ? 'rgba(255, 215, 83, 0.3)' : '',
+                                            borderColor: showInfo ? '#FFD753' : '',
+                                            color: showInfo ? '#FFD753' : ''
+                                        }}
+                                        title="Click for info"
+                                    >
+                                        i
+                                    </div>
+                                    <div className={`${styles.infoMessageMobile} ${showInfo ? styles.infoMessageMobileVisible : ''}`}>
+                                        BuffMoki rates your lineup
+                                    </div>
+                                </div>
                                 {BACKGROUND_OPTIONS.map((bg) => (
                                     <button
                                         key={bg.id}

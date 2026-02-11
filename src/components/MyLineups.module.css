@@ -863,7 +863,140 @@
 .ratingSliderContainer {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex: 1;
+}
+
+.ratingSliderWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Expandable Info Button Styles (PC) */
+.infoContainerDesktop {
+    position: absolute;
+    right: 100%;
+    /* Anchor to the left side of the slider */
+    top: 50%;
+    transform: translateY(-50%);
+    padding-right: 35px;
+    /* Spacing from slider */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* Ensure content expands to left */
+    pointer-events: none;
+    /* Don't block clicks if transparent */
+}
+
+.infoButtonIcon {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.2s;
+    font-size: 0.8rem;
+    font-weight: 700;
+    pointer-events: auto;
+    /* Re-enable clicks for button */
+    flex-shrink: 0;
+}
+
+.infoButtonIcon:hover {
+    background: rgba(255, 215, 83, 0.3);
+    border-color: #FFD753;
+    color: #FFD753;
+    transform: scale(1.15);
+}
+
+.infoMessage {
+    background: #FFD753;
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    margin-right: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(20px) scale(0.9);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.infoMessageVisible {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+}
+
+.infoButtonMobile {
+    display: none;
+}
+
+.infoContainerMobile {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .infoContainerDesktop {
+        display: none;
+    }
+
+    .infoContainerMobile {
+        display: flex;
+        position: absolute;
+        left: 5%;
+        /* Align with rating slider start */
+        top: 50%;
+        transform: translateY(-50%);
+        align-items: center;
+        z-index: 100;
+        pointer-events: none;
+        /* Allow clicks through container */
+    }
+
+    .infoContainerMobile .infoButtonIcon {
+        pointer-events: auto;
+        /* Re-enable clicks */
+    }
+
+    .infoMessageMobile {
+        background: #FFD753;
+        color: #000;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.3rem 0.6rem;
+        border-radius: 20px;
+        position: absolute;
+        bottom: 30px;
+        /* Above the button */
+        left: 0;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(-10px) scale(0.9);
+        transform-origin: bottom left;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .infoMessageMobileVisible {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        pointer-events: auto;
+    }
 }
 
 .modalEditInput {
@@ -1414,6 +1547,12 @@
     .backgroundSwitcher {
         margin: 0;
         gap: 0.35rem;
+        position: relative;
+        /* Context for info button */
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .bgOption {
