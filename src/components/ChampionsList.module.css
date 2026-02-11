@@ -22,7 +22,7 @@
     border: 3px solid #333333;
     border-bottom-width: 6px;
     /* Removed sticky to allow it to scroll away with the container */
-    z-index: 40;
+    z-index: 150;
 }
 
 .headerTopRow {
@@ -38,6 +38,13 @@
     display: flex;
     gap: 1rem;
     align-items: center;
+}
+
+.titleGroup {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
 }
 
 .title {
@@ -103,6 +110,11 @@
 .exportButton:active {
     transform: translateY(1px);
     border-bottom-width: 2px;
+}
+
+.exportButton svg {
+    width: 22px;
+    height: 22px;
 }
 
 .searchBar:hover,
@@ -533,6 +545,58 @@
     padding-bottom: 0.25rem;
 }
 
+/* Confirmation Styles */
+.confirmationContainer {
+    position: relative;
+    z-index: 50;
+}
+
+.confirmationMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #5097FF;
+    border: 1px dashed #333333;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.confirmationText {
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    color: #333333;
+    font-family: 'Inter', sans-serif;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btnConfirm {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btnSuccess {
+    background: #1ABF9E;
+    color: white;
+}
+
+.btnCancel {
+    background: #1a1e32;
+    color: #ffffff;
+    border: 1px solid #333a55;
+}
+
 .statRow {
     display: flex;
     justify-content: space-between;
@@ -717,7 +781,7 @@
     }
 
     .exportButton svg {
-        width: 14px !important;
+        width: 18px !important;
         height: 18px !important;
     }
 

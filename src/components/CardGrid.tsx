@@ -31,10 +31,11 @@ interface CardRowProps {
     viewMode: 'grid' | 'compact';
     onAddCard: (card: EnhancedCard) => void;
     setSelectedModalCard: (card: EnhancedCard | null) => void;
+    currentLineup: EnhancedCard[];
 }
 
 // CardRow defined to accept props directly (merged rowProps)
-const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard, setSelectedModalCard }: { index: number; style: CSSProperties } & CardRowProps) => {
+const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard, setSelectedModalCard, currentLineup }: { index: number; style: CSSProperties } & CardRowProps) => {
     const startIndex = index * itemsPerRow;
     const rowCards = cards.slice(startIndex, startIndex + itemsPerRow);
 
@@ -53,94 +54,110 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                 overflow: 'visible',
             }}
         >
-            {rowCards.map((card, colIndex) => (
-                <div
-                    key={`${viewMode}-${card.name}-${card.id || index}-${colIndex}`}
-                    className={viewMode === 'grid'
-                        ? `${styles.cardItem} ${card.cardType === 'SCHEME' ? styles.scheme : (styles[card.rarity.toLowerCase()] || styles.basic)}`
-                        : `${styles.compactCardItem} ${card.cardType === 'SCHEME' ? styles.compactScheme : (styles['compact' + (card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1).toLowerCase())] || styles.compactBasic)}`
-                    }
-                    onClick={() => onAddCard(card)}
-                >
-                    {viewMode === 'grid' ? (
-                        <>
-                            <div className={styles.imageWrapper}>
-                                <NextImage
-                                    src={card.image}
-                                    alt={card.name}
-                                    fill
-                                    sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1400px) 33vw, 25vw"
-                                    className={styles.cardImage}
-                                    style={{ objectFit: 'cover' }}
-                                    priority={index < 10}
-                                />
-                            </div>
+            {rowCards.map((card, colIndex) => {
+                const isInLineup = currentLineup.some(c =>
+                    c.name === card.name &&
+                    c.rarity === card.rarity &&
+                    c.cardType === card.cardType
+                );
+                return (
+                    <div
+                        key={`${viewMode}-${card.name}-${card.id || index}-${colIndex}`}
+                        className={viewMode === 'grid'
+                            ? `${styles.cardItem} ${card.cardType === 'SCHEME' ? styles.scheme : (styles[card.rarity.toLowerCase()] || styles.basic)} ${isInLineup ? styles.inLineup : ''}`
+                            : `${styles.compactCardItem} ${card.cardType === 'SCHEME' ? styles.compactScheme : (styles['compact' + (card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1).toLowerCase())] || styles.compactBasic)} ${isInLineup ? styles.inLineupCompact : ''}`
+                        }
+                        onClick={() => onAddCard(card)}
+                    >
+                        {viewMode === 'grid' ? (
+                            <>
+                                <div className={styles.imageWrapper}>
+                                    <NextImage
+                                        src={card.image}
+                                        alt={card.name}
+                                        fill
+                                        sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1400px) 33vw, 25vw"
+                                        className={styles.cardImage}
+                                        style={{ objectFit: 'cover' }}
+                                        priority={index < 10}
+                                    />
+                                </div>
 
-                            <div className={styles.cardInfo}>
-                                <div className={styles.cardHeader}>
-                                    <span className={styles.cardName}>{card.name}</span>
-                                </div>
-                                <div className={styles.cardActions}>
-                                    {card.custom.class && card.cardType !== 'SCHEME' && (
-                                        <div className={styles.cardType}>{card.custom.class}</div>
-                                    )}
+                                <div className={styles.cardInfo}>
+                                    <div className={styles.cardHeader}>
+                                        <span className={styles.cardName}>{card.name}</span>
+                                    </div>
+                                    <div className={styles.cardActions}>
+                                        {card.custom.class && card.cardType !== 'SCHEME' && (
+                                            <div className={styles.cardType}>{card.custom.class}</div>
+                                        )}
 
-                                    <button
-                                        className={styles.infoButton}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            setSelectedModalCard(card);
-                                        }}
-                                        title="View details"
-                                    >
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                        </svg>
-                                    </button>
+                                        <button
+                                            className={styles.infoButton}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                setSelectedModalCard(card);
+                                            }}
+                                            title="View details"
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className={styles.compactImageWrapper} style={{ position: 'relative', width: 60, height: 60, flexShrink: 0, marginRight: '1rem' }}>
+                                    <NextImage
+                                        src={card.custom.characterImage || card.custom.imageUrl || card.image}
+                                        alt={card.name}
+                                        width={60}
+                                        height={60}
+                                        className={styles.compactImage}
+                                        style={{ objectFit: 'cover', borderRadius: '0.5rem' }}
+                                        priority={index < 10}
+                                    />
+                                </div>
+                                <div className={styles.compactInfo}>
+                                    <div className={styles.compactName}>{card.name}</div>
+                                    <div className={styles.compactSub}>
+                                        {card.custom.stars > 0 && <span className={styles.compactStars}>{card.custom.stars} ★</span>}
+                                        {card.custom.class && card.cardType !== 'SCHEME' && <span className={styles.compactClass}>{card.custom.class}</span>}
+                                    </div>
+                                </div>
+                                <button
+                                    className={styles.compactInfoButton}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setSelectedModalCard(card);
+                                    }}
+                                    title="View details"
+                                >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                </button>
+                                <div className={styles.compactRarityLabel}>{card.rarity}</div>
+                            </>
+                        )}
+                        {isInLineup && (
+                            <div className={styles.selectedOverlay}>
+                                <div className={styles.selectedIcon}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
                                 </div>
                             </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className={styles.compactImageWrapper} style={{ position: 'relative', width: 60, height: 60, flexShrink: 0, marginRight: '1rem' }}>
-                                <NextImage
-                                    src={card.custom.characterImage || card.custom.imageUrl || card.image}
-                                    alt={card.name}
-                                    width={60}
-                                    height={60}
-                                    className={styles.compactImage}
-                                    style={{ objectFit: 'cover', borderRadius: '0.5rem' }}
-                                    priority={index < 10}
-                                />
-                            </div>
-                            <div className={styles.compactInfo}>
-                                <div className={styles.compactName}>{card.name}</div>
-                                <div className={styles.compactSub}>
-                                    {card.custom.stars > 0 && <span className={styles.compactStars}>{card.custom.stars} ★</span>}
-                                    {card.custom.class && card.cardType !== 'SCHEME' && <span className={styles.compactClass}>{card.custom.class}</span>}
-                                </div>
-                            </div>
-                            <button
-                                className={styles.compactInfoButton}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setSelectedModalCard(card);
-                                }}
-                                title="View details"
-                            >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                            </button>
-                            <div className={styles.compactRarityLabel}>{card.rarity}</div>
-                        </>
-                    )}
-                </div>
-            ))}
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 };
@@ -425,7 +442,8 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                                         itemsPerRow,
                                         colGap,
                                         viewMode,
-                                        setSelectedModalCard
+                                        setSelectedModalCard,
+                                        currentLineup
                                     }}
                                     rowComponent={CardRow}
                                     overscanCount={2}

@@ -43,6 +43,17 @@ export default function CardModal({ card, onClose }: CardModalProps) {
                         className={`${styles.modalContent} ${card.cardType === 'SCHEME' ? styles.schemeModal : ''}`}
                         onClick={(e) => e.stopPropagation()}
                     >
+                        <button
+                            className={styles.modalCloseButton}
+                            onClick={onClose}
+                            title="Close"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+
                         {card.cardType === 'SCHEME' ? (
                             <div className={styles.schemeView}>
                                 <div className={styles.schemeImageWrapper}>

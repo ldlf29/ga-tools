@@ -184,6 +184,18 @@ export default function Home() {
 
   /* Lineup Management Wrappers */
   const handleAddToLineup = (card: EnhancedCard) => {
+    // Check if card is already in lineup (Exact Match for visual toggle)
+    const indexToRemove = lineup.findIndex(c =>
+      c.name === card.name &&
+      c.rarity === card.rarity &&
+      c.cardType === card.cardType
+    );
+
+    if (indexToRemove !== -1) {
+      removeFromLineup(indexToRemove);
+      return;
+    }
+
     const result = addCard(card);
     if (!result.success && result.error) {
       addToast(result.error, 'error');

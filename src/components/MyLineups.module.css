@@ -49,7 +49,7 @@
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
-    z-index: 40;
+    z-index: 150;
 }
 
 .headerTopRow {
@@ -58,6 +58,28 @@
     align-items: center;
     width: 100%;
     min-height: 44px;
+}
+
+.exportButton {
+    background: #A855F7;
+    border: 2px solid #333333;
+    border-bottom-width: 4px;
+    border-radius: 12px;
+    color: white;
+    width: 37px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.exportButton:hover {
+    transform: translateY(-2px);
+    background: #C084FC;
 }
 
 .headerRight {
@@ -517,6 +539,7 @@
     align-items: center;
     backdrop-filter: blur(5px);
     padding: 2rem;
+    overflow-y: auto;
 }
 
 .modalContent {
@@ -533,9 +556,9 @@
     position: relative;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.3s ease-out;
-    color: #333333;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    overflow: visible;
 }
 
 .modalContent::-webkit-scrollbar {
@@ -594,11 +617,8 @@
 }
 
 .modalDownloadButton {
-    position: absolute;
-    left: 0;
     width: 50px;
     height: 50px;
-    top: 10px;
     background: #FF66CC;
     border: 3px solid #333333;
     border-radius: 50%;
@@ -628,6 +648,39 @@
 .modalDownloadButton svg {
     width: 24px;
     height: 24px;
+    stroke: currentColor;
+    stroke-width: 3px;
+    filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+}
+
+.modalCloseButton {
+    position: absolute;
+    right: -12px;
+    top: -12px;
+    width: 40px;
+    height: 40px;
+    background: #FF66CC;
+    border: 3px solid #333333;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, background 0.2s;
+    z-index: 1000;
+    padding: 0;
+}
+
+.modalCloseButton:hover {
+    transform: scale(1.1);
+    background: #FF99DD !important;
+}
+
+.modalCloseButton svg {
+    width: 20px;
+    height: 20px;
     stroke: currentColor;
     stroke-width: 3px;
     filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
@@ -667,6 +720,34 @@
 
 .modalTitleWrapper:hover .editButton {
     opacity: 1;
+}
+
+.titleAnchor {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.editPencil {
+    position: absolute;
+    right: -45px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: transform 0.2s;
+    filter: drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(0 -2px 0 #000);
+    display: flex;
+    align-items: center;
+}
+
+.editPencil:hover {
+    transform: translateY(-50%) scale(1.1);
+}
+
+.excludeFromCapture {
+    pointer-events: auto;
 }
 
 .modalTitle {
@@ -947,10 +1028,20 @@
     color: white;
 }
 
+.btnSuccess {
+    background: #1ABF9E;
+    color: white;
+}
+
 .btnNo {
     background: var(--color-bg-darker);
     color: var(--color-text-main);
     border: 1px solid var(--color-border);
+}
+
+.confirmationContainer {
+    position: relative;
+    z-index: 200;
 }
 
 .orderByMenu li {
@@ -1166,7 +1257,7 @@
     }
 
     .exportButton svg {
-        width: 14px !important;
+        width: 18px !important;
         height: 18px !important;
     }
 
@@ -1218,14 +1309,11 @@
     .modalContent {
         width: 95% !important;
         height: auto !important;
-        max-height: 600px;
-        /* Altura fija para evitar zoom del fondo con el teclado */
-        overflow-y: auto;
+        max-height: none;
+        overflow: visible !important;
         padding: 1.5rem 1rem !important;
         display: flex;
         flex-direction: column;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
     }
 
     .modalContent::-webkit-scrollbar {
@@ -1250,9 +1338,14 @@
         text-overflow: ellipsis;
         text-align: center;
         width: 100%;
+        max-width: 100%;
         display: block;
         line-height: 1.2;
         box-sizing: border-box;
+    }
+
+    .titleAnchor {
+        max-width: calc(100% - 100px);
     }
 
     .modalGridContainer {
@@ -1338,4 +1431,9 @@
     .modalDownloadButton {
         display: none !important;
     }
+}
+
+.excludeFromCapture {
+    /* Marker class */
+    pointer-events: auto;
 }

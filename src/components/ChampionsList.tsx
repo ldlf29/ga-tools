@@ -35,6 +35,7 @@ export default function ChampionsList() {
     const [isMobile, setIsMobile] = useState(false);
     const [openMobileDropdown, setOpenMobileDropdown] = useState<'sort' | 'class' | 'fur' | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
+    const [confirmExport, setConfirmExport] = useState(false);
 
     const classOptions = ["All Classes", ...MOKI_CLASSES];
     const furOptions = ["All Furs", ...MOKI_FURS];
@@ -54,13 +55,18 @@ export default function ChampionsList() {
             if (openMobileDropdown && !(event.target as Element).closest(`.${styles.mobileFilterContainer}`)) {
                 setOpenMobileDropdown(null);
             }
+
+            // Export Confirmation Click Outside
+            if (confirmExport && !(event.target as Element).closest(`.${styles.confirmationContainer}`)) {
+                setConfirmExport(false);
+            }
         }
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [openMobileDropdown]);
+    }, [openMobileDropdown, confirmExport]);
 
     useEffect(() => {
         loadData();
@@ -329,17 +335,49 @@ export default function ChampionsList() {
         <div className={styles.container}>
             <div className={styles.header}>
                 <div className={styles.headerTopRow}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div className={styles.titleGroup}>
                         <div className={styles.title}>Champions</div>
-                        <button
-                            className={styles.exportButton}
-                            onClick={handleExportExcel}
-                            title="Export Champions Stats to Excel (.xlsx)"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="18" height="24" fill="currentColor">
-                                <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
-                            </svg>
-                        </button>
+                        <div className={styles.confirmationContainer}>
+                            <button
+                                className={styles.exportButton}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setConfirmExport(!confirmExport);
+                                }}
+                                title="Export Champions Stats to Excel (.xlsx)"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor">
+                                    <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
+                                </svg>
+                            </button>
+                            {confirmExport && (
+                                <div className={styles.confirmationMenu} style={{ background: '#5097FF', width: '280px', left: '0', top: '45px', right: 'auto', textAlign: 'center' }}>
+                                    <div className={styles.confirmationText}>Would you like to download the current Champions list in Excel?</div>
+                                    <div className={styles.actions}>
+                                        <button
+                                            className={`${styles.btnConfirm} ${styles.btnSuccess}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleExportExcel();
+                                                setConfirmExport(false);
+                                            }}
+                                        >
+                                            YES
+                                        </button>
+                                        <button
+                                            className={`${styles.btnConfirm} ${styles.btnCancel}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setConfirmExport(false);
+                                            }}
+                                        >
+                                            NO
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <button
                             className={styles.exportButton}
                             onClick={() => setShowChangelog(true)}
@@ -460,238 +498,244 @@ export default function ChampionsList() {
             </div>
 
             {/* Desktop Table View - ONLY RENDER IF NOT MOBILE */}
-            {!isMobile && (
-                <div className={styles.tableContainer}>
-                    <div className={styles.tableWrapper}>
-                        <table className={styles.table}>
-                            <thead ref={headerRef}>
-                                <tr>
-                                    {renderHeader("NAME", "name")}
-                                    {renderHeader("FUR", "fur")}
-                                    {renderHeader("CLASS", "class")}
-                                    {renderHeader("★", "stars")}
-                                    {renderHeader("STR", "strength")}
-                                    {renderHeader("SPD", "speed")}
-                                    {renderHeader("DEF", "defense")}
-                                    {renderHeader("DEX", "dexterity")}
-                                    {renderHeader("FOR", "fortitude")}
-                                    {renderHeader("TOTAL", "totalStats")}
-                                    {renderHeader("TRAIN", "train")}
-                                    {renderHeader("ELIMS", "eliminations")}
-                                    {renderHeader("BALLS", "deposits")}
-                                    {renderHeader("WART", "wartDistance")}
-                                    {renderHeader("SCORE", "score")}
-                                    {renderHeader("W/R", "winRate")}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {sortedData.length > 0 ? (
-                                    sortedData.map((moki, idx) => (
-                                        <tr key={moki.id || moki.name + idx} className={styles.tr}>
-                                            <td className={styles.td}>
-                                                <div className={styles.tdName}>
-                                                    {moki.imageUrl && (
-                                                        <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
-                                                            <NextImage
-                                                                src={moki.imageUrl}
-                                                                alt={moki.name}
-                                                                width={40}
-                                                                height={40}
-                                                                className={styles.mokiImage}
-                                                                style={{ objectFit: 'contain' }}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    {moki.name}
+            {
+                !isMobile && (
+                    <div className={styles.tableContainer}>
+                        <div className={styles.tableWrapper}>
+                            <table className={styles.table}>
+                                <thead ref={headerRef}>
+                                    <tr>
+                                        {renderHeader("NAME", "name")}
+                                        {renderHeader("FUR", "fur")}
+                                        {renderHeader("CLASS", "class")}
+                                        {renderHeader("★", "stars")}
+                                        {renderHeader("STR", "strength")}
+                                        {renderHeader("SPD", "speed")}
+                                        {renderHeader("DEF", "defense")}
+                                        {renderHeader("DEX", "dexterity")}
+                                        {renderHeader("FOR", "fortitude")}
+                                        {renderHeader("TOTAL", "totalStats")}
+                                        {renderHeader("TRAIN", "train")}
+                                        {renderHeader("ELIMS", "eliminations")}
+                                        {renderHeader("BALLS", "deposits")}
+                                        {renderHeader("WART", "wartDistance")}
+                                        {renderHeader("SCORE", "score")}
+                                        {renderHeader("W/R", "winRate")}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sortedData.length > 0 ? (
+                                        sortedData.map((moki, idx) => (
+                                            <tr key={moki.id || moki.name + idx} className={styles.tr}>
+                                                <td className={styles.td}>
+                                                    <div className={styles.tdName}>
+                                                        {moki.imageUrl && (
+                                                            <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
+                                                                <NextImage
+                                                                    src={moki.imageUrl}
+                                                                    alt={moki.name}
+                                                                    width={40}
+                                                                    height={40}
+                                                                    className={styles.mokiImage}
+                                                                    style={{ objectFit: 'contain' }}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        {moki.name}
+                                                        {moki.marketLink && (
+                                                            <a
+                                                                href={moki.marketLink}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className={styles.linkButton}
+                                                                title="View on Market"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            >
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                </svg>
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className={styles.td}>{moki.fur}</td>
+                                                <td className={styles.td}>{moki.class}</td>
+                                                <td className={styles.td}>{moki.stars}</td>
+                                                <td className={styles.td}>{moki.strength?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.speed?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.defense?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.dexterity?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.fortitude?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.train?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.eliminations?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.wartDistance?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.score?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={15}>
+                                                <div className={styles.noResults}>
+                                                    No Moki found matching your filters.
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Mobile Card List View - ONLY RENDER IF MOBILE */}
+            {
+                isMobile && (
+                    <div className={styles.mobileCardList}>
+                        {sortedData.length > 0 ? (
+                            sortedData.map((moki, idx) => {
+                                const mokiUniqueId = moki.id || `moki-${idx}-${moki.name}`;
+                                const isExpanded = expandedCardId === mokiUniqueId;
+                                return (
+                                    <div
+                                        key={mokiUniqueId}
+                                        className={`${styles.mobileCard} ${isExpanded ? styles.expanded : ''}`}
+                                    >
+                                        <div
+                                            className={styles.mobileCardHeader}
+                                            onClick={() => toggleCard(mokiUniqueId)}
+                                        >
+                                            {moki.imageUrl && (
+                                                <NextImage
+                                                    src={moki.imageUrl}
+                                                    alt={moki.name}
+                                                    width={48}
+                                                    height={48}
+                                                    className={styles.mobileCardImage}
+                                                />
+                                            )}
+                                            <div className={styles.mobileCardName}>
+                                                {moki.name}
+                                            </div>
+                                            <div className={styles.expandIcon}>
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </div>
+                                        </div>
+
+                                        {isExpanded && (
+                                            <div className={styles.mobileCardBody} onClick={(e) => e.stopPropagation()}>
+                                                <div className={styles.statBlock} style={{ marginBottom: '1rem' }}>
+                                                    <div className={styles.statTitle}>Identity</div>
+                                                    <div className={styles.statRow}>
+                                                        <span className={styles.statLabel}>CLASS</span>
+                                                        <span className={styles.statValue}>{moki.class}</span>
+                                                    </div>
+                                                    <div className={styles.statRow}>
+                                                        <span className={styles.statLabel}>FUR</span>
+                                                        <span className={styles.statValue}>{moki.fur}</span>
+                                                    </div>
+                                                    <div className={styles.statRow}>
+                                                        <span className={styles.statLabel}>STARS</span>
+                                                        <span className={styles.statValue}>{moki.stars} ★</span>
+                                                    </div>
                                                     {moki.marketLink && (
                                                         <a
                                                             href={moki.marketLink}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className={styles.linkButton}
-                                                            title="View on Market"
+                                                            className={styles.marketButton}
+                                                            style={{ marginTop: '0.75rem' }}
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                                                <polyline points="15 3 21 3 21 9"></polyline>
-                                                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                                                            </svg>
+                                                            View on Market
                                                         </a>
                                                     )}
                                                 </div>
-                                            </td>
-                                            <td className={styles.td}>{moki.fur}</td>
-                                            <td className={styles.td}>{moki.class}</td>
-                                            <td className={styles.td}>{moki.stars}</td>
-                                            <td className={styles.td}>{moki.strength?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.speed?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.defense?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.dexterity?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.fortitude?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.train?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.eliminations?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.wartDistance?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.score?.toFixed(2) || '-'}</td>
-                                            <td className={styles.td}>{moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'}</td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={15}>
-                                            <div className={styles.noResults}>
-                                                No Moki found matching your filters.
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            )}
 
-            {/* Mobile Card List View - ONLY RENDER IF MOBILE */}
-            {isMobile && (
-                <div className={styles.mobileCardList}>
-                    {sortedData.length > 0 ? (
-                        sortedData.map((moki, idx) => {
-                            const mokiUniqueId = moki.id || `moki-${idx}-${moki.name}`;
-                            const isExpanded = expandedCardId === mokiUniqueId;
-                            return (
-                                <div
-                                    key={mokiUniqueId}
-                                    className={`${styles.mobileCard} ${isExpanded ? styles.expanded : ''}`}
-                                >
-                                    <div
-                                        className={styles.mobileCardHeader}
-                                        onClick={() => toggleCard(mokiUniqueId)}
-                                    >
-                                        {moki.imageUrl && (
-                                            <NextImage
-                                                src={moki.imageUrl}
-                                                alt={moki.name}
-                                                width={48}
-                                                height={48}
-                                                className={styles.mobileCardImage}
-                                            />
+                                                <div className={styles.statsGrid}>
+                                                    <div className={styles.statBlock}>
+                                                        <div className={styles.statTitle}>Base Stats</div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>STR</span>
+                                                            <span className={styles.statValue}>{moki.strength?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>SPD</span>
+                                                            <span className={styles.statValue}>{moki.speed?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>DEF</span>
+                                                            <span className={styles.statValue}>{moki.defense?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>DEX</span>
+                                                            <span className={styles.statValue}>{moki.dexterity?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>FOR</span>
+                                                            <span className={styles.statValue}>{moki.fortitude?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>TOTAL</span>
+                                                            <span className={styles.statValue}>{moki.totalStats?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>TRAIN</span>
+                                                            <span className={styles.statValue}>{moki.train?.toFixed(1) || '0.0'}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className={styles.statBlock}>
+                                                        <div className={styles.statTitle}>Performance</div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>ELIMS</span>
+                                                            <span className={styles.statValue}>{moki.eliminations?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>BALLS</span>
+                                                            <span className={styles.statValue}>{moki.deposits?.toFixed(1)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>WART</span>
+                                                            <span className={styles.statValue}>{moki.wartDistance?.toFixed(0)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>SCORE</span>
+                                                            <span className={styles.statValue}>{moki.score?.toFixed(0)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>W/R</span>
+                                                            <span className={styles.statValue}>
+                                                                {moki.winRate ? moki.winRate.toFixed(1) + '%' : '-'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         )}
-                                        <div className={styles.mobileCardName}>
-                                            {moki.name}
-                                        </div>
-                                        <div className={styles.expandIcon}>
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <polyline points="6 9 12 15 18 9"></polyline>
-                                            </svg>
-                                        </div>
                                     </div>
-
-                                    {isExpanded && (
-                                        <div className={styles.mobileCardBody} onClick={(e) => e.stopPropagation()}>
-                                            <div className={styles.statBlock} style={{ marginBottom: '1rem' }}>
-                                                <div className={styles.statTitle}>Identity</div>
-                                                <div className={styles.statRow}>
-                                                    <span className={styles.statLabel}>CLASS</span>
-                                                    <span className={styles.statValue}>{moki.class}</span>
-                                                </div>
-                                                <div className={styles.statRow}>
-                                                    <span className={styles.statLabel}>FUR</span>
-                                                    <span className={styles.statValue}>{moki.fur}</span>
-                                                </div>
-                                                <div className={styles.statRow}>
-                                                    <span className={styles.statLabel}>STARS</span>
-                                                    <span className={styles.statValue}>{moki.stars} ★</span>
-                                                </div>
-                                                {moki.marketLink && (
-                                                    <a
-                                                        href={moki.marketLink}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className={styles.marketButton}
-                                                        style={{ marginTop: '0.75rem' }}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        View on Market
-                                                    </a>
-                                                )}
-                                            </div>
-
-                                            <div className={styles.statsGrid}>
-                                                <div className={styles.statBlock}>
-                                                    <div className={styles.statTitle}>Base Stats</div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>STR</span>
-                                                        <span className={styles.statValue}>{moki.strength?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>SPD</span>
-                                                        <span className={styles.statValue}>{moki.speed?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>DEF</span>
-                                                        <span className={styles.statValue}>{moki.defense?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>DEX</span>
-                                                        <span className={styles.statValue}>{moki.dexterity?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>FOR</span>
-                                                        <span className={styles.statValue}>{moki.fortitude?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>TOTAL</span>
-                                                        <span className={styles.statValue}>{moki.totalStats?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>TRAIN</span>
-                                                        <span className={styles.statValue}>{moki.train?.toFixed(1) || '0.0'}</span>
-                                                    </div>
-                                                </div>
-
-                                                <div className={styles.statBlock}>
-                                                    <div className={styles.statTitle}>Performance</div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>ELIMS</span>
-                                                        <span className={styles.statValue}>{moki.eliminations?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>BALLS</span>
-                                                        <span className={styles.statValue}>{moki.deposits?.toFixed(1)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>WART</span>
-                                                        <span className={styles.statValue}>{moki.wartDistance?.toFixed(0)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>SCORE</span>
-                                                        <span className={styles.statValue}>{moki.score?.toFixed(0)}</span>
-                                                    </div>
-                                                    <div className={styles.statRow}>
-                                                        <span className={styles.statLabel}>W/R</span>
-                                                        <span className={styles.statValue}>
-                                                            {moki.winRate ? moki.winRate.toFixed(1) + '%' : '-'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <div className={styles.noResults}>
-                            No Mokis found! {data.length === 0 ? "(Dataset empty)" : "(No matches)"}
-                        </div>
-                    )}
-                </div>
-            )}
-            {showChangelog && (
-                <ChangelogModal onClose={() => setShowChangelog(false)} />
-            )}
-        </div>
+                                );
+                            })
+                        ) : (
+                            <div className={styles.noResults}>
+                                No Mokis found! {data.length === 0 ? "(Dataset empty)" : "(No matches)"}
+                            </div>
+                        )}
+                    </div>
+                )
+            }
+            {
+                showChangelog && (
+                    <ChangelogModal onClose={() => setShowChangelog(false)} />
+                )
+            }
+        </div >
     );
 }
