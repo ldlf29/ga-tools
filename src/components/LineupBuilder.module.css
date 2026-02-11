@@ -490,6 +490,7 @@
     gap: 0.75rem;
     align-items: center;
     text-align: center;
+    padding-bottom: 5rem;
 }
 
 .madeBy {

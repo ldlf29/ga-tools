@@ -5,12 +5,14 @@ import { getCardGroupKey } from '@/utils/cardService';
 import { matchesFilter } from '@/utils/filterUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 import styles from './MyLineups.module.css';
+import FilterSidebar from './FilterSidebar';
 import NextImage from 'next/image';
 import RatingSlider from './RatingSlider';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import ExcelJS from 'exceljs';
+import CardGrid from './CardGrid';
 
 interface MyLineupsProps {
     lineups: SavedLineup[];
@@ -28,6 +30,9 @@ interface MyLineupsProps {
     setFavoritesOpen: (open: boolean) => void;
     allLineupsOpen: boolean;
     setAllLineupsOpen: (open: boolean) => void;
+    // New props for editing
+    allCards: EnhancedCard[];
+    onUpdateLineup: (id: number, cards: EnhancedCard[]) => void;
 }
 
 type SortOption = 'default' | 'name_asc' | 'name_desc' | 'rating_desc' | 'rating_asc';
@@ -35,7 +40,8 @@ type SortOption = 'default' | 'name_asc' | 'name_desc' | 'rating_desc' | 'rating
 export default function MyLineups({
     lineups, onDelete, onRename, onToggleFavorite, onRate,
     onUpdateBackground, onBulkDelete, onError, filters, onRemoveFilter,
-    favoritesOpen, setFavoritesOpen, allLineupsOpen, setAllLineupsOpen
+    favoritesOpen, setFavoritesOpen, allLineupsOpen, setAllLineupsOpen,
+    allCards, onUpdateLineup
 }: MyLineupsProps) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -47,6 +53,36 @@ export default function MyLineups({
     const [activeDropdown, setActiveDropdown] = useState<'favorites' | 'others' | null>(null);
     const [activeBackground, setActiveBackground] = useState<string>('default');
     const [showInfo, setShowInfo] = useState(false);
+
+    // Editing State
+    const [localCards, setLocalCards] = useState<(EnhancedCard | null)[]>([]);
+    const [originalCards, setOriginalCards] = useState<(EnhancedCard | null)[]>([]);
+
+    // Derived state for changes
+    const hasChanges = useMemo(() => {
+        if (localCards.length !== originalCards.length) return false;
+        return localCards.some((card, index) => {
+            const original = originalCards[index];
+            if (card === original) return false;
+            if (!card || !original) return true;
+
+            // Compare key properties
+            return card.name !== original.name ||
+                card.rarity !== original.rarity ||
+                card.image !== original.image ||
+                JSON.stringify(card.custom) !== JSON.stringify(original.custom);
+        });
+    }, [localCards, originalCards]);
+
+    const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+
+    // Card Selector State
+    const [selectorSlot, setSelectorSlot] = useState<number | null>(null);
+    const [selectorSearch, setSelectorSearch] = useState('');
+    const [selectorFilters, setSelectorFilters] = useState<FilterState>({
+        cardType: 'MOKI',
+        rarity: [], schemeName: [], fur: [], stars: [], customClass: [], specialization: [], traits: [], insertionOrder: []
+    });
 
     const handleExportExcel = async () => {
         const favorites = favoriteLineups;
@@ -111,6 +147,70 @@ export default function MyLineups({
         window.URL.revokeObjectURL(url);
     };
 
+    // --- Editing Handlers ---
+
+    const handleSelectSlot = (index: number) => {
+        setSelectorSlot(index);
+        // Initialize filters based on slot type (0-3 = MOKI, 4 = SCHEME)
+        const type = index === 4 ? 'SCHEME' : 'MOKI';
+        setSelectorFilters({
+            ...selectorFilters,
+            cardType: type,
+            // Reset other filters
+            rarity: [], schemeName: [], fur: [], stars: [], customClass: [], specialization: [], traits: [], insertionOrder: []
+        });
+    };
+
+    const handleCardSelect = (card: EnhancedCard) => {
+        if (selectorSlot === null) return;
+
+        // Validation for Mokis (Slots 0-3)
+        if (selectorSlot < 4) {
+            // Check if Moki name already exists in other slots
+            const isDuplicate = localCards.some((c, i) => i !== selectorSlot && c?.name === card.name);
+            if (isDuplicate) {
+                onError("You cannot have duplicate Mokis!");
+                return;
+            }
+        }
+
+        const newCards = [...localCards];
+        newCards[selectorSlot] = card;
+        setLocalCards(newCards);
+        setSelectorSlot(null);
+    };
+
+    const handleDeleteCard = (index: number) => {
+        const newCards = [...localCards];
+        newCards[index] = null;
+        setLocalCards(newCards);
+    };
+
+    const handleUndoDelete = (index: number) => {
+        const newCards = [...localCards];
+        newCards[index] = originalCards[index];
+        setLocalCards(newCards);
+    };
+
+    const handleSaveChanges = () => {
+        if (localCards.some(c => c === null)) {
+            onError("Lineup must have 5 cards!");
+            return;
+        }
+        // Filter out nulls (guaranteed by check above)
+        onUpdateLineup(expandedId!, localCards as EnhancedCard[]);
+        setOriginalCards(localCards); // Update reference to mark as saved
+    };
+
+
+
+    const handleSelectorRemoveFilter = (key: keyof FilterState, value: string | number) => {
+        setSelectorFilters(prev => ({
+            ...prev,
+            [key]: (prev[key] as any[]).filter((v: any) => v !== value)
+        }));
+    };
+
     const BACKGROUND_OPTIONS = [
         { id: 'default', label: 'Default', color: '#5097FF', image: null },
         { id: 'egg_field', label: 'Egg Field', color: '#7BCF5C', image: '/backgrounds/Egg_field.jpg' },
@@ -124,14 +224,40 @@ export default function MyLineups({
     const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
     const [imageDownloadConfirmOpen, setImageDownloadConfirmOpen] = useState(false);
 
-    // Sync activeBackground with available lineup data when expanded
+    // Track initialized ID to prevent resetting state on updates (like background change)
+    const initializedIdRef = useRef<number | null>(null);
+
+    // Sync activeBackground and initialize editing state
     useEffect(() => {
         if (expandedId !== null) {
-            const lineup = lineups.find(l => l.id === expandedId);
-            if (lineup) {
-                // Initialize with saved background or default
-                setActiveBackground(lineup.backgroundId || 'default');
+            // Only initialize if we haven't already for this ID
+            if (expandedId !== initializedIdRef.current) {
+                const lineup = lineups.find(l => l.id === expandedId);
+                if (lineup) {
+                    setActiveBackground(lineup.backgroundId || 'default');
+
+                    // Initialize local cards (5 slots: 0-3 Moki, 4 Scheme)
+                    const mokis = lineup.cards.filter(c => c.cardType !== 'SCHEME');
+                    const scheme = lineup.cards.find(c => c.cardType === 'SCHEME');
+                    const slots = Array(5).fill(null);
+
+                    // Fill Moki slots
+                    mokis.forEach((m, i) => {
+                        if (i < 4) slots[i] = m;
+                    });
+
+                    // Fill Scheme slot
+                    if (scheme) slots[4] = scheme;
+
+                    setLocalCards(slots);
+                    setOriginalCards(slots);
+                    setSelectorSlot(null);
+                    setEditingId(null);
+                    initializedIdRef.current = expandedId;
+                }
             }
+        } else {
+            initializedIdRef.current = null;
         }
     }, [expandedId, lineups]);
 
@@ -237,6 +363,15 @@ export default function MyLineups({
         setTempName('');
     };
 
+    // handleCloseModal Logic
+    const handleCloseModal = () => {
+        if (hasChanges) {
+            setShowDiscardConfirm(true);
+        } else {
+            setExpandedId(null);
+        }
+    };
+
     // Lock body scroll when modal is open and handle ESC
     useEffect(() => {
         if (expandedId !== null) {
@@ -253,7 +388,12 @@ export default function MyLineups({
                         }
                         saveName(editingId);
                     }
-                    setExpandedId(null);
+
+                    if (hasChanges) {
+                        setShowDiscardConfirm(true);
+                    } else {
+                        setExpandedId(null);
+                    }
                 }
             };
             window.addEventListener('keydown', handleEsc);
@@ -265,7 +405,7 @@ export default function MyLineups({
             document.body.style.overflow = 'unset';
             return () => { document.body.style.overflow = 'unset'; };
         }
-    }, [expandedId, editingId, tempName]);
+    }, [expandedId, editingId, tempName, hasChanges]);
 
     const lineupRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
@@ -285,10 +425,10 @@ export default function MyLineups({
                 '#rating-slider-container',
                 `.${styles.excludeFromCapture}`
             ];
-            const hiddenElements: HTMLElement[] = [];
+            const hiddenElements: { el: HTMLElement, display: string }[] = [];
             excludeSelectors.forEach(selector => {
                 lineupRef.current!.querySelectorAll<HTMLElement>(selector).forEach(el => {
-                    hiddenElements.push(el);
+                    hiddenElements.push({ el, display: el.style.display });
                     el.style.display = 'none';
                 });
             });
@@ -309,8 +449,8 @@ export default function MyLineups({
                 link.click();
             } finally {
                 // Restore hidden elements
-                hiddenElements.forEach(el => {
-                    el.style.display = '';
+                hiddenElements.forEach(({ el, display }) => {
+                    el.style.display = display;
                 });
             }
         } catch (err) {
@@ -734,7 +874,7 @@ export default function MyLineups({
                     if (editingId !== null) {
                         saveName(editingId);
                     }
-                    setExpandedId(null);
+                    handleCloseModal();
                 }}>
                     <div
                         key={expandedLineup.id}
@@ -754,7 +894,7 @@ export default function MyLineups({
                         {/* Close Button */}
                         <button
                             className={`${styles.modalCloseButton} ${styles.excludeFromCapture}`}
-                            onClick={() => setExpandedId(null)}
+                            onClick={handleCloseModal}
                             title="Close"
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -765,51 +905,7 @@ export default function MyLineups({
 
                         {/* Header Row: Download | Title */}
                         <div className={styles.modalHeaderRow}>
-                            <div className={`${styles.confirmationContainer} ${styles.excludeFromCapture}`} style={{ position: 'absolute', left: '0', top: '10px' }}>
-                                <button
-                                    id="download-button"
-                                    className={`${styles.modalDownloadButton}`}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setImageDownloadConfirmOpen(!imageDownloadConfirmOpen);
-                                    }}
-                                    title="Download Lineup Image"
-                                    disabled={isDownloading}
-                                >
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="7 10 12 15 17 10"></polyline>
-                                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                                    </svg>
-                                </button>
 
-                                {imageDownloadConfirmOpen && (
-                                    <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF', width: '280px', left: '60px', top: '0' }}>
-                                        <div className={styles.deleteConfirmationText}>Would you like to download your lineup as an image?</div>
-                                        <div className={styles.deleteActions}>
-                                            <button
-                                                className={`${styles.deleteConfirmBtn} ${styles.btnSuccess}`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDownload();
-                                                    setImageDownloadConfirmOpen(false);
-                                                }}
-                                            >
-                                                YES
-                                            </button>
-                                            <button
-                                                className={`${styles.deleteConfirmBtn} ${styles.btnNo}`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setImageDownloadConfirmOpen(false);
-                                                }}
-                                            >
-                                                NO
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
 
                             <div className={styles.modalTitleWrapper}>
                                 {editingId === expandedLineup.id ? (
@@ -851,13 +947,9 @@ export default function MyLineups({
 
                         <div className={styles.modalGridContainer}>
                             <div className={styles.modalGrid}>
-                                {(() => {
-                                    const mokis = expandedLineup.cards.filter(c => c.cardType !== 'SCHEME');
-                                    const scheme = expandedLineup.cards.find(c => c.cardType === 'SCHEME');
-                                    const sortedModalCards = scheme ? [...mokis, scheme] : mokis;
-
-                                    return sortedModalCards.map((card, idx) => (
-                                        <div key={`${expandedLineup.id}-${card.id}-${idx}`} className={styles.modalCardWrapper}>
+                                {localCards.map((card, idx) => (
+                                    <div key={`slot-${idx}`} className={styles.modalCardWrapper}>
+                                        {card ? (
                                             <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`} style={{ flexShrink: 0, position: 'relative' }}>
                                                 <NextImage
                                                     src={card.image}
@@ -866,17 +958,129 @@ export default function MyLineups({
                                                     sizes="200px"
                                                     style={{ objectFit: 'cover' }}
                                                 />
+                                                {/* Delete Button (Overlay) */}
+                                                <div
+                                                    className={`${styles.deleteOverlay} ${styles.excludeFromCapture}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteCard(idx);
+                                                    }}
+                                                    title="Remove card"
+                                                >
+                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                    </svg>
+                                                </div>
                                             </div>
-                                            <div className={styles.modalCardClass}>{card.custom.class}</div>
+                                        ) : (
+                                            <div className={`${styles.modalCard} ${styles.placeholderCard} ${styles.excludeFromCapture}`}>
+                                                <button
+                                                    className={styles.addCardButton}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSelectSlot(idx);
+                                                    }}
+                                                    title="Add card"
+                                                >
+                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                    </svg>
+                                                </button>
+                                                {originalCards[idx] && (
+                                                    <button
+                                                        className={styles.undoButton}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleUndoDelete(idx);
+                                                        }}
+                                                        title="Restore original card"
+                                                    >
+                                                        UNDO
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                        <div
+                                            className={styles.modalCardClass}
+                                            style={{ visibility: card ? 'visible' : 'hidden' }}
+                                        >
+                                            {card?.custom?.class || 'Class'}
                                         </div>
-                                    ));
-                                })()}
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
                         <div className={`${styles.modalFooter} ${styles.excludeFromCapture}`}>
-                            {/* Dummy spacer for center alignment of slider */}
-                            <div style={{ width: '220px' }}></div>
+                            {/* Actions Left (Download / Save) */}
+                            <div className={`${styles.confirmationContainer} ${styles.excludeFromCapture}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '220px', position: 'relative', transform: 'translateX(-25px)' }}>
+                                <button
+                                    id="download-button"
+                                    className={`${styles.modalDownloadButton}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setImageDownloadConfirmOpen(!imageDownloadConfirmOpen);
+                                    }}
+                                    title={localCards.some(c => c === null) ? "Lineup incomplete" : "Download Lineup Image"}
+                                    disabled={isDownloading || localCards.some(c => c === null)}
+                                    style={{
+                                        opacity: (isDownloading || localCards.some(c => c === null)) ? 0.5 : 1,
+                                        cursor: (isDownloading || localCards.some(c => c === null)) ? 'not-allowed' : 'pointer'
+                                    }}
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                </button>
+
+                                {imageDownloadConfirmOpen && (
+                                    <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF', width: '280px', left: '0', bottom: '100%', top: 'auto', marginBottom: '10px' }}>
+                                        <div className={styles.deleteConfirmationText}>Would you like to download your lineup as an image?</div>
+                                        <div className={styles.deleteActions}>
+                                            <button
+                                                className={`${styles.deleteConfirmBtn} ${styles.btnSuccess}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDownload();
+                                                    setImageDownloadConfirmOpen(false);
+                                                }}
+                                            >
+                                                YES
+                                            </button>
+                                            <button
+                                                className={`${styles.deleteConfirmBtn} ${styles.btnNo}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setImageDownloadConfirmOpen(false);
+                                                }}
+                                            >
+                                                NO
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {hasChanges && (
+                                    <button
+                                        className={`${styles.modalDownloadButton} ${styles.modalSaveButton}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleSaveChanges();
+                                        }}
+                                        title="Save Changes"
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                            <polyline points="7 3 7 8 15 8"></polyline>
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
 
                             <div id="rating-slider-container" className={styles.ratingSliderContainer}>
                                 <div className={styles.ratingSliderWrapper}>
@@ -943,6 +1147,93 @@ export default function MyLineups({
                                 ))}
                             </div>
                         </div>
+
+                        {/* Selector Overlay */}
+                        {selectorSlot !== null && (
+                            <div className={styles.selectorOverlay}>
+                                <div className={styles.selectorHeader}>
+                                    <h3>Select {selectorSlot === 4 ? 'Scheme' : 'Moki'}</h3>
+                                    <button
+                                        className={styles.modalCloseButton}
+                                        onClick={() => setSelectorSlot(null)}
+                                        style={{ position: 'relative', top: 0, right: 0, marginLeft: 'auto' }}
+                                    >
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div className={styles.selectorBody}>
+                                    <div className={styles.selectorSidebar}>
+                                        <FilterSidebar
+                                            filters={selectorFilters}
+                                            onFilterChange={setSelectorFilters}
+                                            // Lock card type based on slot
+                                            onCardTypeChange={() => { }}
+                                        />
+                                    </div>
+                                    <div className={styles.selectorGridWrapper}>
+                                        <div className={styles.selectorControls}>
+                                            <input
+                                                type="text"
+                                                placeholder="Search by name, class, trait..."
+                                                value={selectorSearch}
+                                                onChange={(e) => setSelectorSearch(e.target.value)}
+                                                className={styles.selectorSearch}
+                                                autoFocus
+                                            />
+                                        </div>
+                                        <CardGrid
+                                            cards={allCards}
+                                            onAddCard={handleCardSelect}
+                                            searchQuery={selectorSearch}
+                                            onSearchChange={setSelectorSearch}
+                                            currentLineup={localCards.filter(c => c) as EnhancedCard[]}
+                                            filters={selectorFilters}
+                                            onRemoveFilter={handleSelectorRemoveFilter}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {/* Discard Confirmation Modal (Inline) */}
+                        {showDiscardConfirm && (
+                            <div className={styles.deleteConfirmationMenu} style={{
+                                position: 'fixed',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                zIndex: 2000,
+                                width: '300px',
+                                border: '3px solid #333',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                            }} onClick={(e) => e.stopPropagation()}>
+                                <div className={styles.deleteConfirmationText}>Discard unsaved changes?</div>
+                                <div className={styles.deleteActions}>
+                                    <button
+                                        className={`${styles.deleteConfirmBtn} ${styles.btnYes}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowDiscardConfirm(false);
+                                            setExpandedId(null);
+                                        }}
+                                    >
+                                        YES
+                                    </button>
+                                    <button
+                                        className={`${styles.deleteConfirmBtn} ${styles.btnNo}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowDiscardConfirm(false);
+                                        }}
+                                    >
+                                        NO
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

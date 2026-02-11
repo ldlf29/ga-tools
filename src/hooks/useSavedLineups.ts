@@ -80,6 +80,10 @@ export function useSavedLineups() {
         setSavedLineups(prev => prev.filter(l => !ids.includes(l.id)));
     };
 
+    const updateLineup = (id: number, cards: EnhancedCard[]) => {
+        setSavedLineups(prev => prev.map(l => l.id === id ? { ...l, cards } : l));
+    };
+
     return {
         savedLineups,
         saveLineup,
@@ -88,6 +92,7 @@ export function useSavedLineups() {
         toggleFavorite,
         rateLineup,
         updateBackground,
-        bulkDelete
+        bulkDelete,
+        updateLineup
     };
 }

@@ -316,9 +316,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                         </button>
                     </div>
 
-                    <div className={styles.disclaimer}>
-                        Disclaimer: This tool was created by a community member unrelated to Moku's Team. All assets used are the property of Moku Studios.
-                    </div>
+
                 </div>
             </div>
         </div>

@@ -43,7 +43,8 @@ export default function Home() {
     toggleFavorite,
     rateLineup,
     updateBackground,
-    bulkDelete
+    bulkDelete,
+    updateLineup
   } = useSavedLineups();
 
   const {
@@ -285,6 +286,8 @@ export default function Home() {
   const [mokiDropdownOpen, setMokiDropdownOpen] = useState(false);
   const [allLineupsOpen, setAllLineupsOpen] = useState(true);
   const [favoritesOpen, setFavoritesOpen] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+  const infoWrapperRef = useRef<HTMLDivElement>(null);
 
   // Drawer State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -310,6 +313,29 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (showInfo) {
+      // Auto-close after 3 seconds
+      const timer = setTimeout(() => {
+        setShowInfo(false);
+      }, 3000);
+
+      // Close on click outside
+      const handleClickOutside = (event: MouseEvent) => {
+        if (infoWrapperRef.current && !infoWrapperRef.current.contains(event.target as Node)) {
+          setShowInfo(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showInfo]);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -325,7 +351,7 @@ export default function Home() {
       {/* Mobile Navigation Drawer */}
       <div className={`${styles.navContainer} ${styles.mobileOnly} ${mobileMenuOpen ? styles.navContainerVisible : ''}`}>
         <div className={`${styles.drawerHeader} ${styles.mobileOnly}`}>
-          <img src="/ga-logo.png" alt="Grand Arena" className={styles.drawerLogo} />
+          <img src="/ga-logo-new.png" alt="Grand Arena" className={styles.drawerLogo} />
           <button
             className={styles.closeMenuButton}
             onClick={() => setMobileMenuOpen(false)}
@@ -396,7 +422,27 @@ export default function Home() {
       <header className={styles.header}>
         <div className={styles.headerMain}>
           <div className={styles.headerLeft}>
-            <img src="/ga-logo.png" alt="Grand Arena Builder" className={styles.logo} />
+            <img src="/ga-logo-new.png" alt="Grand Arena Builder" className={styles.logo} />
+
+            <div className={styles.infoWrapper} ref={infoWrapperRef}>
+              <button
+                className={styles.infoButton}
+                onClick={() => setShowInfo(!showInfo)}
+                title="Disclaimer"
+                style={{ background: showInfo ? 'rgba(255,255,255,0.2)' : 'transparent', color: showInfo ? 'white' : 'rgba(255,255,255,0.6)' }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </button>
+              {showInfo && (
+                <div className={styles.infoPopup}>
+                  This tool was created by a community member unrelated to Moku's Team. All assets used are the property of Moku Studios.
+                </div>
+              )}
+            </div>
 
             {/* Desktop Navigation */}
             <nav className={`${styles.navContainer} ${styles.desktopOnly}`}>
@@ -594,6 +640,8 @@ export default function Home() {
                 setFavoritesOpen={setFavoritesOpen}
                 allLineupsOpen={allLineupsOpen}
                 setAllLineupsOpen={setAllLineupsOpen}
+                allCards={allCards}
+                onUpdateLineup={updateLineup}
               />
             </div>
           </div>
