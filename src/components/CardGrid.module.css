@@ -29,7 +29,6 @@
     width: 100%;
     min-height: 44px;
     flex-wrap: wrap;
-    /* Allow wrapping */
     gap: 1rem;
 }
 
@@ -38,7 +37,6 @@
     gap: 1rem;
     align-items: center;
     flex-wrap: wrap;
-    /* Allow wrapping controls */
 }
 
 .resultsTitle {
@@ -46,7 +44,6 @@
     font-family: var(--font-display);
     font-weight: 700;
     color: #FFD753;
-    /* Yellow */
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0;
@@ -74,26 +71,22 @@
     font-weight: 400;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1180px) {
     .headerContainer {
         padding: 0.75rem 1rem;
         gap: 0.75rem;
-        /* Increased from 0.5rem */
         margin-left: 0;
         margin-right: 0;
         border-radius: 0.75rem;
         position: sticky;
         top: 60px;
-        /* Stay below main header on mobile */
     }
 
     .headerTopRow {
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
-        /* Juntar elementos */
         gap: 1rem;
-        /* Space between groups */
         flex-wrap: nowrap;
     }
 
@@ -106,10 +99,8 @@
 
     .resultsTitle {
         font-size: 0.85rem;
-        /* Even smaller to fit */
         white-space: nowrap;
         margin-right: auto;
-        /* Push others to the right */
     }
 
     .titleGroup {
@@ -117,6 +108,13 @@
         flex-shrink: 0;
     }
 
+    .searchInput {
+        width: auto;
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 600px) {
     .searchInput {
         width: 100%;
         margin-top: 0.25rem;
@@ -136,13 +134,11 @@
 .searchRow {
     width: 100%;
     display: none;
-    /* Hidden by default (desktop) */
 }
 
 @media (max-width: 600px) {
     .searchRow {
         display: block;
-        /* Show only on mobile */
     }
 }
 
@@ -182,7 +178,6 @@
 }
 
 .cardItem {
-    /* Crystal/Glass Container Base */
     background: #000;
     border-radius: 1.5rem;
     padding: 0;
@@ -191,7 +186,6 @@
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-top: 1px solid rgba(255, 255, 255, 0.5);
-    /* Rim light */
     overflow: hidden;
     animation: fadeInUp 0.4s ease-out forwards;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
@@ -200,7 +194,6 @@
     flex-direction: column;
 }
 
-/* Crystal Overlay (Always visible glass reflection) */
 .cardItem::after {
     content: '';
     position: absolute;
@@ -219,7 +212,6 @@
     transition: opacity 0.3s ease;
 }
 
-/* Shine Effect (Sweep) */
 .cardItem::before {
     content: '';
     position: absolute;
@@ -229,7 +221,6 @@
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transition: 0s;
-    /* Instant reset on leave */
     pointer-events: none;
     z-index: 11;
 }
@@ -237,7 +228,6 @@
 .cardItem:hover::before {
     left: 100%;
     transition: 0.6s ease;
-    /* Animate only on enter */
 }
 
 .cardRow {
@@ -305,7 +295,6 @@
     box-shadow: 2px 3px 0 rgba(0, 0, 0, 1);
 }
 
-/* Rarity Accents (Subtle glow instead of background) */
 .basic {
     border-color: rgba(148, 163, 184, 0.3);
 }
@@ -346,8 +335,6 @@
     box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
 }
 
-
-
 .imageWrapper {
     width: 100%;
     height: 100%;
@@ -364,7 +351,6 @@
     image-rendering: -webkit-optimize-contrast;
 }
 
-/* Card Info */
 .cardInfo {
     position: absolute;
     bottom: 0.75rem;
@@ -408,7 +394,6 @@
     display: none;
 }
 
-/* New Class Label Style (Copied from MyLineups modal) */
 .cardType {
     background: #FFD753;
     border: 2px solid #000;
@@ -448,13 +433,11 @@
     }
 }
 
-/* Active Filters */
 .activeFilters {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 0;
-    /* Removed large margin */
     padding: 0;
 }
 
@@ -462,12 +445,10 @@
     display: flex;
     align-items: center;
     background: #FFD753;
-    /* User Requested Yellow */
     border: 2px solid #000;
     border-radius: 0.75rem;
     padding: 0.3rem 0.6rem;
     padding-right: 0.3rem;
-    /* Less padding on right for button */
     font-size: 0.75rem;
     color: #232842;
     gap: 0.4rem;
@@ -477,26 +458,20 @@
 
 .filterLabel {
     font-weight: 700;
-    /* Bold */
     color: #333333;
-    /* Dark Gray */
     text-transform: uppercase;
     opacity: 1;
-    /* Remove opacity */
     font-family: 'Inter', sans-serif;
 }
 
 .filterValue {
     font-weight: 800;
-    /* Extra Bold */
     color: #000000;
-    /* Black */
     font-family: 'Inter', sans-serif;
 }
 
 .removeFilterButton {
     background: #ef4444;
-    /* Darker Red from Clear Filters Hover */
     color: white;
     border: 2px solid #232842;
     border-radius: 50%;
@@ -508,7 +483,6 @@
     cursor: pointer;
     padding: 0;
     margin-left: 0.2rem;
-    /* Space on left */
     transition: transform 0.2s;
     flex-shrink: 0;
     line-height: 0;
@@ -536,7 +510,6 @@
     background: #5097FF;
 }
 
-/* Order By Dropdown */
 .orderByContainer {
     position: relative;
     z-index: 50;
@@ -546,20 +519,15 @@
     background: none;
     border: none;
     color: #1ABF9E;
-    /* Teal */
     font-size: 0.8rem;
-    /* Keep size */
     font-family: 'Inter', sans-serif;
-    /* Inter */
     font-weight: 800;
-    /* Extra Bold */
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.25rem;
     transition: color 0.2s;
     text-transform: capitalize;
-    /* Capitalize */
     text-shadow: 1.5px 0 #000, -1.5px 0 #000, 0 1.5px #000, 0 -1.5px #000,
         1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
@@ -569,14 +537,11 @@
     height: 20px;
     stroke-width: 3px;
     stroke: #FFD753;
-    /* Yellow Arrow */
     filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
-    /* Black border effect */
 }
 
 .orderByButton:hover {
     color: #1ABF9E;
-    /* Maintain Teal on hover */
 }
 
 .orderByMenu {
@@ -584,9 +549,7 @@
     top: 100%;
     right: 0;
     background: #5097FF;
-    /* Input Background Color */
     border: 1px dashed var(--color-border);
-    /* Dashed border to match inputs */
     border-radius: 0.75rem;
     padding: 0.5rem 0;
     min-width: 160px;
@@ -602,9 +565,7 @@
     font-size: 0.85rem;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
-    /* Regular */
     color: #333333;
-    /* Dark Gray */
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
     display: block;
@@ -613,19 +574,15 @@
 
 .orderByMenu li:hover {
     background: rgba(255, 255, 255, 0.4);
-    /* Stronger lighten to match Default if needed, or keep 0.2 */
     color: #333333;
-    /* Dark Gray to match Default */
     font-weight: 700;
 }
 
 .activeSort {
     color: #FFD753 !important;
-    /* Yellow for selected option */
     font-weight: 800;
 }
 
-/* View Toggle */
 .viewToggle {
     display: flex;
     background: #5097FF;
@@ -659,7 +616,6 @@
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Compact Grid */
 .compactGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -751,7 +707,7 @@
 }
 
 .compactClass {
-    color: #333;
+    color: #33;
     font-size: 0.8rem;
     font-weight: 500;
     text-transform: uppercase;
@@ -769,7 +725,6 @@
     pointer-events: none;
 }
 
-/* Compact Rarity Backgrounds */
 .compactBasic {
     border-color: #64748b !important;
     background: rgba(148, 163, 184, 0.7) !important;
@@ -825,6 +780,10 @@
     border-radius: inherit;
 }
 
+.lockedOverlay {
+    background: rgba(0, 0, 0, 0.45) !important;
+}
+
 .selectedIcon {
     background: #4ade80;
     color: #000;
@@ -836,6 +795,11 @@
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lockedIcon {
+    background: #FFD753 !important;
+    color: #000 !important;
 }
 
 .compactGrid .selectedIcon {
@@ -852,5 +816,23 @@
     100% {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+/* Tablet Specific Adjustments */
+@media (min-width: 601px) and (max-width: 1180px) {
+    .cardType {
+        font-size: 0.8rem !important;
+        padding: 0.2rem 0.5rem !important;
+    }
+
+    .infoButton {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .infoButton svg {
+        width: 16px !important;
+        height: 16px !important;
     }
 }

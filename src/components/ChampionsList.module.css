@@ -619,7 +619,7 @@
 }
 
 /* Tablet/Mobile Media Query */
-@media (max-width: 1024px) {
+@media (max-width: 1180px) {
     .container {
         display: flex;
         flex-direction: column;
@@ -628,8 +628,8 @@
         padding: 0;
         width: 100%;
         box-sizing: border-box;
-        background-color: #2673E8;
-        /* Background color matching the app */
+        background: url('/bg.pattern.webp') repeat;
+        background-size: 400px;
     }
 
     .header {
@@ -744,8 +744,7 @@
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch;
         padding: 0 0.5rem 5rem 0.5rem;
-        background-color: #2673E8;
-        /* Ensure BG is consistent */
+        background: transparent;
     }
 
     .headerTopRow {
@@ -800,5 +799,55 @@
     .linkButton {
         color: #000 !important;
         font-weight: 700 !important;
+    }
+}
+
+/* Tablet Specific Header (601px - 1180px) */
+@media (min-width: 601px) and (max-width: 1180px) {
+    .header {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 1rem !important;
+        padding: 0.75rem 1rem !important;
+    }
+
+    .headerTopRow {
+        display: contents !important;
+    }
+
+    .titleGroup {
+        order: 1 !important;
+        gap: 0.6rem !important;
+        flex: 0 0 auto !important;
+    }
+
+    .mobileToolbar {
+        display: flex !important;
+        order: 2 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        flex: 1 !important;
+        justify-content: center !important;
+        gap: 1.25rem !important;
+        width: auto !important;
+    }
+
+    .mobileFilterContainer {
+        flex: 0 1 auto !important;
+        width: auto !important;
+    }
+
+    .headerRight {
+        order: 3 !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+        margin: 0 !important;
+    }
+
+    .searchBar {
+        width: 150px !important;
+        max-width: 150px !important;
+        margin: 0 !important;
     }
 }

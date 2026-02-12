@@ -56,11 +56,13 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
             }}
         >
             {rowCards.map((card, colIndex) => {
-                const isInLineup = currentLineup.some(c =>
+                const lineupEntry = currentLineup.find(c =>
                     c.name === card.name &&
                     c.rarity === card.rarity &&
                     c.cardType === card.cardType
                 );
+                const isInLineup = !!lineupEntry;
+                const isLocked = lineupEntry?.locked;
                 return (
                     <div
                         key={`${viewMode}-${card.name}-${card.id || index}-${colIndex}`}
@@ -148,11 +150,18 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                             </>
                         )}
                         {isInLineup && (
-                            <div className={styles.selectedOverlay}>
-                                <div className={styles.selectedIcon}>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
+                            <div className={`${styles.selectedOverlay} ${isLocked ? styles.lockedOverlay : ''}`}>
+                                <div className={`${styles.selectedIcon} ${isLocked ? styles.lockedIcon : ''}`}>
+                                    {isLocked ? (
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                    ) : (
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    )}
                                 </div>
                             </div>
                         )}

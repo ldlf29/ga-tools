@@ -568,7 +568,7 @@
 }
 
 /* Tablet / Small Desktop Breakpoint */
-@media (max-width: 1200px) {
+@media (max-width: 1180px) {
 
   .mainLayout,
   .mainLayoutLineups {

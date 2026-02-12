@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { EnhancedCard } from '@/types';
 import styles from './CardModal.module.css';
 import NextImage from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface CardModalProps {
     card: EnhancedCard | null;
@@ -12,9 +13,15 @@ interface CardModalProps {
 }
 
 export default function CardModal({ card, onClose }: CardModalProps) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     // Prevent scroll when modal is open
     useEffect(() => {
-        if (card) {
+        if (mounted && card) {
             document.body.style.overflow = 'hidden';
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') onClose();
@@ -27,12 +34,12 @@ export default function CardModal({ card, onClose }: CardModalProps) {
         }
     }, [card, onClose]);
 
-    if (!card) return null;
+    if (!mounted || !card) return null;
 
     const rarityClass = styles[card.rarity.toLowerCase()] || '';
     const isCharacterImage = card.cardType === 'MOKI' && !!(card.custom.characterImage || card.custom.imageUrl);
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {card && (
                 <div className={styles.modalOverlay} onClick={onClose}>
@@ -201,6 +208,7 @@ export default function CardModal({ card, onClose }: CardModalProps) {
                 </div >
             )
             }
-        </AnimatePresence >
+        </AnimatePresence >,
+        document.body
     );
 }

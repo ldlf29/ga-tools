@@ -626,3 +626,28 @@
     width: 16px;
     height: 16px;
 }
+
+/* Unify Drawer Height for Tablet/Mobile */
+@media (max-width: 1180px) {
+    .container {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border-top: none !important;
+        border-bottom: none !important;
+        border-left: none !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+
+/* Footer pull-up for Tablet (601px - 1180px) */
+@media (min-width: 601px) and (max-width: 1180px) {
+    .footer {
+        margin-top: 0.25rem !important;
+    }
+
+    .lowerFooter {
+        padding-bottom: 0.25rem !important;
+    }
+}

@@ -76,7 +76,6 @@ export default function Home() {
   /* Data Refresh Wrapper */
   const handleRefresh = async () => {
     await refreshCards();
-    addToast("Data updated!", 'success');
   };
 
   /* Filters State - Separate states for MOKI and SCHEME */
@@ -194,6 +193,9 @@ export default function Home() {
     );
 
     if (indexToRemove !== -1) {
+      if (lineup[indexToRemove].locked) {
+        return;
+      }
       removeFromLineup(indexToRemove);
       return;
     }
@@ -303,7 +305,6 @@ export default function Home() {
 
   const handleConnect = () => {
     // Wallet connection available in PRO version
-    addToast("Wallet connection coming soon!", 'suggestion');
   };
 
   useEffect(() => {

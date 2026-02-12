@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import ExcelJS from 'exceljs';
 import CardGrid from './CardGrid';
+import CardModal from './CardModal';
 import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 
 interface MyLineupsProps {
@@ -54,6 +55,8 @@ export default function MyLineups({
     const [activeDropdown, setActiveDropdown] = useState<'favorites' | 'others' | null>(null);
     const [activeBackground, setActiveBackground] = useState<string>('default');
     const [showInfo, setShowInfo] = useState(false);
+    const infoWrapperRef = useRef<HTMLDivElement>(null);
+    const [selectedInfoCard, setSelectedInfoCard] = useState<EnhancedCard | null>(null);
 
     // Editing State
     const [localCards, setLocalCards] = useState<(EnhancedCard | null)[]>([]);
@@ -324,6 +327,25 @@ export default function MyLineups({
             }
         });
     };
+
+    useEffect(() => {
+        if (showInfo) {
+            const timer = setTimeout(() => {
+                setShowInfo(false);
+            }, 5000);
+
+            const handleClickOutside = (event: MouseEvent) => {
+                if (infoWrapperRef.current && !infoWrapperRef.current.contains(event.target as Node)) {
+                    setShowInfo(false);
+                }
+            };
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                clearTimeout(timer);
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }
+    }, [showInfo]);
 
     const filteredLineups = useMemo(() => {
         return lineups.filter(l => {
@@ -743,31 +765,73 @@ export default function MyLineups({
                                 </div>
                             )}
                         </div>
-                        <div className={styles.storageWarning}>
-                            ⚠️ Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
-                        </div>
                     </div>
                     <div className={`${styles.headerRight} ${styles.desktopSearch}`}>
-                        <div className={styles.desktopSearch}>
-                            <input
-                                type="text"
-                                placeholder="Search lineups..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className={styles.searchInput}
-                            />
+                        <div className={styles.infoWrapper} ref={infoWrapperRef}>
+                            <button
+                                className={styles.infoButton}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowInfo(!showInfo);
+                                }}
+                                title="Data Management Info"
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </button>
+                            {showInfo && (
+                                <div className={styles.infoPopup}>
+                                    Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
+                                </div>
+                            )}
                         </div>
+                        <input
+                            type="text"
+                            placeholder="Search lineups..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className={styles.searchInput}
+                        />
                     </div>
                 </div>
 
                 <div className={styles.searchRow}>
-                    <input
-                        type="text"
-                        placeholder="Search lineups..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className={styles.searchInput}
-                    />
+                    <div className={styles.mobileSearchWrapper}>
+                        <div className={styles.infoWrapper} ref={infoWrapperRef}>
+                            <button
+                                className={styles.infoButton}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowInfo(!showInfo);
+                                }}
+                                style={{
+                                    borderColor: '#333'
+                                }}
+                                title="Data Management Info"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </button>
+                            {showInfo && (
+                                <div className={styles.infoPopup} style={{ left: '0', right: 'auto' }}>
+                                    Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
+                                </div>
+                            )}
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search lineups..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className={styles.searchInput}
+                        />
+                    </div>
                 </div>
 
                 {activeFilters.length > 0 && onRemoveFilter && (
@@ -1022,10 +1086,27 @@ export default function MyLineups({
                                             </div>
                                         )}
                                         <div
-                                            className={styles.modalCardClass}
+                                            className={styles.modalCardBottom}
                                             style={{ visibility: card ? 'visible' : 'hidden' }}
                                         >
-                                            {card?.custom?.class || 'Class'}
+                                            <div className={styles.modalCardClassBadge}>
+                                                {card?.custom?.class || 'Class'}
+                                            </div>
+                                            {card && (
+                                                <button
+                                                    className={styles.cardInfoButton}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedInfoCard(card);
+                                                    }}
+                                                    title="View details"
+                                                >
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                    </svg>
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
@@ -1297,6 +1378,11 @@ export default function MyLineups({
                     )}
                 </div>
             )}
+            {/* Card Information Modal */}
+            <CardModal
+                card={selectedInfoCard}
+                onClose={() => setSelectedInfoCard(null)}
+            />
         </div>
     );
 }
