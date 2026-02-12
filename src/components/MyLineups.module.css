@@ -1376,8 +1376,17 @@
     }
 
     .titleGroup {
+        display: flex;
+        /* Force horizontal layout */
+        align-items: center;
         gap: 0.5rem;
         flex-shrink: 0;
+    }
+
+    /* Prevent the export button's container from collapsing in the top bar */
+    .titleGroup .confirmationContainer {
+        height: auto !important;
+        position: relative !important;
     }
 
     .title {
@@ -1666,7 +1675,7 @@
     z-index: auto;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
 
     .placeholderCard:hover,
     .placeholderCard:active {
@@ -1684,6 +1693,13 @@
     padding: 10px;
     border-radius: 50%;
     transition: all 0.2s;
+    outline: none;
+}
+
+.addCardButton:focus,
+.addCardButton:focus-visible {
+    outline: none;
+    box-shadow: none;
 }
 
 .addCardButton:hover {
@@ -1712,22 +1728,38 @@
 }
 
 /* Selector Overlay */
-.selectorOverlay {
-    position: absolute;
+.selectorBackdrop {
+    position: fixed;
     top: 0;
     left: 0;
-    /* Counter parent padding if any, assuming standard box model */
-    top: -2rem;
-    left: -2rem;
-    width: calc(100% + 4rem);
-    height: calc(100% + 4rem);
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+}
 
-    background: #1e293b;
-    z-index: 50;
+.selectorOverlay {
+    position: relative;
+    width: 1100px;
+    max-width: 95vw;
+    height: 920px;
+    max-height: 95vh;
+    background-image: url('/bg-pattern.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 3000;
+    /* Highest z-index */
     display: flex;
     flex-direction: column;
     border-radius: 1.5rem;
     overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .selectorHeader {
@@ -1737,17 +1769,24 @@
     padding: 1rem 1.5rem;
     background: rgba(0, 0, 0, 0.3);
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    color: #FFD753;
     font-family: var(--font-display);
     height: 60px;
 }
 
-.selectorHeader h3 {
-    margin: 0;
-    font-size: 1.5rem;
+.selectorHeader span {
+    font-size: 1.7rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: #FFD753;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-bottom: 0;
+    text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
+
+
 
 .selectorBody {
     flex: 1;
@@ -1769,52 +1808,182 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 0;
+    padding: 1rem;
     overflow: hidden;
     position: relative;
 }
 
-.selectorControls {
-    padding: 1rem;
-    padding-bottom: 0;
+
+
+/* Selector overrides for internal CardGrid header (the "MOKIS" header) */
+.selectorGridWrapper :global(div > div:first-child) {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: 1.25rem !important;
 }
 
-.selectorSearch {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    outline: none;
-    border-radius: 8px;
+/* Scoped Fix for Card Texts in Compact Mode (ONLY for selector) */
+.selectorGridWrapper :global([class*="compactImageWrapper"]) {
+    margin-right: 0.75rem !important;
+    /* Standard spacing from photo */
 }
 
-.selectorSearch:focus {
-    background: rgba(255, 255, 255, 0.15);
+.selectorGridWrapper :global([class*="compactInfo"]) {
+    margin-left: 0.75rem !important;
+    /* Add extra spacing to shift the text block further right */
+    gap: 0.2rem !important;
+    justify-content: center !important;
 }
 
-/* Selector overrides */
-.selectorGridWrapper :global(.grid-container) {
-    padding: 1rem;
+.selectorGridWrapper :global([class*="compactName"]) {
+    font-size: 1.05rem !important;
 }
 
-@media (max-width: 768px) {
+.selectorFabFilters,
+.selectorMobileDrawer,
+.selectorMobileDrawerBackdrop {
+    display: none;
+}
+
+@media (max-width: 1024px) {
     .selectorOverlay {
         border-radius: 0;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
+        max-width: 100vw;
+        max-height: 100vh;
         position: fixed;
-        z-index: 2000;
+        z-index: 5000;
         top: 0 !important;
         left: 0 !important;
         margin: 0 !important;
+        transform: none;
+        overflow: visible !important;
     }
 
     .selectorSidebar {
         display: none;
     }
+
+    .selectorGridWrapper {
+        padding: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    /* Target the internal 'MOKIS' header to pull it up in mobile */
+    .selectorGridWrapper :global([class*="headerContainer"]) {
+        position: relative !important;
+        top: 0 !important;
+        margin-top: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+    }
+
+    .mobileFilterToggle {
+        display: flex;
+    }
+
+    .selectorMobileDrawer {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 85%;
+        height: 100%;
+        background: #1e293b;
+        z-index: 9000;
+        /* Above overlay */
+        transition: left 0.3s ease-out;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .selectorMobileDrawerContent {
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .selectorMobileDrawerOpen {
+        left: 0 !important;
+    }
+
+    .selectorFabFilters {
+        display: flex;
+        position: fixed;
+        left: 0;
+        top: 55%;
+        /* Match Builder's fabContainer top 55% */
+        transform: translateY(-50%);
+        width: 54px;
+        height: 54px;
+        background: #FFD753;
+        border: 3px solid #333;
+        border-left: none;
+        border-radius: 0 1.5rem 1.5rem 0;
+        color: #333;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 4px 6px 15px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s, background 0.2s;
+        z-index: 8000;
+        pointer-events: auto;
+    }
+
+    .selectorFabFilters:active {
+        transform: translateY(-50%) translateX(2px);
+        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .selectorMobileDrawerBackdrop {
+        display: block;
+        /* Ensure it's visible on mobile */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 8500;
+        backdrop-filter: blur(8px);
+    }
+}
+
+.mobileOnly {
+    display: none !important;
+}
+
+.selectorCloseButton {
+    width: 32px;
+    height: 32px;
+    background: #FF66CC;
+    border: 3px solid #333333;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+    padding: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.selectorCloseButton:hover {
+    transform: scale(1.1);
+    background: #FF99DD !important;
+}
+
+.selectorCloseButton svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 3px;
+    filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }

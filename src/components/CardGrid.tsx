@@ -32,10 +32,11 @@ interface CardRowProps {
     onAddCard: (card: EnhancedCard) => void;
     setSelectedModalCard: (card: EnhancedCard | null) => void;
     currentLineup: EnhancedCard[];
+    paddingX: number;
 }
 
 // CardRow defined to accept props directly (merged rowProps)
-const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard, setSelectedModalCard, currentLineup }: { index: number; style: CSSProperties } & CardRowProps) => {
+const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard, setSelectedModalCard, currentLineup, paddingX }: { index: number; style: CSSProperties } & CardRowProps) => {
     const startIndex = index * itemsPerRow;
     const rowCards = cards.slice(startIndex, startIndex + itemsPerRow);
 
@@ -47,8 +48,8 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
                 display: 'grid',
                 gridTemplateColumns: `repeat(${itemsPerRow}, 1fr)`,
                 columnGap: `${colGap}px`,
-                width: 'calc(100% - 24px)',
-                marginLeft: '12px',
+                width: `calc(100% - ${paddingX}px)`,
+                left: `${paddingX / 2}px`,
                 height: (style.height as number),
                 alignItems: 'flex-start',
                 overflow: 'visible',
@@ -414,9 +415,11 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                                 else itemsPerRow = 2;
                             }
 
+                            // Horizontal padding must match headerContainer padding (16px mobile, 24px desktop)
+                            const paddingX = w < 600 ? 32 : 48;
+                            const availableWidth = w - paddingX;
                             const colGap = w < 600 ? 8 : 16;
                             const rowGap = 2;
-                            const availableWidth = w - (w < 600 ? 16 : 24);
                             const colWidth = Math.max(0, (availableWidth - (colGap * (itemsPerRow - 1))) / itemsPerRow);
 
                             const rowHeight = viewMode === 'grid'
@@ -432,7 +435,6 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                                         width: w,
                                         overflowX: 'visible',
                                         overflowY: 'auto',
-                                        paddingTop: '10px',
                                     }}
                                     rowCount={rowCount}
                                     rowHeight={rowHeight + rowGap}
@@ -443,7 +445,8 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                                         colGap,
                                         viewMode,
                                         setSelectedModalCard,
-                                        currentLineup
+                                        currentLineup,
+                                        paddingX
                                     }}
                                     rowComponent={CardRow}
                                     overscanCount={2}

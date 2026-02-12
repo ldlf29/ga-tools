@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import ExcelJS from 'exceljs';
 import CardGrid from './CardGrid';
+import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 
 interface MyLineupsProps {
     lineups: SavedLineup[];
@@ -83,6 +84,16 @@ export default function MyLineups({
         cardType: 'MOKI',
         rarity: [], schemeName: [], fur: [], stars: [], customClass: [], specialization: [], traits: [], insertionOrder: []
     });
+    const [selectorMobileFiltersOpen, setSelectorMobileFiltersOpen] = useState(false);
+
+    // Reset mobile filters when closing selector
+    useEffect(() => {
+        if (selectorSlot === null) {
+            setSelectorMobileFiltersOpen(false);
+        }
+    }, [selectorSlot]);
+
+    const filteredSelectorCards = useWorkerFilter(allCards, selectorFilters, selectorSearch);
 
     const handleExportExcel = async () => {
         const favorites = favoriteLineups;
@@ -378,6 +389,12 @@ export default function MyLineups({
             document.body.style.overflow = 'hidden';
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
+                    // If selector is open, just close it and stop
+                    if (selectorSlot !== null) {
+                        setSelectorSlot(null);
+                        return;
+                    }
+
                     // If we are editing, we must validate and save first
                     if (editingId !== null) {
                         if (tempName.length > 20) {
@@ -405,7 +422,7 @@ export default function MyLineups({
             document.body.style.overflow = 'unset';
             return () => { document.body.style.overflow = 'unset'; };
         }
-    }, [expandedId, editingId, tempName, hasChanges]);
+    }, [expandedId, editingId, tempName, hasChanges, selectorSlot]);
 
     const lineupRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
@@ -892,16 +909,18 @@ export default function MyLineups({
                         }}
                     >
                         {/* Close Button */}
-                        <button
-                            className={`${styles.modalCloseButton} ${styles.excludeFromCapture}`}
-                            onClick={handleCloseModal}
-                            title="Close"
-                        >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
+                        {selectorSlot === null && (
+                            <button
+                                className={`${styles.modalCloseButton} ${styles.excludeFromCapture}`}
+                                onClick={handleCloseModal}
+                                title="Close"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        )}
 
                         {/* Header Row: Download | Title */}
                         <div className={styles.modalHeaderRow}>
@@ -1148,56 +1167,6 @@ export default function MyLineups({
                             </div>
                         </div>
 
-                        {/* Selector Overlay */}
-                        {selectorSlot !== null && (
-                            <div className={styles.selectorOverlay}>
-                                <div className={styles.selectorHeader}>
-                                    <h3>Select {selectorSlot === 4 ? 'Scheme' : 'Moki'}</h3>
-                                    <button
-                                        className={styles.modalCloseButton}
-                                        onClick={() => setSelectorSlot(null)}
-                                        style={{ position: 'relative', top: 0, right: 0, marginLeft: 'auto' }}
-                                    >
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                <div className={styles.selectorBody}>
-                                    <div className={styles.selectorSidebar}>
-                                        <FilterSidebar
-                                            filters={selectorFilters}
-                                            onFilterChange={setSelectorFilters}
-                                            // Lock card type based on slot
-                                            onCardTypeChange={() => { }}
-                                        />
-                                    </div>
-                                    <div className={styles.selectorGridWrapper}>
-                                        <div className={styles.selectorControls}>
-                                            <input
-                                                type="text"
-                                                placeholder="Search by name, class, trait..."
-                                                value={selectorSearch}
-                                                onChange={(e) => setSelectorSearch(e.target.value)}
-                                                className={styles.selectorSearch}
-                                                autoFocus
-                                            />
-                                        </div>
-                                        <CardGrid
-                                            cards={allCards}
-                                            onAddCard={handleCardSelect}
-                                            searchQuery={selectorSearch}
-                                            onSearchChange={setSelectorSearch}
-                                            currentLineup={localCards.filter(c => c) as EnhancedCard[]}
-                                            filters={selectorFilters}
-                                            onRemoveFilter={handleSelectorRemoveFilter}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                         {/* Discard Confirmation Modal (Inline) */}
                         {showDiscardConfirm && (
                             <div className={styles.deleteConfirmationMenu} style={{
@@ -1235,6 +1204,88 @@ export default function MyLineups({
                             </div>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Selector Overlay - Moved outside modalContent to avoid transform issues */}
+            {selectorSlot !== null && (
+                <div className={styles.selectorBackdrop} onClick={() => setSelectorSlot(null)}>
+                    <div className={styles.selectorOverlay} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.selectorHeader}>
+                            <span>SELECT A CARD</span>
+                            <div className={styles.selectorHeaderActions}>
+                                <button
+                                    className={styles.selectorCloseButton}
+                                    onClick={() => setSelectorSlot(null)}
+                                    title="Close"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.selectorBody}>
+                            <div className={styles.selectorSidebar}>
+                                <FilterSidebar
+                                    filters={selectorFilters}
+                                    onFilterChange={setSelectorFilters}
+                                    onCardTypeChange={() => { }}
+                                />
+                            </div>
+                            <div className={styles.selectorGridWrapper}>
+                                <CardGrid
+                                    cards={filteredSelectorCards}
+                                    onAddCard={handleCardSelect}
+                                    searchQuery={selectorSearch}
+                                    onSearchChange={setSelectorSearch}
+                                    currentLineup={localCards.filter(c => c) as EnhancedCard[]}
+                                    filters={selectorFilters}
+                                    onRemoveFilter={handleSelectorRemoveFilter}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Floating Filter Button (Mobile only) */}
+                    <button
+                        className={styles.selectorFabFilters}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectorMobileFiltersOpen(true);
+                        }}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                    </button>
+
+                    {/* Mobile Filters Drawer */}
+                    <div
+                        className={`${styles.selectorMobileDrawer} ${selectorMobileFiltersOpen ? styles.selectorMobileDrawerOpen : ''}`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className={styles.selectorMobileDrawerContent}>
+                            <FilterSidebar
+                                filters={selectorFilters}
+                                onFilterChange={setSelectorFilters}
+                                onCardTypeChange={() => { }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Backdrop for selector mobile drawer */}
+                    {selectorMobileFiltersOpen && (
+                        <div
+                            className={styles.selectorMobileDrawerBackdrop}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectorMobileFiltersOpen(false);
+                            }}
+                        />
+                    )}
                 </div>
             )}
         </div>
