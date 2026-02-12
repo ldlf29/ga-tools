@@ -8,6 +8,7 @@ import LineupBuilder from '@/components/LineupBuilder';
 import { EnhancedCard, FilterState, SavedLineup } from '@/types';
 import styles from './page.module.css';
 import Toast, { ToastMessage } from '@/components/Toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Lazy Loaded Components
 const MyLineups = dynamic(() => import('@/components/MyLineups'), {
@@ -403,11 +404,29 @@ export default function Home() {
 
       {/* Mobile Filters Drawer */}
       <div className={`${styles.mobileDrawer} ${styles.filterDrawer} ${styles.mobileOnly} ${mobileFiltersOpen ? styles.filterDrawerOpen : ''}`}>
+        <button
+          className={`${styles.drawerCloseButton} ${styles.filterCloseButton}`}
+          onClick={() => setMobileFiltersOpen(false)}
+          aria-label="Close Filters"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
         <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
       </div>
 
       {/* Mobile Builder Drawer */}
       <div className={`${styles.mobileDrawer} ${styles.builderDrawer} ${styles.mobileOnly} ${mobileBuilderOpen ? styles.builderDrawerOpen : ''}`}>
+        <button
+          className={`${styles.drawerCloseButton} ${styles.builderCloseButton}`}
+          onClick={() => setMobileBuilderOpen(false)}
+          aria-label="Close Builder"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
         <LineupBuilder
           lineup={lineup}
           onRemove={removeFromLineup}
@@ -570,7 +589,7 @@ export default function Home() {
             </button>
             <button className={`${styles.fabButton} ${styles.fabBuilder}`} onClick={() => setMobileBuilderOpen(true)}>
               {/* Hammer Icon PNG from public */}
-              <img src="/hammer.png" alt="Hammer" width={32} height={32} style={{ filter: 'brightness(0) invert(1)' }} />
+              <img src="/hammer.png" alt="Hammer" width={27} height={27} style={{ filter: 'brightness(0) invert(1)' }} />
             </button>
           </div>
 

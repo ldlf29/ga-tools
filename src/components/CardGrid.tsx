@@ -164,7 +164,20 @@ const CardRow = ({ index, style, cards, itemsPerRow, colGap, viewMode, onAddCard
 };
 
 export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange, currentLineup, filters, onRemoveFilter, onRefresh }: CardGridProps) {
-    const [sortOption, setSortOption] = useState<SortOption>('default');
+    const [mokiSortOption, setMokiSortOption] = useState<SortOption>('default');
+    const [schemeSortOption, setSchemeSortOption] = useState<SortOption>('default');
+
+    const sortOption = filters.cardType === 'SCHEME' ? schemeSortOption : mokiSortOption;
+
+    const handleSortChange = (option: SortOption) => {
+        if (filters.cardType === 'SCHEME') {
+            setSchemeSortOption(option);
+        } else {
+            setMokiSortOption(option);
+        }
+        setDropdownOpen(false);
+    };
+
     const [selectedModalCard, setSelectedModalCard] = useState<EnhancedCard | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -315,13 +328,17 @@ export default function CardGrid({ cards, onAddCard, searchQuery, onSearchChange
                             </button>
                             {dropdownOpen && (
                                 <ul className={styles.orderByMenu}>
-                                    <li onClick={() => { setSortOption('default'); setDropdownOpen(false); }} className={sortOption === 'default' ? styles.activeSort : ''}>Default</li>
-                                    <li onClick={() => { setSortOption('name_asc'); setDropdownOpen(false); }} className={sortOption === 'name_asc' ? styles.activeSort : ''}>Name A → Z</li>
-                                    <li onClick={() => { setSortOption('name_desc'); setDropdownOpen(false); }} className={sortOption === 'name_desc' ? styles.activeSort : ''}>Name Z → A</li>
-                                    <li onClick={() => { setSortOption('rarity_desc'); setDropdownOpen(false); }} className={sortOption === 'rarity_desc' ? styles.activeSort : ''}>Rarity High → Low</li>
-                                    <li onClick={() => { setSortOption('rarity_asc'); setDropdownOpen(false); }} className={sortOption === 'rarity_asc' ? styles.activeSort : ''}>Rarity Low → High</li>
-                                    <li onClick={() => { setSortOption('stars_desc'); setDropdownOpen(false); }} className={sortOption === 'stars_desc' ? styles.activeSort : ''}>Stars High → Low</li>
-                                    <li onClick={() => { setSortOption('stars_asc'); setDropdownOpen(false); }} className={sortOption === 'stars_asc' ? styles.activeSort : ''}>Stars Low → High</li>
+                                    <li onClick={() => handleSortChange('default')} className={sortOption === 'default' ? styles.activeSort : ''}>Default</li>
+                                    <li onClick={() => handleSortChange('name_asc')} className={sortOption === 'name_asc' ? styles.activeSort : ''}>Name A → Z</li>
+                                    <li onClick={() => handleSortChange('name_desc')} className={sortOption === 'name_desc' ? styles.activeSort : ''}>Name Z → A</li>
+                                    {filters.cardType !== 'SCHEME' && (
+                                        <>
+                                            <li onClick={() => handleSortChange('rarity_desc')} className={sortOption === 'rarity_desc' ? styles.activeSort : ''}>Rarity High → Low</li>
+                                            <li onClick={() => handleSortChange('rarity_asc')} className={sortOption === 'rarity_asc' ? styles.activeSort : ''}>Rarity Low → High</li>
+                                            <li onClick={() => handleSortChange('stars_desc')} className={sortOption === 'stars_desc' ? styles.activeSort : ''}>Stars High → Low</li>
+                                            <li onClick={() => handleSortChange('stars_asc')} className={sortOption === 'stars_asc' ? styles.activeSort : ''}>Stars Low → High</li>
+                                        </>
+                                    )}
                                 </ul>
                             )}
                         </div>

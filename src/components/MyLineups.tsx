@@ -1257,7 +1257,7 @@ export default function MyLineups({
                             setSelectorMobileFiltersOpen(true);
                         }}
                     >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                         </svg>
                     </button>
@@ -1267,6 +1267,15 @@ export default function MyLineups({
                         className={`${styles.selectorMobileDrawer} ${selectorMobileFiltersOpen ? styles.selectorMobileDrawerOpen : ''}`}
                         onClick={(e) => e.stopPropagation()}
                     >
+                        <button
+                            className={styles.selectorDrawerCloseButton}
+                            onClick={() => setSelectorMobileFiltersOpen(false)}
+                            aria-label="Close Filters"
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
                         <div className={styles.selectorMobileDrawerContent}>
                             <FilterSidebar
                                 filters={selectorFilters}

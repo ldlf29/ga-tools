@@ -45,7 +45,7 @@
     background: #84BCFF;
     padding: 1rem 1.5rem;
     margin-left: -1.5rem;
-    margin-right: -1.5rem;
+    margin-right: 0;
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
@@ -1802,6 +1802,12 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.selectorSidebar::-webkit-scrollbar {
+    display: none;
 }
 
 .selectorGridWrapper {
@@ -1900,6 +1906,49 @@
         display: flex;
         flex-direction: column;
         box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+        overflow: visible !important;
+    }
+
+    .selectorDrawerCloseButton {
+        position: absolute;
+        top: 55%;
+        right: -29px;
+        /* Positioned outside on the right edge */
+        transform: translateY(-50%);
+        width: 26px;
+        height: 50px;
+        background: #FFD753;
+        border: 3px solid #333;
+        border-left: none;
+        border-radius: 0 1.5rem 1.5rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        z-index: 9001;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.2s;
+        color: #333;
+        padding: 0;
+    }
+
+    .selectorDrawerCloseButton svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 4px;
+        transform: translateX(-1.5px);
+        filter: drop-shadow(1px 0 0 rgba(0, 0, 0, 0.1)) drop-shadow(-1px 0 0 rgba(0, 0, 0, 0.1));
+    }
+
+    .selectorMobileDrawerOpen .selectorDrawerCloseButton {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .selectorDrawerCloseButton:active {
+        transform: translateY(-50%) scale(0.95);
     }
 
     .selectorMobileDrawerContent {
@@ -1918,7 +1967,7 @@
         top: 55%;
         /* Match Builder's fabContainer top 55% */
         transform: translateY(-50%);
-        width: 54px;
+        width: 38px;
         height: 54px;
         background: #FFD753;
         border: 3px solid #333;
@@ -1932,6 +1981,10 @@
         transition: transform 0.2s, background 0.2s;
         z-index: 8000;
         pointer-events: auto;
+    }
+
+    .selectorFabFilters svg {
+        transform: translateX(-1.5px);
     }
 
     .selectorFabFilters:active {
