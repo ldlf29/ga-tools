@@ -572,15 +572,7 @@ export default function MyLineups({
 
                 {deleteConfirmId === lineup.id && (
                     <div
-                        className={styles.deleteConfirmationMenu}
-                        style={{
-                            top: '35px',
-                            right: '-10px',
-                            width: '180px',
-                            minWidth: 'auto',
-                            padding: '0.75rem',
-                            cursor: 'default'
-                        }}
+                        className={styles.individualDeleteMenu}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className={styles.deleteConfirmationText}>Delete this lineup?</div>
@@ -694,7 +686,7 @@ export default function MyLineups({
                     DELETE ALL
                 </button>
                 {deleteConfirmSection === section && (
-                    <div className={styles.deleteConfirmationMenu}>
+                    <div className={styles.bulkDeleteMenu}>
                         <div className={styles.deleteConfirmationText}>Are you sure you want to delete all your lineups?</div>
                         <div className={styles.deleteActions}>
                             <button
@@ -1266,7 +1258,7 @@ export default function MyLineups({
                                 top: '50%',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
-                                width: '300px'
+                                width: '260px'
                             }} onClick={(e) => e.stopPropagation()}>
                                 <div className={styles.deleteConfirmationText}>Discard unsaved changes?</div>
                                 <div className={styles.deleteActions}>
