@@ -1,0 +1,24 @@
+﻿.confirmationMenu {
+
+    position: absolute;
+
+    top: 100%;
+
+    right: 0;
+
+    background: #5097FF;
+
+    border: 1px dashed #333333;
+
+    border-radius: 0.75rem;
+
+    padding: 1rem;
+
+    text-align: center;
+
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+
+    z-index: 100;
+
+}
+

@@ -739,7 +739,7 @@ export default function MyLineups({
                                 </svg>
                             </button>
                             {exportConfirmOpen && (
-                                <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF', width: '280px', left: '0', top: '45px' }}>
+                                <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF' }}>
                                     <div className={styles.deleteConfirmationText}>Would you like to download your favorite lineups in Excel?</div>
                                     <div className={styles.deleteActions}>
                                         <button

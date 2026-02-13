@@ -54,6 +54,13 @@
   margin: 0;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
 body {
   background-color: var(--color-bg-dark);
   background-image: url('/bg-pattern.webp');
@@ -121,4 +128,26 @@ button {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #15A085;
+}
+/* Global fix for mobile confirmation menus */
+/* Global fix for mobile confirmation menus */
+@media (max-width: 768px) {
+  [class*='confirmationMenu'] {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: 280px !important;
+    max-width: 90vw !important;
+    top: 45px !important;
+  }
+  
+  /* Slightly more to the right for My Lineups */
+  [class*='deleteConfirmationMenu'] {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-40%) !important;
+    width: 280px !important;
+    max-width: 90vw !important;
+    top: 45px !important;
+  }
 }

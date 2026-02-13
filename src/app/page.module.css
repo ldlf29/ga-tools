@@ -263,7 +263,8 @@
     border-radius: 0;
     border-left: 4px solid #000;
     overflow-y: auto;
-    /* Allow scroll if content is long */
+    overflow-x: hidden;
+    /* Prevent horizontal shift */
   }
 
   .navContainerVisible {
@@ -595,12 +596,11 @@
 .fabContainer {
   display: none;
   position: fixed;
-  top: 55%;
-  /* Middle of the screen */
+  top: 55dvh;
+  /* Use dynamic viewport height */
   left: 0;
   right: 0;
   pointer-events: none;
-  /* Allow clicks through container */
   z-index: 150;
   flex-direction: row;
   justify-content: space-between;
@@ -711,11 +711,10 @@
     left: 0;
     bottom: 0;
     width: 320px;
-    /* Fixed width */
     max-width: 85vw;
-    height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport height is more reliable on mobile */
     transform: translateX(-110%);
-    /* Hide off-screen left */
     box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
@@ -734,16 +733,14 @@
     bottom: 0;
     width: 320px;
     max-width: 85vw;
-    height: 100vh;
+    height: 100dvh;
     transform: translateX(110%);
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1000;
     overflow: visible !important;
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* IE/Edge */
   }
 
   .builderDrawer::-webkit-scrollbar {
@@ -758,7 +755,8 @@
   /* Drawer Close Buttons */
   .drawerCloseButton {
     position: absolute;
-    top: 55%;
+    top: 55dvh;
+    /* Match the fabContainer position exactly */
     transform: translateY(-50%);
     width: 26px;
     height: 50px;
