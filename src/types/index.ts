@@ -55,7 +55,7 @@ export interface FilterState {
 }
 
 export const TRAIT_GROUPS = [
-    { label: "Ronin or Samurai", traits: ["Ronin", "Samurai"] },
+    { label: "Ronin or Samurai", traits: ["Ronin", "Samurai", "Ronin Aurora", "Ronin Moon"] },
     { label: "Pink, Blue or Green Overalls", traits: ["Pink Overalls", "Blue Overalls", "Green Overalls"] },
     { label: "Tongue Out", traits: ["Tongue Out"] },
     { label: "Tanuki, Kitsune or Cat Mask", traits: ["Tanuki", "Kitsune", "Cat Mask"] },

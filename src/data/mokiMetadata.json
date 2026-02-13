@@ -152,7 +152,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_921564b2ac23d177f500c7f55fc2c4fcead0a7d36cb2167bb73b96e169ea8f82_300x300.png",
     "fur": "Common",
     "traits": [
-      "Banana Onesie"
+      "Banana Onesie",
+      "Ronin Aurora"
     ],
     "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/807"
   },
@@ -574,7 +575,9 @@
     "name": "Kroni",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_cdd555ccac094f0c1b3d737dbaf711db2987ca18d5da7d339e9b108d467debe9_300x300.png",
     "fur": "Common",
-    "traits": [],
+    "traits": [
+      "Ronin Aurora"
+    ],
     "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3246"
   },
   "CAMMYYY": {
@@ -835,7 +838,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_6b31ae120274eb17e256e7801b0263225d1498261e65e4dd06ce8008728b9738_300x300.png",
     "fur": "Common",
     "traits": [
-      "Tongue Out"
+      "Tongue Out",
+      "Ronin Moon"
     ],
     "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4642"
   },
@@ -1260,7 +1264,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_b26a231cc164ddc7bab80dd9236d14aadd3d8a3f08522a127eb1533052624a0b_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Straw Kimono"
+      "Straw Kimono",
+      "Ronin Aurora"
     ],
     "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6824"
   },
