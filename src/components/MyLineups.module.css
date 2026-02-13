@@ -609,16 +609,17 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.85);
-    z-index: 500;
+    z-index: 2500;
     display: flex;
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(5px);
     padding: 2rem;
     overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .modalContent {
@@ -1258,6 +1259,17 @@
     z-index: 100;
 }
 
+.discardConfirmationMenu {
+    background: #5097FF;
+    border: 3px solid #333;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    list-style: none;
+    z-index: 2000;
+}
+
 @media (max-width: 768px) {
     .deleteConfirmationMenu {
         left: 50% !important;
@@ -1601,10 +1613,14 @@
 
     /* Modal Responsive Styles */
     .modalOverlay {
-        z-index: 2000;
+        z-index: 3000;
         align-items: flex-start;
         /* Start from top to avoid header overlap */
         padding: 4rem 1rem 1rem 1rem;
+        height: auto !important;
+        bottom: 0 !important;
+        backdrop-filter: none !important;
+        /* Disable blur on mobile to prevent jitter */
     }
 
     .modalContent {
@@ -1628,6 +1644,8 @@
         align-items: center;
         padding: 5px 15px;
         box-sizing: border-box;
+        min-height: 50px;
+        /* Stabilize height for editing */
     }
 }
 

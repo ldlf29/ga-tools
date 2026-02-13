@@ -54,7 +54,8 @@ export default function MyLineups({
     const [othersSort, setOthersSort] = useState<SortOption>('default');
     const [activeDropdown, setActiveDropdown] = useState<'favorites' | 'others' | null>(null);
     const [activeBackground, setActiveBackground] = useState<string>('default');
-    const [showInfo, setShowInfo] = useState(false);
+    const [showDataInfo, setShowDataInfo] = useState(false);
+    const [showRatingInfo, setShowRatingInfo] = useState(false);
     const infoWrapperRef = useRef<HTMLDivElement>(null);
     const [selectedInfoCard, setSelectedInfoCard] = useState<EnhancedCard | null>(null);
 
@@ -329,14 +330,14 @@ export default function MyLineups({
     };
 
     useEffect(() => {
-        if (showInfo) {
+        if (showDataInfo) {
             const timer = setTimeout(() => {
-                setShowInfo(false);
+                setShowDataInfo(false);
             }, 5000);
 
             const handleClickOutside = (event: MouseEvent) => {
                 if (infoWrapperRef.current && !infoWrapperRef.current.contains(event.target as Node)) {
-                    setShowInfo(false);
+                    setShowDataInfo(false);
                 }
             };
             document.addEventListener('mousedown', handleClickOutside);
@@ -345,7 +346,16 @@ export default function MyLineups({
                 document.removeEventListener('mousedown', handleClickOutside);
             };
         }
-    }, [showInfo]);
+    }, [showDataInfo]);
+
+    useEffect(() => {
+        if (showRatingInfo) {
+            const timer = setTimeout(() => {
+                setShowRatingInfo(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [showRatingInfo]);
 
     const filteredLineups = useMemo(() => {
         return lineups.filter(l => {
@@ -540,7 +550,8 @@ export default function MyLineups({
                 className={styles.lineupCard}
                 onClick={() => {
                     setExpandedId(lineup.id);
-                    setShowInfo(false);
+                    setShowDataInfo(false);
+                    setShowRatingInfo(false);
                 }}
                 style={bgStyle}
             >
@@ -772,7 +783,7 @@ export default function MyLineups({
                                 className={styles.infoButton}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setShowInfo(!showInfo);
+                                    setShowDataInfo(!showDataInfo);
                                 }}
                                 title="Data Management Info"
                             >
@@ -782,7 +793,7 @@ export default function MyLineups({
                                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                 </svg>
                             </button>
-                            {showInfo && (
+                            {showDataInfo && (
                                 <div className={styles.infoPopup}>
                                     Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
                                 </div>
@@ -805,7 +816,7 @@ export default function MyLineups({
                                 className={styles.infoButton}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setShowInfo(!showInfo);
+                                    setShowDataInfo(!showDataInfo);
                                 }}
                                 style={{
                                     borderColor: '#333'
@@ -818,7 +829,7 @@ export default function MyLineups({
                                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                 </svg>
                             </button>
-                            {showInfo && (
+                            {showDataInfo && (
                                 <div className={styles.infoPopup} style={{ left: '0', right: 'auto' }}>
                                     Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
                                 </div>
@@ -1185,16 +1196,16 @@ export default function MyLineups({
                             <div id="rating-slider-container" className={styles.ratingSliderContainer}>
                                 <div className={styles.ratingSliderWrapper}>
                                     <div className={styles.infoContainerDesktop}>
-                                        <div className={`${styles.infoMessage} ${showInfo ? styles.infoMessageVisible : ''}`}>
+                                        <div className={`${styles.infoMessage} ${showRatingInfo ? styles.infoMessageVisible : ''}`}>
                                             BuffMoki rates your lineup
                                         </div>
                                         <div
                                             className={styles.infoButtonIcon}
-                                            onClick={() => setShowInfo(!showInfo)}
+                                            onClick={() => setShowRatingInfo(!showRatingInfo)}
                                             style={{
-                                                backgroundColor: showInfo ? 'rgba(255, 215, 83, 0.3)' : '',
-                                                borderColor: showInfo ? '#FFD753' : '',
-                                                color: showInfo ? '#FFD753' : ''
+                                                backgroundColor: showRatingInfo ? 'rgba(255, 215, 83, 0.3)' : '',
+                                                borderColor: showRatingInfo ? '#FFD753' : '',
+                                                color: showRatingInfo ? '#FFD753' : ''
                                             }}
                                             title="Click for info"
                                         >
@@ -1205,7 +1216,7 @@ export default function MyLineups({
                                         value={expandedLineup.rating || 0}
                                         onChange={(val) => {
                                             onRate(expandedLineup.id, val);
-                                            if (showInfo) setShowInfo(false);
+                                            if (showRatingInfo) setShowRatingInfo(false);
                                         }}
                                     />
                                 </div>
@@ -1216,17 +1227,17 @@ export default function MyLineups({
                                 <div className={styles.infoContainerMobile}>
                                     <div
                                         className={styles.infoButtonIcon}
-                                        onClick={() => setShowInfo(!showInfo)}
+                                        onClick={() => setShowRatingInfo(!showRatingInfo)}
                                         style={{
-                                            backgroundColor: showInfo ? 'rgba(255, 215, 83, 0.3)' : '',
-                                            borderColor: showInfo ? '#FFD753' : '',
-                                            color: showInfo ? '#FFD753' : ''
+                                            backgroundColor: showRatingInfo ? 'rgba(255, 215, 83, 0.3)' : '',
+                                            borderColor: showRatingInfo ? '#FFD753' : '',
+                                            color: showRatingInfo ? '#FFD753' : ''
                                         }}
                                         title="Click for info"
                                     >
                                         i
                                     </div>
-                                    <div className={`${styles.infoMessageMobile} ${showInfo ? styles.infoMessageMobileVisible : ''}`}>
+                                    <div className={`${styles.infoMessageMobile} ${showRatingInfo ? styles.infoMessageMobileVisible : ''}`}>
                                         BuffMoki rates your lineup
                                     </div>
                                 </div>
@@ -1250,15 +1261,12 @@ export default function MyLineups({
 
                         {/* Discard Confirmation Modal (Inline) */}
                         {showDiscardConfirm && (
-                            <div className={styles.deleteConfirmationMenu} style={{
+                            <div className={styles.discardConfirmationMenu} style={{
                                 position: 'fixed',
                                 top: '50%',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
-                                zIndex: 2000,
-                                width: '300px',
-                                border: '3px solid #333',
-                                boxShadow: '0 10px 25px rgba(0,0,0,0.5)'
+                                width: '300px'
                             }} onClick={(e) => e.stopPropagation()}>
                                 <div className={styles.deleteConfirmationText}>Discard unsaved changes?</div>
                                 <div className={styles.deleteActions}>
