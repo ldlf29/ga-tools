@@ -2,6 +2,7 @@ import catalogData from '../data/catalog.json';
 import mokiMetadataRaw from '../data/mokiMetadata.json';
 
 interface MokiMetadata {
+    id?: string;
     name: string;
     portraitUrl?: string;
     fur?: string;
@@ -13,6 +14,7 @@ const mokiMetadata = mokiMetadataRaw as Record<string, MokiMetadata>;
 
 export interface MokiData {
     id?: string;
+    tokenId?: number;
     name: string;
     class: string;
     stars: number;
@@ -23,6 +25,11 @@ export interface MokiData {
     wartDistance?: number;
     score?: number;
     winRate?: number;
+    avgEliminations?: number;
+    avgDeposits?: number;
+    avgWartDistance?: number;
+    avgScore?: number;
+    avgWinRate?: number;
     imageUrl?: string;
     defense?: number;
     dexterity?: number;
@@ -68,6 +75,7 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
                 statsWithIdentity[name].fur = identity.fur || statsWithIdentity[name].fur || "";
                 statsWithIdentity[name].traits = (identity.traits && identity.traits.length > 0) ? identity.traits : (statsWithIdentity[name].traits || []);
                 statsWithIdentity[name].marketLink = identity.marketLink || statsWithIdentity[name].marketLink;
+                statsWithIdentity[name].tokenId = identity.id ? parseInt(identity.id, 10) : undefined;
             } else {
                 // If a Moki exists in our identity database but isn't in the stats sheet yet
                 statsWithIdentity[name] = {
@@ -77,7 +85,8 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
                     stars: 0,
                     fur: identity.fur || "",
                     traits: identity.traits || [],
-                    marketLink: identity.marketLink || ""
+                    marketLink: identity.marketLink || "",
+                    tokenId: identity.id ? parseInt(identity.id, 10) : undefined
                 };
             }
         });
@@ -97,7 +106,8 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
                 stars: 0,
                 fur: identity.fur || "",
                 traits: identity.traits || [],
-                marketLink: identity.marketLink || ""
+                marketLink: identity.marketLink || "",
+                tokenId: identity.id ? parseInt(identity.id, 10) : undefined
             };
         });
         return fallbackData;

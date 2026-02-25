@@ -1,0 +1,17 @@
+name: Sync Matches (10 Mins)
+
+on:
+  schedule:
+    # Runs every 10 minutes, offset by 5 minutes from the top of the hour
+    # i.e., 05, 15, 25, 35, 45, 55
+    - cron: '5,15,25,35,45,55 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Match History API
+        run: |
+          curl -X GET '${{ secrets.VERCEL_URL }}/api/cron/sync-matches?secret=${{ secrets.CRON_SECRET }}' \
+          --fail

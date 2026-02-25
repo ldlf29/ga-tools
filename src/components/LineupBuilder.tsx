@@ -5,6 +5,7 @@ import styles from './LineupBuilder.module.css';
 import { useState } from 'react';
 import NextImage from 'next/image';
 import { SCHEME_SUGGESTIONS } from '@/data/schemes';
+import { getCardCharacterImage } from '@/utils/cardService';
 
 interface LineupBuilderProps {
     lineup: EnhancedCard[];
@@ -156,7 +157,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                         </button>
                                         <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0, marginRight: '0.75rem' }}>
                                             <NextImage
-                                                src={card.custom.characterImage || card.image}
+                                                src={getCardCharacterImage(card)}
                                                 alt={card.name}
                                                 width={48}
                                                 height={48}
@@ -230,7 +231,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                 </button>
                                 <div style={{ position: 'relative', width: 48, height: 48, flexShrink: 0, marginRight: '0.75rem' }}>
                                     <NextImage
-                                        src={schemeCard.custom.characterImage || schemeCard.image}
+                                        src={getCardCharacterImage(schemeCard)}
                                         alt={schemeCard.name}
                                         width={48}
                                         height={48}

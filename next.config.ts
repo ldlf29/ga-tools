@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -41,6 +42,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '*.public.blob.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com',
       }
     ],
   },
@@ -59,7 +64,7 @@ const nextConfig: NextConfig = {
               default-src 'self';
               script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vaul.emilkowal.ski https://vercel.live;
               style-src 'self' 'unsafe-inline';
-              img-src 'self' blob: data: https://*.public.blob.vercel-storage.com https://lh1.googleusercontent.com https://lh2.googleusercontent.com https://lh3.googleusercontent.com https://lh4.googleusercontent.com https://lh5.googleusercontent.com https://lh6.googleusercontent.com https://lh7.googleusercontent.com https://drive.google.com;
+              img-src 'self' blob: data: https://*.public.blob.vercel-storage.com https://lh1.googleusercontent.com https://lh2.googleusercontent.com https://lh3.googleusercontent.com https://lh4.googleusercontent.com https://lh5.googleusercontent.com https://lh6.googleusercontent.com https://lh7.googleusercontent.com https://drive.google.com https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com;
               font-src 'self';
               connect-src 'self' https://*.supabase.co https://vercel.live;
               worker-src 'self' blob:;

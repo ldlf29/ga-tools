@@ -1,7 +1,7 @@
 'use client';
 
 import { EnhancedCard, SavedLineup, FilterState } from '@/types';
-import { getCardGroupKey } from '@/utils/cardService';
+import { getCardGroupKey, getCardCharacterImage } from '@/utils/cardService';
 import { matchesFilter } from '@/utils/filterUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 import styles from './MyLineups.module.css';
@@ -35,6 +35,7 @@ interface MyLineupsProps {
     // New props for editing
     allCards: EnhancedCard[];
     onUpdateLineup: (id: number, cards: EnhancedCard[]) => void;
+    isUserMode?: boolean;
 }
 
 type SortOption = 'default' | 'name_asc' | 'name_desc' | 'rating_desc' | 'rating_asc';
@@ -43,7 +44,7 @@ export default function MyLineups({
     lineups, onDelete, onRename, onToggleFavorite, onRate,
     onUpdateBackground, onBulkDelete, onError, filters, onRemoveFilter,
     favoritesOpen, setFavoritesOpen, allLineupsOpen, setAllLineupsOpen,
-    allCards, onUpdateLineup
+    allCards, onUpdateLineup, isUserMode
 }: MyLineupsProps) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -101,7 +102,10 @@ export default function MyLineups({
 
     const handleExportExcel = async () => {
         const favorites = favoriteLineups;
-        if (favorites.length === 0) return;
+        if (favorites.length === 0) {
+            onError("No lineups in favorite!");
+            return;
+        }
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Favorite Lineups');
@@ -483,12 +487,24 @@ export default function MyLineups({
             });
 
             try {
+                // Clear any text selection that might cause "selection" artifacts
+                window.getSelection()?.removeAllRanges();
+
                 const canvas = await html2canvas(lineupRef.current, {
                     useCORS: true,
-                    allowTaint: true,
+                    allowTaint: false,
                     scale: 2,
                     backgroundColor: null,
                     logging: false,
+                    onclone: (clonedDoc) => {
+                        // Ensure the cloned version doesn't have any accidental hover or transition states
+                        const clonedEl = clonedDoc.querySelector(`.${styles.modalContent}`) as HTMLElement;
+                        if (clonedEl) {
+                            clonedEl.style.transform = 'none';
+                            clonedEl.style.transition = 'none';
+                            clonedEl.style.animation = 'none';
+                        }
+                    }
                 });
 
                 const dataUrl = canvas.toDataURL('image/png');
@@ -528,10 +544,38 @@ export default function MyLineups({
     const expandedLineup = lineups.find(l => l.id === expandedId);
 
 
+    // Calculate overused cards
+    const overusedImages = useMemo(() => {
+        const inventoryCounts = new Map<string, number>();
+        allCards.forEach(card => {
+            const key = card.image;
+            inventoryCounts.set(key, (inventoryCounts.get(key) || 0) + 1);
+        });
+
+        const usageCounts = new Map<string, number>();
+        lineups.forEach(lineup => {
+            lineup.cards.forEach(card => {
+                const key = card.image;
+                usageCounts.set(key, (usageCounts.get(key) || 0) + 1);
+            });
+        });
+
+        const overused = new Set<string>();
+        usageCounts.forEach((count, key) => {
+            const inventory = inventoryCounts.get(key) || 0;
+            if (count > inventory) {
+                overused.add(key);
+            }
+        });
+        return overused;
+    }, [allCards, lineups]);
+
     const renderLineupCard = (lineup: SavedLineup) => {
         const mokis = lineup.cards.filter(c => c.cardType !== 'SCHEME');
         const scheme = lineup.cards.find(c => c.cardType === 'SCHEME');
         const sortedCards = scheme ? [...mokis, scheme] : mokis;
+
+        const hasConflict = isUserMode && lineup.cards.some(c => overusedImages.has(c.image));
 
         const bgOptions = BACKGROUND_OPTIONS.find(b => b.id === (lineup.backgroundId || 'default'));
         const bgStyle = {
@@ -569,6 +613,14 @@ export default function MyLineups({
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
+
+                {hasConflict && (
+                    <div className={styles.warningIcon} title="This lineup contains cards that exceed your inventory limit.">
+                        !
+                    </div>
+                )}
+
+                {/* Rest of the component... */}
 
                 {deleteConfirmId === lineup.id && (
                     <div
@@ -622,7 +674,7 @@ export default function MyLineups({
                     {sortedCards.map((card, idx) => (
                         <div key={`${lineup.id}-${idx}`} className={styles.previewImageContainer} style={{ position: 'relative', flex: 1, aspectRatio: '0.7' }}>
                             <NextImage
-                                src={card.custom.characterImage || card.image}
+                                src={getCardCharacterImage(card)}
                                 alt={card.name}
                                 title={card.name}
                                 fill
@@ -733,6 +785,10 @@ export default function MyLineups({
                                 className={styles.exportButton}
                                 onClick={(e) => {
                                     e.stopPropagation();
+                                    if (favoriteLineups.length === 0) {
+                                        onError("No lineups in favorite!");
+                                        return;
+                                    }
                                     setExportConfirmOpen(!exportConfirmOpen);
                                 }}
                                 title="Export to Excel"
@@ -1323,8 +1379,10 @@ export default function MyLineups({
                                     searchQuery={selectorSearch}
                                     onSearchChange={setSelectorSearch}
                                     currentLineup={localCards.filter(c => c) as EnhancedCard[]}
+                                    savedLineups={lineups}
                                     filters={selectorFilters}
                                     onRemoveFilter={handleSelectorRemoveFilter}
+                                    isUserMode={true}
                                 />
                             </div>
                         </div>

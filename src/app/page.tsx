@@ -1,14 +1,18 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import CardGrid from '@/components/CardGrid';
 import FilterSidebar from '@/components/FilterSidebar';
 import LineupBuilder from '@/components/LineupBuilder';
-import { EnhancedCard, FilterState, SavedLineup } from '@/types';
+import WalletInput from '@/components/WalletInput';
+import WalletManagerModal from '@/components/WalletManagerModal';
+import walletStyles from '@/components/WalletInput.module.css';
+import { EnhancedCard, FilterState, SavedLineup, ConnectedWallet } from '@/types';
 import styles from './page.module.css';
 import Toast, { ToastMessage } from '@/components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchUserCards } from '@/utils/cardService';
 
 // Lazy Loaded Components
 const MyLineups = dynamic(() => import('@/components/MyLineups'), {
@@ -32,6 +36,15 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const lastToastTimeRef = useRef<{ [key: string]: number }>({});
+  const lastRefreshTimeRef = useRef<number>(0);
+
+  /* User Cards Mode State */
+  const [cardMode, setCardMode] = useState<'ALL' | 'USER'>('ALL');
+  const [userWallets, setUserWallets] = useState<ConnectedWallet[]>([]);
+  const [userCards, setUserCards] = useState<EnhancedCard[]>([]);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+  const [showWalletInput, setShowWalletInput] = useState(false);
+  const [showWalletManagerModal, setShowWalletManagerModal] = useState(false);
 
   /* Custom Hooks Integration */
   const { allCards, isLoading, handleRefresh: refreshCards } = useCards();
@@ -46,7 +59,7 @@ export default function Home() {
     updateBackground,
     bulkDelete,
     updateLineup
-  } = useSavedLineups();
+  } = useSavedLineups(cardMode === 'USER' ? 'myGrandArenaLineups' : 'grandArenaLineups');
 
   const {
     lineup,
@@ -75,7 +88,156 @@ export default function Home() {
 
   /* Data Refresh Wrapper */
   const handleRefresh = async () => {
-    await refreshCards();
+    if (cardMode === 'USER' && userWallets.length > 0) {
+      setShowWalletManagerModal(true);
+    } else {
+      await refreshCards();
+    }
+  };
+
+  /* Wallet Persistence */
+  useEffect(() => {
+    const rawWallets = localStorage.getItem('grandArenaWallets_v2');
+    if (rawWallets) {
+      try {
+        const savedWallets: ConnectedWallet[] = JSON.parse(rawWallets);
+        if (savedWallets.length > 0) {
+          setCardMode('USER');
+          handleLoadWallets(savedWallets);
+        }
+      } catch (e) {
+        console.error("Failed to parse wallets", e);
+      }
+    } else {
+      // Legacy compatibility
+      const savedWallet = localStorage.getItem('grandArenaWallet');
+      if (savedWallet) {
+        setCardMode('USER');
+        const legacyWallet: ConnectedWallet = {
+          address: savedWallet,
+          addedAt: Date.now() - (24 * 60 * 60 * 1000), // Allow immediate removal
+          lastRefresh: Date.now()
+        };
+        handleLoadWallets([legacyWallet]);
+      }
+    }
+  }, []);
+
+  /* User Cards Handlers */
+  /* User Cards Handlers */
+  const reloadAllWallets = async (wallets: ConnectedWallet[]) => {
+    setIsLoadingUser(true);
+    try {
+      const allCards = await Promise.all(wallets.map(w => fetchUserCards(w.address)));
+      setUserCards(allCards.flat());
+    } catch (e) {
+      console.warn("Failed loading some wallets", e);
+      addToast("Failed to load some wallets", 'error');
+    } finally {
+      setIsLoadingUser(false);
+    }
+  };
+
+  const handleLoadWallets = async (savedWallets: ConnectedWallet[]) => {
+    setUserWallets(savedWallets);
+    await reloadAllWallets(savedWallets);
+  };
+
+  const handleAddWallet = async (address: string) => {
+    if (userWallets.find(w => w.address.toLowerCase() === address.toLowerCase())) {
+      addToast("Wallet already connected", 'warning');
+      return;
+    }
+    if (userWallets.length >= 2) {
+      addToast("Maximum 2 wallets allowed", 'error');
+      return;
+    }
+
+    setIsLoadingUser(true);
+    setShowWalletInput(false);
+    try {
+      const cards = await fetchUserCards(address, true); // initial fetch force
+
+      const newWallet: ConnectedWallet = {
+        address: address,
+        addedAt: Date.now(),
+        lastRefresh: Date.now()
+      };
+
+      const updatedWallets = [...userWallets, newWallet];
+      setUserWallets(updatedWallets);
+      localStorage.setItem('grandArenaWallets_v2', JSON.stringify(updatedWallets));
+
+      setUserCards(prev => [...prev, ...cards]);
+      addToast(`Added wallet ${address.substring(0, 6)}...${address.substring(address.length - 6)}`, 'success');
+      setCardMode('USER');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to add wallet';
+      addToast(msg, 'error');
+      if (userWallets.length === 0) setCardMode('ALL');
+    } finally {
+      setIsLoadingUser(false);
+    }
+  };
+
+  const handleRemoveWallet = (address: string) => {
+    const updated = userWallets.filter(w => w.address.toLowerCase() !== address.toLowerCase());
+    setUserWallets(updated);
+    localStorage.setItem('grandArenaWallets_v2', JSON.stringify(updated));
+    if (updated.length === 0) {
+      handleDisconnectAllWallets();
+    } else {
+      reloadAllWallets(updated);
+    }
+  };
+
+  const handleRefreshSingleWallet = async (address: string) => {
+    const walletIdx = userWallets.findIndex(w => w.address.toLowerCase() === address.toLowerCase());
+    if (walletIdx === -1) return;
+
+    try {
+      setIsLoadingUser(true);
+      const cards = await fetchUserCards(address, true); // Force network
+
+      const updated = [...userWallets];
+      updated[walletIdx].lastRefresh = Date.now();
+      setUserWallets(updated);
+      localStorage.setItem('grandArenaWallets_v2', JSON.stringify(updated));
+
+      await reloadAllWallets(updated);
+      addToast("Wallet refreshed successfully", "success");
+    } catch (e) {
+      // Since the API returns 429 for cooldowns, the message will properly inform the user
+      const msg = e instanceof Error ? e.message : "Refresh failed";
+      addToast(msg, "error");
+    } finally {
+      setIsLoadingUser(false);
+    }
+  };
+
+  const handleDisconnectAllWallets = () => {
+    setUserWallets([]);
+    setUserCards([]);
+    setCardMode('ALL');
+    localStorage.removeItem('grandArenaWallets_v2');
+    localStorage.removeItem('grandArenaWallet'); // clear legacy
+    setShowWalletManagerModal(false);
+  };
+
+  const handleModeChange = (mode: 'ALL' | 'USER') => {
+    if (mode === cardMode) return;
+
+    // Context Isolation: Clear the current lineup when switching contexts
+    if (lineup.length > 0) {
+      clearLineup();
+      addToast("Lineup builder cleared for new context", 'suggestion');
+    }
+
+    if (mode === 'USER' && userWallets.length === 0) {
+      setShowWalletInput(true);
+    } else {
+      setCardMode(mode);
+    }
   };
 
   /* Filters State - Separate states for MOKI and SCHEME */
@@ -87,7 +249,8 @@ export default function Home() {
     customClass: [] as string[],
     specialization: [] as string[],
     traits: [] as string[],
-    insertionOrder: [] as string[]
+    insertionOrder: [] as string[],
+    useLast10Matches: false
   };
 
   const [filters, setFilters] = useState<FilterState>({
@@ -123,10 +286,9 @@ export default function Home() {
     schemeFilters: { filters: emptyFilters, search: '' }
   });
 
-  // Handle main tab switching (Builder <-> My Lineups)
+  // Handle main tab switching (Builder <-> My Lineups <-> Champions)
   const handleMainTabChange = (newTab: 'builder' | 'lineups' | 'champions') => {
-    if (newTab === activeTab || newTab === 'champions') {
-      setActiveTab(newTab);
+    if (newTab === activeTab) {
       return;
     }
 
@@ -145,11 +307,19 @@ export default function Home() {
     }
 
     // Restore target tab's state
-    const targetState = newTab === 'builder' ? builderStateRef.current : lineupsStateRef.current;
-    setFilters(targetState.filters);
-    setSearchQuery(targetState.search);
-    mokiFiltersRef.current = targetState.mokiFilters;
-    schemeFiltersRef.current = targetState.schemeFilters;
+    if (newTab === 'builder') {
+      const targetState = builderStateRef.current;
+      setFilters(targetState.filters);
+      setSearchQuery(targetState.search);
+      mokiFiltersRef.current = targetState.mokiFilters;
+      schemeFiltersRef.current = targetState.schemeFilters;
+    } else if (newTab === 'lineups') {
+      const targetState = lineupsStateRef.current;
+      setFilters(targetState.filters);
+      setSearchQuery(targetState.search);
+      mokiFiltersRef.current = targetState.mokiFilters;
+      schemeFiltersRef.current = targetState.schemeFilters;
+    }
 
     setActiveTab(newTab);
   };
@@ -181,21 +351,17 @@ export default function Home() {
   };
 
   /* Worker Filter Integration */
-  const filteredCards = useWorkerFilter(allCards, filters, searchQuery);
+  const sourceCards = cardMode === 'USER' ? userCards : allCards;
+
+  const filteredCards = useWorkerFilter(sourceCards, filters, searchQuery);
 
   /* Lineup Management Wrappers */
   const handleAddToLineup = (card: EnhancedCard) => {
-    // Check if card is already in lineup (Exact Match for visual toggle)
-    const indexToRemove = lineup.findIndex(c =>
-      c.name === card.name &&
-      c.rarity === card.rarity &&
-      c.cardType === card.cardType
-    );
+    // Find if an instance of this card type (by image) is already in the lineup
+    const indexToRemove = lineup.findIndex(c => c.image === card.image);
 
     if (indexToRemove !== -1) {
-      if (lineup[indexToRemove].locked) {
-        return;
-      }
+      if (lineup[indexToRemove].locked) return;
       removeFromLineup(indexToRemove);
       return;
     }
@@ -261,7 +427,8 @@ export default function Home() {
       customClass: [],
       specialization: [],
       traits: [],
-      insertionOrder: []
+      insertionOrder: [],
+      useLast10Matches: false
     };
 
     // Build insertion order: first preserved rarity/stars, then new filters
@@ -303,9 +470,7 @@ export default function Home() {
     setMobileMenuOpen(false);
   };
 
-  const handleConnect = () => {
-    // Wallet connection available in PRO version
-  };
+  // handleConnect removed — replaced by mode toggle
 
   useEffect(() => {
     const handleScroll = () => {
@@ -378,28 +543,39 @@ export default function Home() {
           </button>
           <button
             className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
-            onClick={() => { setActiveTab('champions'); closeDrawers(); }}
+            onClick={() => { handleMainTabChange('champions'); closeDrawers(); }}
           >
             Champions
           </button>
-          <button
-            className={`${styles.navTab} ${styles.disabledTab}`}
-            disabled
-            title="Coming soon!"
-          >
-            Analytics
-          </button>
+
         </nav>
 
         <div className={styles.authWrapper}>
-          <button
-            className={styles.connectButton}
-            style={{ opacity: 0.7, cursor: 'not-allowed' }}
-            onClick={handleConnect}
-            title="Coming soon!"
-          >
-            Connect Wallet
-          </button>
+          <div className={walletStyles.modeToggle}>
+            <button
+              className={`${walletStyles.modeButton} ${cardMode === 'ALL' ? walletStyles.modeButtonActive : ''}`}
+              onClick={() => handleModeChange('ALL')}
+            >
+              ALL CARDS
+            </button>
+            {cardMode === 'USER' && userWallets.length > 0 ? (
+              <div className={walletStyles.connectedGroup}>
+                <button
+                  className={walletStyles.connectedButton}
+                  onClick={() => setShowWalletManagerModal(true)}
+                >
+                  MY CARDS ({userWallets.length})
+                </button>
+              </div>
+            ) : (
+              <button
+                className={`${walletStyles.modeButton} ${cardMode === 'USER' ? walletStyles.modeButtonActive : ''}`}
+                onClick={() => handleModeChange('USER')}
+              >
+                MY CARDS
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -481,17 +657,11 @@ export default function Home() {
                 </button>
                 <button
                   className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
-                  onClick={() => setActiveTab('champions')}
+                  onClick={() => handleMainTabChange('champions')}
                 >
                   Champions
                 </button>
-                <button
-                  className={`${styles.navTab} ${styles.disabledTab}`}
-                  disabled
-                  title="Coming soon!"
-                >
-                  Analytics
-                </button>
+
               </div>
             </nav>
           </div>
@@ -526,14 +696,31 @@ export default function Home() {
               </button>
             </div>
 
-            <button
-              className={styles.connectButton}
-              style={{ opacity: 0.7, cursor: 'not-allowed' }}
-              onClick={handleConnect}
-              title="Coming soon!"
-            >
-              Connect Wallet
-            </button>
+            <div className={walletStyles.modeToggle}>
+              <button
+                className={`${walletStyles.modeButton} ${cardMode === 'ALL' ? walletStyles.modeButtonActive : ''}`}
+                onClick={() => handleModeChange('ALL')}
+              >
+                ALL CARDS
+              </button>
+              {cardMode === 'USER' && userWallets.length > 0 ? (
+                <div className={walletStyles.connectedGroup}>
+                  <button
+                    className={walletStyles.connectedButton}
+                    onClick={() => setShowWalletManagerModal(true)}
+                  >
+                    MY CARDS ({userWallets.length})
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className={`${walletStyles.modeButton} ${cardMode === 'USER' ? walletStyles.modeButtonActive : ''}`}
+                  onClick={() => handleModeChange('USER')}
+                >
+                  MY CARDS
+                </button>
+              )}
+            </div>
           </div>
 
           <div className={`${styles.headerRightMobile} ${styles.mobileOnly}`}>
@@ -579,6 +766,9 @@ export default function Home() {
           </div>
         </div>
       </header>
+      {/* User Wallet Banner */}
+
+
       <div className={styles.content}>
         <div style={{ display: activeTab === 'builder' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
 
@@ -608,8 +798,11 @@ export default function Home() {
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 currentLineup={lineup}
+                savedLineups={savedLineups}
                 filters={filters}
                 onRemoveFilter={handleRemoveFilter}
+                isUserMode={cardMode === 'USER'}
+                userCardCount={cardMode === 'USER' ? filteredCards.length : undefined}
               />
             </div>
 
@@ -660,8 +853,9 @@ export default function Home() {
                 setFavoritesOpen={setFavoritesOpen}
                 allLineupsOpen={allLineupsOpen}
                 setAllLineupsOpen={setAllLineupsOpen}
-                allCards={allCards}
+                allCards={sourceCards}
                 onUpdateLineup={updateLineup}
+                isUserMode={cardMode === 'USER'}
               />
             </div>
           </div>
@@ -685,12 +879,50 @@ export default function Home() {
 
       {
         isLoading && allCards.length === 0 && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+            <img src="/Gn Moki.png" alt="Loading" width={100} height={100} style={{ marginBottom: '1.5rem', objectFit: 'contain' }} />
             <div className={styles.spinner} style={{ width: '50px', height: '50px', border: '5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-            <p style={{ color: '#fff', marginLeft: '1rem' }}>Loading Cards Catalog...</p>
+            <p style={{ color: '#FFD753', marginTop: '1rem', fontFamily: 'Inter', fontWeight: '800', fontSize: '1.2rem', textTransform: 'uppercase' }}>Loading cards...</p>
           </div>
         )
       }
+
+      {/* Wallet Manager Modal */}
+      {showWalletManagerModal && (
+        <WalletManagerModal
+          wallets={userWallets}
+          onClose={() => setShowWalletManagerModal(false)}
+          onAddWallet={() => {
+            setShowWalletManagerModal(false);
+            setShowWalletInput(true);
+          }}
+          onRemoveWallet={handleRemoveWallet}
+          onRefreshWallet={handleRefreshSingleWallet}
+          onToast={addToast}
+        />
+      )}
+
+      {/* Wallet Input Modal */}
+      {showWalletInput && (
+        <WalletInput
+          onSubmit={handleAddWallet}
+          onCancel={() => {
+            setShowWalletInput(false);
+            if (userWallets.length === 0) setCardMode('ALL');
+            else setShowWalletManagerModal(true);
+          }}
+          isLoading={isLoadingUser}
+        />
+      )}
+
+      {/* Loading overlay for user cards */}
+      {isLoadingUser && !showWalletInput && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <img src="/Gn Moki.png" alt="Loading" width={100} height={100} style={{ marginBottom: '1.5rem', objectFit: 'contain' }} />
+          <div className={styles.spinner} style={{ width: '50px', height: '50px', border: '5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <p style={{ color: '#FFD753', marginTop: '1rem', fontFamily: 'Inter', fontWeight: '800', fontSize: '1.2rem', textTransform: 'uppercase' }}>Loading cards...</p>
+        </div>
+      )}
 
       <Toast messages={toasts} onClose={removeToast} />
     </main >

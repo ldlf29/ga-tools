@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { fetchLiveData, MokiData } from '../utils/liveData';
 import ChangelogModal from './ChangelogModal';
+import MatchHistoryModal from './MatchHistoryModal';
 import NextImage from 'next/image';
 import styles from './ChampionsList.module.css';
 import ExcelJS from 'exceljs';
@@ -36,6 +37,8 @@ export default function ChampionsList() {
     const [openMobileDropdown, setOpenMobileDropdown] = useState<'sort' | 'class' | 'fur' | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
     const [confirmExport, setConfirmExport] = useState(false);
+    const [historyTokenId, setHistoryTokenId] = useState<number | null>(null);
+    const [historyName, setHistoryName] = useState<string | null>(null);
 
     const classOptions = ["All Classes", ...MOKI_CLASSES];
     const furOptions = ["All Furs", ...MOKI_FURS];
@@ -392,7 +395,7 @@ export default function ChampionsList() {
                         </button>
                     </div>
                     <div className={styles.headerRight}>
-                        <div className={styles.updateInfo}>The data is updated every 12 hours.</div>
+                        <div className={styles.updateInfo}>Class and Stats are updated every 10 minutes. Performance and Winrate every 6 hours.</div>
                         <input
                             type="text"
                             placeholder="Search Moki..."
@@ -542,21 +545,25 @@ export default function ChampionsList() {
                                                             </div>
                                                         )}
                                                         {moki.name}
-                                                        {moki.marketLink && (
-                                                            <a
-                                                                href={moki.marketLink}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
+                                                        {moki.tokenId && (
+                                                            <button
                                                                 className={styles.linkButton}
-                                                                title="View on Market"
-                                                                onClick={(e) => e.stopPropagation()}
+                                                                title="View Match History"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setHistoryTokenId(moki.tokenId!);
+                                                                    setHistoryName(moki.name);
+                                                                }}
+
                                                             >
                                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                                                    <polyline points="15 3 21 3 21 9"></polyline>
-                                                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                                    <polyline points="10 9 9 9 8 9"></polyline>
                                                                 </svg>
-                                                            </a>
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -645,17 +652,18 @@ export default function ChampionsList() {
                                                         <span className={styles.statLabel}>STARS</span>
                                                         <span className={styles.statValue}>{moki.stars} ★</span>
                                                     </div>
-                                                    {moki.marketLink && (
-                                                        <a
-                                                            href={moki.marketLink}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
+                                                    {moki.tokenId && (
+                                                        <button
                                                             className={styles.marketButton}
-                                                            style={{ marginTop: '0.75rem' }}
-                                                            onClick={(e) => e.stopPropagation()}
+
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setHistoryTokenId(moki.tokenId!);
+                                                                setHistoryName(moki.name);
+                                                            }}
                                                         >
-                                                            View on Market
-                                                        </a>
+                                                            Match History
+                                                        </button>
                                                     )}
                                                 </div>
 
@@ -734,6 +742,18 @@ export default function ChampionsList() {
             {
                 showChangelog && (
                     <ChangelogModal onClose={() => setShowChangelog(false)} />
+                )
+            }
+            {
+                historyTokenId && (
+                    <MatchHistoryModal
+                        tokenId={historyTokenId}
+                        mokiName={historyName}
+                        onClose={() => {
+                            setHistoryTokenId(null);
+                            setHistoryName(null);
+                        }}
+                    />
                 )
             }
         </div >

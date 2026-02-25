@@ -55,27 +55,22 @@ export const matchesFilter = (
     if (filters.customClass.length > 0) {
         if (!card.custom.class || !filters.customClass.includes(card.custom.class)) return false;
     }
-    // SPECIALIZATION
+    // SPECIALIZATION (Sorting + Threshold Filtering)
     if (filters.specialization.length > 0) {
-        const hasSpec = filters.specialization.some(spec => {
-            switch (spec) {
-                case 'Gacha':
-                    return (card.custom.deposits ?? 0) >= 4.75;
-                case 'Killer':
-                    return (card.custom.eliminations ?? 0) >= 1.50;
-                case 'Wart Rider':
-                    return (card.custom.wartDistance ?? 0) >= 170;
-                case 'Winner':
-                    return (card.custom.winRate ?? 0) >= 53.5;
-                case 'Loser':
-                    // Note: User specified "menorigual" (<= 47.50)
-                    if (card.custom.winRate === undefined || card.custom.winRate === null) return false;
-                    return card.custom.winRate <= 47.5;
-                default:
-                    return false;
+        const useLast10 = filters.useLast10Matches;
+
+        for (const spec of filters.specialization) {
+            if (spec === 'Gacha') {
+                const val = useLast10 ? (card.custom.avgDeposits || 0) : (card.custom.deposits || 0);
+                if (val <= 4) return false;
+            } else if (spec === 'Killer') {
+                const val = useLast10 ? (card.custom.avgEliminations || 0) : (card.custom.eliminations || 0);
+                if (val <= 1.25) return false;
+            } else if (spec === 'Wart Rider') {
+                const val = useLast10 ? (card.custom.avgWartDistance || 0) : (card.custom.wartDistance || 0);
+                if (val <= 150) return false;
             }
-        });
-        if (!hasSpec) return false;
+        }
     }
     // TRAITS
     if (filters.traits.length > 0) {

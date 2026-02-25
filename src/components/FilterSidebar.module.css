@@ -127,6 +127,61 @@
     outline: none;
 }
 
+.last10ToggleWrapper {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.25rem;
+}
+
+.toggleLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggleLabel input {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 2px solid #333333;
+    border-radius: 6px;
+    background: #84BCFF;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    margin-top: 1px;
+}
+
+.toggleLabel input:checked {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+.toggleLabel:hover input {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
+}
+
+.toggleLabel input:checked::after {
+    content: '✔';
+    position: absolute;
+    top: -3px;
+    left: 1px;
+    font-size: 14px;
+    color: #333333;
+    font-weight: bold;
+}
+
+.toggleText {
+    font-size: 0.9rem;
+    color: #333333;
+    padding-top: 2px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+
 .accordionHeader {
     width: 100%;
     display: flex;

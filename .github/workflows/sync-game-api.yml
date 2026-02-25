@@ -1,0 +1,16 @@
+name: Sync Game API (10 Mins)
+
+on:
+  schedule:
+    # Runs every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Moki Bulk Game API
+        run: |
+          curl -X GET '${{ secrets.VERCEL_URL }}/api/cron/sync-moki-api?secret=${{ secrets.CRON_SECRET }}' \
+          --fail
