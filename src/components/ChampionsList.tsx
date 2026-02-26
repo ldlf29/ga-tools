@@ -638,7 +638,7 @@ export default function ChampionsList() {
 
                                         {isExpanded && (
                                             <div className={styles.mobileCardBody} onClick={(e) => e.stopPropagation()}>
-                                                <div className={styles.statBlock} style={{ marginBottom: '1rem' }}>
+                                                <div className={styles.statBlock} style={{ marginBottom: '0.75rem' }}>
                                                     <div className={styles.statTitle}>Identity</div>
                                                     <div className={styles.statRow}>
                                                         <span className={styles.statLabel}>CLASS</span>
@@ -652,20 +652,21 @@ export default function ChampionsList() {
                                                         <span className={styles.statLabel}>STARS</span>
                                                         <span className={styles.statValue}>{moki.stars} ★</span>
                                                     </div>
-                                                    {moki.tokenId && (
-                                                        <button
-                                                            className={styles.marketButton}
-
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setHistoryTokenId(moki.tokenId!);
-                                                                setHistoryName(moki.name);
-                                                            }}
-                                                        >
-                                                            Match History
-                                                        </button>
-                                                    )}
                                                 </div>
+
+                                                {moki.tokenId && (
+                                                    <button
+                                                        className={styles.marketButton}
+                                                        style={{ marginBottom: '1rem' }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setHistoryTokenId(moki.tokenId!);
+                                                            setHistoryName(moki.name);
+                                                        }}
+                                                    >
+                                                        Match History
+                                                    </button>
+                                                )}
 
                                                 <div className={styles.statsGrid}>
                                                     <div className={styles.statBlock}>

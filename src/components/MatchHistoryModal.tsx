@@ -222,7 +222,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
                     <div className={styles.header}>
                         <div className={styles.headerLeft}>
                             <h2 className={styles.title}>MATCH HISTORY (LAST 10)</h2>
-                            <p className={styles.updateFreq}>Updated every hour.</p>
+                            <p className={styles.updateFreq}>Updated every 10 minutes.</p>
                             <div className={styles.subtitleRow}>
                                 <h3 className={styles.subtitle}>{mokiName}</h3>
                                 {marketLink && (

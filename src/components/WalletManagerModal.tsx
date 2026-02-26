@@ -69,7 +69,12 @@ export default function WalletManagerModal({
                                         className={`${styles.actionBtn} ${styles.refreshBtn} ${!canRefresh ? styles.disabled : ''}`}
                                         title={canRefresh ? "Force Refresh NFTs" : `Cooldown: ${formatTimeLeft(refreshWaitTime)} left`}
                                     >
-                                        Refresh
+                                        <span className={styles.btnText}>Refresh</span>
+                                        <svg className={styles.btnIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M23 4v6h-6"></path>
+                                            <path d="M1 20v-6h6"></path>
+                                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                        </svg>
                                     </button>
                                     <button
                                         onClick={() => {
@@ -79,7 +84,11 @@ export default function WalletManagerModal({
                                         className={`${styles.actionBtn} ${styles.removeBtn} ${!canRemove ? styles.disabled : ''}`}
                                         title={canRemove ? "Disconnect Wallet" : `Locked: ${formatTimeLeft(removeWaitTime)} left`}
                                     >
-                                        Remove
+                                        <span className={styles.btnText}>Remove</span>
+                                        <svg className={styles.btnIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>

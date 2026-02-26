@@ -136,12 +136,10 @@ export default function CardModal({ card, onClose, useLast10Matches }: CardModal
 
                                     {card.cardType === 'MOKI' && (
                                         <>
-                                            {useLast10Matches && (
-                                                <div style={{ textAlign: 'center', marginBottom: '4px', fontSize: '0.8rem', color: '#EF6666', fontWeight: 'bold' }}>
-                                                    LAST 10 MATCHES AVG
-                                                </div>
-                                            )}
                                             <div className={styles.performanceGrid}>
+                                                <div className={styles.perfHeader}>
+                                                    {useLast10Matches ? 'LAST 10 MATCHES AVERAGE' : 'PERFORMANCE'}
+                                                </div>
                                                 <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>ELIMS</span>
                                                     <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgEliminations : card.custom.eliminations)?.toFixed(1) || '0'}</span>

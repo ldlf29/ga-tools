@@ -791,7 +791,7 @@ export default function Home() {
             </div>
 
             {/* Column 2: CardGrid */}
-            <div style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <div style={{ width: '100%', minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
               <CardGrid
                 cards={filteredCards}
                 onAddCard={handleAddToLineup}

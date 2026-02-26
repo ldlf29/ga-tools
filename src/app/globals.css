@@ -130,6 +130,16 @@ button {
   background: #15A085;
 }
 
+/* Hide body scrollbar when modals are open */
+body.modal-open {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+body.modal-open::-webkit-scrollbar {
+  display: none !important;
+}
+
 /* Global fix for mobile confirmation menus */
 /* Global fix for mobile confirmation menus */
 @media (max-width: 768px) {

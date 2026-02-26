@@ -14,8 +14,8 @@
     margin-bottom: 0.5rem;
     background: #84BCFF;
     padding: 1rem 1.5rem;
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
+    margin-left: 0;
+    margin-right: 0;
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
@@ -63,12 +63,24 @@
     border-radius: 0.75rem;
     padding: 0.5rem 1rem;
     color: #333333;
-    width: 250px;
+    width: 200px;
     font-size: 0.9rem;
     outline: none;
     transition: all 0.2s;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
+}
+
+/* Notebook Adjustments for wide screens that are still too small for full scaling */
+@media (max-width: 1440px) {
+    .resultsTitle {
+        font-size: 1.35rem;
+        /* Reduced from 1.7rem */
+    }
+
+    .headerContainer {
+        padding: 0.8rem 1.2rem;
+    }
 }
 
 @media (max-width: 1180px) {
@@ -262,6 +274,18 @@
     flex-shrink: 0;
 }
 
+@media (max-width: 1440px) {
+    .infoButton {
+        width: 19px;
+        height: 19px;
+    }
+
+    .infoButton svg {
+        width: 11px;
+        height: 11px;
+    }
+}
+
 @media (max-width: 1200px) {
     .infoButton {
         width: 20px;
@@ -410,6 +434,13 @@
     text-align: center;
     margin: 0;
     pointer-events: auto;
+}
+
+@media (max-width: 1440px) {
+    .cardType {
+        font-size: 0.68rem;
+        padding: 0.15rem 0.45rem;
+    }
 }
 
 @media (max-width: 1200px) {
@@ -841,7 +872,7 @@
 .stackBadge {
     position: absolute;
     top: 8px;
-    right: 8px;
+    right: 28px;
     background: #FFD753;
     border: 1.5px solid #000;
     color: #000;
@@ -864,7 +895,7 @@
 .compactStackBadge {
     position: absolute;
     top: 4px;
-    right: 8px;
+    right: 28px;
     background: #FFD753;
     border: 1.5px solid #000;
     color: #000;
@@ -889,7 +920,7 @@
         font-size: 0.65rem;
         padding: 0.1rem 0.3rem;
         top: 6px;
-        right: 6px;
+        right: 24px;
         border-width: 1px;
         box-shadow: 1px 1px 0 #000;
     }
@@ -898,7 +929,7 @@
         font-size: 0.55rem;
         padding: 0.05rem 0.2rem;
         top: 3px;
-        right: 6px;
+        right: 24px;
         border-width: 1px;
     }
 }

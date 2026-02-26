@@ -34,6 +34,8 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-right: 5px;
+    padding-bottom: 40vh;
+    /* Allow overscroll at the end of filters */
     /* Prevent scrollbar overlap with content if visible */
     margin-right: -5px;
     scrollbar-width: none;

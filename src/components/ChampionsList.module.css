@@ -21,8 +21,13 @@
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
-    /* Removed sticky to allow it to scroll away with the container */
     z-index: 150;
+}
+
+@media (max-width: 1440px) {
+    .header {
+        padding: 0.8rem 1.2rem;
+    }
 }
 
 .headerTopRow {
@@ -57,6 +62,12 @@
     letter-spacing: 1px;
     text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
         1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+@media (max-width: 1440px) {
+    .title {
+        font-size: 1.35rem;
+    }
 }
 
 .searchBar {
@@ -130,7 +141,8 @@
 
 .tableContainer {
     flex: 1;
-    overflow-y: scroll;
+    overflow-y: auto;
+    overflow-x: auto;
     border: 3px solid #333333;
     border-bottom-width: 8px;
     border-radius: 20px;
@@ -856,5 +868,66 @@
         width: 150px !important;
         max-width: 150px !important;
         margin: 0 !important;
+    }
+}
+
+/* Notebook Table Adjustments */
+@media (max-width: 1440px) {
+
+    .th:first-child,
+    .td:first-child {
+        width: 130px;
+        min-width: 130px;
+        max-width: 130px;
+    }
+
+    .th:nth-child(2),
+    .td:nth-child(2),
+    .th:nth-child(3),
+    .td:nth-child(3) {
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        font-size: 0.7rem;
+    }
+
+    .th:nth-child(n+4):nth-child(-n+9),
+    .td:nth-child(n+4):nth-child(-n+9) {
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        padding-left: 1px;
+        padding-right: 1px;
+        font-size: 0.7rem;
+    }
+
+    .th:nth-child(n+10),
+    .td:nth-child(n+10) {
+        width: 48px;
+        min-width: 48px;
+        max-width: 48px;
+        font-size: 0.7rem;
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+
+    .td {
+        padding: 4px 5px;
+        font-size: 0.75rem;
+    }
+
+    .th {
+        padding: 6px 4px;
+        font-size: 0.7rem;
+        -webkit-text-stroke: 1px black;
+    }
+
+    .mokiImage {
+        height: 28px;
+    }
+
+    .tdName {
+        gap: 4px;
+        font-size: 0.8rem;
     }
 }

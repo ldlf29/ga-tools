@@ -95,12 +95,24 @@
     top: 0;
     background: #84BCFF;
     padding: 1rem 1.5rem;
-    margin-left: -1.5rem;
+    margin-left: 0;
     margin-right: 0;
     border-radius: 1rem;
     border: 3px solid #333333;
     border-bottom-width: 6px;
     z-index: 150;
+}
+
+/* Notebook Adjustments */
+@media (max-width: 1440px) {
+    .title {
+        font-size: 1.35rem;
+        /* Match the 1.35rem of Builder MOKIS header */
+    }
+
+    .topBar {
+        padding: 0.8rem 1.2rem;
+    }
 }
 
 .headerTopRow {
@@ -641,6 +653,12 @@
     padding: 2rem;
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.modalOverlay::-webkit-scrollbar {
+    display: none !important;
 }
 
 .modalContent {
@@ -1979,22 +1997,30 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.7);
     z-index: 4000;
     display: flex;
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(3px);
+    overflow: hidden;
+    overscroll-behavior: none;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.selectorBackdrop::-webkit-scrollbar {
+    display: none !important;
 }
 
 .selectorOverlay {
     position: relative;
     width: 1100px;
-    max-width: 95vw;
+    max-width: 95%;
     height: 920px;
-    max-height: 95vh;
+    max-height: 90%;
     background-image: url('/bg-pattern.webp');
     background-size: cover;
     background-position: center;
@@ -2005,8 +2031,15 @@
     flex-direction: column;
     border-radius: 1.5rem;
     overflow: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.selectorOverlay::-webkit-scrollbar {
+    display: none !important;
 }
 
 .selectorHeader {

@@ -120,18 +120,29 @@
 }
 
 .actionBtn {
-    padding: 0.4rem 0.75rem;
+    padding: 0.5rem;
     border-radius: 0.5rem;
     border: none;
     font-size: 0.75rem;
     cursor: pointer;
     font-weight: 700;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .actionBtn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.actionBtn svg {
+    display: block;
+}
+
+.btnText {
+    display: none;
 }
 
 .refreshBtn {

@@ -100,6 +100,15 @@ export default function MyLineups({
 
     const filteredSelectorCards = useWorkerFilter(allCards, selectorFilters, selectorSearch);
 
+    const [copiedSlot, setCopiedSlot] = useState<number | null>(null);
+
+    const handleCopyCardName = (e: React.MouseEvent, cardName: string, slotIndex: number) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(cardName);
+        setCopiedSlot(slotIndex);
+        setTimeout(() => setCopiedSlot(null), 1500);
+    };
+
     const handleExportExcel = async () => {
         const favorites = favoriteLineups;
         if (favorites.length === 0) {
@@ -423,6 +432,7 @@ export default function MyLineups({
     useEffect(() => {
         if (expandedId !== null) {
             document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
                     // If selector is open, just close it and stop
@@ -452,11 +462,16 @@ export default function MyLineups({
             window.addEventListener('keydown', handleEsc);
             return () => {
                 document.body.style.overflow = 'unset';
+                document.body.classList.remove('modal-open');
                 window.removeEventListener('keydown', handleEsc);
             };
         } else {
             document.body.style.overflow = 'unset';
-            return () => { document.body.style.overflow = 'unset'; };
+            document.body.classList.remove('modal-open');
+            return () => {
+                document.body.style.overflow = 'unset';
+                document.body.classList.remove('modal-open');
+            };
         }
     }, [expandedId, editingId, tempName, hasChanges, selectorSlot]);
 
@@ -1004,18 +1019,21 @@ export default function MyLineups({
 
             {/* Modal Overlay */}
             {expandedLineup && (
-                <div className={styles.modalOverlay} onClick={() => {
-                    // If editing and name is too long, don't allow closing
-                    if (editingId !== null && tempName.length > 20) {
-                        onError("Maximum 20 characters.");
-                        return;
-                    }
-                    // Save name if editing before closing
-                    if (editingId !== null) {
-                        saveName(editingId);
-                    }
-                    handleCloseModal();
-                }}>
+                <div
+                    className={styles.modalOverlay}
+                    style={{ overflowY: selectorSlot !== null ? 'hidden' : 'auto' }}
+                    onClick={() => {
+                        // If editing and name is too long, don't allow closing
+                        if (editingId !== null && tempName.length > 20) {
+                            onError("Maximum 20 characters.");
+                            return;
+                        }
+                        // Save name if editing before closing
+                        if (editingId !== null) {
+                            saveName(editingId);
+                        }
+                        handleCloseModal();
+                    }}>
                     <div
                         key={expandedLineup.id}
                         ref={lineupRef}
@@ -1152,19 +1170,37 @@ export default function MyLineups({
                                                 {card?.custom?.class || 'Class'}
                                             </div>
                                             {card && (
-                                                <button
-                                                    className={styles.cardInfoButton}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setSelectedInfoCard(card);
-                                                    }}
-                                                    title="View details"
-                                                >
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                                    </svg>
-                                                </button>
+                                                <div style={{ display: 'flex', gap: '6px' }}>
+                                                    <button
+                                                        className={styles.cardInfoButton}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedInfoCard(card);
+                                                        }}
+                                                        title="View details"
+                                                    >
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        className={styles.cardInfoButton}
+                                                        onClick={(e) => handleCopyCardName(e, card.name, idx)}
+                                                        title="Copy Name"
+                                                    >
+                                                        {copiedSlot === idx ? (
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        ) : (
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                            </svg>
+                                                        )}
+                                                    </button>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
