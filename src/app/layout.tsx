@@ -43,8 +43,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Nonce is applied via the CSP header in proxy.ts — NOT as a DOM attribute
-  // (browsers strip nonce from DOM after load, causing hydration mismatch)
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${lilitaOne.variable}`}>

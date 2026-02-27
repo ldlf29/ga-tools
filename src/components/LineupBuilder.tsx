@@ -96,6 +96,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
             <div className={styles.header}>
                 <input
                     type="text"
+                    id="lineup-name"
                     value={lineupName}
                     onChange={(e) => setLineupName(e.target.value)}
                     className={styles.input}

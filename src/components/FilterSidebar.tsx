@@ -233,6 +233,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
             <div className={styles.filterGroup}>
                 <input
                     type="text"
+                    id="filter-search"
                     className={styles.filterSearchInput}
                     placeholder="Search filters..."
                     value={filterSearch}

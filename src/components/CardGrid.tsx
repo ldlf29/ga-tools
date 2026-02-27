@@ -498,6 +498,7 @@ export default function CardGrid({
 
                         <input
                             type="text"
+                            id="card-search-desktop"
                             placeholder="Search card name..."
                             className={`${styles.searchInput} ${styles.desktopSearch}`}
                             value={searchQuery}
@@ -538,6 +539,7 @@ export default function CardGrid({
                 <div className={styles.searchRow}>
                     <input
                         type="text"
+                        id="card-search-mobile"
                         placeholder="Search card name..."
                         className={styles.searchInput}
                         value={searchQuery}
