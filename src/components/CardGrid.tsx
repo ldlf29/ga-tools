@@ -10,7 +10,8 @@ import { useState, useEffect, useMemo, CSSProperties } from 'react';
 import { List } from 'react-window';
 import { AutoSizer as _AutoSizer, Size } from 'react-virtualized-auto-sizer';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
-const AutoSizer = _AutoSizer as any;
+// Type workaround: react-virtualized-auto-sizer v2 has mismatched types
+const AutoSizer = _AutoSizer as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 type SortOption = 'default' | 'name_asc' | 'name_desc' | 'rarity_desc' | 'rarity_asc' | 'stars_desc' | 'stars_asc';
 

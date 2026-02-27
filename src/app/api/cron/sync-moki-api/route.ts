@@ -1,24 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import mokiMetadataRaw from '@/data/mokiMetadata.json';
-
-// Bypass RLS in this backend route using the Service Role Key
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 // Get target IDs from our static database
 const mokiMetadata = mokiMetadataRaw as Record<string, any>;
 const BATCH_SIZE = 90;
 
 export async function GET(request: NextRequest) {
-    // 1. Verify Authentication
+    // 1. Verify Authentication (via Authorization header only — never via URL params)
     const authHeader = request.headers.get('authorization');
-    const urlSecret = request.nextUrl.searchParams.get('secret');
     const CRON_SECRET = process.env.CRON_SECRET;
     const GA_API_KEY = process.env.GA_API_KEY;
 
-    if (!CRON_SECRET || (authHeader !== `Bearer ${CRON_SECRET}` && urlSecret !== CRON_SECRET)) {
+    if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
         return NextResponse.json({ error: 'Unauthorized. Invalid or missing secret.' }, { status: 401 });
     }
 
@@ -205,6 +199,6 @@ export async function GET(request: NextRequest) {
             details: e.message || 'Unknown error during sync'
         });
 
-        return NextResponse.json({ error: 'Failed to sync API data.', details: e.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to sync API data.' }, { status: 500 });
     }
 }

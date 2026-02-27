@@ -131,12 +131,15 @@ button {
 }
 
 /* Hide body scrollbar when modals are open */
-body.modal-open {
+body.modal-open,
+html.modal-open {
+  overflow: hidden !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
 
-body.modal-open::-webkit-scrollbar {
+body.modal-open::-webkit-scrollbar,
+html.modal-open::-webkit-scrollbar {
   display: none !important;
 }
 

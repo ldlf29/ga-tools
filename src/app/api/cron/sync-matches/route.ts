@@ -1,22 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import mokiMetadataRaw from '@/data/mokiMetadata.json';
-
-// Configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 const mokiMetadata = mokiMetadataRaw as Record<string, any>;
 const BATCH_SIZE = 180; // Process all 180 Mokis in a single run
 
 export async function GET(request: NextRequest) {
-    // 1. Verify Authentication
-    const urlSecret = request.nextUrl.searchParams.get('secret');
+    // 1. Verify Authentication (via Authorization header only — never via URL params)
+    const authHeader = request.headers.get('authorization');
     const CRON_SECRET = process.env.CRON_SECRET;
     const GA_API_KEY = process.env.GA_API_KEY;
 
-    if (!CRON_SECRET || urlSecret !== CRON_SECRET) {
+    if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -142,47 +137,22 @@ export async function GET(request: NextRequest) {
         });
 
         // 6. Housekeeping: Keep only the latest 20 matches per Moki ID
-        console.log(`[Cron Matches] Running housekeeping to clean up older records...`);
-        const { data: allMatches, error: cleanupFetchErr } = await supabaseAdmin
-            .from('moki_match_history')
-            .select('id, moki_id, created_at')
-            .order('created_at', { ascending: false });
-
+        //    Uses a single SQL query instead of fetching all rows into memory.
         let recordsDeleted = 0;
+        try {
+            const { data: deletedData, error: cleanupErr } = await supabaseAdmin
+                .rpc('cleanup_old_matches', { keep_count: 20 });
 
-        if (cleanupFetchErr) {
-            console.error(`[Cron Matches] Failed to fetch for housekeeping`, cleanupFetchErr);
-        } else if (allMatches) {
-            const matchCounts = new Map<string, number>();
-            const idsToDelete: number[] = [];
-
-            for (const match of allMatches) {
-                const count = matchCounts.get(match.moki_id) || 0;
-                if (count >= 20) { // Keep only 20
-                    idsToDelete.push(match.id);
-                } else {
-                    matchCounts.set(match.moki_id, count + 1);
+            if (cleanupErr) {
+                console.error(`[Cron Matches] Housekeeping SQL error:`, cleanupErr);
+            } else {
+                recordsDeleted = deletedData ?? 0;
+                if (recordsDeleted > 0) {
+                    console.log(`[Cron Matches] Housekeeping: deleted ${recordsDeleted} old matches.`);
                 }
             }
-
-            if (idsToDelete.length > 0) {
-                console.log(`[Cron Matches] Found ${idsToDelete.length} ancient matches. Deleting to free space...`);
-                // Batch delete in chunks of 500
-                const CHUNK_SIZE = 500;
-                for (let i = 0; i < idsToDelete.length; i += CHUNK_SIZE) {
-                    const chunk = idsToDelete.slice(i, i + CHUNK_SIZE);
-                    const { error: delErr } = await supabaseAdmin
-                        .from('moki_match_history')
-                        .delete()
-                        .in('id', chunk);
-
-                    if (delErr) {
-                        console.error(`[Cron Matches] Error deleting chunk:`, delErr);
-                    } else {
-                        recordsDeleted += chunk.length;
-                    }
-                }
-            }
+        } catch (err) {
+            console.error(`[Cron Matches] Housekeeping failed:`, err);
         }
 
         return NextResponse.json({
@@ -195,6 +165,6 @@ export async function GET(request: NextRequest) {
 
     } catch (error: any) {
         console.error('[Cron Matches] Fatal Error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: 'Sync failed' }, { status: 500 });
     }
 }

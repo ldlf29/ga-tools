@@ -38,15 +38,22 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
         fetchChangelog();
     }, []);
 
-    // Keyboard listener for ESC key only (as requested)
+    // Prevent scroll when modal is open and handle ESC
     useEffect(() => {
+        document.body.classList.add('modal-open');
+        document.documentElement.classList.add('modal-open');
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 onClose();
             }
         };
         window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open');
+            window.removeEventListener('keydown', handleKeyDown);
+        };
     }, [onClose]);
 
     const filteredChanges = useMemo(() => {

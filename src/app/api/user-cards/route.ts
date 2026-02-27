@@ -4,15 +4,24 @@ import { AlchemyService } from '@/services/AlchemyService';
 
 const CONTRACT_ADDRESS = '0x9e8ed4ff354bd11602255b3d8e1ed13a1bb26b4b';
 
-// In-memory single-region limits (will reset on Vercel cold restarts but provides a strong baseline)
+// In-memory single-region limits.
+// ⚠️ LIMITATION: These reset on Vercel cold starts and don't share across regions.
+// TODO: For stronger protection, migrate to Vercel KV or Upstash Redis.
 const ipRateLimitMap = new Map<string, { wallets: Set<string>; resetAt: number }>();
 const walletRefreshCooldowns = new Map<string, number>();
+
+// Validate Ronin/Ethereum hex address format
+const isValidAddress = (addr: string): boolean => /^0x[a-fA-F0-9]{40}$/.test(addr);
 
 export async function GET(request: NextRequest) {
     const address = request.nextUrl.searchParams.get('address');
 
     if (!address) {
         return NextResponse.json({ error: 'Missing Wallet Address' }, { status: 400 });
+    }
+
+    if (!isValidAddress(address)) {
+        return NextResponse.json({ error: 'Invalid wallet address format' }, { status: 400 });
     }
 
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('client-ip') || 'unknown';
@@ -57,7 +66,7 @@ export async function GET(request: NextRequest) {
         }
     }
 
-    console.log(`[API] Fetching cards for address: ${address} via Alchemy. IP: ${ip}. Known Wallets for IP: ${ipRateLimitMap.get(ip)?.wallets.size || 0}`);
+    console.log(`[API] Fetching cards for wallet ${address.substring(0, 6)}...${address.slice(-4)}`);
 
     try {
         const alchemy = AlchemyService.getInstance();
@@ -89,8 +98,7 @@ export async function GET(request: NextRequest) {
     } catch (error: any) {
         console.error('[API] Error:', error);
         return NextResponse.json({
-            error: 'Failed to retrieve card data from Alchemy API',
-            details: error.message
+            error: 'Failed to retrieve card data'
         }, { status: 500 });
     }
 }

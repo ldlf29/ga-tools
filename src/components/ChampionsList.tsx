@@ -6,7 +6,6 @@ import ChangelogModal from './ChangelogModal';
 import MatchHistoryModal from './MatchHistoryModal';
 import NextImage from 'next/image';
 import styles from './ChampionsList.module.css';
-import ExcelJS from 'exceljs';
 import { MOKI_CLASSES, MOKI_FURS } from '@/utils/constants';
 
 type SortField = keyof MokiData;
@@ -23,12 +22,10 @@ export default function ChampionsList() {
     const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
     // Filter state
-    const [filterClass, setFilterClass] = useState<string | null>(null);
+    const [filterClasses, setFilterClasses] = useState<string[]>([]);
     const [showClassFilter, setShowClassFilter] = useState(false);
 
-
-
-    const [filterFur, setFilterFur] = useState<string | null>(null);
+    const [filterFurs, setFilterFurs] = useState<string[]>([]);
     const [showFurFilter, setShowFurFilter] = useState(false);
 
     // Mobile States
@@ -143,6 +140,7 @@ export default function ChampionsList() {
     const handleExportExcel = async () => {
         if (sortedData.length === 0) return;
 
+        const ExcelJS = await import('exceljs');
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Champions Stats');
 
@@ -199,16 +197,24 @@ export default function ChampionsList() {
         window.URL.revokeObjectURL(url);
     };
 
-    const selectClass = (cls: string) => {
-        setFilterClass(cls === "All Classes" ? null : cls);
-        setFilterFur(null);
-        setShowClassFilter(false);
+    const toggleClass = (cls: string) => {
+        if (cls === "All Classes") {
+            setFilterClasses([]);
+        } else {
+            setFilterClasses(prev =>
+                prev.includes(cls) ? prev.filter(c => c !== cls) : [...prev, cls]
+            );
+        }
     };
 
-    const selectFur = (fur: string) => {
-        setFilterFur(fur === "All Furs" ? null : fur);
-        setFilterClass(null);
-        setShowFurFilter(false);
+    const toggleFur = (fur: string) => {
+        if (fur === "All Furs") {
+            setFilterFurs([]);
+        } else {
+            setFilterFurs(prev =>
+                prev.includes(fur) ? prev.filter(f => f !== fur) : [...prev, fur]
+            );
+        }
     };
 
     const sortedData = useMemo(() => {
@@ -219,12 +225,12 @@ export default function ChampionsList() {
             items = items.filter(i => i.name.toLowerCase().includes(q));
         }
 
-        if (filterClass) {
-            items = items.filter(i => i.class === filterClass);
+        if (filterClasses.length > 0) {
+            items = items.filter(i => i.class && filterClasses.includes(i.class));
         }
 
-        if (filterFur) {
-            items = items.filter(i => i.fur === filterFur);
+        if (filterFurs.length > 0) {
+            items = items.filter(i => i.fur && filterFurs.includes(i.fur));
         }
 
         items.sort((a, b) => {
@@ -246,7 +252,7 @@ export default function ChampionsList() {
         });
 
         return items;
-    }, [data, search, sortField, sortDirection, filterClass, filterFur]);
+    }, [data, search, sortField, sortDirection, filterClasses, filterFurs]);
 
     const renderHeader = (label: string, field: SortField, width?: string) => {
         const isClass = field === 'class';
@@ -254,7 +260,7 @@ export default function ChampionsList() {
         const isActive = sortField === field;
 
         const showFilter = isClass ? showClassFilter : (isFur ? showFurFilter : false);
-        const hasActiveFilter = isClass ? filterClass : (isFur ? filterFur : false);
+        const hasActiveFilter = isClass ? filterClasses.length > 0 : (isFur ? filterFurs.length > 0 : false);
 
         const toggleFilter = () => {
             if (isClass) {
@@ -279,21 +285,23 @@ export default function ChampionsList() {
                     {label}
 
                     {(isClass || isFur) && showFilter && (
-                        <div className={styles.dropdownMenu}>
-                            {(isClass ? classOptions : furOptions).map(opt => {
+                        <div className={styles.dropdownMenu} onClick={(e) => e.stopPropagation()}>
+                            <div
+                                className={`${styles.dropdownItem} ${((isClass && filterClasses.length === 0) || (isFur && filterFurs.length === 0)) ? styles.dropdownItemActive : ''}`}
+                                onClick={() => isClass ? toggleClass("All Classes") : toggleFur("All Furs")}
+                            >
+                                {isClass ? "All Classes" : "All Furs"}
+                            </div>
+                            {(isClass ? MOKI_CLASSES : MOKI_FURS).map(opt => {
                                 const isActive = isClass
-                                    ? (filterClass === opt || (!filterClass && opt === "All Classes"))
-                                    : (filterFur === opt || (!filterFur && opt === "All Furs"));
+                                    ? filterClasses.includes(opt)
+                                    : filterFurs.includes(opt);
 
                                 return (
                                     <div
                                         key={opt}
                                         className={`${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ''}`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (isClass) selectClass(opt);
-                                            if (isFur) selectFur(opt);
-                                        }}
+                                        onClick={() => isClass ? toggleClass(opt) : toggleFur(opt)}
                                     >
                                         {opt}
                                     </div>
@@ -448,16 +456,16 @@ export default function ChampionsList() {
                         {openMobileDropdown === 'class' && (
                             <ul className={styles.mobileFilterMenu}>
                                 <li
-                                    onClick={() => { selectClass(""); setOpenMobileDropdown(null); }}
-                                    className={!filterClass ? styles.mobileFilterActive : ''}
+                                    onClick={() => toggleClass("All Classes")}
+                                    className={filterClasses.length === 0 ? styles.mobileFilterActive : ''}
                                 >
                                     All Classes
                                 </li>
-                                {classOptions.slice(1).map(opt => (
+                                {MOKI_CLASSES.map(opt => (
                                     <li
                                         key={opt}
-                                        onClick={() => { selectClass(opt); setOpenMobileDropdown(null); }}
-                                        className={filterClass === opt ? styles.mobileFilterActive : ''}
+                                        onClick={() => toggleClass(opt)}
+                                        className={filterClasses.includes(opt) ? styles.mobileFilterActive : ''}
                                     >
                                         {opt}
                                     </li>
@@ -480,16 +488,16 @@ export default function ChampionsList() {
                         {openMobileDropdown === 'fur' && (
                             <ul className={styles.mobileFilterMenu}>
                                 <li
-                                    onClick={() => { selectFur(""); setOpenMobileDropdown(null); }}
-                                    className={!filterFur ? styles.mobileFilterActive : ''}
+                                    onClick={() => toggleFur("All Furs")}
+                                    className={filterFurs.length === 0 ? styles.mobileFilterActive : ''}
                                 >
                                     All Furs
                                 </li>
-                                {furOptions.slice(1).map(opt => (
+                                {MOKI_FURS.map(opt => (
                                     <li
                                         key={opt}
-                                        onClick={() => { selectFur(opt); setOpenMobileDropdown(null); }}
-                                        className={filterFur === opt ? styles.mobileFilterActive : ''}
+                                        onClick={() => toggleFur(opt)}
+                                        className={filterFurs.includes(opt) ? styles.mobileFilterActive : ''}
                                     >
                                         {opt}
                                     </li>
@@ -586,7 +594,7 @@ export default function ChampionsList() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={15}>
+                                            <td colSpan={16}>
                                                 <div className={styles.noResults}>
                                                     No Moki found matching your filters.
                                                 </div>

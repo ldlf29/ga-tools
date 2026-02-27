@@ -13,5 +13,6 @@ jobs:
     steps:
       - name: Fetch Match History API
         run: |
-          curl -X GET '${{ secrets.VERCEL_URL }}/api/cron/sync-matches?secret=${{ secrets.CRON_SECRET }}' \
+          curl -X GET ${{ secrets.VERCEL_URL }}/api/cron/sync-matches \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
           --fail

@@ -58,19 +58,7 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
-          {
-            key: 'Content-Security-Policy',
-            value: `
-              default-src 'self';
-              script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vaul.emilkowal.ski https://vercel.live;
-              style-src 'self' 'unsafe-inline';
-              img-src 'self' blob: data: https://*.public.blob.vercel-storage.com https://lh1.googleusercontent.com https://lh2.googleusercontent.com https://lh3.googleusercontent.com https://lh4.googleusercontent.com https://lh5.googleusercontent.com https://lh6.googleusercontent.com https://lh7.googleusercontent.com https://drive.google.com https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com;
-              font-src 'self';
-              connect-src 'self' https://*.supabase.co https://vercel.live;
-              worker-src 'self' blob:;
-              frame-src 'self' https://vercel.live;
-            `.replace(/\s{2,}/g, ' ').trim()
-          }
+          // CSP is now handled by middleware.ts with per-request nonce
         ],
       },
     ];

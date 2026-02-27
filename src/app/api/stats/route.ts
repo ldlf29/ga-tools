@@ -6,9 +6,7 @@ export const revalidate = 600;
 
 export async function GET() {
     try {
-        // console.log("[API Stats] Fetching from Supabase moki_stats...");
-
-        // 1. Fetch all Moki stats from the new minimal table
+        // 1. Fetch all Moki stats
         const { data: globalData, error: globalError } = await supabase
             .from('moki_stats')
             .select('*');
@@ -21,55 +19,26 @@ export async function GET() {
             return NextResponse.json({});
         }
 
-        // 2. Fetch match history to calculate 10-match averages
-        const { data: matchData, error: matchError } = await supabase
-            .from('moki_match_history')
-            .select('moki_name, eliminations, deposits, wart_distance, team_won, moki_team, created_at')
-            .order('created_at', { ascending: false });
+        // 2. Fetch last-10-match averages via SQL function (avoids full-table scan)
+        const averagesByName: Record<string, any> = {};
+        const { data: avgData, error: avgError } = await supabase
+            .rpc('get_moki_match_averages', { match_limit: 10 });
 
-        if (matchError) {
-            console.warn("[API Stats] Failed to fetch match history:", matchError);
-        }
-
-        // Group matches by moki_name and keep latest 10
-        const mokiMatchesMap = new Map<string, any[]>();
-        if (matchData) {
-            for (const row of matchData) {
-                if (!row.moki_name) continue;
-                const key = row.moki_name.toUpperCase();
-                if (!mokiMatchesMap.has(key)) {
-                    mokiMatchesMap.set(key, []);
-                }
-                const matches = mokiMatchesMap.get(key)!;
-                if (matches.length < 10) {
-                    matches.push(row);
-                }
+        if (avgError) {
+            console.warn("[API Stats] Failed to fetch match averages:", avgError);
+        } else if (avgData) {
+            for (const row of avgData) {
+                averagesByName[row.moki_name] = {
+                    avgWinRate: row.avg_win_rate || 0,
+                    avgScore: row.avg_score || 0,
+                    avgEliminations: row.avg_eliminations || 0,
+                    avgDeposits: row.avg_deposits || 0,
+                    avgWartDistance: row.avg_wart_distance || 0,
+                };
             }
         }
 
-        // Calculate averages
-        const averagesByName: Record<string, any> = {};
-        for (const [name, matches] of mokiMatchesMap.entries()) {
-            let wins = 0, totalElims = 0, totalDeposits = 0, totalWart = 0, totalScore = 0;
-            matches.forEach(m => {
-                const isWinner = m.team_won === m.moki_team;
-                if (isWinner) wins++;
-                totalElims += m.eliminations || 0;
-                totalDeposits += m.deposits || 0;
-                totalWart += m.wart_distance || 0;
-                totalScore += (isWinner ? 300 : 0) + ((m.deposits || 0) * 50) + ((m.eliminations || 0) * 80) + (Math.floor((m.wart_distance || 0) / 80) * 45);
-            });
-            const numMatches = matches.length;
-            averagesByName[name] = {
-                avgWinRate: numMatches > 0 ? (wins / numMatches) * 100 : 0,
-                avgScore: numMatches > 0 ? totalScore / numMatches : 0,
-                avgEliminations: numMatches > 0 ? totalElims / numMatches : 0,
-                avgDeposits: numMatches > 0 ? totalDeposits / numMatches : 0,
-                avgWartDistance: numMatches > 0 ? totalWart / numMatches : 0,
-            };
-        }
-
-        // Transform into the expected Map format: { "NAME": { ...stats } }
+        // 3. Build the response map
         const statsMap: Record<string, any> = {};
 
         for (const row of globalData) {
@@ -102,13 +71,14 @@ export async function GET() {
             }
         }
 
-        // console.log(`[API Stats] Returned ${Object.keys(statsMap).length} records from moki_stats.`);
-
-        return NextResponse.json(statsMap);
+        return NextResponse.json(statsMap, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=300'
+            }
+        });
 
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Database error';
         console.error("[API Stats] DB Error:", error);
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to load stats' }, { status: 500 });
     }
 }

@@ -2346,3 +2346,76 @@
         padding-top: 1.5rem !important;
     }
 }
+
+/* Extracted Inline Styles from MyLineups.tsx */
+.previewImageContainer {
+    position: relative;
+    flex: 1;
+    aspect-ratio: 0.7;
+}
+
+.previewImage {
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.sectionTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sectionActionRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.overflowHidden {
+    overflow: hidden;
+}
+
+.infoPopupExt {
+    left: 0;
+    right: auto;
+}
+
+.modalCardRelative {
+    flex-shrink: 0;
+    position: relative;
+}
+
+.cardInfoActions {
+    display: flex;
+    gap: 6px;
+}
+
+.confirmationContainerGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 220px;
+    position: relative;
+    transform: translateX(-25px);
+}
+
+.deleteConfirmationMenuExt {
+    background: #5097FF;
+    width: 280px;
+    left: 0;
+    bottom: 100%;
+    top: auto;
+    margin-bottom: 10px;
+}
+
+.deleteConfirmationMenuBlue {
+    background: #5097FF;
+}
+
+.discardConfirmationModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 260px;
+}

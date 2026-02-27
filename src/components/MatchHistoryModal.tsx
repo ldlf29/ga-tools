@@ -31,7 +31,8 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
 
     useEffect(() => {
         if (mounted && tokenId !== null) {
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open');
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') onClose();
             };
@@ -62,7 +63,8 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
             fetchMatches();
 
             return () => {
-                document.body.style.overflow = 'unset';
+                document.body.classList.remove('modal-open');
+                document.documentElement.classList.remove('modal-open');
                 window.removeEventListener('keydown', handleEsc);
             };
         }

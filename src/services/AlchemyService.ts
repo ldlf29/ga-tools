@@ -198,7 +198,14 @@ export class AlchemyService {
                 imageUrl: imageUrl,
                 championTokenId: championTokenId,
                 minted: true,
-                custom: undefined,
+                custom: {
+                    stars: 0,
+                    class: finalCardType === 'scheme' ? 'Scheme' : '',
+                    fur: '',
+                    traits: [],
+                    imageUrl: imageUrl,
+                    characterImage: imageUrl
+                } as unknown as EnhancedCard['custom'], // Cast safely
                 rank: 0,
                 grade: 0
             } as unknown as EnhancedCard;

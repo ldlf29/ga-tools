@@ -11,9 +11,9 @@ import RatingSlider from './RatingSlider';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
-import ExcelJS from 'exceljs';
 import CardGrid from './CardGrid';
 import CardModal from './CardModal';
+import { LineupCardSelector } from '@/components/LineupCardSelector';
 import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 
 interface MyLineupsProps {
@@ -47,6 +47,19 @@ export default function MyLineups({
     allCards, onUpdateLineup, isUserMode
 }: MyLineupsProps) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
+
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (expandedId !== null) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [expandedId]);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
     const [tempName, setTempName] = useState('');
@@ -116,6 +129,7 @@ export default function MyLineups({
             return;
         }
 
+        const ExcelJS = await import('exceljs');
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Favorite Lineups');
 
@@ -371,7 +385,27 @@ export default function MyLineups({
     }, [showRatingInfo]);
 
     const filteredLineups = useMemo(() => {
-        return lineups.filter(l => {
+        // Hydrate the lineups with fresh class/fur from allCards to prevent stale metadata
+        const hydratedLineups = lineups.map(l => ({
+            ...l,
+            cards: l.cards.map(card => {
+                if (card.cardType !== 'MOKI') return card;
+                // Match by name or some reliable unique identifier
+                const freshCard = allCards.find(c => c.name === card.name);
+                if (freshCard && freshCard.custom) {
+                    return {
+                        ...card,
+                        custom: {
+                            ...card.custom,
+                            class: freshCard.custom.class || card.custom?.class
+                        }
+                    };
+                }
+                return card;
+            })
+        }));
+
+        return hydratedLineups.filter(l => {
             const nameMatch = l.name.toLowerCase().includes(searchQuery.toLowerCase());
             if (!nameMatch) return false;
 
@@ -382,7 +416,7 @@ export default function MyLineups({
 
             return true;
         });
-    }, [lineups, searchQuery, filters]);
+    }, [lineups, searchQuery, filters, allCards]);
 
     const favoriteLineups = useMemo(() => {
         const rawFavorites = filteredLineups.filter(l => l.isFavorite);
@@ -431,8 +465,8 @@ export default function MyLineups({
     // Lock body scroll when modal is open and handle ESC
     useEffect(() => {
         if (expandedId !== null) {
-            document.body.style.overflow = 'hidden';
             document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open');
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
                     // If selector is open, just close it and stop
@@ -461,16 +495,16 @@ export default function MyLineups({
             };
             window.addEventListener('keydown', handleEsc);
             return () => {
-                document.body.style.overflow = 'unset';
                 document.body.classList.remove('modal-open');
+                document.documentElement.classList.remove('modal-open');
                 window.removeEventListener('keydown', handleEsc);
             };
         } else {
-            document.body.style.overflow = 'unset';
             document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open');
             return () => {
-                document.body.style.overflow = 'unset';
                 document.body.classList.remove('modal-open');
+                document.documentElement.classList.remove('modal-open');
             };
         }
     }, [expandedId, editingId, tempName, hasChanges, selectorSlot]);
@@ -491,7 +525,9 @@ export default function MyLineups({
                 '#download-button',
                 '#background-switcher',
                 '#rating-slider-container',
-                `.${styles.excludeFromCapture}`
+                `.${styles.excludeFromCapture}`,
+                `.${styles.modalCardClassBadge}`,
+                `.${styles.cardInfoActions}`
             ];
             const hiddenElements: { el: HTMLElement, display: string }[] = [];
             excludeSelectors.forEach(selector => {
@@ -813,7 +849,7 @@ export default function MyLineups({
                                 </svg>
                             </button>
                             {exportConfirmOpen && (
-                                <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF' }}>
+                                <div className={`${styles.deleteConfirmationMenu} ${styles.deleteConfirmationMenuBlue}`}>
                                     <div className={styles.deleteConfirmationText}>Would you like to download your favorite lineups in Excel?</div>
                                     <div className={styles.deleteActions}>
                                         <button
@@ -893,7 +929,7 @@ export default function MyLineups({
                                 </svg>
                             </button>
                             {showDataInfo && (
-                                <div className={styles.infoPopup} style={{ left: '0', right: 'auto' }}>
+                                <div className={`${styles.infoPopup} ${styles.infoPopupExt}`}>
                                     Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
                                 </div>
                             )}
@@ -934,7 +970,7 @@ export default function MyLineups({
             {favoriteLineups.length > 0 && (
                 <div className={styles.section}>
                     <div className={styles.sectionHeader}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div className={styles.sectionTitleRow}>
                             <h3 className={styles.sectionTitle}>
                                 FAVORITES
                             </h3>
@@ -947,7 +983,7 @@ export default function MyLineups({
                             </button>
                         </div>
                         {favoritesOpen && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div className={styles.sectionActionRow}>
                                 {renderSortDropdown('favorites', favoritesSort, setFavoritesSort)}
                                 {renderDeleteAllButton('favorites', favoriteLineups.map(l => l.id))}
                             </div>
@@ -961,7 +997,7 @@ export default function MyLineups({
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                                style={{ overflow: "hidden" }}
+                                className={styles.overflowHidden}
                             >
                                 <div className={styles.grid}>
                                     {favoriteLineups.map(renderLineupCard)}
@@ -975,7 +1011,7 @@ export default function MyLineups({
             {recentLineups.length > 0 && (
                 <div className={styles.section}>
                     <div className={styles.sectionHeader}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div className={styles.sectionTitleRow}>
                             <h3 className={styles.sectionTitle}>
                                 {favoriteLineups.length > 0 ? 'OTHERS' : 'ALL LINEUPS'}
                             </h3>
@@ -988,7 +1024,7 @@ export default function MyLineups({
                             </button>
                         </div>
                         {allLineupsOpen && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div className={styles.sectionActionRow}>
                                 {renderSortDropdown('others', othersSort, setOthersSort)}
                                 {renderDeleteAllButton('others', recentLineups.map(l => l.id))}
                             </div>
@@ -1002,7 +1038,7 @@ export default function MyLineups({
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                                style={{ overflow: "hidden" }}
+                                className={styles.overflowHidden}
                             >
                                 <div className={styles.grid}>
                                     {recentLineups.map(renderLineupCard)}
@@ -1110,7 +1146,7 @@ export default function MyLineups({
                                 {localCards.map((card, idx) => (
                                     <div key={`slot-${idx}`} className={styles.modalCardWrapper}>
                                         {card ? (
-                                            <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`} style={{ flexShrink: 0, position: 'relative' }}>
+                                            <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''} ${styles.modalCardRelative}`}>
                                                 <NextImage
                                                     src={card.image}
                                                     alt={card.name}
@@ -1170,7 +1206,7 @@ export default function MyLineups({
                                                 {card?.custom?.class || 'Class'}
                                             </div>
                                             {card && (
-                                                <div style={{ display: 'flex', gap: '6px' }}>
+                                                <div className={styles.cardInfoActions}>
                                                     <button
                                                         className={styles.cardInfoButton}
                                                         onClick={(e) => {
@@ -1210,7 +1246,7 @@ export default function MyLineups({
 
                         <div className={`${styles.modalFooter} ${styles.excludeFromCapture}`}>
                             {/* Actions Left (Download / Save) */}
-                            <div className={`${styles.confirmationContainer} ${styles.excludeFromCapture}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '220px', position: 'relative', transform: 'translateX(-25px)' }}>
+                            <div className={`${styles.confirmationContainer} ${styles.excludeFromCapture} ${styles.confirmationContainerGroup}`}>
                                 <button
                                     id="download-button"
                                     className={`${styles.modalDownloadButton}`}
@@ -1233,7 +1269,7 @@ export default function MyLineups({
                                 </button>
 
                                 {imageDownloadConfirmOpen && (
-                                    <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF', width: '280px', left: '0', bottom: '100%', top: 'auto', marginBottom: '10px' }}>
+                                    <div className={`${styles.deleteConfirmationMenu} ${styles.deleteConfirmationMenuExt}`}>
                                         <div className={styles.deleteConfirmationText}>Would you like to download your lineup as an image?</div>
                                         <div className={styles.deleteActions}>
                                             <button
@@ -1345,13 +1381,7 @@ export default function MyLineups({
 
                         {/* Discard Confirmation Modal (Inline) */}
                         {showDiscardConfirm && (
-                            <div className={styles.discardConfirmationMenu} style={{
-                                position: 'fixed',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: '260px'
-                            }} onClick={(e) => e.stopPropagation()}>
+                            <div className={`${styles.discardConfirmationMenu} ${styles.discardConfirmationModal}`} onClick={(e) => e.stopPropagation()}>
                                 <div className={styles.deleteConfirmationText}>Discard unsaved changes?</div>
                                 <div className={styles.deleteActions}>
                                     <button
@@ -1380,97 +1410,22 @@ export default function MyLineups({
                 </div>
             )}
 
-            {/* Selector Overlay - Moved outside modalContent to avoid transform issues */}
+            {/* Selector Overlay - Extracted Component */}
             {selectorSlot !== null && (
-                <div className={styles.selectorBackdrop} onClick={() => setSelectorSlot(null)}>
-                    <div className={styles.selectorOverlay} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.selectorHeader}>
-                            <span>SELECT A CARD</span>
-                            <div className={styles.selectorHeaderActions}>
-                                <button
-                                    className={styles.selectorCloseButton}
-                                    onClick={() => setSelectorSlot(null)}
-                                    title="Close"
-                                >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className={styles.selectorBody}>
-                            <div className={styles.selectorSidebar}>
-                                <FilterSidebar
-                                    filters={selectorFilters}
-                                    onFilterChange={setSelectorFilters}
-                                    onCardTypeChange={() => { }}
-                                />
-                            </div>
-                            <div className={styles.selectorGridWrapper}>
-                                <CardGrid
-                                    cards={filteredSelectorCards}
-                                    onAddCard={handleCardSelect}
-                                    searchQuery={selectorSearch}
-                                    onSearchChange={setSelectorSearch}
-                                    currentLineup={localCards.filter(c => c) as EnhancedCard[]}
-                                    savedLineups={lineups}
-                                    filters={selectorFilters}
-                                    onRemoveFilter={handleSelectorRemoveFilter}
-                                    isUserMode={true}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Floating Filter Button (Mobile only) */}
-                    <button
-                        className={styles.selectorFabFilters}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectorMobileFiltersOpen(true);
-                        }}
-                    >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                        </svg>
-                    </button>
-
-                    {/* Mobile Filters Drawer */}
-                    <div
-                        className={`${styles.selectorMobileDrawer} ${selectorMobileFiltersOpen ? styles.selectorMobileDrawerOpen : ''}`}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            className={styles.selectorDrawerCloseButton}
-                            onClick={() => setSelectorMobileFiltersOpen(false)}
-                            aria-label="Close Filters"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="15 18 9 12 15 6"></polyline>
-                            </svg>
-                        </button>
-                        <div className={styles.selectorMobileDrawerContent}>
-                            <FilterSidebar
-                                filters={selectorFilters}
-                                onFilterChange={setSelectorFilters}
-                                onCardTypeChange={() => { }}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Backdrop for selector mobile drawer */}
-                    {selectorMobileFiltersOpen && (
-                        <div
-                            className={styles.selectorMobileDrawerBackdrop}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectorMobileFiltersOpen(false);
-                            }}
-                        />
-                    )}
-                </div>
+                <LineupCardSelector
+                    selectorFilters={selectorFilters}
+                    setSelectorFilters={setSelectorFilters}
+                    filteredSelectorCards={filteredSelectorCards}
+                    handleCardSelect={handleCardSelect}
+                    selectorSearch={selectorSearch}
+                    setSelectorSearch={setSelectorSearch}
+                    localCards={localCards}
+                    lineups={lineups}
+                    handleSelectorRemoveFilter={handleSelectorRemoveFilter}
+                    setSelectorSlot={setSelectorSlot}
+                    selectorMobileFiltersOpen={selectorMobileFiltersOpen}
+                    setSelectorMobileFiltersOpen={setSelectorMobileFiltersOpen}
+                />
             )}
             {/* Card Information Modal */}
             <CardModal

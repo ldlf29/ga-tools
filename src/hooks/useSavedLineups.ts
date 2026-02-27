@@ -3,14 +3,11 @@ import { SavedLineup, EnhancedCard } from '@/types';
 
 export function useSavedLineups(storageKey: string = 'grandArenaLineups') {
     const [savedLineups, setSavedLineups] = useState<SavedLineup[]>([]);
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [loadedKey, setLoadedKey] = useState<string | null>(null);
 
     // Load from LocalStorage on mount or key change
     useEffect(() => {
         if (typeof window === 'undefined') return;
-
-        // Reset initialization state when key changes
-        setIsInitialized(false);
 
         try {
             const saved = localStorage.getItem(storageKey);
@@ -24,14 +21,17 @@ export function useSavedLineups(storageKey: string = 'grandArenaLineups') {
             setSavedLineups([]);
         }
 
-        setIsInitialized(true);
+        setLoadedKey(storageKey);
     }, [storageKey]);
 
     // Save to LocalStorage whenever savedLineups changes
     useEffect(() => {
-        if (typeof window === 'undefined' || !isInitialized) return;
+        if (typeof window === 'undefined') return;
+        // MUST check if the data corresponds to the current key, otherwise when switching tabs it cross-saves old data to the new key
+        if (loadedKey !== storageKey) return;
+
         localStorage.setItem(storageKey, JSON.stringify(savedLineups));
-    }, [savedLineups, isInitialized, storageKey]);
+    }, [savedLineups, loadedKey, storageKey]);
 
     const getUniqueName = (baseName: string, existingNames: string[]) => {
         let name = baseName;

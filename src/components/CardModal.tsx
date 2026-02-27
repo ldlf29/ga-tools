@@ -20,20 +20,25 @@ export default function CardModal({ card, onClose, useLast10Matches }: CardModal
         setMounted(true);
     }, []);
 
-    // Prevent scroll when modal is open
+    // Prevent scroll when modal is open and handle ESC
     useEffect(() => {
-        if (mounted && card) {
-            document.body.style.overflow = 'hidden';
-            const handleEsc = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') onClose();
-            };
-            window.addEventListener('keydown', handleEsc);
-            return () => {
-                document.body.style.overflow = 'unset';
-                window.removeEventListener('keydown', handleEsc);
-            };
-        }
-    }, [card, onClose]);
+        if (!card) return; // Only apply scroll lock and ESC handler if modal is open (card is not null)
+
+        document.body.classList.add('modal-open');
+        document.documentElement.classList.add('modal-open');
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open');
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [card, onClose]); // Depend on card to re-run effect when modal opens/closes
 
     if (!mounted || !card) return null;
 

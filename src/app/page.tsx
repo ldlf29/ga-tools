@@ -13,6 +13,9 @@ import styles from './page.module.css';
 import Toast, { ToastMessage } from '@/components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchUserCards } from '@/utils/cardService';
+import { ModeToggle } from '@/components/ModeToggle';
+import { LoadingOverlay } from '@/components/LoadingOverlay';
+import { HeaderControls } from '@/components/HeaderControls';
 
 // Lazy Loaded Components
 const MyLineups = dynamic(() => import('@/components/MyLineups'), {
@@ -124,7 +127,23 @@ export default function Home() {
   }, []);
 
   /* User Cards Handlers */
-  /* User Cards Handlers */
+  /* Global Scroll Lock for Modals */
+  useEffect(() => {
+    const isInitialLoading = isLoading && allCards.length === 0;
+    const shouldLock = showWalletManagerModal || showWalletInput || (isLoadingUser && !showWalletInput) || isInitialLoading;
+    if (shouldLock) {
+      document.body.classList.add('modal-open');
+      document.documentElement.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+      document.documentElement.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+      document.documentElement.classList.remove('modal-open');
+    };
+  }, [showWalletManagerModal, showWalletInput, isLoadingUser, isLoading, allCards.length]);
+
   const reloadAllWallets = async (wallets: ConnectedWallet[]) => {
     setIsLoadingUser(true);
     try {
@@ -551,31 +570,12 @@ export default function Home() {
         </nav>
 
         <div className={styles.authWrapper}>
-          <div className={walletStyles.modeToggle}>
-            <button
-              className={`${walletStyles.modeButton} ${cardMode === 'ALL' ? walletStyles.modeButtonActive : ''}`}
-              onClick={() => handleModeChange('ALL')}
-            >
-              ALL CARDS
-            </button>
-            {cardMode === 'USER' && userWallets.length > 0 ? (
-              <div className={walletStyles.connectedGroup}>
-                <button
-                  className={walletStyles.connectedButton}
-                  onClick={() => setShowWalletManagerModal(true)}
-                >
-                  MY CARDS ({userWallets.length})
-                </button>
-              </div>
-            ) : (
-              <button
-                className={`${walletStyles.modeButton} ${cardMode === 'USER' ? walletStyles.modeButtonActive : ''}`}
-                onClick={() => handleModeChange('USER')}
-              >
-                MY CARDS
-              </button>
-            )}
-          </div>
+          <ModeToggle
+            cardMode={cardMode}
+            handleModeChange={handleModeChange}
+            userWalletsCount={userWallets.length}
+            onOpenWalletManager={() => setShowWalletManagerModal(true)}
+          />
         </div>
       </div>
 
@@ -667,92 +667,30 @@ export default function Home() {
           </div>
 
           <div className={`${styles.authWrapper} ${styles.desktopOnly}`}>
-            <div className={styles.headerControls}>
-              <div className={styles.mokiButtonContainer}>
-                <button
-                  onClick={() => {
-                    if (!mokiDropdownOpen) {
-                      setMokiDropdownOpen(true);
-                      setTimeout(() => setMokiDropdownOpen(false), 1500);
-                    }
-                  }}
-                  className={styles.mokiButton}
-                  title="Dorime"
-                >
-                  <img src="/moki-praying.png" alt="Moki" width={56} height={56} />
-                </button>
-                <div className={`${styles.mokiDropdown} ${mokiDropdownOpen ? styles.mokiDropdownOpen : ''}`}>
-                  <img src="/count.png" alt="Count" width={24} height={24} />
-                </div>
-              </div>
+            <HeaderControls
+              mokiDropdownOpen={mokiDropdownOpen}
+              setMokiDropdownOpen={setMokiDropdownOpen}
+              notificationsEnabled={notificationsEnabled}
+              setNotificationsEnabled={setNotificationsEnabled}
+              iconSize={56}
+            />
 
-
-              <button onClick={() => setNotificationsEnabled(!notificationsEnabled)} className={styles.iconButton} title={notificationsEnabled ? "Disable Notifications" : "Enable Notifications"}>
-                {notificationsEnabled ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                )}
-              </button>
-            </div>
-
-            <div className={walletStyles.modeToggle}>
-              <button
-                className={`${walletStyles.modeButton} ${cardMode === 'ALL' ? walletStyles.modeButtonActive : ''}`}
-                onClick={() => handleModeChange('ALL')}
-              >
-                ALL CARDS
-              </button>
-              {cardMode === 'USER' && userWallets.length > 0 ? (
-                <div className={walletStyles.connectedGroup}>
-                  <button
-                    className={walletStyles.connectedButton}
-                    onClick={() => setShowWalletManagerModal(true)}
-                  >
-                    MY CARDS ({userWallets.length})
-                  </button>
-                </div>
-              ) : (
-                <button
-                  className={`${walletStyles.modeButton} ${cardMode === 'USER' ? walletStyles.modeButtonActive : ''}`}
-                  onClick={() => handleModeChange('USER')}
-                >
-                  MY CARDS
-                </button>
-              )}
-            </div>
+            <ModeToggle
+              cardMode={cardMode}
+              handleModeChange={handleModeChange}
+              userWalletsCount={userWallets.length}
+              onOpenWalletManager={() => setShowWalletManagerModal(true)}
+            />
           </div>
 
           <div className={`${styles.headerRightMobile} ${styles.mobileOnly}`}>
-            <div className={styles.mokiButtonContainer}>
-              <button
-                onClick={() => {
-                  if (!mokiDropdownOpen) {
-                    setMokiDropdownOpen(true);
-                    setTimeout(() => setMokiDropdownOpen(false), 1500);
-                  }
-                }}
-                className={styles.mokiButton}
-                title="Dorime"
-              >
-                <img src="/moki-praying.png" alt="Moki" width={44} height={44} />
-              </button>
-              <div className={`${styles.mokiDropdown} ${mokiDropdownOpen ? styles.mokiDropdownOpen : ''}`}>
-                <img src="/count.png" alt="Count" width={20} height={20} />
-              </div>
-            </div>
-
-            <button
-              onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-              className={styles.iconButton}
-              aria-label="Toggle Notifications"
-            >
-              {notificationsEnabled ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-              ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-              )}
-            </button>
+            <HeaderControls
+              mokiDropdownOpen={mokiDropdownOpen}
+              setMokiDropdownOpen={setMokiDropdownOpen}
+              notificationsEnabled={notificationsEnabled}
+              setNotificationsEnabled={setNotificationsEnabled}
+              iconSize={44}
+            />
 
             <button
               className={`${styles.menuToggle} ${mobileMenuOpen ? styles.menuToggleActive : ''}`}
@@ -770,100 +708,106 @@ export default function Home() {
 
 
       <div className={styles.content}>
-        <div style={{ display: activeTab === 'builder' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+        {activeTab === 'builder' && (
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
 
-          {/* Mobile Floating Action Buttons */}
-          <div className={styles.fabContainer}>
-            <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
-              {/* Filter Icon */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            </button>
-            <button className={`${styles.fabButton} ${styles.fabBuilder}`} onClick={() => setMobileBuilderOpen(true)}>
-              {/* Hammer Icon PNG from public */}
-              <img src="/hammer.png" alt="Hammer" width={27} height={27} style={{ filter: 'brightness(0) invert(1)' }} />
-            </button>
-          </div>
-
-          <div className={styles.mainLayout}>
-            {/* Column 1: FilterSidebar (Desktop only) */}
-            <div className={styles.desktopOnly}>
-              <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
+            {/* Mobile Floating Action Buttons */}
+            <div className={styles.fabContainer}>
+              <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
+                {/* Filter Icon */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              </button>
+              <button className={`${styles.fabButton} ${styles.fabBuilder}`} onClick={() => setMobileBuilderOpen(true)}>
+                {/* Hammer Icon PNG from public */}
+                <img src="/hammer.png" alt="Hammer" width={27} height={27} style={{ filter: 'brightness(0) invert(1)' }} />
+              </button>
             </div>
 
-            {/* Column 2: CardGrid */}
-            <div style={{ width: '100%', minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-              <CardGrid
-                cards={filteredCards}
-                onAddCard={handleAddToLineup}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                currentLineup={lineup}
-                savedLineups={savedLineups}
-                filters={filters}
-                onRemoveFilter={handleRemoveFilter}
-                isUserMode={cardMode === 'USER'}
-                userCardCount={cardMode === 'USER' ? filteredCards.length : undefined}
-              />
-            </div>
+            <div className={styles.mainLayout}>
+              {/* Column 1: FilterSidebar (Desktop only) */}
+              <div className={styles.desktopOnly}>
+                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
+              </div>
 
-            {/* Column 3: LineupBuilder (Desktop only) */}
-            <div className={styles.desktopOnly}>
-              <LineupBuilder
-                lineup={lineup}
-                onRemove={removeFromLineup}
-                onClear={clearLineup}
-                onSave={handleSaveLineup}
-                onUpdate={setLineup}
-                onSuggestFilters={handleSuggestFilters}
-                onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
-              />
-            </div>
-          </div>
-        </div>
+              {/* Column 2: CardGrid */}
+              <div style={{ width: '100%', minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                <CardGrid
+                  cards={filteredCards}
+                  onAddCard={handleAddToLineup}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  currentLineup={lineup}
+                  savedLineups={savedLineups}
+                  filters={filters}
+                  onRemoveFilter={handleRemoveFilter}
+                  isUserMode={cardMode === 'USER'}
+                  userCardCount={cardMode === 'USER' ? filteredCards.length : undefined}
+                />
+              </div>
 
-        <div style={{ display: activeTab === 'lineups' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-          {/* Mobile Floating Action Buttons */}
-          <div className={styles.fabContainer}>
-            <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
-              {/* Filter Icon */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            </button>
-          </div>
-
-          <div className={styles.mainLayoutLineups}>
-            {/* Column 1: Sidebar */}
-            <div className={styles.desktopOnly}>
-              <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
-            </div>
-
-            {/* Column 2: Lineups List */}
-            <div style={{ gridColumn: '2 / span 2', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-              <MyLineups
-                lineups={savedLineups}
-                onDelete={deleteLineup}
-                onRename={renameLineup}
-                onToggleFavorite={toggleFavorite}
-                onRate={rateLineup}
-                onUpdateBackground={updateBackground}
-                onBulkDelete={bulkDelete}
-                onError={(msg) => addToast(msg, 'error')}
-                filters={filters}
-                onRemoveFilter={handleRemoveFilter}
-                favoritesOpen={favoritesOpen}
-                setFavoritesOpen={setFavoritesOpen}
-                allLineupsOpen={allLineupsOpen}
-                setAllLineupsOpen={setAllLineupsOpen}
-                allCards={sourceCards}
-                onUpdateLineup={updateLineup}
-                isUserMode={cardMode === 'USER'}
-              />
+              {/* Column 3: LineupBuilder (Desktop only) */}
+              <div className={styles.desktopOnly}>
+                <LineupBuilder
+                  lineup={lineup}
+                  onRemove={removeFromLineup}
+                  onClear={clearLineup}
+                  onSave={handleSaveLineup}
+                  onUpdate={setLineup}
+                  onSuggestFilters={handleSuggestFilters}
+                  onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div style={{ display: activeTab === 'champions' ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-          <ChampionsList />
-        </div>
+        {activeTab === 'lineups' && (
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+            {/* Mobile Floating Action Buttons */}
+            <div className={styles.fabContainer}>
+              <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
+                {/* Filter Icon */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              </button>
+            </div>
+
+            <div className={styles.mainLayoutLineups}>
+              {/* Column 1: Sidebar */}
+              <div className={styles.desktopOnly}>
+                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
+              </div>
+
+              {/* Column 2: Lineups List */}
+              <div style={{ gridColumn: '2 / span 2', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                <MyLineups
+                  lineups={savedLineups}
+                  onDelete={deleteLineup}
+                  onRename={renameLineup}
+                  onToggleFavorite={toggleFavorite}
+                  onRate={rateLineup}
+                  onUpdateBackground={updateBackground}
+                  onBulkDelete={bulkDelete}
+                  onError={(msg) => addToast(msg, 'error')}
+                  filters={filters}
+                  onRemoveFilter={handleRemoveFilter}
+                  favoritesOpen={favoritesOpen}
+                  setFavoritesOpen={setFavoritesOpen}
+                  allLineupsOpen={allLineupsOpen}
+                  setAllLineupsOpen={setAllLineupsOpen}
+                  allCards={sourceCards}
+                  onUpdateLineup={updateLineup}
+                  isUserMode={cardMode === 'USER'}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'champions' && (
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+            <ChampionsList />
+          </div>
+        )}
       </div>
 
       <button
@@ -879,11 +823,7 @@ export default function Home() {
 
       {
         isLoading && allCards.length === 0 && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-            <img src="/Gn Moki.png" alt="Loading" width={100} height={100} style={{ marginBottom: '1.5rem', objectFit: 'contain' }} />
-            <div className={styles.spinner} style={{ width: '50px', height: '50px', border: '5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-            <p style={{ color: '#FFD753', marginTop: '1rem', fontFamily: 'Inter', fontWeight: '800', fontSize: '1.2rem', textTransform: 'uppercase' }}>Loading cards...</p>
-          </div>
+          <LoadingOverlay message="Loading cards..." />
         )
       }
 
@@ -917,11 +857,7 @@ export default function Home() {
 
       {/* Loading overlay for user cards */}
       {isLoadingUser && !showWalletInput && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <img src="/Gn Moki.png" alt="Loading" width={100} height={100} style={{ marginBottom: '1.5rem', objectFit: 'contain' }} />
-          <div className={styles.spinner} style={{ width: '50px', height: '50px', border: '5px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-          <p style={{ color: '#FFD753', marginTop: '1rem', fontFamily: 'Inter', fontWeight: '800', fontSize: '1.2rem', textTransform: 'uppercase' }}>Loading cards...</p>
-        </div>
+        <LoadingOverlay message="Loading cards..." />
       )}
 
       <Toast messages={toasts} onClose={removeToast} />
