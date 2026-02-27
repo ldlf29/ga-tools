@@ -131,8 +131,8 @@ export default function ChampionsList() {
         { label: "Total", value: "totalStats" },
         { label: "Train", value: "train" },
         { label: "Elims", value: "eliminations" },
-        { label: "Balls", value: "deposits" },
         { label: "Wart", value: "wartDistance" },
+        { label: "Balls", value: "deposits" },
         { label: "Score", value: "score" },
         { label: "Win Rate", value: "winRate" }
     ];
@@ -157,8 +157,8 @@ export default function ChampionsList() {
             { header: 'TOTAL', key: 'total', width: 10 },
             { header: 'TRAIN', key: 'train', width: 10 },
             { header: 'ELIMS', key: 'elims', width: 10 },
-            { header: 'BALLS', key: 'balls', width: 10 },
             { header: 'WART', key: 'wart', width: 10 },
+            { header: 'BALLS', key: 'balls', width: 10 },
             { header: 'SCORE', key: 'score', width: 10 },
             { header: 'W/R', key: 'wr', width: 10 },
         ];
@@ -528,8 +528,8 @@ export default function ChampionsList() {
                                         {renderHeader("TOTAL", "totalStats")}
                                         {renderHeader("TRAIN", "train")}
                                         {renderHeader("ELIMS", "eliminations")}
-                                        {renderHeader("BALLS", "deposits")}
                                         {renderHeader("WART", "wartDistance")}
+                                        {renderHeader("BALLS", "deposits")}
                                         {renderHeader("SCORE", "score")}
                                         {renderHeader("W/R", "winRate")}
                                     </tr>
@@ -586,8 +586,8 @@ export default function ChampionsList() {
                                                 <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.train?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.eliminations?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.wartDistance?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.score?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'}</td>
                                             </tr>
@@ -716,12 +716,12 @@ export default function ChampionsList() {
                                                             <span className={styles.statValue}>{moki.eliminations?.toFixed(1)}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
-                                                            <span className={styles.statLabel}>BALLS</span>
-                                                            <span className={styles.statValue}>{moki.deposits?.toFixed(1)}</span>
-                                                        </div>
-                                                        <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>WART</span>
                                                             <span className={styles.statValue}>{moki.wartDistance?.toFixed(0)}</span>
+                                                        </div>
+                                                        <div className={styles.statRow}>
+                                                            <span className={styles.statLabel}>BALLS</span>
+                                                            <span className={styles.statValue}>{moki.deposits?.toFixed(1)}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>SCORE</span>

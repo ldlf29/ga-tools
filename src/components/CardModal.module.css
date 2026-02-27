@@ -150,6 +150,11 @@
     width: 100%;
 }
 
+.statsGrid .perfHeader {
+    width: 100%;
+    flex-basis: 100%;
+}
+
 .statItem {
     display: flex;
     flex-direction: column;

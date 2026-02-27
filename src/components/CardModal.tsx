@@ -150,12 +150,12 @@ export default function CardModal({ card, onClose, useLast10Matches }: CardModal
                                                     <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgEliminations : card.custom.eliminations)?.toFixed(1) || '0'}</span>
                                                 </div>
                                                 <div className={styles.perfItem}>
-                                                    <span className={styles.perfLabel}>BALLS</span>
-                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgDeposits : card.custom.deposits)?.toFixed(1) || '0'}</span>
-                                                </div>
-                                                <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>WART</span>
                                                     <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgWartDistance : card.custom.wartDistance)?.toFixed(1) || '0'}</span>
+                                                </div>
+                                                <div className={styles.perfItem}>
+                                                    <span className={styles.perfLabel}>BALLS</span>
+                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgDeposits : card.custom.deposits)?.toFixed(1) || '0'}</span>
                                                 </div>
                                                 <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>SCORE</span>
@@ -171,6 +171,7 @@ export default function CardModal({ card, onClose, useLast10Matches }: CardModal
 
                                     {card.cardType === 'MOKI' && (
                                         <div className={styles.statsGrid}>
+                                            <div className={styles.perfHeader}>STATS</div>
                                             <div className={styles.statItem}>
                                                 <span className={styles.statLabel}>STR</span>
                                                 <span className={styles.statValue}>{card.custom.strength?.toFixed(1) || '0.0'}</span>
