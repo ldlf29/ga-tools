@@ -24,11 +24,19 @@ CREATE INDEX IF NOT EXISTS idx_moki_stats_class ON moki_stats (class);
 ALTER TABLE moki_stats ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read access
-CREATE POLICY "Allow public read access" ON moki_stats
+CREATE POLICY "Public read" ON moki_stats
     FOR SELECT USING (true);
 
--- Allow service role to insert/update (for sync script)
-CREATE POLICY "Service role write access" ON moki_stats
-    FOR ALL
-    USING (auth.role() = 'service_role')
-    WITH CHECK (auth.role() = 'service_role');
+-- Allow service role to write (for sync script)
+CREATE POLICY "Service role write" ON moki_stats
+    FOR INSERT
+    WITH CHECK ((select auth.role()) = 'service_role');
+
+CREATE POLICY "Service role update" ON moki_stats
+    FOR UPDATE
+    USING ((select auth.role()) = 'service_role')
+    WITH CHECK ((select auth.role()) = 'service_role');
+
+CREATE POLICY "Service role delete" ON moki_stats
+    FOR DELETE
+    USING ((select auth.role()) = 'service_role');

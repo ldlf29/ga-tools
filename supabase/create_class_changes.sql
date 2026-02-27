@@ -14,12 +14,20 @@ CREATE INDEX IF NOT EXISTS idx_class_changes_date ON class_changes (changed_at D
 -- Enable Row Level Security (optional but recommended)
 ALTER TABLE class_changes ENABLE ROW LEVEL SECURITY;
 
--- Allow public read access (if you want the changelog to be publicly visible)
-CREATE POLICY "Allow public read access" ON class_changes
+-- Allow public read access (changelog is publicly visible)
+CREATE POLICY "Public read" ON class_changes
     FOR SELECT USING (true);
 
--- Allow service role to insert (for the sync script)
-CREATE POLICY "Service role write access" ON class_changes
-    FOR ALL
-    USING (auth.role() = 'service_role')
-    WITH CHECK (auth.role() = 'service_role');
+-- Allow service role to write (for the sync script)
+CREATE POLICY "Service role write" ON class_changes
+    FOR INSERT
+    WITH CHECK ((select auth.role()) = 'service_role');
+
+CREATE POLICY "Service role update" ON class_changes
+    FOR UPDATE
+    USING ((select auth.role()) = 'service_role')
+    WITH CHECK ((select auth.role()) = 'service_role');
+
+CREATE POLICY "Service role delete" ON class_changes
+    FOR DELETE
+    USING ((select auth.role()) = 'service_role');
