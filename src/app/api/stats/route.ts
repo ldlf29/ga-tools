@@ -1,17 +1,19 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 // Revalidate every 10 minutes (600s) to sync smoothly with the new Cron endpoints
 export const revalidate = 600;
 
 export async function GET() {
+    console.log("[API Stats] Loading data...");
     try {
         // 1. Fetch all Moki stats
-        const { data: globalData, error: globalError } = await supabase
+        const { data: globalData, error: globalError } = await supabaseAdmin
             .from('moki_stats')
             .select('*');
 
         if (globalError) {
+            console.error("[API Stats] Moki stats fetch error:", globalError);
             throw globalError;
         }
 
@@ -21,12 +23,13 @@ export async function GET() {
 
         // 2. Fetch last-10-match averages via SQL function (avoids full-table scan)
         const averagesByName: Record<string, any> = {};
-        const { data: avgData, error: avgError } = await supabase
+        const { data: avgData, error: avgError } = await supabaseAdmin
             .rpc('get_moki_match_averages', { match_limit: 10 });
 
         if (avgError) {
-            console.warn("[API Stats] Failed to fetch match averages:", avgError);
+            console.warn("[API Stats] Failed to fetch match averages (Function might not exist yet):", avgError);
         } else if (avgData) {
+            console.log(`[API Stats] Fetched averages for ${avgData.length} Mokis`);
             for (const row of avgData) {
                 averagesByName[row.moki_name] = {
                     avgWinRate: row.avg_win_rate || 0,

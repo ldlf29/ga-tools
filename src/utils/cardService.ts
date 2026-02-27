@@ -164,6 +164,7 @@ const normalizeLiteCard = (catalogItem: { id: string, name: string, rarity: stri
 };
 
 export const fetchLiteCollection = async (): Promise<EnhancedCard[]> => {
+    console.log("[CardService] Starting lite collection fetch...");
     const now = Date.now();
     if (!cachedLiveData || (now - lastFetchTime > CACHE_DURATION)) {
         try {
@@ -178,10 +179,14 @@ export const fetchLiteCollection = async (): Promise<EnhancedCard[]> => {
     }
 
     try {
+        console.log("[CardService] Fetching catalog data...");
         const catalog = await fetchCatalogData();
         if (!catalog) throw new Error("Catalog fetch empty");
 
-        return catalog.map(item => normalizeLiteCard(item as any));
+        console.log(`[CardService] Mapping ${catalog.length} items from catalog...`);
+        const cards = catalog.map(item => normalizeLiteCard(item as any));
+        console.log(`[CardService] Mapping complete: ${cards.length} cards.`);
+        return cards;
     } catch (e) {
         console.error("Lite Collection Fetch Failed:", e);
         return [];

@@ -58,10 +58,16 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
 
     try {
         // console.log("[LiveData] Fetching cached stats from backend...");
-        const response = await fetch(STATS_API_URL);
-        if (!response.ok) throw new Error("Backend stats fetch failed");
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        const response = await fetch(STATS_API_URL, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) throw new Error(`Backend stats fetch failed: ${response.status}`);
 
         const data = await response.json();
+        console.log(`[LiveData] Successfully loaded stats for ${Object.keys(data).length} objects`);
 
         // Merge with our Local Source of Truth (mokiMetadata)
         const statsWithIdentity: LiveDataMap = { ...data };
