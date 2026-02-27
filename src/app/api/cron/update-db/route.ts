@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { parseCSVLine } from '@/utils/csv';
 
 // Force dynamic to prevent static generation
 export const dynamic = 'force-dynamic';
@@ -9,19 +10,12 @@ const STATS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAcXVDO4ylx4
 
 interface MokiStats {
     name: string;
-    class: string;
     stars: number;
     eliminations: number;
     deposits: number;
     wart_distance: number;
     score: number;
     win_rate: number;
-    defense: number;
-    dexterity: number;
-    fortitude: number;
-    speed: number;
-    strength: number;
-    total_stats: number;
 }
 
 export async function GET(request: Request) {
@@ -47,73 +41,36 @@ export async function GET(request: Request) {
         const statsRecords = parseStatsCSV(csvText);
         console.log(`✅ [Cron] Loaded stats for ${statsRecords.length} Mokis.`);
 
-        // 2. Detect Class Changes
-        const { data: existingStats } = await supabaseAdmin
+        // 2. detecting Class Changes is now handled by the 10-minute Game API sync.
+        // We skip it here to keep the Google Sheet sync focused on performance stats.
+
+        // 3. Merge with existing DB data to prevent overwriting Base Stats/Training
+        const { data: dbStats } = await supabaseAdmin
             .from('moki_stats')
-            .select('name, class');
+            .select('*');
 
-        const existingClassMap: Record<string, string> = {};
-        if (existingStats) {
-            for (const stat of existingStats) {
-                existingClassMap[stat.name.toUpperCase()] = stat.class || "";
-            }
+        const dbMap = new Map<string, any>();
+        if (dbStats) {
+            dbStats.forEach(row => dbMap.set(row.name.trim().toUpperCase(), row));
         }
 
-        const classChanges: { moki_name: string, old_class: string, new_class: string }[] = [];
-        const loggedMokis = new Set<string>();
+        const mergedUpdates = statsRecords.map(record => {
+            const upperName = record.name.trim().toUpperCase();
+            const existing = dbMap.get(upperName) || {};
 
-        for (const stat of statsRecords) {
-            const normalizedName = stat.name.toUpperCase();
-            if (loggedMokis.has(normalizedName)) continue;
+            return {
+                ...existing,
+                ...record,
+                last_updated: new Date().toISOString()
+            };
+        });
 
-            const existingClass = existingClassMap[normalizedName];
-            const newClass = stat.class;
-
-            if (existingClass && newClass && existingClass !== newClass) {
-                classChanges.push({
-                    moki_name: stat.name,
-                    old_class: existingClass,
-                    new_class: newClass
-                });
-                loggedMokis.add(normalizedName);
-            }
-        }
-
-        // Insert class changes (avoiding duplicates)
-        if (classChanges.length > 0) {
-            const mokiNames = classChanges.map(c => c.moki_name);
-            const { data: existingChanges } = await supabaseAdmin
-                .from('class_changes')
-                .select('moki_name, new_class')
-                .in('moki_name', mokiNames)
-                .order('changed_at', { ascending: false });
-
-            const mostRecentClass = new Map<string, string>();
-            if (existingChanges) {
-                for (const change of existingChanges) {
-                    if (!mostRecentClass.has(change.moki_name)) {
-                        mostRecentClass.set(change.moki_name, change.new_class);
-                    }
-                }
-            }
-
-            const newChanges = classChanges.filter(c => {
-                const lastLoggedClass = mostRecentClass.get(c.moki_name);
-                return !lastLoggedClass || lastLoggedClass !== c.new_class;
-            });
-
-            if (newChanges.length > 0) {
-                await supabaseAdmin.from('class_changes').insert(newChanges);
-                console.log(`✅ [Cron] Logged ${newChanges.length} class change(s).`);
-            }
-        }
-
-        // 3. Batch Upsert to moki_stats
+        // 4. Batch Upsert to moki_stats
         const CHUNK_SIZE = 100;
         let successCount = 0;
 
-        for (let i = 0; i < statsRecords.length; i += CHUNK_SIZE) {
-            const chunk = statsRecords.slice(i, i + CHUNK_SIZE);
+        for (let i = 0; i < mergedUpdates.length; i += CHUNK_SIZE) {
+            const chunk = mergedUpdates.slice(i, i + CHUNK_SIZE);
             const { error } = await supabaseAdmin.from('moki_stats').upsert(chunk, { onConflict: 'name' });
             if (error) throw error;
             successCount += chunk.length;
@@ -145,37 +102,6 @@ export async function GET(request: Request) {
 }
 
 // --- Helpers ---
-function parseCSVLine(text: string): string[] {
-    const result: string[] = [];
-    let cur = '';
-    let inQuote = false;
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        if (inQuote) {
-            if (char === '"') {
-                if (i + 1 < text.length && text[i + 1] === '"') {
-                    cur += '"';
-                    i++;
-                } else {
-                    inQuote = false;
-                }
-            } else {
-                cur += char;
-            }
-        } else {
-            if (char === '"') {
-                inQuote = true;
-            } else if (char === ',') {
-                result.push(cur);
-                cur = '';
-            } else {
-                cur += char;
-            }
-        }
-    }
-    result.push(cur);
-    return result;
-}
 
 function parseStatsCSV(csvText: string): MokiStats[] {
     const lines = csvText.split('\n').filter(l => l.trim());
@@ -197,26 +123,19 @@ function parseStatsCSV(csvText: string): MokiStats[] {
         // Helper to clean commas from numbers (e.g., "1,234" -> 1234)
         const parseNum = (val: string | undefined): number => {
             if (!val) return 0;
-            const cleaned = val.replace(/,/g, '').trim();
+            const cleaned = val.toString().replace(/,/g, '').trim();
             const num = parseFloat(cleaned);
             return isNaN(num) ? 0 : num;
         };
 
         statsRecords.push({
             name: name,
-            class: row['class'] || '',
             stars: parseInt((row['stars'] || '0').replace(/,/g, ''), 10) || 0,
             eliminations: parseNum(row['eliminations']),
             deposits: parseNum(row['deposits']),
             wart_distance: parseNum(row['wart distance'] || row['wartdistance']),
             score: parseNum(row['score']),
-            win_rate: parseNum(row['win rate'] || row['winrate']),
-            defense: parseNum(row['defense']),
-            dexterity: parseNum(row['dexterity']),
-            fortitude: parseNum(row['fortitude']),
-            speed: parseNum(row['speed']),
-            strength: parseNum(row['strength']),
-            total_stats: parseNum(row['total stats'] || row['totalstats'] || row['total'])
+            win_rate: parseNum(row['win rate'] || row['winrate'])
         });
     }
 

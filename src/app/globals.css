@@ -129,6 +129,20 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: #15A085;
 }
+
+/* Hide body scrollbar when modals are open */
+body.modal-open,
+html.modal-open {
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+body.modal-open::-webkit-scrollbar,
+html.modal-open::-webkit-scrollbar {
+  display: none !important;
+}
+
 /* Global fix for mobile confirmation menus */
 /* Global fix for mobile confirmation menus */
 @media (max-width: 768px) {
@@ -140,7 +154,7 @@ button {
     max-width: 90vw !important;
     top: 45px !important;
   }
-  
+
   /* Slightly more to the right for My Lineups */
   [class*='deleteConfirmationMenu'] {
     left: 50% !important;
@@ -149,5 +163,15 @@ button {
     width: 280px !important;
     max-width: 90vw !important;
     top: 45px !important;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { EnhancedCard, SavedLineup, FilterState } from '@/types';
-import { getCardGroupKey } from '@/utils/cardService';
+import { getCardGroupKey, getCardCharacterImage } from '@/utils/cardService';
 import { matchesFilter } from '@/utils/filterUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 import styles from './MyLineups.module.css';
@@ -11,9 +11,9 @@ import RatingSlider from './RatingSlider';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
-import ExcelJS from 'exceljs';
 import CardGrid from './CardGrid';
 import CardModal from './CardModal';
+import { LineupCardSelector } from '@/components/LineupCardSelector';
 import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 
 interface MyLineupsProps {
@@ -35,6 +35,7 @@ interface MyLineupsProps {
     // New props for editing
     allCards: EnhancedCard[];
     onUpdateLineup: (id: number, cards: EnhancedCard[]) => void;
+    isUserMode?: boolean;
 }
 
 type SortOption = 'default' | 'name_asc' | 'name_desc' | 'rating_desc' | 'rating_asc';
@@ -43,9 +44,22 @@ export default function MyLineups({
     lineups, onDelete, onRename, onToggleFavorite, onRate,
     onUpdateBackground, onBulkDelete, onError, filters, onRemoveFilter,
     favoritesOpen, setFavoritesOpen, allLineupsOpen, setAllLineupsOpen,
-    allCards, onUpdateLineup
+    allCards, onUpdateLineup, isUserMode
 }: MyLineupsProps) {
     const [expandedId, setExpandedId] = useState<number | null>(null);
+
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (expandedId !== null) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [expandedId]);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [editingId, setEditingId] = useState<number | null>(null);
     const [tempName, setTempName] = useState('');
@@ -99,10 +113,23 @@ export default function MyLineups({
 
     const filteredSelectorCards = useWorkerFilter(allCards, selectorFilters, selectorSearch);
 
+    const [copiedSlot, setCopiedSlot] = useState<number | null>(null);
+
+    const handleCopyCardName = (e: React.MouseEvent, cardName: string, slotIndex: number) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(cardName);
+        setCopiedSlot(slotIndex);
+        setTimeout(() => setCopiedSlot(null), 1500);
+    };
+
     const handleExportExcel = async () => {
         const favorites = favoriteLineups;
-        if (favorites.length === 0) return;
+        if (favorites.length === 0) {
+            onError("No lineups in favorite!");
+            return;
+        }
 
+        const ExcelJS = await import('exceljs');
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Favorite Lineups');
 
@@ -358,7 +385,27 @@ export default function MyLineups({
     }, [showRatingInfo]);
 
     const filteredLineups = useMemo(() => {
-        return lineups.filter(l => {
+        // Hydrate the lineups with fresh class/fur from allCards to prevent stale metadata
+        const hydratedLineups = lineups.map(l => ({
+            ...l,
+            cards: l.cards.map(card => {
+                if (card.cardType !== 'MOKI') return card;
+                // Match by name or some reliable unique identifier
+                const freshCard = allCards.find(c => c.name === card.name);
+                if (freshCard && freshCard.custom) {
+                    return {
+                        ...card,
+                        custom: {
+                            ...card.custom,
+                            class: freshCard.custom.class || card.custom?.class
+                        }
+                    };
+                }
+                return card;
+            })
+        }));
+
+        return hydratedLineups.filter(l => {
             const nameMatch = l.name.toLowerCase().includes(searchQuery.toLowerCase());
             if (!nameMatch) return false;
 
@@ -369,7 +416,7 @@ export default function MyLineups({
 
             return true;
         });
-    }, [lineups, searchQuery, filters]);
+    }, [lineups, searchQuery, filters, allCards]);
 
     const favoriteLineups = useMemo(() => {
         const rawFavorites = filteredLineups.filter(l => l.isFavorite);
@@ -418,7 +465,8 @@ export default function MyLineups({
     // Lock body scroll when modal is open and handle ESC
     useEffect(() => {
         if (expandedId !== null) {
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open');
+            document.documentElement.classList.add('modal-open');
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
                     // If selector is open, just close it and stop
@@ -447,12 +495,17 @@ export default function MyLineups({
             };
             window.addEventListener('keydown', handleEsc);
             return () => {
-                document.body.style.overflow = 'unset';
+                document.body.classList.remove('modal-open');
+                document.documentElement.classList.remove('modal-open');
                 window.removeEventListener('keydown', handleEsc);
             };
         } else {
-            document.body.style.overflow = 'unset';
-            return () => { document.body.style.overflow = 'unset'; };
+            document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open');
+            return () => {
+                document.body.classList.remove('modal-open');
+                document.documentElement.classList.remove('modal-open');
+            };
         }
     }, [expandedId, editingId, tempName, hasChanges, selectorSlot]);
 
@@ -472,7 +525,9 @@ export default function MyLineups({
                 '#download-button',
                 '#background-switcher',
                 '#rating-slider-container',
-                `.${styles.excludeFromCapture}`
+                `.${styles.excludeFromCapture}`,
+                `.${styles.modalCardClassBadge}`,
+                `.${styles.cardInfoActions}`
             ];
             const hiddenElements: { el: HTMLElement, display: string }[] = [];
             excludeSelectors.forEach(selector => {
@@ -483,12 +538,24 @@ export default function MyLineups({
             });
 
             try {
+                // Clear any text selection that might cause "selection" artifacts
+                window.getSelection()?.removeAllRanges();
+
                 const canvas = await html2canvas(lineupRef.current, {
                     useCORS: true,
-                    allowTaint: true,
+                    allowTaint: false,
                     scale: 2,
                     backgroundColor: null,
                     logging: false,
+                    onclone: (clonedDoc) => {
+                        // Ensure the cloned version doesn't have any accidental hover or transition states
+                        const clonedEl = clonedDoc.querySelector(`.${styles.modalContent}`) as HTMLElement;
+                        if (clonedEl) {
+                            clonedEl.style.transform = 'none';
+                            clonedEl.style.transition = 'none';
+                            clonedEl.style.animation = 'none';
+                        }
+                    }
                 });
 
                 const dataUrl = canvas.toDataURL('image/png');
@@ -528,10 +595,38 @@ export default function MyLineups({
     const expandedLineup = lineups.find(l => l.id === expandedId);
 
 
+    // Calculate overused cards
+    const overusedImages = useMemo(() => {
+        const inventoryCounts = new Map<string, number>();
+        allCards.forEach(card => {
+            const key = card.image;
+            inventoryCounts.set(key, (inventoryCounts.get(key) || 0) + 1);
+        });
+
+        const usageCounts = new Map<string, number>();
+        lineups.forEach(lineup => {
+            lineup.cards.forEach(card => {
+                const key = card.image;
+                usageCounts.set(key, (usageCounts.get(key) || 0) + 1);
+            });
+        });
+
+        const overused = new Set<string>();
+        usageCounts.forEach((count, key) => {
+            const inventory = inventoryCounts.get(key) || 0;
+            if (count > inventory) {
+                overused.add(key);
+            }
+        });
+        return overused;
+    }, [allCards, lineups]);
+
     const renderLineupCard = (lineup: SavedLineup) => {
         const mokis = lineup.cards.filter(c => c.cardType !== 'SCHEME');
         const scheme = lineup.cards.find(c => c.cardType === 'SCHEME');
         const sortedCards = scheme ? [...mokis, scheme] : mokis;
+
+        const hasConflict = isUserMode && lineup.cards.some(c => overusedImages.has(c.image));
 
         const bgOptions = BACKGROUND_OPTIONS.find(b => b.id === (lineup.backgroundId || 'default'));
         const bgStyle = {
@@ -569,6 +664,14 @@ export default function MyLineups({
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                 </button>
+
+                {hasConflict && (
+                    <div className={styles.warningIcon} title="This lineup contains cards that exceed your inventory limit.">
+                        !
+                    </div>
+                )}
+
+                {/* Rest of the component... */}
 
                 {deleteConfirmId === lineup.id && (
                     <div
@@ -622,7 +725,7 @@ export default function MyLineups({
                     {sortedCards.map((card, idx) => (
                         <div key={`${lineup.id}-${idx}`} className={styles.previewImageContainer} style={{ position: 'relative', flex: 1, aspectRatio: '0.7' }}>
                             <NextImage
-                                src={card.custom.characterImage || card.image}
+                                src={getCardCharacterImage(card)}
                                 alt={card.name}
                                 title={card.name}
                                 fill
@@ -733,6 +836,10 @@ export default function MyLineups({
                                 className={styles.exportButton}
                                 onClick={(e) => {
                                     e.stopPropagation();
+                                    if (favoriteLineups.length === 0) {
+                                        onError("No lineups in favorite!");
+                                        return;
+                                    }
                                     setExportConfirmOpen(!exportConfirmOpen);
                                 }}
                                 title="Export to Excel"
@@ -742,7 +849,7 @@ export default function MyLineups({
                                 </svg>
                             </button>
                             {exportConfirmOpen && (
-                                <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF' }}>
+                                <div className={`${styles.deleteConfirmationMenu} ${styles.deleteConfirmationMenuBlue}`}>
                                     <div className={styles.deleteConfirmationText}>Would you like to download your favorite lineups in Excel?</div>
                                     <div className={styles.deleteActions}>
                                         <button
@@ -822,7 +929,7 @@ export default function MyLineups({
                                 </svg>
                             </button>
                             {showDataInfo && (
-                                <div className={styles.infoPopup} style={{ left: '0', right: 'auto' }}>
+                                <div className={`${styles.infoPopup} ${styles.infoPopupExt}`}>
                                     Data is stored locally in your browser. Clearing your browser cache will delete your lineups.
                                 </div>
                             )}
@@ -863,7 +970,7 @@ export default function MyLineups({
             {favoriteLineups.length > 0 && (
                 <div className={styles.section}>
                     <div className={styles.sectionHeader}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div className={styles.sectionTitleRow}>
                             <h3 className={styles.sectionTitle}>
                                 FAVORITES
                             </h3>
@@ -876,7 +983,7 @@ export default function MyLineups({
                             </button>
                         </div>
                         {favoritesOpen && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div className={styles.sectionActionRow}>
                                 {renderSortDropdown('favorites', favoritesSort, setFavoritesSort)}
                                 {renderDeleteAllButton('favorites', favoriteLineups.map(l => l.id))}
                             </div>
@@ -890,7 +997,7 @@ export default function MyLineups({
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                                style={{ overflow: "hidden" }}
+                                className={styles.overflowHidden}
                             >
                                 <div className={styles.grid}>
                                     {favoriteLineups.map(renderLineupCard)}
@@ -904,7 +1011,7 @@ export default function MyLineups({
             {recentLineups.length > 0 && (
                 <div className={styles.section}>
                     <div className={styles.sectionHeader}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div className={styles.sectionTitleRow}>
                             <h3 className={styles.sectionTitle}>
                                 {favoriteLineups.length > 0 ? 'OTHERS' : 'ALL LINEUPS'}
                             </h3>
@@ -917,7 +1024,7 @@ export default function MyLineups({
                             </button>
                         </div>
                         {allLineupsOpen && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div className={styles.sectionActionRow}>
                                 {renderSortDropdown('others', othersSort, setOthersSort)}
                                 {renderDeleteAllButton('others', recentLineups.map(l => l.id))}
                             </div>
@@ -931,7 +1038,7 @@ export default function MyLineups({
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                                style={{ overflow: "hidden" }}
+                                className={styles.overflowHidden}
                             >
                                 <div className={styles.grid}>
                                     {recentLineups.map(renderLineupCard)}
@@ -948,18 +1055,21 @@ export default function MyLineups({
 
             {/* Modal Overlay */}
             {expandedLineup && (
-                <div className={styles.modalOverlay} onClick={() => {
-                    // If editing and name is too long, don't allow closing
-                    if (editingId !== null && tempName.length > 20) {
-                        onError("Maximum 20 characters.");
-                        return;
-                    }
-                    // Save name if editing before closing
-                    if (editingId !== null) {
-                        saveName(editingId);
-                    }
-                    handleCloseModal();
-                }}>
+                <div
+                    className={styles.modalOverlay}
+                    style={{ overflowY: selectorSlot !== null ? 'hidden' : 'auto' }}
+                    onClick={() => {
+                        // If editing and name is too long, don't allow closing
+                        if (editingId !== null && tempName.length > 20) {
+                            onError("Maximum 20 characters.");
+                            return;
+                        }
+                        // Save name if editing before closing
+                        if (editingId !== null) {
+                            saveName(editingId);
+                        }
+                        handleCloseModal();
+                    }}>
                     <div
                         key={expandedLineup.id}
                         ref={lineupRef}
@@ -1036,7 +1146,7 @@ export default function MyLineups({
                                 {localCards.map((card, idx) => (
                                     <div key={`slot-${idx}`} className={styles.modalCardWrapper}>
                                         {card ? (
-                                            <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''}`} style={{ flexShrink: 0, position: 'relative' }}>
+                                            <div className={`${styles.modalCard} ${card.cardType === 'SCHEME' ? styles.schemeImage : ''} ${styles.modalCardRelative}`}>
                                                 <NextImage
                                                     src={card.image}
                                                     alt={card.name}
@@ -1096,19 +1206,37 @@ export default function MyLineups({
                                                 {card?.custom?.class || 'Class'}
                                             </div>
                                             {card && (
-                                                <button
-                                                    className={styles.cardInfoButton}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setSelectedInfoCard(card);
-                                                    }}
-                                                    title="View details"
-                                                >
-                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                                    </svg>
-                                                </button>
+                                                <div className={styles.cardInfoActions}>
+                                                    <button
+                                                        className={styles.cardInfoButton}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedInfoCard(card);
+                                                        }}
+                                                        title="View details"
+                                                    >
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        className={styles.cardInfoButton}
+                                                        onClick={(e) => handleCopyCardName(e, card.name, idx)}
+                                                        title="Copy Name"
+                                                    >
+                                                        {copiedSlot === idx ? (
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        ) : (
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                            </svg>
+                                                        )}
+                                                    </button>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -1118,7 +1246,7 @@ export default function MyLineups({
 
                         <div className={`${styles.modalFooter} ${styles.excludeFromCapture}`}>
                             {/* Actions Left (Download / Save) */}
-                            <div className={`${styles.confirmationContainer} ${styles.excludeFromCapture}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '220px', position: 'relative', transform: 'translateX(-25px)' }}>
+                            <div className={`${styles.confirmationContainer} ${styles.excludeFromCapture} ${styles.confirmationContainerGroup}`}>
                                 <button
                                     id="download-button"
                                     className={`${styles.modalDownloadButton}`}
@@ -1141,7 +1269,7 @@ export default function MyLineups({
                                 </button>
 
                                 {imageDownloadConfirmOpen && (
-                                    <div className={styles.deleteConfirmationMenu} style={{ background: '#5097FF', width: '280px', left: '0', bottom: '100%', top: 'auto', marginBottom: '10px' }}>
+                                    <div className={`${styles.deleteConfirmationMenu} ${styles.deleteConfirmationMenuExt}`}>
                                         <div className={styles.deleteConfirmationText}>Would you like to download your lineup as an image?</div>
                                         <div className={styles.deleteActions}>
                                             <button
@@ -1253,13 +1381,7 @@ export default function MyLineups({
 
                         {/* Discard Confirmation Modal (Inline) */}
                         {showDiscardConfirm && (
-                            <div className={styles.discardConfirmationMenu} style={{
-                                position: 'fixed',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: '260px'
-                            }} onClick={(e) => e.stopPropagation()}>
+                            <div className={`${styles.discardConfirmationMenu} ${styles.discardConfirmationModal}`} onClick={(e) => e.stopPropagation()}>
                                 <div className={styles.deleteConfirmationText}>Discard unsaved changes?</div>
                                 <div className={styles.deleteActions}>
                                     <button
@@ -1288,95 +1410,22 @@ export default function MyLineups({
                 </div>
             )}
 
-            {/* Selector Overlay - Moved outside modalContent to avoid transform issues */}
+            {/* Selector Overlay - Extracted Component */}
             {selectorSlot !== null && (
-                <div className={styles.selectorBackdrop} onClick={() => setSelectorSlot(null)}>
-                    <div className={styles.selectorOverlay} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.selectorHeader}>
-                            <span>SELECT A CARD</span>
-                            <div className={styles.selectorHeaderActions}>
-                                <button
-                                    className={styles.selectorCloseButton}
-                                    onClick={() => setSelectorSlot(null)}
-                                    title="Close"
-                                >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className={styles.selectorBody}>
-                            <div className={styles.selectorSidebar}>
-                                <FilterSidebar
-                                    filters={selectorFilters}
-                                    onFilterChange={setSelectorFilters}
-                                    onCardTypeChange={() => { }}
-                                />
-                            </div>
-                            <div className={styles.selectorGridWrapper}>
-                                <CardGrid
-                                    cards={filteredSelectorCards}
-                                    onAddCard={handleCardSelect}
-                                    searchQuery={selectorSearch}
-                                    onSearchChange={setSelectorSearch}
-                                    currentLineup={localCards.filter(c => c) as EnhancedCard[]}
-                                    filters={selectorFilters}
-                                    onRemoveFilter={handleSelectorRemoveFilter}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Floating Filter Button (Mobile only) */}
-                    <button
-                        className={styles.selectorFabFilters}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectorMobileFiltersOpen(true);
-                        }}
-                    >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                        </svg>
-                    </button>
-
-                    {/* Mobile Filters Drawer */}
-                    <div
-                        className={`${styles.selectorMobileDrawer} ${selectorMobileFiltersOpen ? styles.selectorMobileDrawerOpen : ''}`}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            className={styles.selectorDrawerCloseButton}
-                            onClick={() => setSelectorMobileFiltersOpen(false)}
-                            aria-label="Close Filters"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="15 18 9 12 15 6"></polyline>
-                            </svg>
-                        </button>
-                        <div className={styles.selectorMobileDrawerContent}>
-                            <FilterSidebar
-                                filters={selectorFilters}
-                                onFilterChange={setSelectorFilters}
-                                onCardTypeChange={() => { }}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Backdrop for selector mobile drawer */}
-                    {selectorMobileFiltersOpen && (
-                        <div
-                            className={styles.selectorMobileDrawerBackdrop}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectorMobileFiltersOpen(false);
-                            }}
-                        />
-                    )}
-                </div>
+                <LineupCardSelector
+                    selectorFilters={selectorFilters}
+                    setSelectorFilters={setSelectorFilters}
+                    filteredSelectorCards={filteredSelectorCards}
+                    handleCardSelect={handleCardSelect}
+                    selectorSearch={selectorSearch}
+                    setSelectorSearch={setSelectorSearch}
+                    localCards={localCards}
+                    lineups={lineups}
+                    handleSelectorRemoveFilter={handleSelectorRemoveFilter}
+                    setSelectorSlot={setSelectorSlot}
+                    selectorMobileFiltersOpen={selectorMobileFiltersOpen}
+                    setSelectorMobileFiltersOpen={setSelectorMobileFiltersOpen}
+                />
             )}
             {/* Card Information Modal */}
             <CardModal

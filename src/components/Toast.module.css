@@ -34,7 +34,7 @@
 
 .warning {
     border-color: var(--color-secondary);
-    color: #fff;
+    color: #333333;
 }
 
 .suggestion {

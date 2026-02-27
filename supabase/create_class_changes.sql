@@ -19,5 +19,7 @@ CREATE POLICY "Allow public read access" ON class_changes
     FOR SELECT USING (true);
 
 -- Allow service role to insert (for the sync script)
-CREATE POLICY "Allow service role insert" ON class_changes
-    FOR INSERT WITH CHECK (true);
+CREATE POLICY "Service role write access" ON class_changes
+    FOR ALL
+    USING (auth.role() = 'service_role')
+    WITH CHECK (auth.role() = 'service_role');

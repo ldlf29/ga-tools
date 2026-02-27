@@ -1,32 +1,52 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// Revalidate every 1 hour (3600s)
-export const revalidate = 3600;
+// Revalidate every 10 minutes (600s) to sync smoothly with the new Cron endpoints
+export const revalidate = 600;
 
 export async function GET() {
     try {
-        // console.log("[API Stats] Fetching from Supabase moki_stats...");
-
-        // Fetch all Moki stats from the new minimal table
-        const { data, error } = await supabase
+        // 1. Fetch all Moki stats
+        const { data: globalData, error: globalError } = await supabase
             .from('moki_stats')
-            .select('name, class, stars, eliminations, deposits, wart_distance, score, win_rate, defense, dexterity, fortitude, speed, strength, total_stats, train');
+            .select('*');
 
-        if (error) {
-            throw error;
+        if (globalError) {
+            throw globalError;
         }
 
-        if (!data) {
+        if (!globalData) {
             return NextResponse.json({});
         }
 
-        // Transform into the expected Map format: { "NAME": { ...stats } }
+        // 2. Fetch last-10-match averages via SQL function (avoids full-table scan)
+        const averagesByName: Record<string, any> = {};
+        const { data: avgData, error: avgError } = await supabase
+            .rpc('get_moki_match_averages', { match_limit: 10 });
+
+        if (avgError) {
+            console.warn("[API Stats] Failed to fetch match averages:", avgError);
+        } else if (avgData) {
+            for (const row of avgData) {
+                averagesByName[row.moki_name] = {
+                    avgWinRate: row.avg_win_rate || 0,
+                    avgScore: row.avg_score || 0,
+                    avgEliminations: row.avg_eliminations || 0,
+                    avgDeposits: row.avg_deposits || 0,
+                    avgWartDistance: row.avg_wart_distance || 0,
+                };
+            }
+        }
+
+        // 3. Build the response map
         const statsMap: Record<string, any> = {};
 
-        for (const row of data) {
+        for (const row of globalData) {
             if (row.name) {
-                statsMap[row.name.toUpperCase()] = {
+                const upperName = row.name.toUpperCase();
+                const avgs = averagesByName[upperName] || {};
+
+                statsMap[upperName] = {
                     name: row.name,
                     class: row.class || "",
                     stars: row.stars || 0,
@@ -35,6 +55,11 @@ export async function GET() {
                     wartDistance: row.wart_distance,
                     score: row.score,
                     winRate: row.win_rate,
+                    avgEliminations: avgs.avgEliminations || 0,
+                    avgDeposits: avgs.avgDeposits || 0,
+                    avgWartDistance: avgs.avgWartDistance || 0,
+                    avgScore: avgs.avgScore || 0,
+                    avgWinRate: avgs.avgWinRate || 0,
                     defense: row.defense,
                     dexterity: row.dexterity,
                     fortitude: row.fortitude,
@@ -46,13 +71,14 @@ export async function GET() {
             }
         }
 
-        // console.log(`[API Stats] Returned ${Object.keys(statsMap).length} records from moki_stats.`);
-
-        return NextResponse.json(statsMap);
+        return NextResponse.json(statsMap, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=300'
+            }
+        });
 
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Database error';
         console.error("[API Stats] DB Error:", error);
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to load stats' }, { status: 500 });
     }
 }

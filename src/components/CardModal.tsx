@@ -10,29 +10,35 @@ import { createPortal } from 'react-dom';
 interface CardModalProps {
     card: EnhancedCard | null;
     onClose: () => void;
+    useLast10Matches?: boolean;
 }
 
-export default function CardModal({ card, onClose }: CardModalProps) {
+export default function CardModal({ card, onClose, useLast10Matches }: CardModalProps) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    // Prevent scroll when modal is open
+    // Prevent scroll when modal is open and handle ESC
     useEffect(() => {
-        if (mounted && card) {
-            document.body.style.overflow = 'hidden';
-            const handleEsc = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') onClose();
-            };
-            window.addEventListener('keydown', handleEsc);
-            return () => {
-                document.body.style.overflow = 'unset';
-                window.removeEventListener('keydown', handleEsc);
-            };
-        }
-    }, [card, onClose]);
+        if (!card) return; // Only apply scroll lock and ESC handler if modal is open (card is not null)
+
+        document.body.classList.add('modal-open');
+        document.documentElement.classList.add('modal-open');
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.classList.remove('modal-open');
+            document.documentElement.classList.remove('modal-open');
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [card, onClose]); // Depend on card to re-run effect when modal opens/closes
 
     if (!mounted || !card) return null;
 
@@ -134,28 +140,33 @@ export default function CardModal({ card, onClose }: CardModalProps) {
                                     </div>
 
                                     {card.cardType === 'MOKI' && (
-                                        <div className={styles.performanceGrid}>
-                                            <div className={styles.perfItem}>
-                                                <span className={styles.perfLabel}>ELIMS</span>
-                                                <span className={styles.perfValue}>{card.custom.eliminations || '0'}</span>
+                                        <>
+                                            <div className={styles.performanceGrid}>
+                                                <div className={styles.perfHeader}>
+                                                    {useLast10Matches ? 'LAST 10 MATCHES AVERAGE' : 'PERFORMANCE'}
+                                                </div>
+                                                <div className={styles.perfItem}>
+                                                    <span className={styles.perfLabel}>ELIMS</span>
+                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgEliminations : card.custom.eliminations)?.toFixed(1) || '0'}</span>
+                                                </div>
+                                                <div className={styles.perfItem}>
+                                                    <span className={styles.perfLabel}>BALLS</span>
+                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgDeposits : card.custom.deposits)?.toFixed(1) || '0'}</span>
+                                                </div>
+                                                <div className={styles.perfItem}>
+                                                    <span className={styles.perfLabel}>WART</span>
+                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgWartDistance : card.custom.wartDistance)?.toFixed(1) || '0'}</span>
+                                                </div>
+                                                <div className={styles.perfItem}>
+                                                    <span className={styles.perfLabel}>SCORE</span>
+                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgScore : card.custom.score)?.toFixed(1) || '0'}</span>
+                                                </div>
+                                                <div className={styles.perfItem}>
+                                                    <span className={styles.perfLabel}>W/R</span>
+                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgWinRate : card.custom.winRate) ? `${(useLast10Matches ? card.custom.avgWinRate : card.custom.winRate)?.toFixed(1)}%` : '0%'}</span>
+                                                </div>
                                             </div>
-                                            <div className={styles.perfItem}>
-                                                <span className={styles.perfLabel}>BALLS</span>
-                                                <span className={styles.perfValue}>{card.custom.deposits || '0'}</span>
-                                            </div>
-                                            <div className={styles.perfItem}>
-                                                <span className={styles.perfLabel}>WART</span>
-                                                <span className={styles.perfValue}>{card.custom.wartDistance || '0'}</span>
-                                            </div>
-                                            <div className={styles.perfItem}>
-                                                <span className={styles.perfLabel}>SCORE</span>
-                                                <span className={styles.perfValue}>{card.custom.score || '0'}</span>
-                                            </div>
-                                            <div className={styles.perfItem}>
-                                                <span className={styles.perfLabel}>W/R</span>
-                                                <span className={styles.perfValue}>{card.custom.winRate ? `${card.custom.winRate.toFixed(1)}%` : '0%'}</span>
-                                            </div>
-                                        </div>
+                                        </>
                                     )}
 
                                     {card.cardType === 'MOKI' && (

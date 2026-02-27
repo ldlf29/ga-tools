@@ -14,9 +14,18 @@ export interface GrandArenaCard {
 export interface EnhancedCard extends GrandArenaCard {
     id: string;
     rarity: string;
-    cardType: 'MOKI' | 'SCHEME';
+    cardType: 'MOKI' | 'SCHEME' | 'OTHER';
     category?: string;
     locked?: boolean;
+    tokenId?: number;
+    serializedId?: number;
+    serializedMax?: number;
+    seriesCategory?: string;
+    seriesInfo?: { category: string; series: string; item: string };
+    isSpecial?: boolean;
+    stackCount?: number;      // total copies owned
+    stackAvailable?: number;  // copies not yet used (total - in lineup - in saved lineups)
+    stackedIds?: string[];    // all card IDs in this stack
     custom: {
         stars: number;
         class?: string;
@@ -39,7 +48,18 @@ export interface EnhancedCard extends GrandArenaCard {
         train?: number;
         marketLink?: string;
         catalogMarketLink?: string;
+        avgEliminations?: number;
+        avgDeposits?: number;
+        avgWartDistance?: number;
+        avgScore?: number;
+        avgWinRate?: number;
     };
+}
+
+export interface ConnectedWallet {
+    address: string;
+    addedAt: number;
+    lastRefresh: number;
 }
 
 export interface FilterState {
@@ -52,19 +72,17 @@ export interface FilterState {
     specialization: string[];
     traits: string[];
     insertionOrder?: string[];
+    useLast10Matches?: boolean;
 }
 
 export const TRAIT_GROUPS = [
     { label: "Ronin or Samurai", traits: ["Ronin", "Samurai", "Ronin Aurora", "Ronin Moon"] },
     { label: "Pink, Blue or Green Overalls", traits: ["Pink Overalls", "Blue Overalls", "Green Overalls"] },
-    { label: "Tongue Out", traits: ["Tongue Out"] },
-    { label: "Tanuki, Kitsune or Cat Mask", traits: ["Tanuki", "Kitsune", "Cat Mask"] },
-    { label: "Devious Mouth", traits: ["Devious Mouth"] },
-    { label: "Oni, Tengu or Skull Mask", traits: ["Oni", "Tengu", "Skull Mask"] },
+    { label: "Tongue Out or Tanuki, Kitsune or Cat Mask", traits: ["Tongue Out", "Tanuki", "Kitsune", "Cat Mask"] },
+    { label: "Devious Mouth or Oni, Tengu or Skull Mask", traits: ["Devious Mouth", "Oni", "Tengu", "Skull Mask"] },
     { label: "Apron, Garbage/Gold Can or Toilet Paper", traits: ["Apron", "Garbage Can", "Gold Can", "Toilet Paper"] },
     { label: "Crying Eye", traits: ["Crying Eye"] },
-    { label: "Onesie", traits: ["Onesie"] },
-    { label: "Lemon, Kappa, Tomato, Bear, Frog or Blob Head", traits: ["Lemon", "Kappa", "Tomato", "Bear", "Frog", "Blob Head"] },
+    { label: "Onesie or Lemon, Kappa, Tomato or Blob Head", traits: ["Onesie", "Lemon", "Kappa", "Tomato", "Blob Head"] },
     { label: "Kimono", traits: ["Kimono"] }
 ];
 

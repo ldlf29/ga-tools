@@ -1,0 +1,185 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid rgba(38, 115, 232, 0.4);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: white;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h2 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: white;
+}
+
+.disclaimer {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    margin: 0 0 1rem 0;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    border-radius: 0.75rem;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.walletList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.walletCard {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.walletInfo {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    color: white;
+    text-align: left;
+}
+
+.walletActions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.actionBtn {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actionBtn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.actionBtn svg {
+    display: block;
+}
+
+.btnText {
+    display: none;
+}
+
+.refreshBtn {
+    background: linear-gradient(135deg, #2673E8, #1a5cc7);
+    color: white;
+}
+
+.refreshBtn:not(.disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(38, 115, 232, 0.4);
+}
+
+.removeBtn {
+    background: rgba(255, 68, 102, 0.2);
+    color: #ff4466;
+    border: 1px solid rgba(255, 68, 102, 0.3);
+}
+
+.removeBtn:not(.disabled):hover {
+    background: rgba(255, 68, 102, 0.3);
+    color: white;
+}
+
+.addWalletBtn {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.addWalletBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+}

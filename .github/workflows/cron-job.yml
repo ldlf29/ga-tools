@@ -2,9 +2,9 @@ name: Update Database Cron
 
 on:
   schedule:
-    # Runs at 03:27 and 15:27 UTC (12:27 AM/PM Argentina time)
-    # This provides a 15-minute buffer after the Google Sheets script runs at 12:12
-    - cron: '27 3,15 * * *'
+    # Runs at 03:27, 09:27, 15:27, 21:27 UTC (every 6 hours)
+    # This provides a 15-minute buffer after the Google Sheets script runs
+    - cron: '27 3,9,15,21 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:

@@ -18,7 +18,7 @@ export function useLineupBuilder() {
         }
 
         if (!isScheme) {
-            const hasSameMoki = lineup.some(c => c.cardType !== 'SCHEME' && c.name === card.name);
+            const hasSameMoki = lineup.some(c => c.cardType !== 'SCHEME' && c.image === card.image);
             if (hasSameMoki) {
                 return { success: false, error: "Only 1 Moki of the same type per Lineup!" };
             }

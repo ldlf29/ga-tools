@@ -9,40 +9,40 @@ export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
         message: "You should choose 1 Basic, 1 Rare, 1 Epic and 1 Legendary"
     },
     'Aggressive Specialization': {
-        title: "Specialization: Killer (+1.50), Class: Bruiser",
-        filters: { specialization: ['Killer'], customClass: ['Bruiser'] }
+        title: "Specialization: Killer",
+        filters: { specialization: ['Killer'] }
     },
     'Baiting the Trap': {
-        title: "Specialization: Wart Rider (+170), Class: Defender, Sprinter",
-        filters: { specialization: ['Wart Rider'], customClass: ['Defender', 'Sprinter'] }
+        title: "Specialization: Wart Rider",
+        filters: { specialization: ['Wart Rider'] }
     },
     'Beat the Buzzer': {
-        title: "Specialization: Gacha (+4.75), Class: Striker, Grinder, Sprinter",
-        filters: { specialization: ['Gacha'], customClass: ['Striker', 'Grinder', 'Sprinter'] }
+        title: "Specialization: Gacha",
+        filters: { specialization: ['Gacha'] }
     },
     'Big Game Hunt': {
-        title: "Specialization: Wart Rider (+170), Class: Defender, Sprinter",
-        filters: { specialization: ['Wart Rider'], customClass: ['Defender', 'Sprinter'] }
+        title: "Specialization: Wart Rider",
+        filters: { specialization: ['Wart Rider'] }
     },
     'Cage Match': {
-        title: "Specialization: Killer (+1.50), Class: Bruiser",
-        filters: { specialization: ['Killer'], customClass: ['Bruiser'] }
+        title: "Specialization: Killer",
+        filters: { specialization: ['Killer'] }
     },
     'Call to Arms': {
         title: "Traits: Ronin or Samurai",
         filters: { traits: ['Ronin or Samurai'] }
     },
     'Collective Specialization': {
-        title: "Specialization: Gacha (+4.75), Class: Striker, Grinder, Sprinter",
-        filters: { specialization: ['Gacha'], customClass: ['Striker', 'Grinder', 'Sprinter'] }
+        title: "Specialization: Gacha",
+        filters: { specialization: ['Gacha'] }
     },
     'Costume Party': {
         title: "Traits: Onesie, Lemon/Kappa/Tomato...",
-        filters: { traits: ['Onesie', 'Lemon, Kappa, Tomato, Bear, Frog or Blob Head'] }
+        filters: { traits: ['Onesie or Lemon, Kappa, Tomato or Blob Head'] }
     },
     'Cursed Dinner': {
-        title: "Specialization: Wart Rider (+170), Class: Defender, Sprinter",
-        filters: { specialization: ['Wart Rider'], customClass: ['Defender', 'Sprinter'] }
+        title: "Specialization: Wart Rider",
+        filters: { specialization: ['Wart Rider'] }
     },
     'Divine Intervention': {
         title: "Fur: Spirit",
@@ -57,68 +57,68 @@ export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
         filters: { traits: ['Pink, Blue or Green Overalls'] }
     },
     'Enforcing the Naughty List': {
-        title: "Specialization: Killer (+1.50), Class: Bruiser",
-        filters: { specialization: ['Killer'], customClass: ['Bruiser'] }
+        title: "Specialization: Killer",
+        filters: { specialization: ['Killer'] }
     },
     'Final Blow': {
-        title: "Specialization: Killer (+1.50), Class: Bruiser",
-        filters: { specialization: ['Killer'], customClass: ['Bruiser'] }
+        title: "Specialization: Killer",
+        filters: { specialization: ['Killer'] }
     },
     'Flexing': {
-        title: "Class: Bruiser",
-        filters: { customClass: ['Bruiser'] }
+        title: "Specialization: Killer",
+        filters: { specialization: ['Killer'] }
     },
     'Gacha Gouging': {
-        title: "Specialization: Gacha (+4.75), Class: Striker, Grinder, Sprinter",
-        filters: { specialization: ['Gacha'], customClass: ['Striker', 'Grinder', 'Sprinter'] }
+        title: "Specialization: Gacha",
+        filters: { specialization: ['Gacha'] }
     },
     'Gacha Hoarding': {
-        title: "Specialization: Gacha (+4.75), Class: Striker, Grinder, Sprinter",
-        filters: { specialization: ['Gacha'], customClass: ['Striker', 'Grinder', 'Sprinter'] }
+        title: "Specialization: Gacha",
+        filters: { specialization: ['Gacha'] }
     },
     'Golden Shower': {
         title: "Fur: Gold",
         filters: { fur: ['Gold'] }
     },
     'Grabbing Balls': {
-        title: "Specialization: Gacha (+4.75), Class: Striker, Grinder, Sprinter",
-        filters: { specialization: ['Gacha'], customClass: ['Striker', 'Grinder', 'Sprinter'] }
+        title: "Specialization: Gacha",
+        filters: { specialization: ['Gacha'] }
     },
     'Housekeeping': {
         title: "Traits: Apron, Garbage/Gold Can or Toilet Paper",
         filters: { traits: ['Apron, Garbage/Gold Can or Toilet Paper'] }
     },
     'Litter Collection': {
-        title: "Class: Bruiser, Striker, Grinder, Sprinter",
-        filters: { customClass: ['Bruiser', 'Striker', 'Grinder', 'Sprinter'] }
+        title: "Specialization: Gacha",
+        filters: { specialization: ['Gacha'] }
     },
     'Malicious Intent': {
         title: "Traits: Devious Mouth, Oni/Tengu/Skull Mask",
-        filters: { traits: ['Devious Mouth', 'Oni, Tengu or Skull Mask'] }
+        filters: { traits: ['Devious Mouth or Oni, Tengu or Skull Mask'] }
     },
     'Midnight Strike': {
         title: "Fur: Shadow",
         filters: { fur: ['Shadow'] }
     },
     'Moki Smash': {
-        title: "Specialization: Killer (+1.50), Class: Bruiser",
-        filters: { specialization: ['Killer'], customClass: ['Bruiser'] }
+        title: "Specialization: Killer",
+        filters: { specialization: ['Killer'] }
     },
     'Rainbow Riot': {
         title: "Fur: Rainbow",
         filters: { fur: ['Rainbow'] }
     },
     'Running Interference': {
-        title: "Stars: 1-2, Specialization: Loser",
-        filters: { stars: [1, 2], specialization: ['Loser'] }
+        title: "Specialization: Wart Rider",
+        filters: { specialization: ['Wart Rider'] }
     },
     'Saccing': {
-        title: "Class: Defender, Specialization: Loser",
-        filters: { customClass: ['Defender'], specialization: ['Loser'] }
+        title: "Specialization: Wart Rider",
+        filters: { specialization: ['Wart Rider'] }
     },
     'Shapeshifting': {
         title: "Traits: Tongue Out, Tanuki/Kitsune/Cat Mask",
-        filters: { traits: ['Tongue Out', 'Tanuki, Kitsune or Cat Mask'] }
+        filters: { traits: ['Tongue Out or Tanuki, Kitsune or Cat Mask'] }
     },
     'Taking a Dive': {
         title: "Specialization: Loser (-47.50%)",
@@ -129,16 +129,16 @@ export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
         filters: { traits: ['Crying Eye'] }
     },
     'Touching the Wart': {
-        title: "Specialization: Wart Rider (+170), Class: Defender, Sprinter",
-        filters: { specialization: ['Wart Rider'], customClass: ['Defender', 'Sprinter'] }
+        title: "Specialization: Gacha",
+        filters: { specialization: ['Gacha'] }
     },
     'Victory Lap': {
         title: "Specialization: Winner (+53.50%)",
         filters: { specialization: ['Winner'] }
     },
     'Wart Rodeo': {
-        title: "Specialization: Wart Rider (+170), Class: Defender, Sprinter",
-        filters: { specialization: ['Wart Rider'], customClass: ['Defender', 'Sprinter'] }
+        title: "Specialization: Wart Rider",
+        filters: { specialization: ['Wart Rider'] }
     },
     'Whale Watching': {
         title: "Fur: 1 of 1",

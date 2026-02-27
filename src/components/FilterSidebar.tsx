@@ -27,11 +27,12 @@ const STAR_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 const CLASS_OPTIONS = [...MOKI_CLASSES];
 
 const SPECIALIZATION_CONFIG: { key: string, label: string }[] = [
-    { key: "Gacha", label: "Gacha (+4.75)" },
-    { key: "Killer", label: "Killer (+1.50)" },
-    { key: "Wart Rider", label: "Wart Rider (+170)" },
-    { key: "Winner", label: "Winner (+53.50%)" },
-    { key: "Loser", label: "Loser (-47.50%)" }
+    { key: "Gacha", label: "Gacha" },
+    { key: "Killer", label: "Killer" },
+    { key: "Wart Rider", label: "Wart Rider" },
+    { key: "Winner", label: "Winner" },
+    { key: "Loser", label: "Loser" },
+    { key: "Score", label: "Score" }
 ];
 
 export default function FilterSidebar({ filters, onFilterChange, onCardTypeChange }: FilterSidebarProps) {
@@ -99,10 +100,62 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
     const handleFurChange = (val: string) => updateFilter('fur', val);
     const handleStarChange = (val: number) => updateFilter('stars', val);
     const handleClassChange = (val: string) => updateFilter('customClass', val);
-    const handleSpecializationChange = (val: string) => updateFilter('specialization', val);
+    const handleSpecializationChange = (val: string) => {
+        const perfSpecs = ["Gacha", "Killer", "Wart Rider"];
+        const contextSpecs = ["Winner", "Loser", "Score"];
+
+        let newSpecialization = [...filters.specialization];
+        const isSelected = newSpecialization.includes(val);
+
+        if (isSelected) {
+            newSpecialization = newSpecialization.filter(s => s !== val);
+        } else {
+            if (perfSpecs.includes(val)) {
+                newSpecialization = newSpecialization.filter(s => !perfSpecs.includes(s));
+            } else if (contextSpecs.includes(val)) {
+                newSpecialization = newSpecialization.filter(s => !contextSpecs.includes(s));
+            }
+            newSpecialization.push(val);
+        }
+
+        let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
+        newOrder = newOrder.filter(k => {
+            if (!k.startsWith('specialization:')) return true;
+            const specVal = k.split(':')[1];
+            return newSpecialization.includes(specVal);
+        });
+
+        if (!isSelected) {
+            const orderKey = `specialization:${val}`;
+            if (!newOrder.includes(orderKey)) {
+                newOrder.push(orderKey);
+            }
+        }
+
+        onFilterChange({
+            ...filters,
+            specialization: newSpecialization,
+            insertionOrder: newOrder
+        });
+    };
 
     const handleTraitGroupChange = (group: { label: string, traits: string[] }) => {
-        updateFilter('traits', group.label);
+        const isSelected = filters.traits.includes(group.label);
+        const newTraits = isSelected ? [] : [group.label];
+
+        // Remove ALL previous traits orders
+        let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
+        newOrder = newOrder.filter(k => !k.startsWith('traits:'));
+
+        if (!isSelected) {
+            newOrder.push(`traits:${group.label}`);
+        }
+
+        onFilterChange({
+            ...filters,
+            traits: newTraits,
+            insertionOrder: newOrder
+        });
     };
 
     const handleClearFilters = () => {
@@ -115,7 +168,8 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
             customClass: [],
             specialization: [],
             traits: [],
-            insertionOrder: []
+            insertionOrder: [],
+            useLast10Matches: false
         });
     };
 
@@ -184,6 +238,24 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                     value={filterSearch}
                     onChange={(e) => setFilterSearch(e.target.value)}
                 />
+
+                {filters.cardType === 'MOKI' && (
+                    <div className={styles.last10ToggleWrapper}>
+                        <label className={styles.toggleLabel}>
+                            <input
+                                type="checkbox"
+                                checked={filters.useLast10Matches || false}
+                                onChange={(e) => {
+                                    onFilterChange({
+                                        ...filters,
+                                        useLast10Matches: e.target.checked
+                                    });
+                                }}
+                            />
+                            <span className={styles.toggleText}>Filter by the last 10 matches</span>
+                        </label>
+                    </div>
+                )}
             </div>
 
             <div className={styles.scrollableContent}>
@@ -280,7 +352,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                                     return (
                                         <label key={group.label} className={styles.checkboxLabel}>
                                             <input
-                                                type="checkbox"
+                                                type="checkbox" // Keep as checkbox visually so they can toggle it off, but logic handles it exclusively
                                                 checked={isChecked}
                                                 onChange={() => handleTraitGroupChange(group)}
                                             />

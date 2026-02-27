@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { fetchLiveData, MokiData } from '../utils/liveData';
 import ChangelogModal from './ChangelogModal';
+import MatchHistoryModal from './MatchHistoryModal';
 import NextImage from 'next/image';
 import styles from './ChampionsList.module.css';
-import ExcelJS from 'exceljs';
 import { MOKI_CLASSES, MOKI_FURS } from '@/utils/constants';
 
 type SortField = keyof MokiData;
@@ -22,12 +22,10 @@ export default function ChampionsList() {
     const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
     // Filter state
-    const [filterClass, setFilterClass] = useState<string | null>(null);
+    const [filterClasses, setFilterClasses] = useState<string[]>([]);
     const [showClassFilter, setShowClassFilter] = useState(false);
 
-
-
-    const [filterFur, setFilterFur] = useState<string | null>(null);
+    const [filterFurs, setFilterFurs] = useState<string[]>([]);
     const [showFurFilter, setShowFurFilter] = useState(false);
 
     // Mobile States
@@ -36,6 +34,8 @@ export default function ChampionsList() {
     const [openMobileDropdown, setOpenMobileDropdown] = useState<'sort' | 'class' | 'fur' | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
     const [confirmExport, setConfirmExport] = useState(false);
+    const [historyTokenId, setHistoryTokenId] = useState<number | null>(null);
+    const [historyName, setHistoryName] = useState<string | null>(null);
 
     const classOptions = ["All Classes", ...MOKI_CLASSES];
     const furOptions = ["All Furs", ...MOKI_FURS];
@@ -140,6 +140,7 @@ export default function ChampionsList() {
     const handleExportExcel = async () => {
         if (sortedData.length === 0) return;
 
+        const ExcelJS = await import('exceljs');
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Champions Stats');
 
@@ -196,16 +197,24 @@ export default function ChampionsList() {
         window.URL.revokeObjectURL(url);
     };
 
-    const selectClass = (cls: string) => {
-        setFilterClass(cls === "All Classes" ? null : cls);
-        setFilterFur(null);
-        setShowClassFilter(false);
+    const toggleClass = (cls: string) => {
+        if (cls === "All Classes") {
+            setFilterClasses([]);
+        } else {
+            setFilterClasses(prev =>
+                prev.includes(cls) ? prev.filter(c => c !== cls) : [...prev, cls]
+            );
+        }
     };
 
-    const selectFur = (fur: string) => {
-        setFilterFur(fur === "All Furs" ? null : fur);
-        setFilterClass(null);
-        setShowFurFilter(false);
+    const toggleFur = (fur: string) => {
+        if (fur === "All Furs") {
+            setFilterFurs([]);
+        } else {
+            setFilterFurs(prev =>
+                prev.includes(fur) ? prev.filter(f => f !== fur) : [...prev, fur]
+            );
+        }
     };
 
     const sortedData = useMemo(() => {
@@ -216,12 +225,12 @@ export default function ChampionsList() {
             items = items.filter(i => i.name.toLowerCase().includes(q));
         }
 
-        if (filterClass) {
-            items = items.filter(i => i.class === filterClass);
+        if (filterClasses.length > 0) {
+            items = items.filter(i => i.class && filterClasses.includes(i.class));
         }
 
-        if (filterFur) {
-            items = items.filter(i => i.fur === filterFur);
+        if (filterFurs.length > 0) {
+            items = items.filter(i => i.fur && filterFurs.includes(i.fur));
         }
 
         items.sort((a, b) => {
@@ -243,7 +252,7 @@ export default function ChampionsList() {
         });
 
         return items;
-    }, [data, search, sortField, sortDirection, filterClass, filterFur]);
+    }, [data, search, sortField, sortDirection, filterClasses, filterFurs]);
 
     const renderHeader = (label: string, field: SortField, width?: string) => {
         const isClass = field === 'class';
@@ -251,7 +260,7 @@ export default function ChampionsList() {
         const isActive = sortField === field;
 
         const showFilter = isClass ? showClassFilter : (isFur ? showFurFilter : false);
-        const hasActiveFilter = isClass ? filterClass : (isFur ? filterFur : false);
+        const hasActiveFilter = isClass ? filterClasses.length > 0 : (isFur ? filterFurs.length > 0 : false);
 
         const toggleFilter = () => {
             if (isClass) {
@@ -276,21 +285,23 @@ export default function ChampionsList() {
                     {label}
 
                     {(isClass || isFur) && showFilter && (
-                        <div className={styles.dropdownMenu}>
-                            {(isClass ? classOptions : furOptions).map(opt => {
+                        <div className={styles.dropdownMenu} onClick={(e) => e.stopPropagation()}>
+                            <div
+                                className={`${styles.dropdownItem} ${((isClass && filterClasses.length === 0) || (isFur && filterFurs.length === 0)) ? styles.dropdownItemActive : ''}`}
+                                onClick={() => isClass ? toggleClass("All Classes") : toggleFur("All Furs")}
+                            >
+                                {isClass ? "All Classes" : "All Furs"}
+                            </div>
+                            {(isClass ? MOKI_CLASSES : MOKI_FURS).map(opt => {
                                 const isActive = isClass
-                                    ? (filterClass === opt || (!filterClass && opt === "All Classes"))
-                                    : (filterFur === opt || (!filterFur && opt === "All Furs"));
+                                    ? filterClasses.includes(opt)
+                                    : filterFurs.includes(opt);
 
                                 return (
                                     <div
                                         key={opt}
                                         className={`${styles.dropdownItem} ${isActive ? styles.dropdownItemActive : ''}`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (isClass) selectClass(opt);
-                                            if (isFur) selectFur(opt);
-                                        }}
+                                        onClick={() => isClass ? toggleClass(opt) : toggleFur(opt)}
                                     >
                                         {opt}
                                     </div>
@@ -392,7 +403,7 @@ export default function ChampionsList() {
                         </button>
                     </div>
                     <div className={styles.headerRight}>
-                        <div className={styles.updateInfo}>The data is updated every 12 hours.</div>
+                        <div className={styles.updateInfo}>Class and Stats are updated every 10 minutes. Performance and Winrate every 6 hours.</div>
                         <input
                             type="text"
                             placeholder="Search Moki..."
@@ -445,16 +456,16 @@ export default function ChampionsList() {
                         {openMobileDropdown === 'class' && (
                             <ul className={styles.mobileFilterMenu}>
                                 <li
-                                    onClick={() => { selectClass(""); setOpenMobileDropdown(null); }}
-                                    className={!filterClass ? styles.mobileFilterActive : ''}
+                                    onClick={() => toggleClass("All Classes")}
+                                    className={filterClasses.length === 0 ? styles.mobileFilterActive : ''}
                                 >
                                     All Classes
                                 </li>
-                                {classOptions.slice(1).map(opt => (
+                                {MOKI_CLASSES.map(opt => (
                                     <li
                                         key={opt}
-                                        onClick={() => { selectClass(opt); setOpenMobileDropdown(null); }}
-                                        className={filterClass === opt ? styles.mobileFilterActive : ''}
+                                        onClick={() => toggleClass(opt)}
+                                        className={filterClasses.includes(opt) ? styles.mobileFilterActive : ''}
                                     >
                                         {opt}
                                     </li>
@@ -477,16 +488,16 @@ export default function ChampionsList() {
                         {openMobileDropdown === 'fur' && (
                             <ul className={styles.mobileFilterMenu}>
                                 <li
-                                    onClick={() => { selectFur(""); setOpenMobileDropdown(null); }}
-                                    className={!filterFur ? styles.mobileFilterActive : ''}
+                                    onClick={() => toggleFur("All Furs")}
+                                    className={filterFurs.length === 0 ? styles.mobileFilterActive : ''}
                                 >
                                     All Furs
                                 </li>
-                                {furOptions.slice(1).map(opt => (
+                                {MOKI_FURS.map(opt => (
                                     <li
                                         key={opt}
-                                        onClick={() => { selectFur(opt); setOpenMobileDropdown(null); }}
-                                        className={filterFur === opt ? styles.mobileFilterActive : ''}
+                                        onClick={() => toggleFur(opt)}
+                                        className={filterFurs.includes(opt) ? styles.mobileFilterActive : ''}
                                     >
                                         {opt}
                                     </li>
@@ -542,21 +553,25 @@ export default function ChampionsList() {
                                                             </div>
                                                         )}
                                                         {moki.name}
-                                                        {moki.marketLink && (
-                                                            <a
-                                                                href={moki.marketLink}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
+                                                        {moki.tokenId && (
+                                                            <button
                                                                 className={styles.linkButton}
-                                                                title="View on Market"
-                                                                onClick={(e) => e.stopPropagation()}
+                                                                title="View Match History"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setHistoryTokenId(moki.tokenId!);
+                                                                    setHistoryName(moki.name);
+                                                                }}
+
                                                             >
                                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                                                    <polyline points="15 3 21 3 21 9"></polyline>
-                                                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                                    <polyline points="10 9 9 9 8 9"></polyline>
                                                                 </svg>
-                                                            </a>
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -579,7 +594,7 @@ export default function ChampionsList() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={15}>
+                                            <td colSpan={16}>
                                                 <div className={styles.noResults}>
                                                     No Moki found matching your filters.
                                                 </div>
@@ -631,7 +646,7 @@ export default function ChampionsList() {
 
                                         {isExpanded && (
                                             <div className={styles.mobileCardBody} onClick={(e) => e.stopPropagation()}>
-                                                <div className={styles.statBlock} style={{ marginBottom: '1rem' }}>
+                                                <div className={styles.statBlock} style={{ marginBottom: '0.75rem' }}>
                                                     <div className={styles.statTitle}>Identity</div>
                                                     <div className={styles.statRow}>
                                                         <span className={styles.statLabel}>CLASS</span>
@@ -645,19 +660,21 @@ export default function ChampionsList() {
                                                         <span className={styles.statLabel}>STARS</span>
                                                         <span className={styles.statValue}>{moki.stars} ★</span>
                                                     </div>
-                                                    {moki.marketLink && (
-                                                        <a
-                                                            href={moki.marketLink}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className={styles.marketButton}
-                                                            style={{ marginTop: '0.75rem' }}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                            View on Market
-                                                        </a>
-                                                    )}
                                                 </div>
+
+                                                {moki.tokenId && (
+                                                    <button
+                                                        className={styles.marketButton}
+                                                        style={{ marginBottom: '1rem' }}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setHistoryTokenId(moki.tokenId!);
+                                                            setHistoryName(moki.name);
+                                                        }}
+                                                    >
+                                                        Match History
+                                                    </button>
+                                                )}
 
                                                 <div className={styles.statsGrid}>
                                                     <div className={styles.statBlock}>
@@ -734,6 +751,18 @@ export default function ChampionsList() {
             {
                 showChangelog && (
                     <ChangelogModal onClose={() => setShowChangelog(false)} />
+                )
+            }
+            {
+                historyTokenId && (
+                    <MatchHistoryModal
+                        tokenId={historyTokenId}
+                        mokiName={historyName}
+                        onClose={() => {
+                            setHistoryTokenId(null);
+                            setHistoryName(null);
+                        }}
+                    />
                 )
             }
         </div >

@@ -1,29 +1,37 @@
 import { useState, useEffect } from 'react';
 import { SavedLineup, EnhancedCard } from '@/types';
 
-export function useSavedLineups() {
+export function useSavedLineups(storageKey: string = 'grandArenaLineups') {
     const [savedLineups, setSavedLineups] = useState<SavedLineup[]>([]);
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [loadedKey, setLoadedKey] = useState<string | null>(null);
 
-    // Load from LocalStorage on mount
+    // Load from LocalStorage on mount or key change
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        const saved = localStorage.getItem('grandArenaLineups');
-        if (saved) {
-            try {
-                setSavedLineups(JSON.parse(saved));
-            } catch (e) {
-                console.error("Failed to parse saved lineups", e);
-            }
-        }
-        setIsInitialized(true);
-    }, []);
 
-    // Save to LocalStorage whenever savedLineups changes, BUT only after initialization
+        try {
+            const saved = localStorage.getItem(storageKey);
+            if (saved) {
+                setSavedLineups(JSON.parse(saved));
+            } else {
+                setSavedLineups([]);
+            }
+        } catch (e) {
+            console.error(`Failed to parse saved lineups for key: ${storageKey}`, e);
+            setSavedLineups([]);
+        }
+
+        setLoadedKey(storageKey);
+    }, [storageKey]);
+
+    // Save to LocalStorage whenever savedLineups changes
     useEffect(() => {
-        if (typeof window === 'undefined' || !isInitialized) return;
-        localStorage.setItem('grandArenaLineups', JSON.stringify(savedLineups));
-    }, [savedLineups, isInitialized]);
+        if (typeof window === 'undefined') return;
+        // MUST check if the data corresponds to the current key, otherwise when switching tabs it cross-saves old data to the new key
+        if (loadedKey !== storageKey) return;
+
+        localStorage.setItem(storageKey, JSON.stringify(savedLineups));
+    }, [savedLineups, loadedKey, storageKey]);
 
     const getUniqueName = (baseName: string, existingNames: string[]) => {
         let name = baseName;

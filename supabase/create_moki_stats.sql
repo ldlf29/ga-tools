@@ -28,5 +28,7 @@ CREATE POLICY "Allow public read access" ON moki_stats
     FOR SELECT USING (true);
 
 -- Allow service role to insert/update (for sync script)
-CREATE POLICY "Allow service role upsert" ON moki_stats
-    FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role write access" ON moki_stats
+    FOR ALL
+    USING (auth.role() = 'service_role')
+    WITH CHECK (auth.role() = 'service_role');
