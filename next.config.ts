@@ -62,11 +62,11 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' blob: data: https://*.public.blob.vercel-storage.com https://lh1.googleusercontent.com https://lh2.googleusercontent.com https://lh3.googleusercontent.com https://lh4.googleusercontent.com https://lh5.googleusercontent.com https://lh6.googleusercontent.com https://lh7.googleusercontent.com https://drive.google.com https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com",
               "font-src 'self'",
-              "connect-src 'self' https://*.supabase.co https://vercel.live",
+              "connect-src 'self' https://*.supabase.co https://vercel.live https://vitals.vercel-insights.com https://va.vercel-scripts.com",
               "worker-src 'self' blob:",
               "frame-src 'self' https://vercel.live",
             ].join('; '),
