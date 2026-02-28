@@ -97,12 +97,14 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                 <input
                     type="text"
                     id="lineup-name"
+                    name="lineup_name_unique_99"
                     value={lineupName}
                     onChange={(e) => setLineupName(e.target.value)}
                     className={styles.input}
                     placeholder="Name your lineup..."
                     maxLength={20}
-                    autoComplete="off"
+                    autoComplete="new-password"
+                    spellCheck="false"
                 />
             </div>
 

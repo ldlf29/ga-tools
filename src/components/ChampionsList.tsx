@@ -430,12 +430,14 @@ export default function ChampionsList() {
 
                         <input
                             type="text"
-                            id="champions-search"
+                            id="champs_srch_1"
+                            name="champs_srch_unq_123"
                             placeholder="Search Moki..."
                             className={styles.searchBar}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            autoComplete="off"
+                            autoComplete="new-password"
+                            spellCheck="false"
                         />
                     </div>
                 </div>
@@ -507,12 +509,14 @@ export default function ChampionsList() {
 
                     <input
                         type="text"
-                        id="champions-search-mobile"
+                        id="champs_srch_mob_2"
+                        name="champs_srch_mob_unq_123"
                         placeholder="Search Moki..."
                         className={styles.searchBar}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        autoComplete="off"
+                        autoComplete="new-password"
+                        spellCheck="false"
                     />
                 </div>
 

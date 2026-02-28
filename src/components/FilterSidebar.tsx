@@ -233,12 +233,14 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
             <div className={styles.filterGroup}>
                 <input
                     type="text"
-                    id="filter-search"
+                    id="fncy_fltr_unq"
+                    name="fncy_fltr_unq_123"
                     className={styles.filterSearchInput}
                     placeholder="Search filters..."
                     value={filterSearch}
                     onChange={(e) => setFilterSearch(e.target.value)}
-                    autoComplete="off"
+                    autoComplete="new-password"
+                    spellCheck="false"
                 />
 
                 {filters.cardType === 'MOKI' && (

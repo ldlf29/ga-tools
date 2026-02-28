@@ -498,12 +498,14 @@ export default function CardGrid({
 
                         <input
                             type="text"
-                            id="card-search-desktop"
+                            id="cards_srch_dsk"
+                            name="cards_srch_dsk_unq_123"
                             placeholder="Search card name..."
                             className={`${styles.searchInput} ${styles.desktopSearch}`}
                             value={searchQuery}
                             onChange={(e) => onSearchChange(e.target.value)}
-                            autoComplete="off"
+                            autoComplete="new-password"
+                            spellCheck="false"
                         />
 
                         <div className={styles.viewToggle}>
@@ -540,12 +542,14 @@ export default function CardGrid({
                 <div className={styles.searchRow}>
                     <input
                         type="text"
-                        id="card-search-mobile"
+                        id="cards_srch_mob"
+                        name="cards_srch_mob_unq_123"
                         placeholder="Search card name..."
                         className={styles.searchInput}
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        autoComplete="off"
+                        autoComplete="new-password"
+                        spellCheck="false"
                     />
                 </div>
 
