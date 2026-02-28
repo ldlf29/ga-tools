@@ -432,6 +432,8 @@
     border: 2px solid #cbd5e1;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
+    aspect-ratio: 1;
 }
 
 .leadOpponent {
@@ -766,15 +768,15 @@
 
     .avgStatBox {
         flex: 1;
-        min-width: 50px;
+        min-width: 0;
     }
 
     .avgNumber {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
     }
 
     .avgLabel {
-        font-size: 0.55rem !important;
+        font-size: 0.5rem !important;
     }
 
     /* Grid layout to easily organize matchCard on mobile */
