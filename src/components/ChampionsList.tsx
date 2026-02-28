@@ -435,6 +435,7 @@ export default function ChampionsList() {
                             className={styles.searchBar}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
+                            autoComplete="off"
                         />
                     </div>
                 </div>
@@ -511,6 +512,7 @@ export default function ChampionsList() {
                         className={styles.searchBar}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
+                        autoComplete="off"
                     />
                 </div>
 

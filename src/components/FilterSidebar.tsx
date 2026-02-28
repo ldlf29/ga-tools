@@ -238,6 +238,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                     placeholder="Search filters..."
                     value={filterSearch}
                     onChange={(e) => setFilterSearch(e.target.value)}
+                    autoComplete="off"
                 />
 
                 {filters.cardType === 'MOKI' && (

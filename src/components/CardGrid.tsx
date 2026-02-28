@@ -503,6 +503,7 @@ export default function CardGrid({
                             className={`${styles.searchInput} ${styles.desktopSearch}`}
                             value={searchQuery}
                             onChange={(e) => onSearchChange(e.target.value)}
+                            autoComplete="off"
                         />
 
                         <div className={styles.viewToggle}>
@@ -544,6 +545,7 @@ export default function CardGrid({
                         className={styles.searchInput}
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
+                        autoComplete="off"
                     />
                 </div>
 
