@@ -34,6 +34,7 @@ export default function ChampionsList() {
     const [openMobileDropdown, setOpenMobileDropdown] = useState<'sort' | 'class' | 'fur' | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
     const [confirmExport, setConfirmExport] = useState(false);
+    const [useLast10, setUseLast10] = useState(false);
     const [historyTokenId, setHistoryTokenId] = useState<number | null>(null);
     const [historyName, setHistoryName] = useState<string | null>(null);
 
@@ -217,6 +218,19 @@ export default function ChampionsList() {
         }
     };
 
+    // Map sort field to avg equivalent when LAST 10 is active
+    const getEffectiveSortField = (field: SortField): SortField => {
+        if (!useLast10) return field;
+        const avgMap: Partial<Record<SortField, SortField>> = {
+            eliminations: 'avgEliminations',
+            deposits: 'avgDeposits',
+            wartDistance: 'avgWartDistance',
+            score: 'avgScore',
+            winRate: 'avgWinRate',
+        };
+        return avgMap[field] || field;
+    };
+
     const sortedData = useMemo(() => {
         let items = [...data];
 
@@ -233,9 +247,11 @@ export default function ChampionsList() {
             items = items.filter(i => i.fur && filterFurs.includes(i.fur));
         }
 
+        const effectiveField = getEffectiveSortField(sortField);
+
         items.sort((a, b) => {
-            let valA = a[sortField];
-            let valB = b[sortField];
+            let valA = a[effectiveField];
+            let valB = b[effectiveField];
 
             if (typeof valA === 'string' && typeof valB === 'string') {
                 valA = valA.toLowerCase();
@@ -252,7 +268,7 @@ export default function ChampionsList() {
         });
 
         return items;
-    }, [data, search, sortField, sortDirection, filterClasses, filterFurs]);
+    }, [data, search, sortField, sortDirection, filterClasses, filterFurs, useLast10]);
 
     const renderHeader = (label: string, field: SortField, width?: string) => {
         const isClass = field === 'class';
@@ -347,7 +363,30 @@ export default function ChampionsList() {
             <div className={styles.header}>
                 <div className={styles.headerTopRow}>
                     <div className={styles.titleGroup}>
-                        <div className={styles.title}>Champions</div>
+                        <div className={styles.title}>{useLast10 ? 'Champions - Last 10 Matches' : 'Champions - S1'}</div>
+                    </div>
+                    <div className={styles.headerRight}>
+                        <button
+                            className={`${styles.last10Button} ${useLast10 ? styles.last10Active : ''}`}
+                            onClick={() => setUseLast10(!useLast10)}
+                            title="Toggle Last 10 Matches Stats"
+                        >
+                            LAST 10
+                        </button>
+
+                        <button
+                            className={styles.exportButton}
+                            onClick={() => setShowChangelog(true)}
+                            title="View Class Changes Log"
+                            style={{ background: '#FFD753', color: '#333', borderColor: '#333' }}
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </button>
+
                         <div className={styles.confirmationContainer}>
                             <button
                                 className={styles.exportButton}
@@ -389,29 +428,90 @@ export default function ChampionsList() {
                             )}
                         </div>
 
-                        <button
-                            className={styles.exportButton}
-                            onClick={() => setShowChangelog(true)}
-                            title="View Class Changes Log"
-                            style={{ background: '#FFD753', color: '#333', borderColor: '#333' }}
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                        </button>
-                    </div>
-                    <div className={styles.headerRight}>
-                        <div className={styles.updateInfo}>Class and Stats are updated every 10 minutes. Performance and Winrate every 6 hours.</div>
                         <input
                             type="text"
+                            id="champions-search"
                             placeholder="Search Moki..."
                             className={styles.searchBar}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
+                </div>
+                <div className={styles.updateInfo}>Class and Stats are updated every 10 minutes. Performance and Winrate every 6 hours.</div>
+
+                {/* Mobile Action Row (hidden on desktop) */}
+                <div className={styles.actionRow}>
+                    <button
+                        className={`${styles.last10Button} ${useLast10 ? styles.last10Active : ''}`}
+                        onClick={() => setUseLast10(!useLast10)}
+                        title="Toggle Last 10 Matches Stats"
+                    >
+                        LAST 10
+                    </button>
+
+                    <button
+                        className={styles.exportButton}
+                        onClick={() => setShowChangelog(true)}
+                        title="View Class Changes Log"
+                        style={{ background: '#FFD753', color: '#333', borderColor: '#333' }}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </button>
+
+                    <div className={styles.confirmationContainer}>
+                        <button
+                            className={styles.exportButton}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setConfirmExport(!confirmExport);
+                            }}
+                            title="Export Champions Stats to Excel (.xlsx)"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor">
+                                <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
+                            </svg>
+                        </button>
+                        {confirmExport && (
+                            <div className={styles.confirmationMenu} style={{ background: '#5097FF', width: '280px', left: '0', top: '45px', right: 'auto', textAlign: 'center' }}>
+                                <div className={styles.confirmationText}>Would you like to download the current Champions list in Excel?</div>
+                                <div className={styles.actions}>
+                                    <button
+                                        className={`${styles.btnConfirm} ${styles.btnSuccess}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleExportExcel();
+                                            setConfirmExport(false);
+                                        }}
+                                    >
+                                        YES
+                                    </button>
+                                    <button
+                                        className={`${styles.btnConfirm} ${styles.btnCancel}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setConfirmExport(false);
+                                        }}
+                                    >
+                                        NO
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <input
+                        type="text"
+                        id="champions-search-mobile"
+                        placeholder="Search Moki..."
+                        className={styles.searchBar}
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
                 </div>
 
                 {/* Mobile Toolbar */}
@@ -585,11 +685,11 @@ export default function ChampionsList() {
                                                 <td className={styles.td}>{moki.fortitude?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.train?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{moki.eliminations?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{moki.wartDistance?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{moki.deposits?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{moki.score?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'}</td>
+                                                <td className={styles.td}>{(useLast10 ? moki.avgEliminations : moki.eliminations)?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{(useLast10 ? moki.avgWartDistance : moki.wartDistance)?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{(useLast10 ? moki.avgDeposits : moki.deposits)?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{(useLast10 ? moki.avgScore : moki.score)?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{(useLast10 ? moki.avgWinRate : moki.winRate) ? (useLast10 ? moki.avgWinRate : moki.winRate)?.toFixed(2) + '%' : '-'}</td>
                                             </tr>
                                         ))
                                     ) : (
@@ -713,24 +813,24 @@ export default function ChampionsList() {
                                                         <div className={styles.statTitle}>Performance</div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>ELIMS</span>
-                                                            <span className={styles.statValue}>{moki.eliminations?.toFixed(1)}</span>
+                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgEliminations : moki.eliminations)?.toFixed(1)}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>WART</span>
-                                                            <span className={styles.statValue}>{moki.wartDistance?.toFixed(0)}</span>
+                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgWartDistance : moki.wartDistance)?.toFixed(0)}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>BALLS</span>
-                                                            <span className={styles.statValue}>{moki.deposits?.toFixed(1)}</span>
+                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgDeposits : moki.deposits)?.toFixed(1)}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>SCORE</span>
-                                                            <span className={styles.statValue}>{moki.score?.toFixed(0)}</span>
+                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgScore : moki.score)?.toFixed(0)}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>W/R</span>
                                                             <span className={styles.statValue}>
-                                                                {moki.winRate ? moki.winRate.toFixed(1) + '%' : '-'}
+                                                                {(useLast10 ? moki.avgWinRate : moki.winRate) ? (useLast10 ? moki.avgWinRate : moki.winRate)?.toFixed(1) + '%' : '-'}
                                                             </span>
                                                         </div>
                                                     </div>
