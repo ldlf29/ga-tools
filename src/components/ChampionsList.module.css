@@ -199,7 +199,7 @@
 
 .tableContainer::-webkit-scrollbar-track {
     background: transparent;
-    margin-top: 46px;
+    margin-top: 44px;
     margin-bottom: 20px;
 }
 
@@ -232,11 +232,11 @@
     top: 0;
     z-index: 10;
     background-color: #FFD753;
-    padding: 12px 14px;
+    padding: 12px 10px;
     text-align: center;
     font-family: 'Inter', sans-serif;
     font-weight: 800;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: white;
     -webkit-text-stroke: 2.25px black;
     paint-order: stroke fill;
@@ -247,12 +247,25 @@
     transition: background-color 0.2s;
 }
 
+/* # rank column */
 .th:first-child,
 .td:first-child {
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
+    text-align: center;
+    font-weight: 700;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+/* NAME column */
+.th:nth-child(2),
+.td:nth-child(2) {
     font-weight: 800;
-    width: 260px;
-    min-width: 260px;
-    max-width: 260px;
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
 }
 
 .th:hover {
@@ -263,44 +276,48 @@
     border-right: none;
 }
 
-.th:nth-child(2),
-.td:nth-child(2) {
-    width: 110px;
-    min-width: 110px;
-    max-width: 110px;
-}
-
+/* FUR column */
 .th:nth-child(3),
 .td:nth-child(3) {
-    width: 110px;
-    min-width: 110px;
-    max-width: 110px;
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
 }
 
-.th:nth-child(n+4):nth-child(-n+9),
-.td:nth-child(n+4):nth-child(-n+9) {
-    width: 75px;
-    min-width: 75px;
-    max-width: 75px;
-    padding-left: 4px;
-    padding-right: 4px;
+/* CLASS column */
+.th:nth-child(4),
+.td:nth-child(4) {
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
 }
 
-.th:nth-child(n+10),
-.td:nth-child(n+10) {
-    width: 90px;
-    min-width: 90px;
-    max-width: 90px;
+/* Stats columns (★, STR, SPD, DEF, DEX, FOR) */
+.th:nth-child(n+5):nth-child(-n+10),
+.td:nth-child(n+5):nth-child(-n+10) {
+    width: 65px;
+    min-width: 65px;
+    max-width: 65px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+/* Performance columns (TOTAL, TRAIN, ELIMS, WART, BALLS, SCORE, W/R) */
+.th:nth-child(n+11),
+.td:nth-child(n+11) {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
 }
 
 .td {
-    padding: 10px 16px;
+    padding: 8px 10px;
     border-bottom: 1px solid #E5E7EB;
     border-right: 1px solid #E5E7EB;
     color: #333333;
     font-family: 'Inter', sans-serif;
     font-weight: 800;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     text-align: center;
     vertical-align: middle;
 }
@@ -561,6 +578,17 @@
     word-break: break-word;
     /* Allow long names to wrap */
     line-height: 1.2;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mobileRank {
+    color: #FFD753;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000;
+    flex-shrink: 0;
 }
 
 .expandIcon {

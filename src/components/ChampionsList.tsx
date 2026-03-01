@@ -17,9 +17,9 @@ export default function ChampionsList() {
     const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
 
-    // Sort state
-    const [sortField, setSortField] = useState<SortField>('name');
-    const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+    // Sort state - default sort by score descending (leaderboard position)
+    const [sortField, setSortField] = useState<SortField>('score');
+    const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
     // Filter state
     const [filterClasses, setFilterClasses] = useState<string[]>([]);
@@ -269,6 +269,17 @@ export default function ChampionsList() {
 
         return items;
     }, [data, search, sortField, sortDirection, filterClasses, filterFurs, useLast10]);
+
+    // Pre-compute leaderboard ranks based on score (full dataset, no filters)
+    const rankMap = useMemo(() => {
+        const map = new Map<string, number>();
+        const ranked = [...data].sort((a, b) => (b.score || 0) - (a.score || 0));
+        ranked.forEach((moki, idx) => {
+            const key = moki.id || moki.name;
+            map.set(key, idx + 1);
+        });
+        return map;
+    }, [data]);
 
     const renderHeader = (label: string, field: SortField, width?: string) => {
         const isClass = field === 'class';
@@ -622,6 +633,7 @@ export default function ChampionsList() {
                             <table className={styles.table}>
                                 <thead ref={headerRef}>
                                     <tr>
+                                        <th className={styles.th} style={{ width: '44px', textAlign: 'center', cursor: 'default' }}>#</th>
                                         {renderHeader("NAME", "name")}
                                         {renderHeader("FUR", "fur")}
                                         {renderHeader("CLASS", "class")}
@@ -644,6 +656,9 @@ export default function ChampionsList() {
                                     {sortedData.length > 0 ? (
                                         sortedData.map((moki, idx) => (
                                             <tr key={moki.id || moki.name + idx} className={styles.tr}>
+                                                <td className={styles.td} style={{ textAlign: 'center', fontWeight: 700 }}>
+                                                    {rankMap.get(moki.id || moki.name) || '-'}
+                                                </td>
                                                 <td className={styles.td}>
                                                     <div className={styles.tdName}>
                                                         {moki.imageUrl && (
@@ -700,7 +715,7 @@ export default function ChampionsList() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={16}>
+                                            <td colSpan={17}>
                                                 <div className={styles.noResults}>
                                                     No Moki found matching your filters.
                                                 </div>
@@ -741,6 +756,7 @@ export default function ChampionsList() {
                                                 />
                                             )}
                                             <div className={styles.mobileCardName}>
+                                                <span className={styles.mobileRank}>#{rankMap.get(moki.id || moki.name) || '-'}</span>
                                                 {moki.name}
                                             </div>
                                             <div className={styles.expandIcon}>

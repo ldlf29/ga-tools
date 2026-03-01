@@ -311,7 +311,10 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
 
                 <div className={styles.lowerFooter}>
                     <div className={styles.madeBy}>
-                        Made by <a href="https://x.com/luksqron" target="_blank" rel="noopener noreferrer" className={styles.creatorLink}>luksq.ron</a>
+                        Made by <a href="https://x.com/luksqron" target="_blank" rel="noopener noreferrer" className={styles.creatorLink}>luksq.ron</a> ⚔️
+                        <div style={{ marginTop: '0.5rem' }}>
+                            Join <a href="https://fantasy.grandarena.gg/clubs/join/dojo" target="_blank" rel="noopener noreferrer" className={styles.guildLink}>The Dojo</a> Guild ⛩️
+                        </div>
                     </div>
 
                     <div className={styles.donateSection}>

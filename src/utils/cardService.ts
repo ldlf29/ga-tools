@@ -331,5 +331,5 @@ export const fetchUserCards = async (walletAddress: string, forceRefresh: boolea
             catalogData?.market,
             apiCard
         );
-    });
+    }).filter(card => card.image && card.image.trim() !== '');
 };
