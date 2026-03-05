@@ -159,7 +159,13 @@ export async function GET(request: NextRequest) {
             const { error: logErr } = await supabaseAdmin
                 .from('class_changes')
                 .insert(classChanges);
-            if (logErr) console.error('[Cron Sync] Error inserting class changes:', logErr);
+            if (logErr) {
+                console.error('[Cron Sync] Error inserting class changes:', logErr);
+            } else {
+                // Send Discord notification
+                const { DiscordService } = await import('@/services/DiscordService');
+                await DiscordService.notifyClassChanges(classChanges);
+            }
         }
 
         // B. Upsert Stats (Upsert will overwrite the full row, but we kept the old performance stats in the object so they are perfectly safe!)

@@ -118,6 +118,9 @@ async function main() {
                     console.error("⚠️ Failed to log class changes:", changelogError.message);
                 } else {
                     console.log(`✅ Logged ${newChanges.length} class change(s) to changelog.`);
+                    // Send Discord notification
+                    const { DiscordService } = await import('../services/DiscordService');
+                    await DiscordService.notifyClassChanges(newChanges);
                 }
             } else {
                 console.log("✅ Class changes already logged (no new entries).");
