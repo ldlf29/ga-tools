@@ -163,8 +163,19 @@ export async function GET(request: NextRequest) {
                 console.error('[Cron Sync] Error inserting class changes:', logErr);
             } else {
                 // Send Discord notification
-                const { DiscordService } = await import('@/services/DiscordService');
-                await DiscordService.notifyClassChanges(classChanges);
+                try {
+                    const { DiscordService } = await import('@/services/DiscordService');
+                    await DiscordService.notifyClassChanges(classChanges);
+                    console.log('[Cron Sync] Successfully dispatched Discord notification.');
+                } catch (discordErr: any) {
+                    console.error('[Cron Sync] CRITICAL ERROR Dispatching Discord Notification:', discordErr);
+                    // Also attempt to log this to Supabase so it's not totally lost if Vercel logs rotate
+                    await supabaseAdmin.from('sync_logs').insert({
+                        status: 'error',
+                        cards_updated: 0,
+                        details: `Discord Notification Failure: ${discordErr.message || String(discordErr)}`
+                    });
+                }
             }
         }
 

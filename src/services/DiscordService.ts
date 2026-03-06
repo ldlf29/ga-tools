@@ -43,7 +43,9 @@ export class DiscordService {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error(`❌ Failed to send Discord notification (${response.status}):`, errorText);
+                const errMsg = `Failed to send Discord notification (${response.status}): ${errorText}`;
+                console.error(`❌ ${errMsg}`);
+                throw new Error(errMsg);
             } else {
                 console.log(`✅ Sent Discord notification for ${changes.length} class changes.`);
             }
