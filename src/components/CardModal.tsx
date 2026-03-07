@@ -10,10 +10,10 @@ import { createPortal } from 'react-dom';
 interface CardModalProps {
     card: EnhancedCard | null;
     onClose: () => void;
-    useLast10Matches?: boolean;
+    matchLimit?: 'ALL' | 10 | 20 | 30;
 }
 
-export default function CardModal({ card, onClose, useLast10Matches }: CardModalProps) {
+export default function CardModal({ card, onClose, matchLimit = 'ALL' }: CardModalProps) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -143,27 +143,30 @@ export default function CardModal({ card, onClose, useLast10Matches }: CardModal
                                         <>
                                             <div className={styles.performanceGrid}>
                                                 <div className={styles.perfHeader}>
-                                                    {useLast10Matches ? 'LAST 10 MATCHES AVERAGE' : 'PERFORMANCE'}
+                                                    {matchLimit === 'ALL' ? 'PERFORMANCE' : `LAST ${matchLimit} MATCHES AVERAGE`}
                                                 </div>
                                                 <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>ELIMS</span>
-                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgEliminations : card.custom.eliminations)?.toFixed(1) || '0'}</span>
+                                                    <span className={styles.perfValue}>{(matchLimit === 10 ? card.custom.avgEliminations10 : matchLimit === 20 ? card.custom.avgEliminations20 : matchLimit === 30 ? card.custom.avgEliminations30 : card.custom.eliminations)?.toFixed(1) || '0'}</span>
                                                 </div>
                                                 <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>WART</span>
-                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgWartDistance : card.custom.wartDistance)?.toFixed(1) || '0'}</span>
+                                                    <span className={styles.perfValue}>{(matchLimit === 10 ? card.custom.avgWartDistance10 : matchLimit === 20 ? card.custom.avgWartDistance20 : matchLimit === 30 ? card.custom.avgWartDistance30 : card.custom.wartDistance)?.toFixed(1) || '0'}</span>
                                                 </div>
                                                 <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>BALLS</span>
-                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgDeposits : card.custom.deposits)?.toFixed(1) || '0'}</span>
+                                                    <span className={styles.perfValue}>{(matchLimit === 10 ? card.custom.avgDeposits10 : matchLimit === 20 ? card.custom.avgDeposits20 : matchLimit === 30 ? card.custom.avgDeposits30 : card.custom.deposits)?.toFixed(1) || '0'}</span>
                                                 </div>
                                                 <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>SCORE</span>
-                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgScore : card.custom.score)?.toFixed(1) || '0'}</span>
+                                                    <span className={styles.perfValue}>{(matchLimit === 10 ? card.custom.avgScore10 : matchLimit === 20 ? card.custom.avgScore20 : matchLimit === 30 ? card.custom.avgScore30 : card.custom.score)?.toFixed(1) || '0'}</span>
                                                 </div>
                                                 <div className={styles.perfItem}>
                                                     <span className={styles.perfLabel}>W/R</span>
-                                                    <span className={styles.perfValue}>{(useLast10Matches ? card.custom.avgWinRate : card.custom.winRate) ? `${(useLast10Matches ? card.custom.avgWinRate : card.custom.winRate)?.toFixed(1)}%` : '0%'}</span>
+                                                    <span className={styles.perfValue}>{(() => {
+                                                        const wr = matchLimit === 10 ? card.custom.avgWinRate10 : matchLimit === 20 ? card.custom.avgWinRate20 : matchLimit === 30 ? card.custom.avgWinRate30 : card.custom.winRate;
+                                                        return wr ? `${wr.toFixed(1)}%` : '0%';
+                                                    })()}</span>
                                                 </div>
                                             </div>
                                         </>

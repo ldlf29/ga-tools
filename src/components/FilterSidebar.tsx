@@ -169,7 +169,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
             specialization: [],
             traits: [],
             insertionOrder: [],
-            useLast10Matches: false
+            matchLimit: 'ALL'
         });
     };
 
@@ -244,20 +244,32 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                 />
 
                 {filters.cardType === 'MOKI' && (
-                    <div className={styles.last10ToggleWrapper}>
-                        <label className={styles.toggleLabel}>
-                            <input
-                                type="checkbox"
-                                checked={filters.useLast10Matches || false}
-                                onChange={(e) => {
-                                    onFilterChange({
-                                        ...filters,
-                                        useLast10Matches: e.target.checked
-                                    });
-                                }}
-                            />
-                            <span className={styles.toggleText}>Filter by the last 10 matches</span>
-                        </label>
+                    <div className={styles.last10ToggleWrapper} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px', padding: '12px 10px' }}>
+                        <span className={styles.toggleText} style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '4px', display: 'block' }}>Match Performance Data</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                            {[
+                                { label: 'All-Time (Season)', value: 'ALL' },
+                                { label: 'Last 10 Matches', value: 10 },
+                                { label: 'Last 20 Matches', value: 20 },
+                                { label: 'Last 30 Matches', value: 30 }
+                            ].map((opt) => (
+                                <label key={opt.value} className={styles.radioLabel} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                                    <input
+                                        type="radio"
+                                        name="matchLimitFilter"
+                                        checked={(filters.matchLimit || 'ALL') === opt.value}
+                                        onChange={() => {
+                                            onFilterChange({
+                                                ...filters,
+                                                matchLimit: opt.value as 10 | 20 | 30 | 'ALL'
+                                            });
+                                        }}
+                                        style={{ accentColor: '#ff2e93', width: '16px', height: '16px', margin: 0 }}
+                                    />
+                                    {opt.label}
+                                </label>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>

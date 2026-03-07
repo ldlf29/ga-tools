@@ -25,6 +25,28 @@ export interface MokiData {
     wartDistance?: number;
     score?: number;
     winRate?: number;
+    // Last 10 Averages
+    avgEliminations10?: number;
+    avgDeposits10?: number;
+    avgWartDistance10?: number;
+    avgScore10?: number;
+    avgWinRate10?: number;
+
+    // Last 20 Averages
+    avgEliminations20?: number;
+    avgDeposits20?: number;
+    avgWartDistance20?: number;
+    avgScore20?: number;
+    avgWinRate20?: number;
+
+    // Last 30 Averages
+    avgEliminations30?: number;
+    avgDeposits30?: number;
+    avgWartDistance30?: number;
+    avgScore30?: number;
+    avgWinRate30?: number;
+
+    // Backwards compatibility
     avgEliminations?: number;
     avgDeposits?: number;
     avgWartDistance?: number;

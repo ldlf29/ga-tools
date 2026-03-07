@@ -269,7 +269,7 @@ export default function Home() {
     specialization: [] as string[],
     traits: [] as string[],
     insertionOrder: [] as string[],
-    useLast10Matches: false
+    matchLimit: 'ALL' as 'ALL' | 10 | 20 | 30
   };
 
   const [filters, setFilters] = useState<FilterState>({
@@ -447,7 +447,7 @@ export default function Home() {
       specialization: [],
       traits: [],
       insertionOrder: [],
-      useLast10Matches: false
+      matchLimit: 'ALL'
     };
 
     // Build insertion order: first preserved rarity/stars, then new filters

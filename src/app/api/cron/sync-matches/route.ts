@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
             const chunkTokenIds = batchTokenIds.slice(i, i + CONCURRENCY_LIMIT);
 
             const fetchPromises = chunkTokenIds.map(async (tokenId) => {
-                const apiUrl = `https://api.grandarena.gg/api/v1/mokis/${tokenId}/performances?page=1&limit=10`;
+                const apiUrl = `https://api.grandarena.gg/api/v1/mokis/${tokenId}/performances?page=1&limit=30`;
                 try {
                     const response = await fetch(apiUrl, {
                         headers: {
@@ -136,12 +136,12 @@ export async function GET(request: NextRequest) {
             details: `${nextIndex}`
         });
 
-        // 6. Housekeeping: Keep only the latest 20 matches per Moki ID
+        // 6. Housekeeping: Keep only the latest 40 matches per Moki ID
         //    Uses a single SQL query instead of fetching all rows into memory.
         let recordsDeleted = 0;
         try {
             const { data: deletedData, error: cleanupErr } = await supabaseAdmin
-                .rpc('cleanup_old_matches', { keep_count: 20 });
+                .rpc('cleanup_old_matches', { keep_count: 40 });
 
             if (cleanupErr) {
                 console.error(`[Cron Matches] Housekeeping SQL error:`, cleanupErr);

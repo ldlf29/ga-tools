@@ -34,7 +34,7 @@ export default function ChampionsList() {
     const [openMobileDropdown, setOpenMobileDropdown] = useState<'sort' | 'class' | 'fur' | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
     const [confirmExport, setConfirmExport] = useState(false);
-    const [useLast10, setUseLast10] = useState(false);
+    const [matchLimit, setMatchLimit] = useState<'ALL' | 10 | 20 | 30>('ALL');
     const [historyTokenId, setHistoryTokenId] = useState<number | null>(null);
     const [historyName, setHistoryName] = useState<string | null>(null);
 
@@ -218,15 +218,15 @@ export default function ChampionsList() {
         }
     };
 
-    // Map sort field to avg equivalent when LAST 10 is active
-    const getEffectiveSortField = (field: SortField): SortField => {
-        if (!useLast10) return field;
-        const avgMap: Partial<Record<SortField, SortField>> = {
-            eliminations: 'avgEliminations',
-            deposits: 'avgDeposits',
-            wartDistance: 'avgWartDistance',
-            score: 'avgScore',
-            winRate: 'avgWinRate',
+    // Map sort field to avg equivalent when a limit is active
+    const getEffectiveSortField = (field: SortField): string => {
+        if (matchLimit === 'ALL') return field;
+        const avgMap: Partial<Record<SortField, string>> = {
+            eliminations: `avgEliminations${matchLimit}`,
+            deposits: `avgDeposits${matchLimit}`,
+            wartDistance: `avgWartDistance${matchLimit}`,
+            score: `avgScore${matchLimit}`,
+            winRate: `avgWinRate${matchLimit}`,
         };
         return avgMap[field] || field;
     };
@@ -250,8 +250,8 @@ export default function ChampionsList() {
         const effectiveField = getEffectiveSortField(sortField);
 
         items.sort((a, b) => {
-            let valA = a[effectiveField];
-            let valB = b[effectiveField];
+            let valA = (a as any)[effectiveField];
+            let valB = (b as any)[effectiveField];
 
             if (typeof valA === 'string' && typeof valB === 'string') {
                 valA = valA.toLowerCase();
@@ -268,7 +268,13 @@ export default function ChampionsList() {
         });
 
         return items;
-    }, [data, search, sortField, sortDirection, filterClasses, filterFurs, useLast10]);
+    }, [data, search, sortField, sortDirection, filterClasses, filterFurs, matchLimit]);
+
+    const getStat = (moki: MokiData, baseProperty: string) => {
+        if (matchLimit === 'ALL') return (moki as any)[baseProperty];
+        const prop = `avg${baseProperty.charAt(0).toUpperCase() + baseProperty.slice(1)}${matchLimit}`;
+        return (moki as any)[prop];
+    };
 
     // Pre-compute leaderboard ranks based on score (full dataset, no filters)
     const rankMap = useMemo(() => {
@@ -374,15 +380,16 @@ export default function ChampionsList() {
             <div className={styles.header}>
                 <div className={styles.headerTopRow}>
                     <div className={styles.titleGroup}>
-                        <div className={styles.title}>{useLast10 ? 'Champions - Last 10 Matches' : 'Champions - S1'}</div>
+                        <div className={styles.title}>{matchLimit !== 'ALL' ? `Champions - Last ${matchLimit} Matches` : 'Champions - S1'}</div>
                     </div>
                     <div className={styles.headerRight}>
                         <button
-                            className={`${styles.last10Button} ${useLast10 ? styles.last10Active : ''}`}
-                            onClick={() => setUseLast10(!useLast10)}
-                            title="Toggle Last 10 Matches Stats"
+                            className={`${styles.last10Button} ${matchLimit !== 'ALL' ? styles.last10Active : ''}`}
+                            onClick={() => setMatchLimit(prev => prev === 'ALL' ? 10 : prev === 10 ? 20 : prev === 20 ? 30 : 'ALL')}
+                            title="Toggle Match Performance Limit"
+                            style={{ width: '90px' }}
                         >
-                            LAST 10
+                            {matchLimit === 'ALL' ? 'S1 (ALL)' : `LAST ${matchLimit}`}
                         </button>
 
                         <button
@@ -457,11 +464,12 @@ export default function ChampionsList() {
                 {/* Mobile Action Row (hidden on desktop) */}
                 <div className={styles.actionRow}>
                     <button
-                        className={`${styles.last10Button} ${useLast10 ? styles.last10Active : ''}`}
-                        onClick={() => setUseLast10(!useLast10)}
-                        title="Toggle Last 10 Matches Stats"
+                        className={`${styles.last10Button} ${matchLimit !== 'ALL' ? styles.last10Active : ''}`}
+                        onClick={() => setMatchLimit(prev => prev === 'ALL' ? 10 : prev === 10 ? 20 : prev === 20 ? 30 : 'ALL')}
+                        title="Toggle Match Performance Limit"
+                        style={{ width: '90px' }}
                     >
-                        LAST 10
+                        {matchLimit === 'ALL' ? 'S1 (ALL)' : `LAST ${matchLimit}`}
                     </button>
 
                     <button
@@ -706,11 +714,11 @@ export default function ChampionsList() {
                                                 <td className={styles.td}>{moki.fortitude?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.totalStats?.toFixed(2) || '-'}</td>
                                                 <td className={styles.td}>{moki.train?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{(useLast10 ? moki.avgEliminations : moki.eliminations)?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{(useLast10 ? moki.avgWartDistance : moki.wartDistance)?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{(useLast10 ? moki.avgDeposits : moki.deposits)?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{(useLast10 ? moki.avgScore : moki.score)?.toFixed(2) || '-'}</td>
-                                                <td className={styles.td}>{(useLast10 ? moki.avgWinRate : moki.winRate) ? (useLast10 ? moki.avgWinRate : moki.winRate)?.toFixed(2) + '%' : '-'}</td>
+                                                <td className={styles.td}>{getStat(moki, 'eliminations')?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{getStat(moki, 'wartDistance')?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{getStat(moki, 'deposits')?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{getStat(moki, 'score')?.toFixed(2) || '-'}</td>
+                                                <td className={styles.td}>{getStat(moki, 'winRate') ? getStat(moki, 'winRate')?.toFixed(2) + '%' : '-'}</td>
                                             </tr>
                                         ))
                                     ) : (
@@ -835,24 +843,24 @@ export default function ChampionsList() {
                                                         <div className={styles.statTitle}>Performance</div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>ELIMS</span>
-                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgEliminations : moki.eliminations)?.toFixed(1)}</span>
+                                                            <span className={styles.statValue}>{getStat(moki, 'eliminations')?.toFixed(1) || '-'}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>WART</span>
-                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgWartDistance : moki.wartDistance)?.toFixed(0)}</span>
+                                                            <span className={styles.statValue}>{getStat(moki, 'wartDistance')?.toFixed(0) || '-'}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>BALLS</span>
-                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgDeposits : moki.deposits)?.toFixed(1)}</span>
+                                                            <span className={styles.statValue}>{getStat(moki, 'deposits')?.toFixed(1) || '-'}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>SCORE</span>
-                                                            <span className={styles.statValue}>{(useLast10 ? moki.avgScore : moki.score)?.toFixed(0)}</span>
+                                                            <span className={styles.statValue}>{getStat(moki, 'score')?.toFixed(0) || '-'}</span>
                                                         </div>
                                                         <div className={styles.statRow}>
                                                             <span className={styles.statLabel}>W/R</span>
                                                             <span className={styles.statValue}>
-                                                                {(useLast10 ? moki.avgWinRate : moki.winRate) ? (useLast10 ? moki.avgWinRate : moki.winRate)?.toFixed(1) + '%' : '-'}
+                                                                {getStat(moki, 'winRate') ? getStat(moki, 'winRate')?.toFixed(1) + '%' : '-'}
                                                             </span>
                                                         </div>
                                                     </div>

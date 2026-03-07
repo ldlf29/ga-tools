@@ -104,6 +104,36 @@
     margin: 0.5rem 0 0 0;
 }
 
+.limitToggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.limitBtn {
+    background: #FFD753;
+    border: 2px solid #333;
+    border-bottom-width: 4px;
+    border-radius: 8px;
+    padding: 0.25rem 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #333;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+}
+
+.limitBtn:hover {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+    background: #ffea99;
+}
+
+.limitBtnActive {
+    background: #FF66CC;
+    color: white;
+}
+
 .subtitle {
     font-size: 1.3rem;
     font-weight: 700;

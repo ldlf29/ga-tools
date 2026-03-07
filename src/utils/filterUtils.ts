@@ -57,17 +57,29 @@ export const matchesFilter = (
     }
     // SPECIALIZATION (Sorting + Threshold Filtering)
     if (filters.specialization.length > 0) {
-        const useLast10 = filters.useLast10Matches;
+        const limit = filters.matchLimit;
 
         for (const spec of filters.specialization) {
             if (spec === 'Gacha') {
-                const val = useLast10 ? (card.custom.avgDeposits || 0) : (card.custom.deposits || 0);
+                if (card.custom.class === 'Defender' || card.custom.class === 'Bruiser') return false;
+                let val = card.custom.deposits || 0;
+                if (limit === 10) val = card.custom.avgDeposits10 || 0;
+                if (limit === 20) val = card.custom.avgDeposits20 || 0;
+                if (limit === 30) val = card.custom.avgDeposits30 || 0;
                 if (val <= 4) return false;
             } else if (spec === 'Killer') {
-                const val = useLast10 ? (card.custom.avgEliminations || 0) : (card.custom.eliminations || 0);
+                if (card.custom.class === 'Striker') return false;
+                let val = card.custom.eliminations || 0;
+                if (limit === 10) val = card.custom.avgEliminations10 || 0;
+                if (limit === 20) val = card.custom.avgEliminations20 || 0;
+                if (limit === 30) val = card.custom.avgEliminations30 || 0;
                 if (val <= 1.25) return false;
             } else if (spec === 'Wart Rider') {
-                const val = useLast10 ? (card.custom.avgWartDistance || 0) : (card.custom.wartDistance || 0);
+                if (card.custom.class === 'Striker') return false;
+                let val = card.custom.wartDistance || 0;
+                if (limit === 10) val = card.custom.avgWartDistance10 || 0;
+                if (limit === 20) val = card.custom.avgWartDistance20 || 0;
+                if (limit === 30) val = card.custom.avgWartDistance30 || 0;
                 if (val <= 150) return false;
             }
         }

@@ -24,6 +24,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
     const [matches, setMatches] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [selectedMatchForDetails, setSelectedMatchForDetails] = useState<any | null>(null);
+    const [historyLimit, setHistoryLimit] = useState<10 | 20 | 30>(10);
 
     useEffect(() => {
         setMounted(true);
@@ -46,7 +47,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
                         .select('*')
                         .eq('token_id', tokenId)
                         .order('created_at', { ascending: false })
-                        .limit(10);
+                        .limit(historyLimit);
 
                     if (!error && data) {
                         setMatches(data);
@@ -68,7 +69,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
                 window.removeEventListener('keydown', handleEsc);
             };
         }
-    }, [tokenId, mounted, onClose]);
+    }, [tokenId, mounted, onClose, historyLimit]);
 
     if (!mounted || tokenId === null) return null;
 
@@ -223,7 +224,21 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
 
                     <div className={styles.header}>
                         <div className={styles.headerLeft}>
-                            <h2 className={styles.title}>MATCH HISTORY (LAST 10)</h2>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                <h2 className={styles.title}>MATCH HISTORY</h2>
+                                <div className={styles.limitToggle}>
+                                    {[10, 20, 30].map(val => (
+                                        <button
+                                            key={val}
+                                            className={`${styles.limitBtn} ${historyLimit === val ? styles.limitBtnActive : ''}`}
+                                            onClick={() => setHistoryLimit(val as 10 | 20 | 30)}
+                                            disabled={loading}
+                                        >
+                                            LAST {val}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <p className={styles.updateFreq}>Updated every 10 minutes.</p>
                             <div className={styles.subtitleRow}>
                                 <h3 className={styles.subtitle}>{mokiName}</h3>

@@ -331,14 +331,38 @@ export default function CardGrid({
                     // CASE: Both are active - Calculation of Coeff
                     if (activePerf && activeContext) {
                         const getVal = (card: any, spec: string) => {
-                            const useLast10 = filters.useLast10Matches;
+                            const limit = filters.matchLimit;
                             switch (spec) {
-                                case 'Gacha': return useLast10 ? (card.custom?.avgDeposits || 0) : (card.custom?.deposits || 0);
-                                case 'Killer': return useLast10 ? (card.custom?.avgEliminations || 0) : (card.custom?.eliminations || 0);
-                                case 'Wart Rider': return useLast10 ? (card.custom?.avgWartDistance || 0) : (card.custom?.wartDistance || 0);
-                                case 'Winner': return useLast10 ? (card.custom?.avgWinRate || 0) : (card.custom?.winRate || 0);
-                                case 'Loser': return 1 / (useLast10 ? (card.custom?.avgWinRate || 0.0001) : (card.custom?.winRate || 0.0001));
-                                case 'Score': return useLast10 ? (card.custom?.avgScore || 0) : (card.custom?.score || 0);
+                                case 'Gacha':
+                                    if (limit === 10) return card.custom?.avgDeposits10 || 0;
+                                    if (limit === 20) return card.custom?.avgDeposits20 || 0;
+                                    if (limit === 30) return card.custom?.avgDeposits30 || 0;
+                                    return card.custom?.deposits || 0;
+                                case 'Killer':
+                                    if (limit === 10) return card.custom?.avgEliminations10 || 0;
+                                    if (limit === 20) return card.custom?.avgEliminations20 || 0;
+                                    if (limit === 30) return card.custom?.avgEliminations30 || 0;
+                                    return card.custom?.eliminations || 0;
+                                case 'Wart Rider':
+                                    if (limit === 10) return card.custom?.avgWartDistance10 || 0;
+                                    if (limit === 20) return card.custom?.avgWartDistance20 || 0;
+                                    if (limit === 30) return card.custom?.avgWartDistance30 || 0;
+                                    return card.custom?.wartDistance || 0;
+                                case 'Winner':
+                                    if (limit === 10) return card.custom?.avgWinRate10 || 0;
+                                    if (limit === 20) return card.custom?.avgWinRate20 || 0;
+                                    if (limit === 30) return card.custom?.avgWinRate30 || 0;
+                                    return card.custom?.winRate || 0;
+                                case 'Loser':
+                                    if (limit === 10) return 1 / (card.custom?.avgWinRate10 || 0.0001);
+                                    if (limit === 20) return 1 / (card.custom?.avgWinRate20 || 0.0001);
+                                    if (limit === 30) return 1 / (card.custom?.avgWinRate30 || 0.0001);
+                                    return 1 / (card.custom?.winRate || 0.0001);
+                                case 'Score':
+                                    if (limit === 10) return card.custom?.avgScore10 || 0;
+                                    if (limit === 20) return card.custom?.avgScore20 || 0;
+                                    if (limit === 30) return card.custom?.avgScore30 || 0;
+                                    return card.custom?.score || 0;
                                 default: return 0;
                             }
                         };
@@ -349,29 +373,45 @@ export default function CardGrid({
                     }
 
                     // FALLBACK: Individual Sorting (if only one or coeff is same)
-                    const useLast10 = filters.useLast10Matches;
-                    for (let spec of activeSpecs) {
-                        let diff = 0;
+                    const limit = filters.matchLimit;
+                    const getA = (spec: string, card: any) => {
                         switch (spec) {
                             case 'Gacha':
-                                diff = (useLast10 ? (b.custom?.avgDeposits || 0) : (b.custom?.deposits || 0)) - (useLast10 ? (a.custom?.avgDeposits || 0) : (a.custom?.deposits || 0));
-                                break;
+                                if (limit === 10) return card.custom?.avgDeposits10 || 0;
+                                if (limit === 20) return card.custom?.avgDeposits20 || 0;
+                                if (limit === 30) return card.custom?.avgDeposits30 || 0;
+                                return card.custom?.deposits || 0;
                             case 'Killer':
-                                diff = (useLast10 ? (b.custom?.avgEliminations || 0) : (b.custom?.eliminations || 0)) - (useLast10 ? (a.custom?.avgEliminations || 0) : (a.custom?.eliminations || 0));
-                                break;
+                                if (limit === 10) return card.custom?.avgEliminations10 || 0;
+                                if (limit === 20) return card.custom?.avgEliminations20 || 0;
+                                if (limit === 30) return card.custom?.avgEliminations30 || 0;
+                                return card.custom?.eliminations || 0;
                             case 'Wart Rider':
-                                diff = (useLast10 ? (b.custom?.avgWartDistance || 0) : (b.custom?.wartDistance || 0)) - (useLast10 ? (a.custom?.avgWartDistance || 0) : (a.custom?.wartDistance || 0));
-                                break;
+                                if (limit === 10) return card.custom?.avgWartDistance10 || 0;
+                                if (limit === 20) return card.custom?.avgWartDistance20 || 0;
+                                if (limit === 30) return card.custom?.avgWartDistance30 || 0;
+                                return card.custom?.wartDistance || 0;
                             case 'Winner':
-                                diff = (useLast10 ? (b.custom?.avgWinRate || 0) : (b.custom?.winRate || 0)) - (useLast10 ? (a.custom?.avgWinRate || 0) : (a.custom?.winRate || 0));
-                                break;
+                                if (limit === 10) return card.custom?.avgWinRate10 || 0;
+                                if (limit === 20) return card.custom?.avgWinRate20 || 0;
+                                if (limit === 30) return card.custom?.avgWinRate30 || 0;
+                                return card.custom?.winRate || 0;
                             case 'Loser':
-                                diff = (useLast10 ? (a.custom?.avgWinRate || 0) : (a.custom?.winRate || 0)) - (useLast10 ? (b.custom?.avgWinRate || 0) : (b.custom?.winRate || 0));
-                                break;
+                                if (limit === 10) return -(card.custom?.avgWinRate10 || 0);
+                                if (limit === 20) return -(card.custom?.avgWinRate20 || 0);
+                                if (limit === 30) return -(card.custom?.avgWinRate30 || 0);
+                                return -(card.custom?.winRate || 0);
                             case 'Score':
-                                diff = (useLast10 ? (b.custom?.avgScore || 0) : (b.custom?.score || 0)) - (useLast10 ? (a.custom?.avgScore || 0) : (a.custom?.score || 0));
-                                break;
+                                if (limit === 10) return card.custom?.avgScore10 || 0;
+                                if (limit === 20) return card.custom?.avgScore20 || 0;
+                                if (limit === 30) return card.custom?.avgScore30 || 0;
+                                return card.custom?.score || 0;
+                            default: return 0;
                         }
+                    }
+
+                    for (let spec of activeSpecs) {
+                        let diff = getA(spec, b) - getA(spec, a);
                         if (diff !== 0) return diff;
                     }
                 }
@@ -636,11 +676,13 @@ export default function CardGrid({
                 )}
             </div>
 
-            <CardModal
-                card={selectedModalCard}
-                onClose={() => setSelectedModalCard(null)}
-                useLast10Matches={filters.useLast10Matches}
-            />
+            {selectedModalCard && (
+                <CardModal
+                    card={selectedModalCard}
+                    onClose={() => setSelectedModalCard(null)}
+                    matchLimit={filters.matchLimit}
+                />
+            )}
         </div>
     );
 }

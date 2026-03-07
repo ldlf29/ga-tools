@@ -53,6 +53,21 @@ export interface EnhancedCard extends GrandArenaCard {
         avgWartDistance?: number;
         avgScore?: number;
         avgWinRate?: number;
+        avgEliminations10?: number;
+        avgDeposits10?: number;
+        avgWartDistance10?: number;
+        avgScore10?: number;
+        avgWinRate10?: number;
+        avgEliminations20?: number;
+        avgDeposits20?: number;
+        avgWartDistance20?: number;
+        avgScore20?: number;
+        avgWinRate20?: number;
+        avgEliminations30?: number;
+        avgDeposits30?: number;
+        avgWartDistance30?: number;
+        avgScore30?: number;
+        avgWinRate30?: number;
     };
 }
 
@@ -72,7 +87,7 @@ export interface FilterState {
     specialization: string[];
     traits: string[];
     insertionOrder?: string[];
-    useLast10Matches?: boolean;
+    matchLimit?: 10 | 20 | 30 | 'ALL';
 }
 
 export const TRAIT_GROUPS = [
