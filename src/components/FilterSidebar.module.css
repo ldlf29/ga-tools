@@ -333,6 +333,48 @@
     font-weight: bold;
 }
 
+.radioInputHidden {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.radioCustomCheck {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 2px solid #333333;
+    border-radius: 6px;
+    background: #84BCFF;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkboxLabel:hover .radioCustomCheck {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
+}
+
+.radioInputHidden:checked~.radioCustomCheck {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+.radioCustomCheck svg {
+    margin-top: -1px;
+    width: 14px;
+    height: 14px;
+    color: #333333;
+}
+
 .labelText {
     font-size: 0.9rem;
     color: #333333;

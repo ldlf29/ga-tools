@@ -414,6 +414,8 @@ export default function Home() {
       let newValues = currentValues;
       if (key === 'stars') {
         newValues = [];
+      } else if (key === 'matchLimit') {
+        newValues = 'ALL';
       } else if (Array.isArray(currentValues)) {
         newValues = (currentValues as any[]).filter(v => v !== value);
       }
@@ -590,7 +592,7 @@ export default function Home() {
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
+        <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={activeTab === 'lineups'} storagePrefix={activeTab} />
       </div>
 
       {/* Mobile Builder Drawer */}
@@ -726,7 +728,7 @@ export default function Home() {
             <div className={styles.mainLayout}>
               {/* Column 1: FilterSidebar (Desktop only) */}
               <div className={styles.desktopOnly}>
-                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
+                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={false} storagePrefix="builder" />
               </div>
 
               {/* Column 2: CardGrid */}
@@ -774,7 +776,7 @@ export default function Home() {
             <div className={styles.mainLayoutLineups}>
               {/* Column 1: Sidebar */}
               <div className={styles.desktopOnly}>
-                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} />
+                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={true} storagePrefix="lineups" />
               </div>
 
               {/* Column 2: Lineups List */}

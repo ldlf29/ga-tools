@@ -58,6 +58,7 @@ export const LineupCardSelector: React.FC<LineupCardSelectorProps> = ({
                             filters={selectorFilters}
                             onFilterChange={setSelectorFilters}
                             onCardTypeChange={() => { }}
+                            storagePrefix="selector"
                         />
                     </div>
                     <div className={styles.selectorGridWrapper}>
@@ -108,6 +109,7 @@ export const LineupCardSelector: React.FC<LineupCardSelectorProps> = ({
                         filters={selectorFilters}
                         onFilterChange={setSelectorFilters}
                         onCardTypeChange={() => { }}
+                        storagePrefix="selector"
                     />
                 </div>
             </div>

@@ -989,7 +989,7 @@ export default function MyLineups({
                             </div>
                         )}
                     </div>
-                    <AnimatePresence>
+                    <AnimatePresence initial={false}>
                         {favoritesOpen && (
                             <motion.div
                                 key="favorites-content"
@@ -1030,7 +1030,7 @@ export default function MyLineups({
                             </div>
                         )}
                     </div>
-                    <AnimatePresence>
+                    <AnimatePresence initial={false}>
                         {allLineupsOpen && (
                             <motion.div
                                 key="others-content"

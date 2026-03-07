@@ -61,8 +61,15 @@ export function getActiveFiltersDisplay(filters: FilterState): DisplayFilter[] {
         if (key === 'customClass') label = 'CLASS';
         if (key === 'specialization') label = 'SPEC';
         if (key === 'traits') label = 'TRAIT';
+        if (key === 'matchLimit') label = 'MATCHES';
 
-        return { key, label, value };
+        // For matchLimit, format the display properly
+        let displayValue: string | undefined = undefined;
+        if (key === 'matchLimit') {
+            displayValue = `Last ${value}`;
+        }
+
+        return { key, label, value, displayValue };
     });
 
     const result: DisplayFilter[] = mappedInfo.filter((f): f is DisplayFilter => f !== null);

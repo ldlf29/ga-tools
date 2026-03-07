@@ -10,6 +10,8 @@ interface FilterSidebarProps {
     filters: FilterState;
     onFilterChange: (newFilters: FilterState) => void;
     onCardTypeChange?: (newCardType: 'MOKI' | 'SCHEME') => void;
+    hideMatchPerformance?: boolean;
+    storagePrefix?: string;
 }
 
 import { SCHEME_NAMES } from '@/data/schemes';
@@ -35,7 +37,7 @@ const SPECIALIZATION_CONFIG: { key: string, label: string }[] = [
     { key: "Score", label: "Score" }
 ];
 
-export default function FilterSidebar({ filters, onFilterChange, onCardTypeChange }: FilterSidebarProps) {
+export default function FilterSidebar({ filters, onFilterChange, onCardTypeChange, hideMatchPerformance, storagePrefix = 'default' }: FilterSidebarProps) {
 
     // Independent search state for each card type tab
     const [mokiSearch, setMokiSearch] = useState('');
@@ -243,44 +245,51 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                     spellCheck="false"
                 />
 
-                {filters.cardType === 'MOKI' && (
-                    <div className={styles.last10ToggleWrapper} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px', padding: '12px 10px' }}>
-                        <span className={styles.toggleText} style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '4px', display: 'block' }}>Match Performance Data</span>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
-                            {[
-                                { label: 'All-Time (Season)', value: 'ALL' },
-                                { label: 'Last 10 Matches', value: 10 },
-                                { label: 'Last 20 Matches', value: 20 },
-                                { label: 'Last 30 Matches', value: 30 }
-                            ].map((opt) => (
-                                <label key={opt.value} className={styles.radioLabel} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
-                                    <input
-                                        type="radio"
-                                        name="matchLimitFilter"
-                                        checked={(filters.matchLimit || 'ALL') === opt.value}
-                                        onChange={() => {
-                                            onFilterChange({
-                                                ...filters,
-                                                matchLimit: opt.value as 10 | 20 | 30 | 'ALL'
-                                            });
-                                        }}
-                                        style={{ accentColor: '#ff2e93', width: '16px', height: '16px', margin: 0 }}
-                                    />
-                                    {opt.label}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
 
             <div className={styles.scrollableContent}>
                 {/* --- MOKI SECTION --- */}
                 {filters.cardType !== 'SCHEME' && (
                     <>
+                        {/* Match Performance Data */}
+                        {(!hideMatchPerformance && !filterSearch.trim()) && (
+                            <FilterAccordion storagePrefix={storagePrefix} title="Match Performance" isOpenDefault={false} forceOpen={false}>
+                                {[
+                                    { label: 'Last 10 Matches', value: 10 },
+                                    { label: 'Last 20 Matches', value: 20 },
+                                    { label: 'Last 30 Matches', value: 30 }
+                                ].map((opt) => (
+                                    <label key={opt.value} className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            name="matchLimitFilter"
+                                            checked={filters.matchLimit === opt.value}
+                                            onChange={() => {
+                                                const currentLimit = filters.matchLimit || 'ALL';
+                                                const newLimit = currentLimit === opt.value ? 'ALL' : opt.value as 10 | 20 | 30;
+
+                                                // Handle insertion order logic so the chip appears/disappears
+                                                let updatedOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
+                                                updatedOrder = updatedOrder.filter(k => k !== 'matchLimit:10' && k !== 'matchLimit:20' && k !== 'matchLimit:30');
+                                                if (newLimit !== 'ALL') {
+                                                    updatedOrder.push(`matchLimit:${newLimit}`);
+                                                }
+
+                                                onFilterChange({
+                                                    ...filters,
+                                                    matchLimit: newLimit,
+                                                    insertionOrder: updatedOrder
+                                                });
+                                            }}
+                                        />
+                                        <span className={styles.labelText}>{opt.label}</span>
+                                    </label>
+                                ))}
+                            </FilterAccordion>
+                        )}
                         {/* Rarity - only show if no search or has matches */}
                         {(!filterSearch.trim() || rarityMatches) && (
-                            <FilterAccordion title="Rarity" isOpenDefault={false} forceOpen={rarityMatches}>
+                            <FilterAccordion storagePrefix={storagePrefix} title="Rarity" isOpenDefault={false} forceOpen={rarityMatches}>
                                 {filterOptions(rarityOptions).map(r => (
                                     <label key={r} className={styles.checkboxLabel}>
                                         <input
@@ -296,7 +305,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
 
                         {/* Class */}
                         {(!filterSearch.trim() || classMatches) && (
-                            <FilterAccordion title="Class" isOpenDefault={false} forceOpen={classMatches}>
+                            <FilterAccordion storagePrefix={storagePrefix} title="Class" isOpenDefault={false} forceOpen={classMatches}>
                                 {filterOptions(CLASS_OPTIONS).map(c => (
                                     <label key={c} className={styles.checkboxLabel}>
                                         <input type="checkbox" checked={filters.customClass.includes(c)} onChange={() => handleClassChange(c)} />
@@ -308,7 +317,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
 
                         {/* Specialization */}
                         {(!filterSearch.trim() || specMatches) && (
-                            <FilterAccordion title="Specialization" isOpenDefault={false} forceOpen={specMatches}>
+                            <FilterAccordion storagePrefix={storagePrefix} title="Specialization" isOpenDefault={false} forceOpen={specMatches}>
                                 {SPECIALIZATION_CONFIG.filter(s => {
                                     if (!filterSearch.trim()) return true;
                                     return s.label.toLowerCase().includes(filterSearch.toLowerCase());
@@ -323,7 +332,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
 
                         {/* Stars - only show if no search or matches "star" or number 1-8 */}
                         {(!filterSearch.trim() || starsMatches) && (
-                            <FilterAccordion title="Stars" isOpenDefault={false} forceOpen={starsMatches}>
+                            <FilterAccordion storagePrefix={storagePrefix} title="Stars" isOpenDefault={false} forceOpen={starsMatches}>
                                 <div style={{ padding: '0 10px' }}>
                                     <StarRangeSlider
                                         min={1}
@@ -347,7 +356,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
 
                         {/* Fur */}
                         {(!filterSearch.trim() || furMatches) && (
-                            <FilterAccordion title="Fur" isOpenDefault={false} forceOpen={furMatches}>
+                            <FilterAccordion storagePrefix={storagePrefix} title="Fur" isOpenDefault={false} forceOpen={furMatches}>
                                 {filterOptions(FUR_OPTIONS).map(f => (
                                     <label key={f} className={styles.checkboxLabel}>
                                         <input type="checkbox" checked={filters.fur.includes(f)} onChange={() => handleFurChange(f)} />
@@ -359,7 +368,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
 
                         {/* Traits (Grouped) */}
                         {(!filterSearch.trim() || traitsMatches) && (
-                            <FilterAccordion title="Traits" isOpenDefault={false} forceOpen={traitsMatches}>
+                            <FilterAccordion storagePrefix={storagePrefix} title="Traits" isOpenDefault={false} forceOpen={traitsMatches}>
                                 {TRAIT_GROUPS.filter(group => {
                                     if (!filterSearch.trim()) return true;
                                     return group.label.toLowerCase().includes(filterSearch.toLowerCase());
@@ -386,7 +395,7 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                 {filters.cardType === 'SCHEME' && (
                     <>
                         {(!filterSearch.trim() || schemeMatches) && (
-                            <FilterAccordion title="Scheme Name" isOpenDefault={false} forceOpen={schemeMatches}>
+                            <FilterAccordion storagePrefix={storagePrefix} title="Scheme Name" isOpenDefault={false} forceOpen={schemeMatches}>
                                 {filterOptions(SCHEME_NAMES).map(name => (
                                     <label key={name} className={styles.checkboxLabel}>
                                         <input
@@ -408,15 +417,31 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
 }
 
 // Internal Accordion Component
-function FilterAccordion({ title, children, isOpenDefault = false, forceOpen = false }: { title: string, children: React.ReactNode, isOpenDefault?: boolean, forceOpen?: boolean }) {
-    const [isOpen, setIsOpen] = useState(isOpenDefault);
+function FilterAccordion({ title, children, isOpenDefault = false, forceOpen = false, storagePrefix = "default" }: { title: string, children: React.ReactNode, isOpenDefault?: boolean, forceOpen?: boolean, storagePrefix?: string }) {
+    const key = `accordion_${storagePrefix}_${title}`;
+    const [isOpen, setIsOpen] = useState<boolean>(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            const saved = sessionStorage.getItem(key);
+            if (saved !== null) return saved === 'true';
+        }
+        return isOpenDefault;
+    });
+
     const shouldBeOpen = forceOpen || isOpen;
+
+    const toggleOpen = () => {
+        const nextState = !isOpen;
+        setIsOpen(nextState);
+        if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem(key, String(nextState));
+        }
+    };
 
     return (
         <div className={styles.filterGroup}>
             <button
                 className={styles.accordionHeader}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleOpen}
             >
                 <span className={styles.groupTitle}>{title}</span>
                 <svg
@@ -435,7 +460,7 @@ function FilterAccordion({ title, children, isOpenDefault = false, forceOpen = f
                 </svg>
             </button>
 
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
                 {shouldBeOpen && (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}

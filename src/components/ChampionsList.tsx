@@ -15,17 +15,47 @@ export default function ChampionsList() {
     const [data, setData] = useState<MokiData[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            const saved = sessionStorage.getItem('champions_search');
+            if (saved !== null) return saved;
+        }
+        return '';
+    });
 
     // Sort state - default sort by score descending (leaderboard position)
-    const [sortField, setSortField] = useState<SortField>('score');
-    const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+    const [sortField, setSortField] = useState<SortField>(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            const saved = sessionStorage.getItem('champions_sortField');
+            if (saved !== null) return saved as SortField;
+        }
+        return 'score';
+    });
+    const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            const saved = sessionStorage.getItem('champions_sortDirection');
+            if (saved !== null) return saved as SortDirection;
+        }
+        return 'desc';
+    });
 
     // Filter state
-    const [filterClasses, setFilterClasses] = useState<string[]>([]);
+    const [filterClasses, setFilterClasses] = useState<string[]>(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            const saved = sessionStorage.getItem('champions_filterClasses');
+            if (saved !== null) return JSON.parse(saved);
+        }
+        return [];
+    });
     const [showClassFilter, setShowClassFilter] = useState(false);
 
-    const [filterFurs, setFilterFurs] = useState<string[]>([]);
+    const [filterFurs, setFilterFurs] = useState<string[]>(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            const saved = sessionStorage.getItem('champions_filterFurs');
+            if (saved !== null) return JSON.parse(saved);
+        }
+        return [];
+    });
     const [showFurFilter, setShowFurFilter] = useState(false);
 
     // Mobile States
@@ -34,7 +64,13 @@ export default function ChampionsList() {
     const [openMobileDropdown, setOpenMobileDropdown] = useState<'sort' | 'class' | 'fur' | null>(null);
     const [showChangelog, setShowChangelog] = useState(false);
     const [confirmExport, setConfirmExport] = useState(false);
-    const [matchLimit, setMatchLimit] = useState<'ALL' | 10 | 20 | 30>('ALL');
+    const [matchLimit, setMatchLimit] = useState<'ALL' | 10 | 20 | 30>(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            const saved = sessionStorage.getItem('champions_matchLimit');
+            if (saved !== null && saved !== 'ALL') return Number(saved) as 10 | 20 | 30;
+        }
+        return 'ALL';
+    });
     const [historyTokenId, setHistoryTokenId] = useState<number | null>(null);
     const [historyName, setHistoryName] = useState<string | null>(null);
 
@@ -42,6 +78,18 @@ export default function ChampionsList() {
     const furOptions = ["All Furs", ...MOKI_FURS];
 
     const headerRef = useRef<HTMLTableSectionElement>(null);
+
+    // Save state to sessionStorage
+    useEffect(() => {
+        if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem('champions_search', search);
+            sessionStorage.setItem('champions_sortField', sortField);
+            sessionStorage.setItem('champions_sortDirection', sortDirection);
+            sessionStorage.setItem('champions_filterClasses', JSON.stringify(filterClasses));
+            sessionStorage.setItem('champions_filterFurs', JSON.stringify(filterFurs));
+            sessionStorage.setItem('champions_matchLimit', matchLimit.toString());
+        }
+    }, [search, sortField, sortDirection, filterClasses, filterFurs, matchLimit]);
 
     // Click Outside Handler
     useEffect(() => {

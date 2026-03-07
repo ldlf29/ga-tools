@@ -269,6 +269,16 @@ export default function CardGrid({
                 ...filters.customClass.map(v => ({ key: 'customClass' as keyof FilterState, label: 'CLASS', value: v })),
                 ...filters.traits.map(v => ({ key: 'traits' as keyof FilterState, label: 'TRAIT', value: v })),
             ].filter(f => f);
+
+            if (filters.matchLimit && filters.matchLimit !== 'ALL') {
+                defaultList.push({
+                    key: 'matchLimit' as keyof FilterState,
+                    label: 'MATCHES',
+                    value: filters.matchLimit,
+                    displayValue: `Last ${filters.matchLimit}`
+                });
+            }
+
             return defaultList;
         }
 
@@ -293,8 +303,14 @@ export default function CardGrid({
             if (key === 'schemeName') label = 'SCHEME';
             if (key === 'customClass') label = 'CLASS';
             if (key === 'traits') label = 'TRAIT';
+            if (key === 'matchLimit') label = 'MATCHES';
 
-            return { key, label, value };
+            let displayValue: string | undefined = undefined;
+            if (key === 'matchLimit') {
+                displayValue = `Last ${value}`;
+            }
+
+            return { key, label, value, displayValue };
         }).filter(f => f !== null) as { key: keyof FilterState, label: string, value: string | number, displayValue?: string }[];
     })();
 
