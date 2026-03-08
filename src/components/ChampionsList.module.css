@@ -51,35 +51,36 @@
     gap: 0.75rem;
 }
 
-.last10Button {
-    background: #5097FF;
+.limitToggle {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.limitBtn {
+    background: #FFD753;
     border: 2px solid #333333;
     border-bottom-width: 4px;
-    border-radius: 12px;
-    color: white;
-    font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    font-size: 0.75rem;
-    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    padding: 0.25rem 0.5rem;
+    font-family: var(--font-display, 'Grand Arena', sans-serif);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #333;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.1s, background 0.1s;
     text-transform: uppercase;
     white-space: nowrap;
-    flex-shrink: 0;
 }
 
-.last10Button:hover {
-    background: #3b82f6;
-    transform: translateY(-1px);
+.limitBtn:hover {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+    background: #ffea99;
 }
 
-.last10Active {
-    background: #1ABF9E;
-    border-color: #333333;
-}
-
-.last10Active:hover {
-    background: #15a085;
+.limitBtnActive {
+    background: #FF66CC;
+    color: white;
 }
 
 .titleGroup {

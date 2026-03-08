@@ -428,17 +428,21 @@ export default function ChampionsList() {
             <div className={styles.header}>
                 <div className={styles.headerTopRow}>
                     <div className={styles.titleGroup}>
-                        <div className={styles.title}>{matchLimit !== 'ALL' ? `Champions - Last ${matchLimit} Matches` : 'Champions - S1'}</div>
+                        <div className={styles.title}>{matchLimit !== 'ALL' ? `Champions - Last ${matchLimit} Matches` : 'Champions - SEASON 1'}</div>
                     </div>
                     <div className={styles.headerRight}>
-                        <button
-                            className={`${styles.last10Button} ${matchLimit !== 'ALL' ? styles.last10Active : ''}`}
-                            onClick={() => setMatchLimit(prev => prev === 'ALL' ? 10 : prev === 10 ? 20 : prev === 20 ? 30 : 'ALL')}
-                            title="Toggle Match Performance Limit"
-                            style={{ width: '90px' }}
-                        >
-                            {matchLimit === 'ALL' ? 'S1 (ALL)' : `LAST ${matchLimit}`}
-                        </button>
+                        <div className={styles.limitToggle}>
+                            {['ALL', 10, 20, 30].map(val => (
+                                <button
+                                    key={val}
+                                    className={`${styles.limitBtn} ${matchLimit === val ? styles.limitBtnActive : ''}`}
+                                    onClick={() => setMatchLimit(val as 'ALL' | 10 | 20 | 30)}
+                                    title={`View ${val === 'ALL' ? 'Season 1' : 'Last ' + val} Match Performance`}
+                                >
+                                    {val === 'ALL' ? 'S1' : `LAST ${val}`}
+                                </button>
+                            ))}
+                        </div>
 
                         <button
                             className={styles.exportButton}
@@ -511,14 +515,18 @@ export default function ChampionsList() {
 
                 {/* Mobile Action Row (hidden on desktop) */}
                 <div className={styles.actionRow}>
-                    <button
-                        className={`${styles.last10Button} ${matchLimit !== 'ALL' ? styles.last10Active : ''}`}
-                        onClick={() => setMatchLimit(prev => prev === 'ALL' ? 10 : prev === 10 ? 20 : prev === 20 ? 30 : 'ALL')}
-                        title="Toggle Match Performance Limit"
-                        style={{ width: '90px' }}
-                    >
-                        {matchLimit === 'ALL' ? 'S1 (ALL)' : `LAST ${matchLimit}`}
-                    </button>
+                    <div className={styles.limitToggle}>
+                        {['ALL', 10, 20, 30].map(val => (
+                            <button
+                                key={val}
+                                className={`${styles.limitBtn} ${matchLimit === val ? styles.limitBtnActive : ''}`}
+                                onClick={() => setMatchLimit(val as 'ALL' | 10 | 20 | 30)}
+                                title={`View ${val === 'ALL' ? 'Season 1' : 'Last ' + val} Match Performance`}
+                            >
+                                {val === 'ALL' ? 'S1' : val}
+                            </button>
+                        ))}
+                    </div>
 
                     <button
                         className={styles.exportButton}

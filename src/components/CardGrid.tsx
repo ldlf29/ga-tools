@@ -339,13 +339,17 @@ export default function CardGrid({
                 if (filters.specialization && filters.specialization.length > 0) {
                     const activeSpecs = filters.specialization;
                     const perfSpecs = ["Gacha", "Killer", "Wart Rider"];
-                    const contextSpecs = ["Winner", "Loser", "Score"];
+                    const contextSpecs = ["Winner", "Loser", "Bad Streak", "Good Streak"];
+                    const scoreSpecs = ["Score"];
 
                     const activePerf = activeSpecs.find(s => perfSpecs.includes(s));
                     const activeContext = activeSpecs.find(s => contextSpecs.includes(s));
+                    const activeScore = activeSpecs.find(s => scoreSpecs.includes(s));
 
-                    // CASE: Both are active - Calculation of Coeff
-                    if (activePerf && activeContext) {
+                    const activeCategories = [activePerf, activeContext, activeScore].filter(Boolean);
+
+                    // CASE: At least two are active - Calculation of Coeff
+                    if (activeCategories.length > 1) {
                         const getVal = (card: any, spec: string) => {
                             const limit = filters.matchLimit;
                             switch (spec) {
@@ -374,6 +378,18 @@ export default function CardGrid({
                                     if (limit === 20) return 1 / (card.custom?.avgWinRate20 || 0.0001);
                                     if (limit === 30) return 1 / (card.custom?.avgWinRate30 || 0.0001);
                                     return 1 / (card.custom?.winRate || 0.0001);
+                                case 'Bad Streak':
+                                    if (limit === 10) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate10 || 0);
+                                    if (limit === 20) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate20 || 0);
+                                    if (limit === 30) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate30 || 0);
+                                    const streakPond = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                                    return (card.custom?.winRate || 0) - streakPond;
+                                case 'Good Streak':
+                                    if (limit === 10) return (card.custom?.avgWinRate10 || 0) - (card.custom?.winRate || 0);
+                                    if (limit === 20) return (card.custom?.avgWinRate20 || 0) - (card.custom?.winRate || 0);
+                                    if (limit === 30) return (card.custom?.avgWinRate30 || 0) - (card.custom?.winRate || 0);
+                                    const goodStreakPond = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                                    return goodStreakPond - (card.custom?.winRate || 0);
                                 case 'Score':
                                     if (limit === 10) return card.custom?.avgScore10 || 0;
                                     if (limit === 20) return card.custom?.avgScore20 || 0;
@@ -383,8 +399,16 @@ export default function CardGrid({
                             }
                         };
 
-                        const coeffA = getVal(a, activePerf) * getVal(a, activeContext);
-                        const coeffB = getVal(b, activePerf) * getVal(b, activeContext);
+                        const calcCoeff = (card: any) => {
+                            let coeff = 1;
+                            activeCategories.forEach(spec => {
+                                coeff *= getVal(card, spec!);
+                            });
+                            return coeff;
+                        };
+
+                        const coeffA = calcCoeff(a);
+                        const coeffB = calcCoeff(b);
                         if (coeffB !== coeffA) return coeffB - coeffA;
                     }
 
@@ -417,6 +441,18 @@ export default function CardGrid({
                                 if (limit === 20) return -(card.custom?.avgWinRate20 || 0);
                                 if (limit === 30) return -(card.custom?.avgWinRate30 || 0);
                                 return -(card.custom?.winRate || 0);
+                            case 'Bad Streak':
+                                if (limit === 10) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate10 || 0);
+                                if (limit === 20) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate20 || 0);
+                                if (limit === 30) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate30 || 0);
+                                const badStreakPond = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                                return (card.custom?.winRate || 0) - badStreakPond;
+                            case 'Good Streak':
+                                if (limit === 10) return (card.custom?.avgWinRate10 || 0) - (card.custom?.winRate || 0);
+                                if (limit === 20) return (card.custom?.avgWinRate20 || 0) - (card.custom?.winRate || 0);
+                                if (limit === 30) return (card.custom?.avgWinRate30 || 0) - (card.custom?.winRate || 0);
+                                const goodPondFallback = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                                return goodPondFallback - (card.custom?.winRate || 0);
                             case 'Score':
                                 if (limit === 10) return card.custom?.avgScore10 || 0;
                                 if (limit === 20) return card.custom?.avgScore20 || 0;

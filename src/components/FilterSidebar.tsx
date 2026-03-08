@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import styles from './FilterSidebar.module.css';
 import StarRangeSlider from './StarRangeSlider';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +34,8 @@ const SPECIALIZATION_CONFIG: { key: string, label: string }[] = [
     { key: "Wart Rider", label: "Wart Rider" },
     { key: "Winner", label: "Winner" },
     { key: "Loser", label: "Loser" },
+    { key: "Good Streak", label: "Good Streak" },
+    { key: "Bad Streak", label: "Bad Streak" },
     { key: "Score", label: "Score" }
 ];
 
@@ -104,7 +106,8 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
     const handleClassChange = (val: string) => updateFilter('customClass', val);
     const handleSpecializationChange = (val: string) => {
         const perfSpecs = ["Gacha", "Killer", "Wart Rider"];
-        const contextSpecs = ["Winner", "Loser", "Score"];
+        const contextSpecs = ["Winner", "Loser", "Bad Streak", "Good Streak"];
+        const scoreSpecs = ["Score"];
 
         let newSpecialization = [...filters.specialization];
         const isSelected = newSpecialization.includes(val);
@@ -116,6 +119,8 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                 newSpecialization = newSpecialization.filter(s => !perfSpecs.includes(s));
             } else if (contextSpecs.includes(val)) {
                 newSpecialization = newSpecialization.filter(s => !contextSpecs.includes(s));
+            } else if (scoreSpecs.includes(val)) {
+                newSpecialization = newSpecialization.filter(s => !scoreSpecs.includes(s));
             }
             newSpecialization.push(val);
         }
@@ -322,10 +327,15 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                                     if (!filterSearch.trim()) return true;
                                     return s.label.toLowerCase().includes(filterSearch.toLowerCase());
                                 }).map(s => (
-                                    <label key={s.key} className={styles.checkboxLabel}>
-                                        <input type="checkbox" checked={filters.specialization.includes(s.key)} onChange={() => handleSpecializationChange(s.key)} />
-                                        <span className={styles.labelText}>{s.label}</span>
-                                    </label>
+                                    <Fragment key={s.key}>
+                                        {(s.key === 'Winner' || s.key === 'Score') && !filterSearch.trim() && (
+                                            <div style={{ height: '1px', width: '70%', background: '#333333', margin: '4px 0 8px 0.5rem' }} />
+                                        )}
+                                        <label className={styles.checkboxLabel}>
+                                            <input type="checkbox" checked={filters.specialization.includes(s.key)} onChange={() => handleSpecializationChange(s.key)} />
+                                            <span className={styles.labelText}>{s.label}</span>
+                                        </label>
+                                    </Fragment>
                                 ))}
                             </FilterAccordion>
                         )}
@@ -419,13 +429,18 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
 // Internal Accordion Component
 function FilterAccordion({ title, children, isOpenDefault = false, forceOpen = false, storagePrefix = "default" }: { title: string, children: React.ReactNode, isOpenDefault?: boolean, forceOpen?: boolean, storagePrefix?: string }) {
     const key = `accordion_${storagePrefix}_${title}`;
-    const [isOpen, setIsOpen] = useState<boolean>(() => {
+    const [isOpen, setIsOpen] = useState<boolean>(isOpenDefault);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
         if (typeof sessionStorage !== 'undefined') {
             const saved = sessionStorage.getItem(key);
-            if (saved !== null) return saved === 'true';
+            if (saved !== null) {
+                setIsOpen(saved === 'true');
+            }
         }
-        return isOpenDefault;
-    });
+    }, [key]);
 
     const shouldBeOpen = forceOpen || isOpen;
 
@@ -453,7 +468,7 @@ function FilterAccordion({ title, children, isOpenDefault = false, forceOpen = f
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     style={{
-                        transform: shouldBeOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transform: (isMounted ? shouldBeOpen : isOpenDefault || forceOpen) ? 'rotate(180deg)' : 'rotate(0deg)',
                     }}
                 >
                     <polyline points="6 9 12 15 18 9"></polyline>
@@ -461,7 +476,7 @@ function FilterAccordion({ title, children, isOpenDefault = false, forceOpen = f
             </button>
 
             <AnimatePresence initial={false}>
-                {shouldBeOpen && (
+                {(isMounted ? shouldBeOpen : isOpenDefault || forceOpen) && (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeInOut" } }}
