@@ -14,10 +14,11 @@ interface LineupBuilderProps {
     onSave: (name: string) => void;
     onUpdate?: (newLineup: EnhancedCard[]) => void;
     onSuggestFilters?: (filters: Partial<FilterState>) => void;
+    onAutoLineups?: (filters: Partial<FilterState>) => void;
     onShowMessage?: (msg: string) => void;
 }
 
-export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpdate, onSuggestFilters, onShowMessage }: LineupBuilderProps) {
+export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpdate, onSuggestFilters, onAutoLineups, onShowMessage }: LineupBuilderProps) {
     const [lineupName, setLineupName] = useState('');
 
     // ... (rest unchanged)
@@ -258,24 +259,40 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                             <div className={styles.emptyText}>Empty Scheme Slot</div>
                         )}
                     </div>
-                    <div className={styles.placeholder}>
+                    <div className={styles.placeholder} style={{ flexDirection: 'row', gap: '0.5rem', width: '100%', alignItems: 'center', marginTop: '1rem' }}>
                         {suggestion && (
-                            <button
-                                className={styles.suggestButton}
-                                onClick={() => {
-                                    if (suggestion.message && onShowMessage) {
-                                        onShowMessage(suggestion.message);
-                                    } else if (suggestion.filters && onSuggestFilters) {
-                                        onSuggestFilters(suggestion.filters);
-                                    }
-                                }}
-                                title={suggestion.title}
-                            >
-                                <svg className={styles.suggestIcon} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                                </svg>
-                                SUGGEST
-                            </button>
+                            <>
+                                <button
+                                    className={styles.suggestButton}
+                                    style={{ margin: 0, flex: 1, padding: '0.5rem 0' }}
+                                    onClick={() => {
+                                        if (suggestion.message && onShowMessage) {
+                                            onShowMessage(suggestion.message);
+                                        } else if (suggestion.filters && onSuggestFilters) {
+                                            onSuggestFilters(suggestion.filters);
+                                        }
+                                    }}
+                                    title={suggestion.title}
+                                >
+                                    <svg className={styles.suggestIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                    </svg>
+                                    SUGGEST
+                                </button>
+                                {suggestion.filters && onAutoLineups && (
+                                    <button
+                                        className={styles.autoButton}
+                                        style={{ margin: 0, flex: 1, padding: '0.5rem 0' }}
+                                        onClick={() => onAutoLineups(suggestion.filters!)}
+                                        title="Auto construct 5 optimal lineups using SUGGEST logic + SCORE"
+                                    >
+                                        <svg className={styles.suggestIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                        </svg>
+                                        AUTO
+                                    </button>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>
