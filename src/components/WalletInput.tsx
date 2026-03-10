@@ -48,7 +48,7 @@ export default function WalletInput({ onSubmit, onCancel, isLoading }: WalletInp
         return (
             <div className={styles.walletInputOverlay}>
                 <div className={styles.walletInputModal}>
-                    <h2 className={styles.walletTitle}>Loading Your Cards</h2>
+                    <h2 className={styles.walletTitle}>LOAD MY CARDS</h2>
                     <div className={styles.loadingState}>
                         <div className={styles.loadingSpinner} />
                         <p className={styles.loadingText}>Fetching cards from wallet...</p>
@@ -63,11 +63,16 @@ export default function WalletInput({ onSubmit, onCancel, isLoading }: WalletInp
             if (e.target === e.currentTarget) onCancel();
         }}>
             <div className={styles.walletInputModal} onKeyDown={handleKeyDown}>
+                <button className={styles.closeBtn} onClick={onCancel} aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
                 <div className={styles.header}>
-                    <h2 className={styles.walletTitle}>MY CARDS</h2>
-                    <button className={styles.closeBtn} onClick={onCancel} aria-label="Close modal">&times;</button>
+                    <h2 className={styles.walletTitle}>LOAD MY CARDS</h2>
                 </div>
-                <p className={styles.walletSubtitle}>Paste your Ronin wallet address to load your cards. A connected wallet can only be removed after 24 hours.</p>
+                <p className={styles.walletSubtitle}>Paste your Ronin wallet address to load your cards. A loaded wallet can only be removed after 24 hours.</p>
 
                 <form className={styles.walletForm} onSubmit={handleSubmit}>
                     <input
@@ -79,7 +84,6 @@ export default function WalletInput({ onSubmit, onCancel, isLoading }: WalletInp
                             setAddress(e.target.value);
                             if (error) setError('');
                         }}
-                        autoFocus
                         spellCheck={false}
                         autoComplete="off"
                     />
@@ -99,7 +103,7 @@ export default function WalletInput({ onSubmit, onCancel, isLoading }: WalletInp
                     </div>
                 </form>
 
-                <div style={{ marginTop: '1.5rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.5)', fontSize: '0.65rem', textAlign: 'center', lineHeight: '1.4' }}>
+                <div style={{ marginTop: '0.5rem', fontWeight: 700, fontStyle: 'italic', color: 'rgba(0,0,0,0.4)', fontSize: '0.75rem', textAlign: 'center', lineHeight: '1.4' }}>
                     <p>+10k cards: 3m - 5m</p>
                     <p>5k-10k cards: 1m - 2m</p>
                     <p>0-5k cards: 15s - 1m</p>

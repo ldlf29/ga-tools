@@ -436,8 +436,8 @@ export default function MyLineups({
     };
 
     const saveName = (id: number) => {
-        if (tempName.length > 20) {
-            onError("Maximum 20 characters.");
+        if (tempName.length > 50) {
+            onError("Maximum 50 characters.");
             return;
         }
 
@@ -469,6 +469,11 @@ export default function MyLineups({
             document.documentElement.classList.add('modal-open');
             const handleEsc = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
+                    // If card info modal is open, let its own handler take care of it
+                    if (selectedInfoCard !== null) {
+                        return;
+                    }
+
                     // If selector is open, just close it and stop
                     if (selectorSlot !== null) {
                         setSelectorSlot(null);
@@ -477,10 +482,10 @@ export default function MyLineups({
 
                     // If we are editing, we must validate and save first
                     if (editingId !== null) {
-                        if (tempName.length > 20) {
+                        if (tempName.length > 50) {
                             e.preventDefault();
                             e.stopImmediatePropagation();
-                            onError("Maximum 20 characters.");
+                            onError("Maximum 50 characters.");
                             return;
                         }
                         saveName(editingId);
@@ -507,7 +512,7 @@ export default function MyLineups({
                 document.documentElement.classList.remove('modal-open');
             };
         }
-    }, [expandedId, editingId, tempName, hasChanges, selectorSlot]);
+    }, [expandedId, editingId, tempName, hasChanges, selectorSlot, selectedInfoCard]);
 
     const lineupRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
@@ -581,10 +586,10 @@ export default function MyLineups({
         if (e.key === 'Enter') {
             saveName(id);
         } else if (e.key === 'Escape') {
-            if (tempName.length > 20) {
+            if (tempName.length > 50) {
                 e.preventDefault();
                 e.stopPropagation();
-                onError("Maximum 20 characters.");
+                onError("Maximum 50 characters.");
                 return;
             }
             saveName(id);
@@ -717,7 +722,7 @@ export default function MyLineups({
                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                             </svg>
                         </button>
-                        <div className={styles.lineupName}>{lineup.name}</div>
+                        <div className={styles.lineupName} title={lineup.name}>{lineup.name}</div>
                     </div>
                 </div>
 
@@ -1060,8 +1065,8 @@ export default function MyLineups({
                     style={{ overflowY: selectorSlot !== null ? 'hidden' : 'auto' }}
                     onClick={() => {
                         // If editing and name is too long, don't allow closing
-                        if (editingId !== null && tempName.length > 20) {
-                            onError("Maximum 20 characters.");
+                        if (editingId !== null && tempName.length > 50) {
+                            onError("Maximum 50 characters.");
                             return;
                         }
                         // Save name if editing before closing
@@ -1122,6 +1127,7 @@ export default function MyLineups({
                                             className={styles.modalTitle}
                                             onClick={(e) => startEditing(e, expandedLineup.id, expandedLineup.name)}
                                             style={{ cursor: 'pointer' }}
+                                            title={expandedLineup.name}
                                         >
                                             {expandedLineup.name}
                                         </div>

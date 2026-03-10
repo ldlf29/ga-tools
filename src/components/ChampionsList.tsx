@@ -193,6 +193,17 @@ export default function ChampionsList() {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Champions Stats');
 
+        // Helper to get the right performance value based on active matchLimit
+        const getPerfVal = (moki: typeof sortedData[0], field: 'eliminations' | 'deposits' | 'wartDistance' | 'score' | 'winRate'): number | null => {
+            if (matchLimit === 'ALL') {
+                return moki[field] ?? null;
+            }
+            const avgKey = `avg${field.charAt(0).toUpperCase()}${field.slice(1)}${matchLimit}` as keyof typeof moki;
+            return (moki[avgKey] as number) ?? null;
+        };
+
+        const limitLabel = matchLimit === 'ALL' ? '' : ` (L${matchLimit})`;
+
         // Define columns
         worksheet.columns = [
             { header: 'NAME', key: 'name', width: 20 },
@@ -205,15 +216,21 @@ export default function ChampionsList() {
             { header: 'FOR', key: 'for', width: 8 },
             { header: 'TOTAL', key: 'total', width: 10 },
             { header: 'TRAIN', key: 'train', width: 10 },
-            { header: 'ELIMS', key: 'elims', width: 10 },
-            { header: 'WART', key: 'wart', width: 10 },
-            { header: 'BALLS', key: 'balls', width: 10 },
-            { header: 'SCORE', key: 'score', width: 10 },
-            { header: 'W/R', key: 'wr', width: 10 },
+            { header: `ELIMS${limitLabel}`, key: 'elims', width: 12 },
+            { header: `WART${limitLabel}`, key: 'wart', width: 12 },
+            { header: `BALLS${limitLabel}`, key: 'balls', width: 12 },
+            { header: `SCORE${limitLabel}`, key: 'score', width: 12 },
+            { header: `W/R${limitLabel}`, key: 'wr', width: 12 },
         ];
 
         // Add rows
         sortedData.forEach(moki => {
+            const elims = getPerfVal(moki, 'eliminations');
+            const balls = getPerfVal(moki, 'deposits');
+            const wart = getPerfVal(moki, 'wartDistance');
+            const score = getPerfVal(moki, 'score');
+            const wr = getPerfVal(moki, 'winRate');
+
             worksheet.addRow({
                 name: moki.name,
                 fur: moki.fur || '-',
@@ -225,11 +242,11 @@ export default function ChampionsList() {
                 for: moki.fortitude?.toFixed(2) || '0.00',
                 total: moki.totalStats?.toFixed(2) || '0.00',
                 train: moki.train?.toFixed(2) || '0.00',
-                elims: moki.eliminations?.toFixed(2) || '0.00',
-                balls: moki.deposits?.toFixed(2) || '0.00',
-                wart: moki.wartDistance?.toFixed(2) || '0.00',
-                score: moki.score?.toFixed(2) || '0.00',
-                wr: moki.winRate ? moki.winRate.toFixed(2) + '%' : '-'
+                elims: elims !== null ? elims.toFixed(2) : '-',
+                balls: balls !== null ? balls.toFixed(2) : '-',
+                wart: wart !== null ? wart.toFixed(2) : '-',
+                score: score !== null ? score.toFixed(2) : '-',
+                wr: wr !== null ? wr.toFixed(2) + '%' : '-',
             });
         });
 
@@ -241,7 +258,8 @@ export default function ChampionsList() {
         const url = window.URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = url;
-        anchor.download = 'Champions_Stats.xlsx';
+        const limitSuffix = matchLimit === 'ALL' ? '' : `_L${matchLimit}`;
+        anchor.download = `Champions_Stats${limitSuffix}.xlsx`;
         anchor.click();
         window.URL.revokeObjectURL(url);
     };
@@ -448,7 +466,7 @@ export default function ChampionsList() {
                             className={styles.exportButton}
                             onClick={() => setShowChangelog(true)}
                             title="View Class Changes Log"
-                            style={{ background: '#FFD753', color: '#333', borderColor: '#333' }}
+                            style={{ background: '#1ABF9E', color: 'white', borderColor: '#333' }}
                         >
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -532,7 +550,7 @@ export default function ChampionsList() {
                         className={styles.exportButton}
                         onClick={() => setShowChangelog(true)}
                         title="View Class Changes Log"
-                        style={{ background: '#FFD753', color: '#333', borderColor: '#333' }}
+                        style={{ background: '#1ABF9E', color: 'white', borderColor: '#333' }}
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -697,7 +715,7 @@ export default function ChampionsList() {
                             <table className={styles.table}>
                                 <thead ref={headerRef}>
                                     <tr>
-                                        <th className={styles.th} style={{ width: '44px', textAlign: 'center', cursor: 'default' }}>#</th>
+                                        <th className={styles.th} style={{ textAlign: 'center', cursor: 'default' }}>#</th>
                                         {renderHeader("NAME", "name")}
                                         {renderHeader("FUR", "fur")}
                                         {renderHeader("CLASS", "class")}

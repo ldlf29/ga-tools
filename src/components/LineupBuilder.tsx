@@ -16,9 +16,25 @@ interface LineupBuilderProps {
     onSuggestFilters?: (filters: Partial<FilterState>) => void;
     onAutoLineups?: (filters: Partial<FilterState>) => void;
     onShowMessage?: (msg: string) => void;
+    activeSpecializations?: string[];
 }
 
-export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpdate, onSuggestFilters, onAutoLineups, onShowMessage }: LineupBuilderProps) {
+// Schemes that base their filter on fur or context (not on a role spec),
+// but should still allow AUTO when the user has a role spec active in the sidebar.
+const ROLE_FLEXIBLE_SCHEMES = new Set([
+    "Collect 'Em All",
+    'Divine Intervention',
+    'Golden Shower',
+    'Midnight Strike',
+    'Rainbow Riot',
+    'Victory Lap',
+    'Taking a Dive',
+    'Whale Watching',
+]);
+
+const ROLE_SPECS = ['Gacha', 'Killer', 'Wart Rider'];
+
+export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpdate, onSuggestFilters, onAutoLineups, onShowMessage, activeSpecializations = [] }: LineupBuilderProps) {
     const [lineupName, setLineupName] = useState('');
 
     // ... (rest unchanged)
@@ -36,6 +52,22 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
     };
 
     const suggestion = getSuggestion(schemeCard);
+
+    // Determine if we should show AUTO for role-flexible schemes
+    const activeRoleSpecs = activeSpecializations.filter(s => ROLE_SPECS.includes(s));
+    const isFlexibleScheme = schemeCard ? ROLE_FLEXIBLE_SCHEMES.has(schemeCard.name) : false;
+    const canAutoViaRole = isFlexibleScheme && activeRoleSpecs.length > 0 && onAutoLineups !== undefined;
+
+    // Build the filters for the AUTO button: merge scheme filters with active role specs
+    const getAutoFilters = (): Partial<FilterState> => {
+        const base = suggestion?.filters ?? {};
+        if (activeRoleSpecs.length > 0) {
+            const existingSpecs: string[] = (base.specialization as string[]) ?? [];
+            const mergedSpecs = [...new Set([...existingSpecs, ...activeRoleSpecs])];
+            return { ...base, specialization: mergedSpecs };
+        }
+        return base;
+    };
 
     // Drag & Drop State
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -103,7 +135,7 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                     onChange={(e) => setLineupName(e.target.value)}
                     className={styles.input}
                     placeholder="Name your lineup..."
-                    maxLength={20}
+                    maxLength={50}
                     autoComplete="new-password"
                     spellCheck="false"
                 />
@@ -268,7 +300,8 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                     onClick={() => {
                                         if (suggestion.message && onShowMessage) {
                                             onShowMessage(suggestion.message);
-                                        } else if (suggestion.filters && onSuggestFilters) {
+                                        }
+                                        if (suggestion.filters && onSuggestFilters) {
                                             onSuggestFilters(suggestion.filters);
                                         }
                                     }}
@@ -279,12 +312,15 @@ export default function LineupBuilder({ lineup, onRemove, onClear, onSave, onUpd
                                     </svg>
                                     SUGGEST
                                 </button>
-                                {suggestion.filters && onAutoLineups && (
+                                {(suggestion?.filters || canAutoViaRole) && onAutoLineups && (
                                     <button
                                         className={styles.autoButton}
                                         style={{ margin: 0, flex: 1, padding: '0.5rem 0' }}
-                                        onClick={() => onAutoLineups(suggestion.filters!)}
-                                        title="Auto construct 5 optimal lineups using SUGGEST logic + SCORE"
+                                        onClick={() => onAutoLineups(getAutoFilters())}
+                                        title={canAutoViaRole && !suggestion?.filters
+                                            ? `Auto with active role filter: ${activeRoleSpecs.join(', ')}`
+                                            : "Auto construct 5 optimal lineups using SUGGEST logic + SCORE"
+                                        }
                                     >
                                         <svg className={styles.suggestIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>

@@ -33,14 +33,19 @@ export default function WalletManagerModal({
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
+                <button className={styles.closeBtn} onClick={onClose} aria-label="Close modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
                 <div className={styles.header}>
-                    <h2>Manage Connected Wallets</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>&times;</button>
+                    <h2>MANAGE CONNECTED WALLETS</h2>
                 </div>
 
-                <p className={styles.disclaimer}>
-                    You can connect up to 2 wallets per device. A connected wallet can only be removed after 24 hours. Refreshing your wallet updates it entirely if there have been changes and it has a 6h cooldown per wallet.
-                </p>
+                <div className={styles.disclaimer}>
+                    You can connect up to 2 wallets. A connected wallet can only be removed after 24 hours. Refreshing has a 6h cooldown.
+                </div>
 
                 <div className={styles.walletList}>
                     {wallets.map(wallet => {
@@ -69,8 +74,7 @@ export default function WalletManagerModal({
                                         className={`${styles.actionBtn} ${styles.refreshBtn} ${!canRefresh ? styles.disabled : ''}`}
                                         title={canRefresh ? "Force Refresh NFTs" : `Cooldown: ${formatTimeLeft(refreshWaitTime)} left`}
                                     >
-                                        <span className={styles.btnText}>Refresh</span>
-                                        <svg className={styles.btnIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                        <svg className={styles.btnIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                             <path d="M23 4v6h-6"></path>
                                             <path d="M1 20v-6h6"></path>
                                             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -84,8 +88,7 @@ export default function WalletManagerModal({
                                         className={`${styles.actionBtn} ${styles.removeBtn} ${!canRemove ? styles.disabled : ''}`}
                                         title={canRemove ? "Disconnect Wallet" : `Locked: ${formatTimeLeft(removeWaitTime)} left`}
                                     >
-                                        <span className={styles.btnText}>Remove</span>
-                                        <svg className={styles.btnIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                        <svg className={styles.btnIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
@@ -98,7 +101,11 @@ export default function WalletManagerModal({
 
                 {wallets.length < 2 && (
                     <button className={styles.addWalletBtn} onClick={onAddWallet}>
-                        + Add Another Wallet
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Another Wallet
                     </button>
                 )}
             </div>

@@ -4,14 +4,12 @@ import walletStyles from '@/components/WalletInput.module.css';
 interface ModeToggleProps {
     cardMode: 'ALL' | 'USER';
     handleModeChange: (mode: 'ALL' | 'USER') => void;
-    userWalletsCount: number;
     onOpenWalletManager: () => void;
 }
 
 export const ModeToggle: React.FC<ModeToggleProps> = ({
     cardMode,
     handleModeChange,
-    userWalletsCount,
     onOpenWalletManager
 }) => {
     return (
@@ -23,23 +21,18 @@ export const ModeToggle: React.FC<ModeToggleProps> = ({
                 ALL CARDS
             </button>
 
-            {cardMode === 'USER' && userWalletsCount > 0 ? (
-                <div className={walletStyles.connectedGroup}>
-                    <button
-                        className={walletStyles.connectedButton}
-                        onClick={onOpenWalletManager}
-                    >
-                        MY CARDS ({userWalletsCount})
-                    </button>
-                </div>
-            ) : (
-                <button
-                    className={`${walletStyles.modeButton} ${cardMode === 'USER' ? walletStyles.modeButtonActive : ''}`}
-                    onClick={() => handleModeChange('USER')}
-                >
-                    MY CARDS
-                </button>
-            )}
+            <button
+                className={`${walletStyles.modeButton} ${cardMode === 'USER' ? walletStyles.modeButtonActive : ''}`}
+                onClick={() => {
+                    if (cardMode === 'USER') {
+                        onOpenWalletManager();
+                    } else {
+                        handleModeChange('USER');
+                    }
+                }}
+            >
+                MY CARDS
+            </button>
         </div>
     );
 };

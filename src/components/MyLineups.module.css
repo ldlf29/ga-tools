@@ -295,6 +295,8 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
 }
 
 .editButton {
@@ -333,6 +335,7 @@
     border-radius: 50%;
     transition: all 0.2s;
     margin-right: 0.5rem;
+    flex-shrink: 0;
 }
 
 .favoriteButton svg {
@@ -439,6 +442,7 @@
     align-items: center;
     padding-bottom: 0.25rem;
     margin-bottom: 0.25rem;
+    width: 100%;
 }
 
 
@@ -451,7 +455,9 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 15ch;
+    flex: 1;
+    min-width: 0;
+    padding-right: 0.5rem;
 }
 
 .lineupDate {
@@ -782,8 +788,8 @@
 
 .modalCloseButton {
     position: absolute;
-    right: -12px;
-    top: -12px;
+    right: 0.75rem;
+    top: 0.75rem;
     width: 40px;
     height: 40px;
     background: #FF66CC;
@@ -854,6 +860,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 900px;
+    min-width: 0;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
 .editPencil {
@@ -891,6 +902,12 @@
     height: auto;
     padding-top: 0;
     padding-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    min-width: 0;
+    flex-shrink: 1;
 }
 
 .modalEditInput {

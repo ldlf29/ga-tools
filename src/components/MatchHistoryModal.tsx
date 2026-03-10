@@ -224,7 +224,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
 
                     <div className={styles.header}>
                         <div className={styles.headerLeft}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                            <div className={styles.titleRow}>
                                 <h2 className={styles.title}>MATCH HISTORY</h2>
                                 <div className={styles.limitToggle}>
                                     {[10, 20, 30].map(val => (

@@ -101,21 +101,12 @@
     overflow-y: auto;
     flex: 1;
     background: transparent;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .content::-webkit-scrollbar {
-    width: 6px;
-}
-
-.content::-webkit-scrollbar-track {
-    background: var(--color-bg-dark);
-}
-
-.content::-webkit-scrollbar-thumb {
-    background-color: #1ABF9E;
-    border-radius: 3px;
+    display: none;
 }
 
 .emptyState {
@@ -142,10 +133,7 @@
 }
 
 .lineupRow:hover {
-    border-color: #FF66CC;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.8);
+    border-color: #333;
 }
 
 .lineupHeader {
@@ -164,6 +152,15 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.nameText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .renameInput {
@@ -203,41 +200,44 @@
 }
 
 .deleteButton {
-    background: rgba(239, 68, 68, 0.1);
-    color: #EF4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    padding: 0.4rem;
+    background: #ef4444;
+    color: white;
+    border: 2px solid #151829;
+    width: 26px;
+    height: 26px;
     border-radius: 6px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .deleteButton:hover {
-    background: #EF4444;
-    color: white;
-    transform: scale(1.05);
+    transform: scale(1.1);
+    background: #f87171;
 }
 
 .saveButton {
     background: #FFD753;
     color: #333333;
     border: 2px solid #333333;
-    padding: 0.4rem 1rem;
+    padding: 0.34rem 0.6rem;
     border-radius: 6px;
     font-weight: 800;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .saveButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+    transform: scale(1.1);
+    background: #ffea99;
 }
 
 .saveButton.saved {

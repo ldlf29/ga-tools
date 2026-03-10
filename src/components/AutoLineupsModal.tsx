@@ -15,13 +15,15 @@ interface AutoLineupsModalProps {
     onClose: () => void;
     autoLineups: AutoLineup[];
     onSaveLineup: (name: string, cards: EnhancedCard[]) => void;
+    onError?: (msg: string) => void;
 }
 
 export default function AutoLineupsModal({
     isOpen,
     onClose,
     autoLineups,
-    onSaveLineup
+    onSaveLineup,
+    onError
 }: AutoLineupsModalProps) {
     const [lineups, setLineups] = useState<AutoLineup[]>([]);
     const [savedLineupIds, setSavedLineupIds] = useState<Set<string>>(new Set());
@@ -57,8 +59,13 @@ export default function AutoLineupsModal({
     };
 
     const commitEdit = () => {
-        if (editingId && editName.trim().length > 0) {
-            setLineups(lineups.map(l => l.id === editingId ? { ...l, name: editName.trim() } : l));
+        const trimmed = editName.trim();
+        if (trimmed.length > 50) {
+            if (onError) onError("Maximum 50 characters for lineup name.");
+            return;
+        }
+        if (editingId && trimmed.length > 0) {
+            setLineups(lineups.map(l => l.id === editingId ? { ...l, name: trimmed } : l));
         }
         setEditingId(null);
     };
@@ -95,11 +102,11 @@ export default function AutoLineupsModal({
                                                     onKeyDown={(e) => e.key === 'Enter' && commitEdit()}
                                                     autoFocus
                                                     className={styles.renameInput}
-                                                    maxLength={20}
+                                                    maxLength={50}
                                                 />
                                             ) : (
                                                 <h3 className={styles.lineupName}>
-                                                    {lineup.name}
+                                                    <span className={styles.nameText} title={lineup.name}>{lineup.name}</span>
                                                     <button
                                                         className={styles.iconButton}
                                                         onClick={() => startEditing(lineup)}
@@ -115,21 +122,21 @@ export default function AutoLineupsModal({
 
                                             <div className={styles.actions}>
                                                 <button
-                                                    className={styles.deleteButton}
-                                                    onClick={() => handleDelete(lineup.id)}
-                                                    title="Discard Lineup"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                    </svg>
-                                                </button>
-                                                <button
                                                     className={`${styles.saveButton} ${isSaved ? styles.saved : ''}`}
                                                     onClick={() => handleSave(lineup)}
                                                     disabled={isSaved}
                                                 >
                                                     {isSaved ? 'SAVED ✓' : 'SAVE'}
+                                                </button>
+                                                <button
+                                                    className={styles.deleteButton}
+                                                    onClick={() => handleDelete(lineup.id)}
+                                                    title="Remove from list"
+                                                >
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                    </svg>
                                                 </button>
                                             </div>
                                         </div>

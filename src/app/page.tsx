@@ -58,6 +58,7 @@ export default function Home() {
   const [currentAutoLineups, setCurrentAutoLineups] = useState<AutoLineup[]>([]);
   const [contestModalOpen, setContestModalOpen] = useState(false);
   const [pendingAutoFilters, setPendingAutoFilters] = useState<Partial<FilterState> | null>(null);
+  const [isSuggestionActive, setIsSuggestionActive] = useState(false);
 
   /* Custom Hooks Integration */
   const { allCards, isLoading, handleRefresh: refreshCards } = useCards();
@@ -91,7 +92,7 @@ export default function Home() {
     const lastTime = lastToastTimeRef.current[text] || 0;
     if (now - lastTime < 5000) return;
     lastToastTimeRef.current[text] = now;
-    const id = Date.now();
+    const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, text, type }]);
   };
 
@@ -185,7 +186,7 @@ export default function Home() {
     setIsLoadingUser(true);
     setShowWalletInput(false);
     try {
-      const cards = await fetchUserCards(address, true); // initial fetch force
+      const cards = await fetchUserCards(address, false, true); // isInitialAdd=true bypasses server cooldown
 
       const newWallet: ConnectedWallet = {
         address: address,
@@ -385,25 +386,68 @@ export default function Home() {
   const filteredCards = useWorkerFilter(sourceCards, filters, searchQuery);
 
   /* Lineup Management Wrappers */
+  const handleRemoveFromLineup = (index: number) => {
+    const card = lineup[index];
+    removeFromLineup(index);
+
+    // --- NEW DYNAMIC RESELECTION LOGIC ---
+    if (card && card.cardType === 'MOKI' && isSuggestionActive) {
+      const schemeCard = lineup.find(c => c.cardType === 'SCHEME');
+      if (schemeCard && schemeCard.name === "Collect 'Em All") {
+        setFilters(prev => {
+          const currentRarities = prev.rarity || [];
+          const cardRarity = card.rarity === 'Common' ? 'Basic' : card.rarity;
+
+          if (!currentRarities.includes(cardRarity)) {
+            return {
+              ...prev,
+              rarity: [...currentRarities, cardRarity],
+              insertionOrder: [...(prev.insertionOrder || []), `rarity:${cardRarity}`]
+            };
+          }
+          return prev;
+        });
+      }
+    }
+  };
+
   const handleAddToLineup = (card: EnhancedCard) => {
-    // Find if an instance of this card type (by image) is already in the lineup
+    // Toggle-remove: only if the EXACT same card variant (by image) is already in the lineup
     const indexToRemove = lineup.findIndex(c => c.image === card.image);
 
     if (indexToRemove !== -1) {
       if (lineup[indexToRemove].locked) return;
-      removeFromLineup(indexToRemove);
+      handleRemoveFromLineup(indexToRemove);
       return;
     }
 
     const result = addCard(card);
     if (!result.success && result.error) {
       addToast(result.error, 'error');
+    } else if (result.success && card.cardType === 'MOKI') {
+      // --- NEW DYNAMIC DESELECTION LOGIC ---
+      const schemeCard = lineup.find(c => c.cardType === 'SCHEME');
+      if (schemeCard && schemeCard.name === "Collect 'Em All") {
+        setFilters(prev => {
+          const currentRarities = prev.rarity || [];
+          const cardRarity = card.rarity === 'Common' ? 'Basic' : card.rarity;
+
+          if (currentRarities.includes(cardRarity)) {
+            return {
+              ...prev,
+              rarity: currentRarities.filter(r => r !== cardRarity),
+              insertionOrder: (prev.insertionOrder || []).filter(o => o !== `rarity:${cardRarity}`)
+            };
+          }
+          return prev;
+        });
+      }
     }
   };
 
   const handleSaveLineup = (name: string) => {
-    if (name.length > 20) {
-      addToast("Maximum 20 characters for lineup name.", 'error');
+    if (name.length > 50) {
+      addToast("Maximum 50 characters for lineup name.", 'error');
       return;
     }
     try {
@@ -418,7 +462,13 @@ export default function Home() {
     }
   };
 
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+    setIsSuggestionActive(false);
+  };
+
   const handleRemoveFilter = (key: keyof FilterState, value: string | number) => {
+    setIsSuggestionActive(false);
     setFilters(prev => {
       const currentValues = prev[key];
       let newValues = currentValues;
@@ -437,24 +487,12 @@ export default function Home() {
   };
 
   const handleSuggestFilters = (newFilters: Partial<FilterState>) => {
-    // When on SCHEME tab, get preserved filters from mokiFiltersRef
-    // When on MOKI tab, use current filters
-    const sourceFilters = filters.cardType === 'SCHEME'
-      ? mokiFiltersRef.current.filters
-      : filters;
-
-    // Preserve rarity always, stars only if suggestion doesn't include stars
-    const preservedRarity = sourceFilters.rarity || [];
-    // Only preserve stars if the suggestion doesn't specify stars (e.g., Running Interference)
-    const suggestionHasStars = newFilters.stars && newFilters.stars.length > 0;
-    const preservedStars = suggestionHasStars ? [] : (sourceFilters.stars || []);
-
     const cleared: FilterState = {
-      rarity: preservedRarity, // Preserve rarity filter
+      rarity: [],
       cardType: 'MOKI', // Always switch to MOKI mode
       schemeName: [],
       fur: [],
-      stars: preservedStars, // Preserve stars filter only if suggestion doesn't override
+      stars: [],
       customClass: [],
       specialization: [],
       traits: [],
@@ -462,10 +500,8 @@ export default function Home() {
       matchLimit: 'ALL'
     };
 
-    // Build insertion order: first preserved rarity/stars, then new filters
+    // Build insertion order: new filters only
     const newOrder: string[] = [];
-    preservedRarity.forEach(r => newOrder.push(`rarity:${r}`));
-    if (preservedStars.length > 0) newOrder.push('stars:ACTIVE');
     Object.entries(newFilters).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         value.forEach(val => {
@@ -478,6 +514,7 @@ export default function Home() {
     });
 
     setFilters({ ...cleared, ...newFilters, insertionOrder: newOrder });
+    setIsSuggestionActive(true);
     setSearchQuery(''); // Clear search bar when suggesting
     addToast("Suggestion Applied!", 'success');
   };
@@ -490,9 +527,122 @@ export default function Home() {
       return;
     }
 
-    // 2. Open contest type modal
+    // 2. Special fast-path for "Collect 'Em All": skip the contest modal
+    if (schemeCard.name === "Collect 'Em All") {
+      setPendingAutoFilters(suggestionFilters);
+      // Directly generate with 1 of each rarity, best by score
+      generateCollectEmAllLineups(suggestionFilters, schemeCard);
+      return;
+    }
+
+    // 3. All other Schemes: open contest type modal
     setPendingAutoFilters(suggestionFilters);
     setContestModalOpen(true);
+  };
+
+  const generateCollectEmAllLineups = (suggestionFilters: Partial<FilterState>, schemeCard: EnhancedCard) => {
+    const sourceCards = cardMode === 'USER' ? userCards : allCards;
+
+    // Sort all MOKI cards by score (best first), then remove duplicate names
+    const baseFilters: FilterState = {
+      rarity: [],
+      cardType: 'MOKI',
+      schemeName: [],
+      fur: [],
+      stars: [],
+      customClass: [],
+      specialization: ['Score'],
+      traits: [],
+      insertionOrder: ['specialization:Score'],
+      matchLimit: filters.matchLimit ?? 'ALL' // Respect active match performance filter
+    };
+
+    const allMokis = sourceCards.filter(c => c.cardType === 'MOKI');
+
+    // Merge active Context specs from sidebar (Winner/Loser/Good Streak/Bad Streak)
+    // These override the Scheme's default Context.
+    const CONTEXT_SPECS = ['Winner', 'Loser', 'Good Streak', 'Bad Streak'];
+    const ROLE_SPECS_SET = ['Gacha', 'Killer', 'Wart Rider'];
+
+    // 1. Roles come from suggestionFilters (passed by AUTO button)
+    const passedRoleSpecs = (suggestionFilters.specialization || []).filter(s => ROLE_SPECS_SET.includes(s));
+    if (passedRoleSpecs.length > 0) {
+      baseFilters.specialization = [...baseFilters.specialization, ...passedRoleSpecs];
+    }
+
+    // 2. Roles from sidebar (Gacha/Killer/Wart Rider)
+    const sidebarRoleSpecs = (filters.specialization || []).filter(s => ROLE_SPECS_SET.includes(s));
+    if (sidebarRoleSpecs.length > 0) {
+      sidebarRoleSpecs.forEach(role => {
+        if (!baseFilters.specialization.includes(role)) {
+          baseFilters.specialization.push(role);
+        }
+      });
+    }
+
+    // 3. Context specs come from sidebar
+    const sidebarContextSpecs = (filters.specialization || []).filter(s => CONTEXT_SPECS.includes(s));
+    if (sidebarContextSpecs.length > 0) {
+      baseFilters.specialization = baseFilters.specialization.filter(s => !CONTEXT_SPECS.includes(s));
+      baseFilters.specialization.push(...sidebarContextSpecs);
+    }
+
+    // 1. Filter by role/context specs if any are active (STRICT FILTER)
+    const hasActiveSpecs = baseFilters.specialization.some(s => s !== 'Score');
+    const filteredMokis = hasActiveSpecs
+      ? allMokis.filter(c => matchesFilter(c, { ...baseFilters, rarity: [] }, ''))
+      : allMokis;
+
+    // 2. Sort the filtered pool
+    const sortedMokis = sortCardsByFilters(filteredMokis, baseFilters, 'default');
+
+    // 3. Separate into rarity groups (they remain sorted by selection criteria)
+    const lPool = sortedMokis.filter(c => c.rarity.toLowerCase() === 'legendary');
+    const ePool = sortedMokis.filter(c => c.rarity.toLowerCase() === 'epic');
+    const rPool = sortedMokis.filter(c => c.rarity.toLowerCase() === 'rare');
+    const bPool = sortedMokis.filter(c => ['basic', 'common'].includes(c.rarity.toLowerCase()));
+
+    const generatedLineups: AutoLineup[] = [];
+    const usedIds = new Set<string>();
+
+    for (let count = 1; count <= 5; count++) {
+      // For each lineup, we need 4 different names
+      const lineupNames = new Set<string>();
+
+      const findBestUnused = (pool: EnhancedCard[]) => {
+        for (let i = 0; i < pool.length; i++) {
+          const card = pool[i];
+          if (!usedIds.has(card.id) && !lineupNames.has(card.name)) {
+            pool.splice(i, 1); // Remove from pool so it's not reused in next lineup
+            usedIds.add(card.id);
+            lineupNames.add(card.name);
+            return card;
+          }
+        }
+        return null;
+      };
+
+      const legendary = findBestUnused(lPool);
+      const epic = findBestUnused(ePool);
+      const rare = findBestUnused(rPool);
+      const basic = findBestUnused(bPool);
+
+      if (!legendary || !epic || !rare || !basic) break;
+
+      generatedLineups.push({
+        id: `auto-${Date.now()}-${count}`,
+        name: `${schemeCard.name} Auto ${count}`,
+        cards: [legendary, epic, rare, basic, schemeCard]
+      });
+    }
+
+
+    if (generatedLineups.length === 0) {
+      addToast("Not enough cards of each rarity for Collect 'Em All.", 'error');
+    } else {
+      setCurrentAutoLineups(generatedLineups);
+      setAutoLineupsModalOpen(true);
+    }
   };
 
   const generateAutoLineups = (contestType: ContestType, exactCounts?: ExactCounts) => {
@@ -514,7 +664,7 @@ export default function Home() {
       specialization: ['Score'], // Forcibly inject Score
       traits: [],
       insertionOrder: ['specialization:Score'],
-      matchLimit: 'ALL'
+      matchLimit: filters.matchLimit ?? 'ALL' // Respect active match performance filter
     };
 
     // Apply Contest Rules
@@ -545,6 +695,39 @@ export default function Home() {
         baseFilters.matchLimit = value as 'ALL' | 10 | 20 | 30;
       }
     });
+
+    // Merge active Context specs from sidebar (Winner/Loser/Good Streak/Bad Streak)
+    // These override any Context the Scheme's suggestion may already have.
+    const CONTEXT_SPECS = ['Winner', 'Loser', 'Good Streak', 'Bad Streak'];
+    const sidebarContextSpecs = (filters.specialization || []).filter(s => CONTEXT_SPECS.includes(s));
+    if (sidebarContextSpecs.length > 0) {
+      baseFilters.specialization = baseFilters.specialization.filter(s => !CONTEXT_SPECS.includes(s));
+      baseFilters.specialization.push(...sidebarContextSpecs);
+    }
+
+    // Role specs from sidebar (Gacha/Killer/Wart Rider) are ignored by default
+    // UNLESS the scheme is one of the 7 whitelisted "flexible" schemes.
+    const ROLE_WHITELIST = [
+      'Divine Intervention',
+      'Golden Shower',
+      'Midnight Strike',
+      'Rainbow Riot',
+      'Taking a Dive',
+      'Victory Lap',
+      'Whale Watching'
+    ];
+    if (ROLE_WHITELIST.includes(schemeCard.name)) {
+      const ROLE_SPECS_SET = ['Gacha', 'Killer', 'Wart Rider'];
+      const sidebarRoleSpecs = (filters.specialization || []).filter(s => ROLE_SPECS_SET.includes(s));
+      if (sidebarRoleSpecs.length > 0) {
+        // Add roles from sidebar without removing existing roles from the scheme itself
+        sidebarRoleSpecs.forEach(role => {
+          if (!baseFilters.specialization.includes(role)) {
+            baseFilters.specialization.push(role);
+          }
+        });
+      }
+    }
 
     const sourceCards = cardMode === 'USER' ? userCards : allCards;
 
@@ -728,7 +911,6 @@ export default function Home() {
           <ModeToggle
             cardMode={cardMode}
             handleModeChange={handleModeChange}
-            userWalletsCount={userWallets.length}
             onOpenWalletManager={() => setShowWalletManagerModal(true)}
           />
         </div>
@@ -745,7 +927,7 @@ export default function Home() {
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={activeTab === 'lineups'} storagePrefix={activeTab} />
+        <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={activeTab === 'lineups'} storagePrefix={activeTab} />
       </div>
 
       {/* Mobile Builder Drawer */}
@@ -761,13 +943,14 @@ export default function Home() {
         </button>
         <LineupBuilder
           lineup={lineup}
-          onRemove={removeFromLineup}
+          onRemove={handleRemoveFromLineup}
           onClear={clearLineup}
           onSave={handleSaveLineup}
           onUpdate={setLineup}
           onSuggestFilters={handleSuggestFilters}
           onAutoLineups={handleAutoLineups}
           onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
+          activeSpecializations={filters.specialization ?? []}
         />
       </div>
 
@@ -834,7 +1017,6 @@ export default function Home() {
             <ModeToggle
               cardMode={cardMode}
               handleModeChange={handleModeChange}
-              userWalletsCount={userWallets.length}
               onOpenWalletManager={() => setShowWalletManagerModal(true)}
             />
           </div>
@@ -882,7 +1064,7 @@ export default function Home() {
             <div className={styles.mainLayout}>
               {/* Column 1: FilterSidebar (Desktop only) */}
               <div className={styles.desktopOnly}>
-                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={false} storagePrefix="builder" />
+                <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={false} storagePrefix="builder" />
               </div>
 
               {/* Column 2: CardGrid */}
@@ -905,13 +1087,14 @@ export default function Home() {
               <div className={styles.desktopOnly}>
                 <LineupBuilder
                   lineup={lineup}
-                  onRemove={removeFromLineup}
+                  onRemove={handleRemoveFromLineup}
                   onClear={clearLineup}
                   onSave={handleSaveLineup}
                   onUpdate={setLineup}
                   onSuggestFilters={handleSuggestFilters}
                   onAutoLineups={handleAutoLineups}
                   onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
+                  activeSpecializations={filters.specialization ?? []}
                 />
               </div>
             </div>
@@ -931,7 +1114,7 @@ export default function Home() {
             <div className={styles.mainLayoutLineups}>
               {/* Column 1: Sidebar */}
               <div className={styles.desktopOnly}>
-                <FilterSidebar filters={filters} onFilterChange={setFilters} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={true} storagePrefix="lineups" />
+                <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={true} storagePrefix="lineups" />
               </div>
 
               {/* Column 2: Lineups List */}
@@ -996,6 +1179,7 @@ export default function Home() {
         isOpen={autoLineupsModalOpen}
         onClose={() => setAutoLineupsModalOpen(false)}
         autoLineups={currentAutoLineups}
+        onError={(msg) => addToast(msg, 'error')}
         onSaveLineup={(name, cards) => {
           saveLineupToStorage(name, cards);
           addToast(`Lineup "${name}" Saved!`, 'success');

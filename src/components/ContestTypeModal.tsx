@@ -91,12 +91,7 @@ export default function ContestTypeModal({ isOpen, onClose, onGenerate }: Contes
                                 className={`${styles.optionCard} ${selectedType === opt.value ? styles.selected : ''}`}
                                 onClick={() => setSelectedType(opt.value)}
                             >
-                                <div className={styles.optionHeader}>
-                                    <div className={styles.radioIndicator}>
-                                        {selectedType === opt.value && <div className={styles.radioInner} />}
-                                    </div>
-                                    <span className={styles.optionLabel}>{opt.label}</span>
-                                </div>
+                                <span className={styles.optionLabel}>{opt.label}</span>
                             </div>
                         ))}
                     </div>

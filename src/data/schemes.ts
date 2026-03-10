@@ -6,23 +6,23 @@ type Suggestion = { title: string; filters?: Partial<FilterState>; message?: str
 export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
     'Collect \'Em All': {
         title: "Requirement: 1 Basic, 1 Rare, 1 Epic, 1 Legendary",
-        message: "You should choose 1 Basic, 1 Rare, 1 Epic and 1 Legendary"
+        filters: { rarity: ['Basic', 'Rare', 'Epic', 'Legendary'] }
     },
     'Aggressive Specialization': {
         title: "Specialization: Killer",
         filters: { specialization: ['Killer'] }
     },
     'Baiting the Trap': {
-        title: "Specialization: Wart Rider",
-        filters: { specialization: ['Wart Rider'] }
+        title: "Specialization: Wart Rider + Winner",
+        filters: { specialization: ['Wart Rider', 'Winner'] }
     },
     'Beat the Buzzer': {
-        title: "Specialization: Gacha",
-        filters: { specialization: ['Gacha'] }
+        title: "Specialization: Gacha + Winner",
+        filters: { specialization: ['Gacha', 'Winner'] }
     },
     'Big Game Hunt': {
-        title: "Specialization: Wart Rider",
-        filters: { specialization: ['Wart Rider'] }
+        title: "Specialization: Wart Rider + Winner",
+        filters: { specialization: ['Wart Rider', 'Winner'] }
     },
     'Cage Match': {
         title: "Specialization: Killer",
@@ -61,8 +61,8 @@ export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
         filters: { specialization: ['Killer'] }
     },
     'Final Blow': {
-        title: "Specialization: Killer",
-        filters: { specialization: ['Killer'] }
+        title: "Specialization: Killer + Winner",
+        filters: { specialization: ['Killer', 'Winner'] }
     },
     'Flexing': {
         title: "Specialization: Killer",
@@ -81,8 +81,8 @@ export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
         filters: { fur: ['Gold'] }
     },
     'Grabbing Balls': {
-        title: "Specialization: Gacha",
-        filters: { specialization: ['Gacha'] }
+        title: "Specialization: Gacha + Winner",
+        filters: { specialization: ['Gacha', 'Winner'] }
     },
     'Housekeeping': {
         title: "Traits: Apron, Garbage/Gold Can or Toilet Paper",
@@ -101,8 +101,8 @@ export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
         filters: { fur: ['Shadow'] }
     },
     'Moki Smash': {
-        title: "Specialization: Killer",
-        filters: { specialization: ['Killer'] }
+        title: "Specialization: Killer + Winner",
+        filters: { specialization: ['Killer', 'Winner'] }
     },
     'Rainbow Riot': {
         title: "Fur: Rainbow",

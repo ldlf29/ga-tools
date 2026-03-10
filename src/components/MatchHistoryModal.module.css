@@ -20,7 +20,7 @@
     border-bottom-width: 8px;
     border-radius: 1.5rem;
     width: 100%;
-    max-width: 900px;
+    max-width: 1100px;
     height: 85vh;
     max-height: 85vh;
     display: flex;
@@ -63,18 +63,25 @@
 }
 
 .header {
-    padding: 2rem 2rem 1rem 2rem;
+    padding: 2rem 2rem 1.5rem 2rem;
     border-bottom: 3px solid rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 2rem;
 }
 
 .headerLeft {
     display: flex;
     flex-direction: column;
+    gap: 0.35rem;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
 }
 
 .title {
@@ -101,7 +108,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin: 0.5rem 0 0 0;
+    margin: 0;
 }
 
 .limitToggle {
@@ -751,23 +758,46 @@
     }
 
     .header {
-        padding: 1.5rem;
+        padding: 1.5rem !important;
+        gap: 0.75rem !important;
+        flex-wrap: wrap !important;
+    }
+
+    .headerLeft {
+        width: 100% !important;
+        gap: 0.75rem !important;
+    }
+
+    .headerRight {
+        width: 100% !important;
+        margin-top: 0.5rem !important;
+    }
+
+    .titleRow {
+        flex-direction: column !important;
+        align-items: flex-start !important;
         gap: 0.5rem !important;
     }
 
     .title {
-        font-size: 1.7rem;
+        font-size: 1.55rem !important;
+        margin-bottom: 0.25rem !important;
     }
 
     .matchesList {
         gap: 0.85rem;
     }
 
-    /* Fixed Average Performance overflow on mobile */
-    .headerRight {
-        width: 100%;
-        margin-top: 0.25rem !important;
+    .limitBtn {
+        padding: 0.15rem 0.35rem;
+        font-size: 0.65rem;
+        border-radius: 6px;
     }
+
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
 
     .avgBoxContainerWrapper {
         width: 100%;

@@ -51,9 +51,13 @@ export async function GET(request: NextRequest) {
 
     // 2. Wallet Refresh Cooldown (6 hours per wallet)
     const lastRefresh = walletRefreshCooldowns.get(address.toLowerCase());
-    const forceRefresh = request.nextUrl.searchParams.get('force') === 'true'; // A flag if frontend specifically requested
+    const forceRefresh = request.nextUrl.searchParams.get('force') === 'true';
+    const isInitialAdd = request.nextUrl.searchParams.get('initial') === 'true';
 
-    if (forceRefresh) {
+    if (isInitialAdd) {
+        // Initial add always bypasses cooldown — record timestamp so future refreshes are governed
+        walletRefreshCooldowns.set(address.toLowerCase(), now);
+    } else if (forceRefresh) {
         if (lastRefresh && (now - lastRefresh < 6 * 60 * 60 * 1000)) {
             const remainingHours = ((6 * 60 * 60 * 1000 - (now - lastRefresh)) / (1000 * 60 * 60)).toFixed(1);
             return NextResponse.json({ error: `Please wait ${remainingHours} hours before forcing a refresh on this wallet.` }, { status: 429 });

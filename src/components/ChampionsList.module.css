@@ -251,13 +251,15 @@
 /* # rank column */
 .th:first-child,
 .td:first-child {
-    width: 44px;
-    min-width: 44px;
-    max-width: 44px;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    flex-shrink: 0;
     text-align: center;
     font-weight: 700;
     padding-left: 2px;
     padding-right: 2px;
+    box-sizing: border-box;
 }
 
 /* NAME column */

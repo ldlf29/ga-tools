@@ -187,7 +187,8 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
         filters.customClass.length > 0 ||
         filters.specialization.length > 0 ||
         filters.traits.length > 0 ||
-        filters.stars.length > 0;
+        filters.stars.length > 0 ||
+        (filters.matchLimit && filters.matchLimit !== 'ALL');
 
     // Pre-compute matches for each accordion
     const rarityOptions = ['Basic', 'Rare', 'Epic', 'Legendary'];
@@ -256,42 +257,6 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                 {/* --- MOKI SECTION --- */}
                 {filters.cardType !== 'SCHEME' && (
                     <>
-                        {/* Match Performance Data */}
-                        {(!hideMatchPerformance && !filterSearch.trim()) && (
-                            <FilterAccordion storagePrefix={storagePrefix} title="Match Performance" isOpenDefault={false} forceOpen={false}>
-                                {[
-                                    { label: 'Last 10 Matches', value: 10 },
-                                    { label: 'Last 20 Matches', value: 20 },
-                                    { label: 'Last 30 Matches', value: 30 }
-                                ].map((opt) => (
-                                    <label key={opt.value} className={styles.checkboxLabel}>
-                                        <input
-                                            type="checkbox"
-                                            name="matchLimitFilter"
-                                            checked={filters.matchLimit === opt.value}
-                                            onChange={() => {
-                                                const currentLimit = filters.matchLimit || 'ALL';
-                                                const newLimit = currentLimit === opt.value ? 'ALL' : opt.value as 10 | 20 | 30;
-
-                                                // Handle insertion order logic so the chip appears/disappears
-                                                let updatedOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
-                                                updatedOrder = updatedOrder.filter(k => k !== 'matchLimit:10' && k !== 'matchLimit:20' && k !== 'matchLimit:30');
-                                                if (newLimit !== 'ALL') {
-                                                    updatedOrder.push(`matchLimit:${newLimit}`);
-                                                }
-
-                                                onFilterChange({
-                                                    ...filters,
-                                                    matchLimit: newLimit,
-                                                    insertionOrder: updatedOrder
-                                                });
-                                            }}
-                                        />
-                                        <span className={styles.labelText}>{opt.label}</span>
-                                    </label>
-                                ))}
-                            </FilterAccordion>
-                        )}
                         {/* Rarity - only show if no search or has matches */}
                         {(!filterSearch.trim() || rarityMatches) && (
                             <FilterAccordion storagePrefix={storagePrefix} title="Rarity" isOpenDefault={false} forceOpen={rarityMatches}>
@@ -329,13 +294,50 @@ export default function FilterSidebar({ filters, onFilterChange, onCardTypeChang
                                 }).map(s => (
                                     <Fragment key={s.key}>
                                         {(s.key === 'Winner' || s.key === 'Score') && !filterSearch.trim() && (
-                                            <div style={{ height: '1px', width: '70%', background: '#333333', margin: '4px 0 8px 0.5rem' }} />
+                                            <div style={{ width: '85%', borderTop: '1px dashed rgba(0, 0, 0, 0.15)', margin: '4px 0 12px 0' }} />
                                         )}
                                         <label className={styles.checkboxLabel}>
                                             <input type="checkbox" checked={filters.specialization.includes(s.key)} onChange={() => handleSpecializationChange(s.key)} />
                                             <span className={styles.labelText}>{s.label}</span>
                                         </label>
                                     </Fragment>
+                                ))}
+                            </FilterAccordion>
+                        )}
+
+                        {/* Match Performance Data */}
+                        {(!hideMatchPerformance && !filterSearch.trim()) && (
+                            <FilterAccordion storagePrefix={storagePrefix} title="Match Performance" isOpenDefault={false} forceOpen={false}>
+                                {[
+                                    { label: 'Last 10 Matches', value: 10 },
+                                    { label: 'Last 20 Matches', value: 20 },
+                                    { label: 'Last 30 Matches', value: 30 }
+                                ].map((opt) => (
+                                    <label key={opt.value} className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            name="matchLimitFilter"
+                                            checked={filters.matchLimit === opt.value}
+                                            onChange={() => {
+                                                const currentLimit = filters.matchLimit || 'ALL';
+                                                const newLimit = currentLimit === opt.value ? 'ALL' : opt.value as 10 | 20 | 30;
+
+                                                // Handle insertion order logic so the chip appears/disappears
+                                                let updatedOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
+                                                updatedOrder = updatedOrder.filter(k => k !== 'matchLimit:10' && k !== 'matchLimit:20' && k !== 'matchLimit:30');
+                                                if (newLimit !== 'ALL') {
+                                                    updatedOrder.push(`matchLimit:${newLimit}`);
+                                                }
+
+                                                onFilterChange({
+                                                    ...filters,
+                                                    matchLimit: newLimit,
+                                                    insertionOrder: updatedOrder
+                                                });
+                                            }}
+                                        />
+                                        <span className={styles.labelText}>{opt.label}</span>
+                                    </label>
                                 ))}
                             </FilterAccordion>
                         )}

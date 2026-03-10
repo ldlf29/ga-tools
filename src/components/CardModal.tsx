@@ -29,6 +29,7 @@ export default function CardModal({ card, onClose, matchLimit = 'ALL' }: CardMod
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
+                e.stopImmediatePropagation();
                 onClose();
             }
         };

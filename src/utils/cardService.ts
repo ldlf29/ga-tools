@@ -255,7 +255,7 @@ const mapCardType = (apiType: string): 'MOKI' | 'SCHEME' | 'OTHER' => {
     }
 };
 
-export const fetchUserCards = async (walletAddress: string, forceRefresh: boolean = false): Promise<EnhancedCard[]> => {
+export const fetchUserCards = async (walletAddress: string, forceRefresh: boolean = false, isInitialAdd: boolean = false): Promise<EnhancedCard[]> => {
     const now = Date.now();
     if (!cachedLiveData || (now - lastFetchTime > CACHE_DURATION)) {
         try {
@@ -272,7 +272,7 @@ export const fetchUserCards = async (walletAddress: string, forceRefresh: boolea
     let apiCards: APICard[] = [];
     const CACHE_KEY = `grandArena_userCards_${walletAddress}`;
 
-    if (!forceRefresh) {
+    if (!forceRefresh && !isInitialAdd) {
         try {
             const cachedValue = localStorage.getItem(CACHE_KEY);
             if (cachedValue) {
@@ -286,9 +286,14 @@ export const fetchUserCards = async (walletAddress: string, forceRefresh: boolea
 
     if (apiCards.length === 0) {
         console.log(`[CardService] Fetching fresh cards for ${walletAddress} from API...`);
-        const fetchUrl = forceRefresh
-            ? `/api/user-cards?address=${walletAddress}&force=true`
-            : `/api/user-cards?address=${walletAddress}`;
+        let fetchUrl: string;
+        if (isInitialAdd) {
+            fetchUrl = `/api/user-cards?address=${walletAddress}&initial=true`;
+        } else if (forceRefresh) {
+            fetchUrl = `/api/user-cards?address=${walletAddress}&force=true`;
+        } else {
+            fetchUrl = `/api/user-cards?address=${walletAddress}`;
+        }
 
         const response = await fetch(fetchUrl);
         if (!response.ok) {
