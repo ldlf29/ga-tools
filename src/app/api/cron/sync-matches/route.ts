@@ -2,11 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import mokiMetadataRaw from '@/data/mokiMetadata.json';
 
+// Configuration
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Up to 60s runtime
+
 const mokiMetadata = mokiMetadataRaw as Record<string, any>;
-const BATCH_SIZE = 180; // Process all 180 Mokis in a single run
+const CONCURRENCY_LIMIT = 20; // Parallel fetch chunk size
+const DELAY_BETWEEN_BATCHES = 2000; // 2s pacing between chunks
+
+async function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export async function GET(request: NextRequest) {
-    // 1. Verify Authentication (via Authorization header only — never via URL params)
+    // 1. Verify Authentication
     const authHeader = request.headers.get('authorization');
     const CRON_SECRET = process.env.CRON_SECRET;
     const GA_API_KEY = process.env.GA_API_KEY;
@@ -20,34 +29,22 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        console.log('[Cron Matches] Starting Controlled Parallel Sync...');
+        console.log('[Cron Matches] Starting Full Match Sync for 180 Mokis...');
+        const startTime = Date.now();
 
-        // 2. Identify Batch
-        const { data: syncState } = await supabaseAdmin
-            .from('sync_logs')
-            .select('details')
-            .eq('status', 'matches_cursor')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-        let startIndex = syncState ? parseInt(syncState.details, 10) : 0;
-
+        // 2. Identify all Token IDs
         const allTokenIds = Object.values(mokiMetadata)
             .map(m => m.id)
             .filter(id => !!id);
 
-        if (startIndex >= allTokenIds.length) startIndex = 0;
+        console.log(`[Cron Matches] Fetching matches for ${allTokenIds.length} Mokis...`);
 
-        const batchTokenIds = allTokenIds.slice(startIndex, startIndex + BATCH_SIZE);
-        console.log(`[Cron Matches] Batch: ${startIndex} to ${startIndex + batchTokenIds.length}`);
-
-        // 3. Controlled Parallel Fetching in chunks
-        const CONCURRENCY_LIMIT = 20; // Process 20 at a time, so we don't clog up Node's event loop or the external API
+        // 3. Controlled Parallel Fetching
         const matchHistoryRecords: any[] = [];
 
-        for (let i = 0; i < batchTokenIds.length; i += CONCURRENCY_LIMIT) {
-            const chunkTokenIds = batchTokenIds.slice(i, i + CONCURRENCY_LIMIT);
+        for (let i = 0; i < allTokenIds.length; i += CONCURRENCY_LIMIT) {
+            const chunkTokenIds = allTokenIds.slice(i, i + CONCURRENCY_LIMIT);
+            console.log(`[Cron Matches] Fetching Chunk ${i / CONCURRENCY_LIMIT + 1}...`);
 
             const fetchPromises = chunkTokenIds.map(async (tokenId) => {
                 const apiUrl = `https://api.grandarena.gg/api/v1/mokis/${tokenId}/performances?page=1&limit=30`;
@@ -57,7 +54,6 @@ export async function GET(request: NextRequest) {
                             'Accept': 'application/json',
                             'Authorization': `Bearer ${GA_API_KEY}`
                         },
-                        // Increased to 15 seconds so we don't abort slower API fetches
                         signal: AbortSignal.timeout(15000)
                     });
 
@@ -107,12 +103,17 @@ export async function GET(request: NextRequest) {
 
             const resultsArray = await Promise.all(fetchPromises);
             matchHistoryRecords.push(...resultsArray.flat());
+
+            // Respect the pacing requested
+            if (i + CONCURRENCY_LIMIT < allTokenIds.length) {
+                await delay(DELAY_BETWEEN_BATCHES);
+            }
         }
 
         // 4. Batch Upsert to Supabase
         let recordsUpserted = 0;
         if (matchHistoryRecords.length > 0) {
-            console.log(`[Cron Matches] Upserting ${matchHistoryRecords.length} records...`);
+            console.log(`[Cron Matches] Upserting ${matchHistoryRecords.length} match records to DB...`);
 
             const DB_CHUNK_SIZE = 100;
             for (let i = 0; i < matchHistoryRecords.length; i += DB_CHUNK_SIZE) {
@@ -126,18 +127,14 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        // 5. Save next cursor position
-        let nextIndex = startIndex + batchTokenIds.length;
-        if (nextIndex >= allTokenIds.length) nextIndex = 0;
-
+        // 5. Save Status Log
         await supabaseAdmin.from('sync_logs').insert({
-            status: 'matches_cursor',
+            status: 'success',
             cards_updated: recordsUpserted,
-            details: `${nextIndex}`
+            details: `Cron Matches API: Processed ${allTokenIds.length} mokis. Upserted ${recordsUpserted}. Duration: ${Date.now() - startTime}ms`
         });
 
         // 6. Housekeeping: Keep only the latest 40 matches per Moki ID
-        //    Uses a single SQL query instead of fetching all rows into memory.
         let recordsDeleted = 0;
         try {
             const { data: deletedData, error: cleanupErr } = await supabaseAdmin
@@ -157,14 +154,21 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            processedMokis: batchTokenIds.length,
+            processedMokis: allTokenIds.length,
             recordsUpserted: recordsUpserted,
             recordsDeleted: recordsDeleted,
-            nextIndex: nextIndex
+            duration: Date.now() - startTime
         });
 
     } catch (error: any) {
         console.error('[Cron Matches] Fatal Error:', error);
+        
+        await supabaseAdmin.from('sync_logs').insert({
+            status: 'error',
+            cards_updated: 0,
+            details: `Cron Matches Error: ${error.message || 'Unknown error'}`
+        });
+
         return NextResponse.json({ error: 'Sync failed' }, { status: 500 });
     }
 }
