@@ -529,7 +529,7 @@ export default function ChampionsList() {
                         />
                     </div>
                 </div>
-                <div className={styles.updateInfo}>Class and Stats are updated every 10 minutes. Performance and Winrate every 6 hours.</div>
+                <div className={styles.updateInfo}>The data is updated every 5 minutes.</div>
 
                 {/* Mobile Action Row (hidden on desktop) */}
                 <div className={styles.actionRow}>

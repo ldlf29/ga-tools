@@ -239,7 +239,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
                                     ))}
                                 </div>
                             </div>
-                            <p className={styles.updateFreq}>Updated every 10 minutes.</p>
+                            <p className={styles.updateFreq}>The data is updated every 5 minutes.</p>
                             <div className={styles.subtitleRow}>
                                 <h3 className={styles.subtitle}>{mokiName}</h3>
                                 {marketLink && (
