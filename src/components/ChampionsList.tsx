@@ -5,6 +5,7 @@ import { fetchLiveData, MokiData } from '../utils/liveData';
 import ChangelogModal from './ChangelogModal';
 import MatchHistoryModal from './MatchHistoryModal';
 import NextImage from 'next/image';
+import Link from 'next/link';
 import styles from './ChampionsList.module.css';
 import { MOKI_CLASSES, MOKI_FURS } from '@/utils/constants';
 
@@ -122,7 +123,7 @@ export default function ChampionsList() {
 
         // Mobile detection
         const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 1024);
+            setIsMobile(window.innerWidth <= 1300);
         };
         checkMobile();
         window.addEventListener('resize', checkMobile);
@@ -755,7 +756,9 @@ export default function ChampionsList() {
                                                                 />
                                                             </div>
                                                         )}
-                                                        {moki.name}
+                                                        <Link href={`/moki/${encodeURIComponent(moki.name)}`} style={{ textDecoration: 'none', color: 'inherit', borderBottom: '1px solid currentColor' }} onClick={(e) => e.stopPropagation()}>
+                                                            {moki.name}
+                                                        </Link>
                                                         {moki.tokenId && (
                                                             <button
                                                                 className={styles.linkButton}
@@ -839,7 +842,9 @@ export default function ChampionsList() {
                                             )}
                                             <div className={styles.mobileCardName}>
                                                 <span className={styles.mobileRank}>#{rankMap.get(moki.id || moki.name) || '-'}</span>
-                                                {moki.name}
+                                                <Link href={`/moki/${encodeURIComponent(moki.name)}`} style={{ textDecoration: 'none', color: 'inherit', borderBottom: '1px solid currentColor' }} onClick={(e) => e.stopPropagation()}>
+                                                    {moki.name}
+                                                </Link>
                                             </div>
                                             <div className={styles.expandIcon}>
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

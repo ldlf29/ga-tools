@@ -20,8 +20,25 @@ const lilitaOne = Lilita_One({
 });
 
 export const metadata: Metadata = {
-  title: "Grand Arena Tools",
-  description: "Advanced Lineup Builder Tools, Champions, Stats and Analytics for Grand Arena",
+  metadataBase: new URL('https://www.grandarena.tools'),
+  title: {
+    default: "Grand Arena Tools | Auto Lineup Builder & Moki Meta",
+    template: "%s | Grand Arena Tools"
+  },
+  description: "The ultimate Grand Arena tools. Discover the best striker Moki teams, auto lineup builder, synergy calculators, and Grand Arena tier list to increase your win rate.",
+  keywords: ["Grand Arena auto lineup builder", "Grand Arena synergy calculator", "Moki stats tracker", "Best striker Moki team", "Grand Arena tier list", "How to increase win rate Grand Arena", "Best comps Grand Arena Web3"],
+  openGraph: {
+    title: "Grand Arena Tools | Auto Lineup Builder & Moki Meta",
+    description: "The ultimate Grand Arena tools. Discover the best striker Moki teams, auto lineup builder, synergy calculators, and Grand Arena tier list to increase your win rate.",
+    url: 'https://www.grandarena.tools',
+    siteName: 'Grand Arena Tools',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Grand Arena Tools | Auto Lineup Builder & Moki Meta",
+    description: "The ultimate Grand Arena tools. Discover the best striker Moki teams, auto lineup builder, synergy calculators, and Grand Arena tier list to increase your win rate.",
+  },
   icons: {
     icon: [
       { url: "/count.png" },

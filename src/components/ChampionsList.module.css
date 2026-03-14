@@ -707,7 +707,7 @@
 }
 
 /* Tablet/Mobile Media Query */
-@media (max-width: 1180px) {
+@media (max-width: 1300px) {
     .container {
         display: flex;
         flex-direction: column;
@@ -907,8 +907,8 @@
     }
 }
 
-/* Tablet Specific Header (601px - 1180px) */
-@media (min-width: 601px) and (max-width: 1180px) {
+/* Tablet Specific Header (601px - 1300px) */
+@media (min-width: 601px) and (max-width: 1300px) {
     .header {
         flex-direction: column !important;
         align-items: stretch !important;

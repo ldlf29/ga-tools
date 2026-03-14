@@ -578,7 +578,7 @@
   }
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1180px) {
 
   .mainLayout,
   .mainLayoutLineups {
@@ -963,5 +963,170 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Moki Page Interactive Buttons */
+.backToChampions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #FF66CC;
+  color: white;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 3px solid #333333;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4);
+  align-self: flex-start;
+  transition: all 0.1s ease;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.backToChampions:hover {
+  background-color: #FF99DD;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.backToChampions:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.marketIconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #FFD753;
+  border: 3px solid #333333;
+  border-bottom-width: 4px;
+  border-radius: 0.75rem;
+  color: #333333;
+  transition: all 0.1s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.marketIconBtn:hover {
+  background-color: #FFC220;
+  transform: translateY(-2px);
+  border-bottom-width: 6px;
+}
+
+.marketIconBtn:active {
+  transform: translateY(1px);
+  border-bottom-width: 2px;
+}
+
+.builderActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 2rem;
+  background-color: #FF66CC;
+  color: white;
+  border-radius: 0.75rem;
+  border: 3px solid #333333;
+  border-bottom-width: 5px;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-transform: uppercase;
+  font-family: inherit;
+}
+
+.builderActionBtn:hover {
+  background-color: #FF99DD;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.builderActionBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Moki Page Responsive Classes */
+.mokiPageMain {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+}
+
+.mokiModalContainer {
+  max-width: 600px;
+  width: 100%;
+  background-color: #84BCFF;
+  border: 3px solid #333333;
+  border-bottom-width: 10px;
+  border-radius: 2rem;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  color: #333333;
+}
+
+.mokiHeaderGroup {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.mokiTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.mokiTitle {
+  font-size: 1.9rem;
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .mokiPageMain {
+    padding: 1rem;
+    justify-content: flex-start;
+  }
+
+  .mokiModalContainer {
+    padding: 1.25rem;
+    border-radius: 1.5rem;
+    border-bottom-width: 6px;
+  }
+
+  .mokiHeaderGroup {
+    gap: 15px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .mokiTitleRow {
+    justify-content: center;
+  }
+
+  .mokiTitle {
+    font-size: 1.4rem;
   }
 }

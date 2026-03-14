@@ -70,6 +70,7 @@ const STATS_API_URL = "/api/stats";
 
 // In-memory cache to avoid redundant fetches within the same session
 let cachedLiveData: LiveDataMap | null = null;
+let fetchPromise: Promise<LiveDataMap | null> | null = null;
 
 /**
  * Fetches dynamic stats and merges with static Moki portraits.
@@ -77,36 +78,59 @@ let cachedLiveData: LiveDataMap | null = null;
  */
 export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
     if (cachedLiveData) return cachedLiveData;
+    if (fetchPromise) return fetchPromise;
 
-    try {
-        // console.log("[LiveData] Fetching cached stats from backend...");
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    fetchPromise = (async () => {
+        try {
+            // console.log("[LiveData] Fetching cached stats from backend...");
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-        const response = await fetch(STATS_API_URL, { signal: controller.signal });
-        clearTimeout(timeoutId);
+            const response = await fetch(STATS_API_URL, { signal: controller.signal });
+            clearTimeout(timeoutId);
 
-        if (!response.ok) throw new Error(`Backend stats fetch failed: ${response.status}`);
+            if (!response.ok) throw new Error(`Backend stats fetch failed: ${response.status}`);
 
-        const data = await response.json();
-        console.log(`[LiveData] Successfully loaded stats for ${Object.keys(data).length} objects`);
+            const data = await response.json();
+            console.log(`[LiveData] Successfully loaded stats for ${Object.keys(data).length} objects`);
 
-        // Merge with our Local Source of Truth (mokiMetadata)
-        const statsWithIdentity: LiveDataMap = { ...data };
+            // Merge with our Local Source of Truth (mokiMetadata)
+            const statsWithIdentity: LiveDataMap = { ...data };
 
-        // Ensure every Moki in our identity map is present and has its correct visual data
-        Object.keys(mokiMetadata).forEach((name) => {
-            const identity = mokiMetadata[name];
-            if (statsWithIdentity[name]) {
-                // Overwrite with local identity data for consistency
-                statsWithIdentity[name].imageUrl = identity.portraitUrl || statsWithIdentity[name].imageUrl;
-                statsWithIdentity[name].fur = identity.fur || statsWithIdentity[name].fur || "";
-                statsWithIdentity[name].traits = (identity.traits && identity.traits.length > 0) ? identity.traits : (statsWithIdentity[name].traits || []);
-                statsWithIdentity[name].marketLink = identity.marketLink || statsWithIdentity[name].marketLink;
-                statsWithIdentity[name].tokenId = identity.id ? parseInt(identity.id, 10) : undefined;
-            } else {
-                // If a Moki exists in our identity database but isn't in the stats sheet yet
-                statsWithIdentity[name] = {
+            // Ensure every Moki in our identity map is present and has its correct visual data
+            Object.keys(mokiMetadata).forEach((name) => {
+                const identity = mokiMetadata[name];
+                if (statsWithIdentity[name]) {
+                    // Overwrite with local identity data for consistency
+                    statsWithIdentity[name].imageUrl = identity.portraitUrl || statsWithIdentity[name].imageUrl;
+                    statsWithIdentity[name].fur = identity.fur || statsWithIdentity[name].fur || "";
+                    statsWithIdentity[name].traits = (identity.traits && identity.traits.length > 0) ? identity.traits : (statsWithIdentity[name].traits || []);
+                    statsWithIdentity[name].marketLink = identity.marketLink || statsWithIdentity[name].marketLink;
+                    statsWithIdentity[name].tokenId = identity.id ? parseInt(identity.id, 10) : undefined;
+                } else {
+                    // If a Moki exists in our identity database but isn't in the stats sheet yet
+                    statsWithIdentity[name] = {
+                        name: identity.name,
+                        imageUrl: identity.portraitUrl || "",
+                        class: '',
+                        stars: 0,
+                        fur: identity.fur || "",
+                        traits: identity.traits || [],
+                        marketLink: identity.marketLink || "",
+                        tokenId: identity.id ? parseInt(identity.id, 10) : undefined
+                    };
+                }
+            });
+
+            cachedLiveData = statsWithIdentity;
+            return statsWithIdentity;
+        } catch (e) {
+            console.error("[LiveData] Error fetching stats (using local metadata only):", e);
+            // Fallback Mode: return at least the names and identity from our local source
+            const fallbackData: LiveDataMap = {};
+            Object.keys(mokiMetadata).forEach((name) => {
+                const identity = mokiMetadata[name];
+                fallbackData[name] = {
                     name: identity.name,
                     imageUrl: identity.portraitUrl || "",
                     class: '',
@@ -116,30 +140,14 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
                     marketLink: identity.marketLink || "",
                     tokenId: identity.id ? parseInt(identity.id, 10) : undefined
                 };
-            }
-        });
+            });
+            return fallbackData;
+        } finally {
+            fetchPromise = null;
+        }
+    })();
 
-        cachedLiveData = statsWithIdentity;
-        return statsWithIdentity;
-    } catch (e) {
-        console.error("[LiveData] Error fetching stats (using local metadata only):", e);
-        // Fallback Mode: return at least the names and identity from our local source
-        const fallbackData: LiveDataMap = {};
-        Object.keys(mokiMetadata).forEach((name) => {
-            const identity = mokiMetadata[name];
-            fallbackData[name] = {
-                name: identity.name,
-                imageUrl: identity.portraitUrl || "",
-                class: '',
-                stars: 0,
-                fur: identity.fur || "",
-                traits: identity.traits || [],
-                marketLink: identity.marketLink || "",
-                tokenId: identity.id ? parseInt(identity.id, 10) : undefined
-            };
-        });
-        return fallbackData;
-    }
+    return fetchPromise;
 };
 
 /**

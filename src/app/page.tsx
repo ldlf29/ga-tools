@@ -112,11 +112,17 @@ export default function Home() {
   /* Wallet Persistence */
   useEffect(() => {
     const rawWallets = localStorage.getItem('grandArenaWallets_v2');
+    const savedMode = localStorage.getItem('grandArenaCardMode') as 'ALL' | 'USER' | null;
+
     if (rawWallets) {
       try {
         const savedWallets: ConnectedWallet[] = JSON.parse(rawWallets);
         if (savedWallets.length > 0) {
-          setCardMode('USER');
+          if (savedMode === 'ALL') {
+             setCardMode('ALL');
+          } else {
+             setCardMode('USER');
+          }
           handleLoadWallets(savedWallets);
         }
       } catch (e) {
@@ -126,13 +132,40 @@ export default function Home() {
       // Legacy compatibility
       const savedWallet = localStorage.getItem('grandArenaWallet');
       if (savedWallet) {
-        setCardMode('USER');
+        if (savedMode === 'ALL') {
+             setCardMode('ALL');
+        } else {
+             setCardMode('USER');
+        }
         const legacyWallet: ConnectedWallet = {
           address: savedWallet,
           addedAt: Date.now() - (24 * 60 * 60 * 1000), // Allow immediate removal
           lastRefresh: Date.now()
         };
         handleLoadWallets([legacyWallet]);
+      }
+    }
+  }, []);
+
+  /* URL Parameters Handling */
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const mokiSearch = params.get('mokiSearch');
+      const tab = params.get('tab');
+
+      if (tab === 'champions') {
+        setActiveTab('champions');
+      } 
+      
+      if (mokiSearch) {
+        setActiveTab('builder');
+        setSearchQuery(decodeURIComponent(mokiSearch));
+      }
+
+      // Consolidate URL cleanup for both parameters
+      if (tab || mokiSearch) {
+        window.history.replaceState({}, '', window.location.pathname);
       }
     }
   }, []);
@@ -201,10 +234,14 @@ export default function Home() {
       setUserCards(prev => [...prev, ...cards]);
       addToast(`Added wallet ${address.substring(0, 6)}...${address.substring(address.length - 6)}`, 'success');
       setCardMode('USER');
+      localStorage.setItem('grandArenaCardMode', 'USER');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to add wallet';
       addToast(msg, 'error');
-      if (userWallets.length === 0) setCardMode('ALL');
+      if (userWallets.length === 0) {
+        setCardMode('ALL');
+        localStorage.setItem('grandArenaCardMode', 'ALL');
+      }
     } finally {
       setIsLoadingUser(false);
     }
@@ -249,6 +286,7 @@ export default function Home() {
     setUserWallets([]);
     setUserCards([]);
     setCardMode('ALL');
+    localStorage.setItem('grandArenaCardMode', 'ALL');
     localStorage.removeItem('grandArenaWallets_v2');
     localStorage.removeItem('grandArenaWallet'); // clear legacy
     setShowWalletManagerModal(false);
@@ -267,6 +305,7 @@ export default function Home() {
       setShowWalletInput(true);
     } else {
       setCardMode(mode);
+      localStorage.setItem('grandArenaCardMode', mode);
     }
   };
 

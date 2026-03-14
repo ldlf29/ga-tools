@@ -68,14 +68,14 @@ export const matchesFilter = (
                 if (limit === 30) val = card.custom.avgDeposits30 || 0;
                 if (val <= 4) return false;
             } else if (spec === 'Killer') {
-                if (card.custom.class === 'Striker') return false;
+                if (card.custom.class === 'Striker' || card.custom.class === 'Defender') return false;
                 let val = card.custom.eliminations || 0;
                 if (limit === 10) val = card.custom.avgEliminations10 || 0;
                 if (limit === 20) val = card.custom.avgEliminations20 || 0;
                 if (limit === 30) val = card.custom.avgEliminations30 || 0;
                 if (val <= 1.25) return false;
             } else if (spec === 'Wart Rider') {
-                if (card.custom.class === 'Striker') return false;
+                if (card.custom.class === 'Striker' || card.custom.class === 'Bruiser') return false;
                 let val = card.custom.wartDistance || 0;
                 if (limit === 10) val = card.custom.avgWartDistance10 || 0;
                 if (limit === 20) val = card.custom.avgWartDistance20 || 0;
