@@ -79,6 +79,10 @@ export async function GET(request: NextRequest) {
                                 const targetMokiHash = perf.mokiId;
                                 const playerInfo = match.players?.find((p: any) => p.mokiId === targetMokiHash);
                                 const perfResults = perf.results || {};
+                                
+                                const isWinner = (playerInfo && match.result.teamWon !== undefined)
+                                    ? playerInfo.team === match.result.teamWon
+                                    : false;
 
                                 records.push({
                                     match_id: match.id,
@@ -93,6 +97,7 @@ export async function GET(request: NextRequest) {
                                     wart_distance: perfResults.wartDistance || 0,
                                     win_type: (match.result.winType === 'Eliminations') ? 'Combat' : (match.result.winType || 'unknown'),
                                     team_won: match.result.teamWon || 0,
+                                    is_winner: isWinner,
                                     duration: match.result.duration || 0,
                                     match_date: perf.matchDate || match.matchDate || new Date().toISOString().split('T')[0],
                                     match_data: match
@@ -155,6 +160,18 @@ export async function GET(request: NextRequest) {
                 }
             } catch (err) {
                 console.error(`[Cron Matches] Housekeeping failed:`, err);
+            }
+            
+            // 7. Update Daily Leaderboard
+            try {
+                const { error: rpcErr } = await supabaseAdmin.rpc('update_daily_leaderboard');
+                if (rpcErr) {
+                    console.error('[Cron Matches] Leaderboard RPC error:', rpcErr);
+                } else {
+                    console.log('[Cron Matches] Daily leaderboard updated successfully.');
+                }
+            } catch (err) {
+                console.error('[Cron Matches] Leaderboard RPC failed:', err);
             }
 
             console.log(`[Cron Matches] Background Sync Complete. Upserted ${recordsUpserted}.`);
