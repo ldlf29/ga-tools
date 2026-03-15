@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { fetchLiveData, MokiData } from '@/utils/liveData';
+import { supabase } from '@/lib/supabase';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import styles from './CardModal.module.css'; // Reusing matching styles
 
 interface MokiMetadata {
@@ -15,17 +17,41 @@ interface MokiMetadata {
 
 export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
     const [mokiData, setMokiData] = useState<MokiData | null>(null);
+    const [leaderboard, setLeaderboard] = useState<{ date: string; daily_rank: number; daily_score: number }[]>([]);
     const [loading, setLoading] = useState(true);
+    const [view, setView] = useState<'7' | '14' | 'all'>('14');
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile screens for responsive chart features
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         const load = async () => {
             try {
+                // 1. Fetch live metadata stats
                 const data = await fetchLiveData();
                 if (data) {
                     const found = Object.values(data).find(m => m.name.toLowerCase() === moki.name.toLowerCase());
                     if (found) {
                         setMokiData(found);
                     }
+                }
+
+                // 2. Fetch daily leaderboard history from Supabase (All dates)
+                const { data: lbData, error } = await supabase
+                    .from('daily_leaderboard')
+                    .select('date, daily_rank, daily_score')
+                    .eq('moki_id', moki.id)
+                    .order('date', { ascending: false }); // Get newest first - removed limit to fetch all
+
+                if (!error && lbData) {
+                    // Reverse to restore chronological order (left-to-right) for the chart
+                    setLeaderboard([...lbData].reverse());
                 }
             } catch (err) {
                 console.error("Failed to fetch live stats", err);
@@ -34,34 +60,119 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
             }
         };
         load();
-    }, [moki.name]);
+    }, [moki.id, moki.name]);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
-            {/* Leaderboard Chart Placeholder */}
+            {/* Leaderboard Chart */}
             <div style={{
                 background: '#ffffff',
                 border: '3px solid #333333',
                 borderBottomWidth: '6px',
                 borderRadius: '1rem',
                 padding: '1.5rem',
-                textAlign: 'center',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.5rem',
                 marginTop: '1rem'
             }}>
-                <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', color: '#333', fontSize: '1.2rem', textTransform: 'uppercase' }}>
-                    Leaderboard Position (Day by Day)
+                <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', color: '#333', fontSize: '1.2rem', textTransform: 'uppercase', textAlign: 'center' }}>
+                    Leaderboard Position
                 </h3>
-                <p style={{ margin: 0, color: '#666', fontSize: '0.9rem', fontWeight: 600 }}>
-                    Chart Placeholder - Coming soon!
-                </p>
-                <div style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed #ccc', borderRadius: '0.5rem', marginTop: '0.5rem' }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                    </svg>
+
+                {/* Timeframe Controls */}
+                <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'center', margin: '0.5rem 0' }}>
+                    {(['7', '14', 'all'] as const).map((type) => (
+                        <button 
+                            key={type} 
+                            onClick={() => setView(type)}
+                            style={{
+                                padding: '0.3rem 0.6rem',
+                                borderRadius: '0.5rem',
+                                border: '2px solid #333',
+                                background: view === type ? '#FFD753' : '#fff',
+                                fontWeight: 'bold',
+                                fontSize: '0.75rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.1s ease',
+                                textTransform: 'uppercase'
+                            }}
+                        >
+                            {type === 'all' ? 'ALL' : `${type}D`}
+                        </button>
+                    ))}
                 </div>
+                
+                {loading ? (
+                    <p style={{ margin: '1rem 0', color: '#666', fontSize: '0.9rem', fontWeight: 600, textAlign: 'center' }}>
+                        Syncing data...
+                    </p>
+                ) : leaderboard.length === 0 ? (
+                    <p style={{ margin: '1rem 0', color: '#666', fontSize: '0.9rem', fontWeight: 600, textAlign: 'center' }}>
+                        No data available for sync yet.
+                    </p>
+                ) : (
+                    <div style={{ height: '220px', width: '100%', marginTop: '0.5rem' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart
+                                data={(view === 'all' ? leaderboard : leaderboard.slice(-Number(view))).map(d => ({
+                                    ...d,
+                                    formatted_date: new Date(d.date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                                }))}
+                                margin={{ top: 10, right: 25, left: -20, bottom: 0 }}
+                            >
+                                <defs>
+                                    <linearGradient id="colorRank" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#FFD753" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="#FFD753" stopOpacity={0.0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                                <XAxis 
+                                    dataKey="formatted_date" 
+                                    stroke="#555" 
+                                    fontSize={9} 
+                                    fontWeight={600}
+                                    tickLine={false}
+                                    tick={!isMobile && view !== 'all'} // Hide individual dates description on mobile or "ALL" view
+                                    interval={0} // Force show all dates for 7D / 14D
+                                />
+                                <YAxis 
+                                    direction="invert" // Rank 1 should be at the top!
+                                    stroke="#555" 
+                                    fontSize={10} 
+                                    fontWeight={600}
+                                    tickLine={false}
+                                    allowDecimals={false}
+                                />
+                                <Tooltip 
+                                    contentStyle={{ 
+                                        backgroundColor: '#1C1C1E', 
+                                        border: '2px solid #333', 
+                                        borderRadius: '0.5rem',
+                                        color: '#fff',
+                                        fontSize: '0.85rem'
+                                    }}
+                                    formatter={((value: any, name: any) => {
+                                        const label = String(name || '');
+                                        if (label === 'daily_rank') return [`Rank #${value}`, 'Position'];
+                                        if (label === 'daily_score') return [`${value} pts`, 'Score'];
+                                        return [value, label];
+                                    }) as any}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="daily_rank" 
+                                    stroke="#FFD753" 
+                                    strokeWidth={3}
+                                    fillOpacity={1} 
+                                    fill="url(#colorRank)" 
+                                    animationDuration={1500}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
             </div>
 
             {/* Build Lineups Actions */}
