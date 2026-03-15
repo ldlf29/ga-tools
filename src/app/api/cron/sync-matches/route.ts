@@ -97,7 +97,6 @@ export async function GET(request: NextRequest) {
                                     wart_distance: perfResults.wartDistance || 0,
                                     win_type: (match.result.winType === 'Eliminations') ? 'Combat' : (match.result.winType || 'unknown'),
                                     team_won: match.result.teamWon || 0,
-                                    is_winner: isWinner,
                                     duration: match.result.duration || 0,
                                     match_date: perf.matchDate || match.matchDate || new Date().toISOString().split('T')[0],
                                     match_data: match
