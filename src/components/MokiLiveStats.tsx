@@ -83,8 +83,8 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
                 {/* Timeframe Controls */}
                 <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'center', margin: '0.5rem 0' }}>
                     {(['7', '14', 'all'] as const).map((type) => (
-                        <button 
-                            key={type} 
+                        <button
+                            key={type}
                             onClick={() => setView(type)}
                             style={{
                                 padding: '0.3rem 0.6rem',
@@ -102,7 +102,7 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
                         </button>
                     ))}
                 </div>
-                
+
                 {loading ? (
                     <p style={{ margin: '1rem 0', color: '#666', fontSize: '0.9rem', fontWeight: 600, textAlign: 'center' }}>
                         Syncing data...
@@ -123,32 +123,32 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
                             >
                                 <defs>
                                     <linearGradient id="colorRank" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#FFD753" stopOpacity={0.8}/>
-                                        <stop offset="95%" stopColor="#FFD753" stopOpacity={0.0}/>
+                                        <stop offset="5%" stopColor="#FFD753" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#FFD753" stopOpacity={0.0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                                <XAxis 
-                                    dataKey="formatted_date" 
-                                    stroke="#555" 
-                                    fontSize={9} 
+                                <XAxis
+                                    dataKey="formatted_date"
+                                    stroke="#555"
+                                    fontSize={9}
                                     fontWeight={600}
                                     tickLine={false}
                                     tick={!isMobile && view !== 'all'} // Hide individual dates description on mobile or "ALL" view
                                     interval={0} // Force show all dates for 7D / 14D
                                 />
-                                <YAxis 
+                                <YAxis
                                     direction="invert" // Rank 1 should be at the top!
-                                    stroke="#555" 
-                                    fontSize={10} 
+                                    stroke="#555"
+                                    fontSize={10}
                                     fontWeight={600}
                                     tickLine={false}
                                     allowDecimals={false}
                                 />
-                                <Tooltip 
-                                    contentStyle={{ 
-                                        backgroundColor: '#1C1C1E', 
-                                        border: '2px solid #333', 
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: '#1C1C1E',
+                                        border: '2px solid #333',
                                         borderRadius: '0.5rem',
                                         color: '#fff',
                                         fontSize: '0.85rem'
@@ -160,13 +160,13 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
                                         return [value, label];
                                     }) as any}
                                 />
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="daily_rank" 
-                                    stroke="#FFD753" 
+                                <Area
+                                    type="monotone"
+                                    dataKey="daily_rank"
+                                    stroke="#FFD753"
                                     strokeWidth={3}
-                                    fillOpacity={1} 
-                                    fill="url(#colorRank)" 
+                                    fillOpacity={1}
+                                    fill="url(#colorRank)"
                                     animationDuration={1500}
                                 />
                             </AreaChart>
@@ -176,13 +176,13 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
             </div>
 
             {/* Build Lineups Actions */}
-            <div style={{ 
-                marginTop: '1.5rem', 
-                padding: '1.5rem', 
-                backgroundColor: '#ffffff', 
-                border: '3px solid #333333', 
+            <div style={{
+                marginTop: '1.5rem',
+                padding: '1.5rem',
+                backgroundColor: '#ffffff',
+                border: '3px solid #333333',
                 borderBottomWidth: '6px',
-                borderRadius: '1rem', 
+                borderRadius: '1rem',
                 textAlign: 'center',
                 display: 'flex',
                 flexDirection: 'column',
@@ -195,7 +195,7 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
                 <p style={{ color: '#555', margin: 0, fontWeight: 600, fontSize: '0.95rem' }}>
                     Simulate the best team compositions and increase your win rate by combining {moki.name} with synergistic classes and Scheme cards.
                 </p>
-                <button 
+                <button
                     onClick={() => window.location.href = `/?mokiSearch=${encodeURIComponent(moki.name)}`}
                     className={styles.builderActionBtn}
                 >
