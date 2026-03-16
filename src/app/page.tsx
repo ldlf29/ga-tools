@@ -914,7 +914,7 @@ export default function Home() {
       {/* Mobile Navigation Drawer */}
       <div className={`${styles.navContainer} ${styles.mobileOnly} ${mobileMenuOpen ? styles.navContainerVisible : ''}`}>
         <div className={`${styles.drawerHeader} ${styles.mobileOnly}`}>
-          <img src="/ga-logo-new.png" alt="Grand Arena" className={styles.drawerLogo} />
+          <img src="/logo-ga-tools.png" alt="Grand Arena" className={styles.drawerLogo} />
           <button
             className={styles.closeMenuButton}
             onClick={() => setMobileMenuOpen(false)}
@@ -996,7 +996,7 @@ export default function Home() {
       <header className={styles.header}>
         <div className={styles.headerMain}>
           <div className={styles.headerLeft}>
-            <img src="/ga-logo-new.png" alt="Grand Arena Builder" className={styles.logo} />
+            <img src="/logo-ga-tools.png" alt="Grand Arena Builder" className={styles.logo} />
 
             <div className={styles.infoWrapper} ref={infoWrapperRef}>
               <button

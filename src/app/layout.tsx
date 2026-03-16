@@ -41,12 +41,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/count.png" },
-      { url: "/count.png", sizes: "32x32" },
-      { url: "/count.png", sizes: "16x16" },
+      { url: "/logo-ga-tools.png" },
+      { url: "/logo-ga-tools.png", sizes: "32x32" },
+      { url: "/logo-ga-tools.png", sizes: "16x16" },
     ],
-    apple: "/count.png",
-    shortcut: "/count.png",
+    apple: "/logo-ga-tools.png",
+    shortcut: "/logo-ga-tools.png",
   },
   appleWebApp: {
     title: "Grand Arena Tools",

@@ -44,48 +44,72 @@ export const sortCardsByFilters = (
                     const getVal = (card: any, spec: string) => {
                         const limit = filters.matchLimit;
                         switch (spec) {
-                            case 'Gacha':
-                                if (limit === 10) return card.custom?.avgDeposits10 || 0;
-                                if (limit === 20) return card.custom?.avgDeposits20 || 0;
-                                if (limit === 30) return card.custom?.avgDeposits30 || 0;
-                                return card.custom?.deposits || 0;
-                            case 'Killer':
-                                if (limit === 10) return card.custom?.avgEliminations10 || 0;
-                                if (limit === 20) return card.custom?.avgEliminations20 || 0;
-                                if (limit === 30) return card.custom?.avgEliminations30 || 0;
-                                return card.custom?.eliminations || 0;
-                            case 'Wart Rider':
-                                if (limit === 10) return card.custom?.avgWartDistance10 || 0;
-                                if (limit === 20) return card.custom?.avgWartDistance20 || 0;
-                                if (limit === 30) return card.custom?.avgWartDistance30 || 0;
-                                return card.custom?.wartDistance || 0;
-                            case 'Winner':
-                                if (limit === 10) return card.custom?.avgWinRate10 || 0;
-                                if (limit === 20) return card.custom?.avgWinRate20 || 0;
-                                if (limit === 30) return card.custom?.avgWinRate30 || 0;
-                                return card.custom?.winRate || 0;
-                            case 'Loser':
-                                if (limit === 10) return 1 / (card.custom?.avgWinRate10 || 0.0001);
-                                if (limit === 20) return 1 / (card.custom?.avgWinRate20 || 0.0001);
-                                if (limit === 30) return 1 / (card.custom?.avgWinRate30 || 0.0001);
-                                return 1 / (card.custom?.winRate || 0.0001);
-                            case 'Bad Streak':
-                                if (limit === 10) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate10 || 0);
-                                if (limit === 20) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate20 || 0);
-                                if (limit === 30) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate30 || 0);
-                                const streakPond = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
-                                return (card.custom?.winRate || 0) - streakPond;
-                            case 'Good Streak':
-                                if (limit === 10) return (card.custom?.avgWinRate10 || 0) - (card.custom?.winRate || 0);
-                                if (limit === 20) return (card.custom?.avgWinRate20 || 0) - (card.custom?.winRate || 0);
-                                if (limit === 30) return (card.custom?.avgWinRate30 || 0) - (card.custom?.winRate || 0);
-                                const goodStreakPond = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
-                                return goodStreakPond - (card.custom?.winRate || 0);
-                            case 'Score':
-                                if (limit === 10) return card.custom?.avgScore10 || 0;
-                                if (limit === 20) return card.custom?.avgScore20 || 0;
-                                if (limit === 30) return card.custom?.avgScore30 || 0;
-                                return card.custom?.score || 0;
+                            case 'Gacha': {
+                                let val = card.custom?.deposits || 0;
+                                if (limit == 10) val = card.custom?.avgDeposits10 || 0;
+                                if (limit == 20) val = card.custom?.avgDeposits20 || 0;
+                                if (limit == 30) val = card.custom?.avgDeposits30 || 0;
+                                return val - 4;
+                            }
+                            case 'Killer': {
+                                let val = card.custom?.eliminations || 0;
+                                if (limit == 10) val = card.custom?.avgEliminations10 || 0;
+                                if (limit == 20) val = card.custom?.avgEliminations20 || 0;
+                                if (limit == 30) val = card.custom?.avgEliminations30 || 0;
+                                return (val - 1.25) / 0.75;
+                            }
+                            case 'Wart Rider': {
+                                let val = card.custom?.wartDistance || 0;
+                                if (limit == 10) val = card.custom?.avgWartDistance10 || 0;
+                                if (limit == 20) val = card.custom?.avgWartDistance20 || 0;
+                                if (limit == 30) val = card.custom?.avgWartDistance30 || 0;
+                                return (val - 150) / 110;
+                            }
+                            case 'Winner': {
+                                let winVal = card.custom?.winRate || 0;
+                                if (limit == 10) winVal = card.custom?.avgWinRate10 || 0;
+                                if (limit == 20) winVal = card.custom?.avgWinRate20 || 0;
+                                if (limit == 30) winVal = card.custom?.avgWinRate30 || 0;
+                                return ((winVal / 100) - 0.37) / 0.25;
+                            }
+                            case 'Loser': {
+                                let lossVal = card.custom?.winRate || 0;
+                                if (limit == 10) lossVal = card.custom?.avgWinRate10 || 0;
+                                if (limit == 20) lossVal = card.custom?.avgWinRate20 || 0;
+                                if (limit == 30) lossVal = card.custom?.avgWinRate30 || 0;
+                                return ((lossVal / 100) - 0.37) / 0.25;
+                            }
+                            case 'Bad Streak': {
+                                let global = card.custom?.winRate || 0;
+                                let actual = global;
+                                if (limit == 10) actual = card.custom?.avgWinRate10 || 0;
+                                else if (limit == 20) actual = card.custom?.avgWinRate20 || 0;
+                                else if (limit == 30) actual = card.custom?.avgWinRate30 || 0;
+                                else {
+                                    actual = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                                }
+                                const ratio = (global + 0.05) / (actual + 0.05);
+                                return ratio - 1;
+                            }
+                            case 'Good Streak': {
+                                let global = card.custom?.winRate || 0;
+                                let actual = global;
+                                if (limit == 10) actual = card.custom?.avgWinRate10 || 0;
+                                else if (limit == 20) actual = card.custom?.avgWinRate20 || 0;
+                                else if (limit == 30) actual = card.custom?.avgWinRate30 || 0;
+                                else {
+                                    actual = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                                }
+                                const ratio = (global + 0.05) / (actual + 0.05);
+                                return 1 - ratio;
+                            }
+                            case 'Score': {
+                                let val = card.custom?.score || 0;
+                                if (limit == 10) val = card.custom?.avgScore10 || 0;
+                                if (limit == 20) val = card.custom?.avgScore20 || 0;
+                                if (limit == 30) val = card.custom?.avgScore30 || 0;
+                                return (val - 300) / 100;
+                            }
                             default: return 0;
                         }
                     };
@@ -100,61 +124,88 @@ export const sortCardsByFilters = (
 
                     const coeffA = calcCoeff(a);
                     const coeffB = calcCoeff(b);
-                    if (coeffB !== coeffA) return coeffB - coeffA;
+                    const isLoserActive = activeSpecs.includes('Loser');
+                    if (coeffB !== coeffA) return isLoserActive ? coeffA - coeffB : coeffB - coeffA;
                 }
 
                 // FALLBACK: Individual Sorting (if only one or coeff is same)
                 const limit = filters.matchLimit;
                 const getA = (spec: string, card: any) => {
                     switch (spec) {
-                        case 'Gacha':
-                            if (limit === 10) return card.custom?.avgDeposits10 || 0;
-                            if (limit === 20) return card.custom?.avgDeposits20 || 0;
-                            if (limit === 30) return card.custom?.avgDeposits30 || 0;
-                            return card.custom?.deposits || 0;
-                        case 'Killer':
-                            if (limit === 10) return card.custom?.avgEliminations10 || 0;
-                            if (limit === 20) return card.custom?.avgEliminations20 || 0;
-                            if (limit === 30) return card.custom?.avgEliminations30 || 0;
-                            return card.custom?.eliminations || 0;
-                        case 'Wart Rider':
-                            if (limit === 10) return card.custom?.avgWartDistance10 || 0;
-                            if (limit === 20) return card.custom?.avgWartDistance20 || 0;
-                            if (limit === 30) return card.custom?.avgWartDistance30 || 0;
-                            return card.custom?.wartDistance || 0;
-                        case 'Winner':
-                            if (limit === 10) return card.custom?.avgWinRate10 || 0;
-                            if (limit === 20) return card.custom?.avgWinRate20 || 0;
-                            if (limit === 30) return card.custom?.avgWinRate30 || 0;
-                            return card.custom?.winRate || 0;
-                        case 'Loser':
-                            if (limit === 10) return -(card.custom?.avgWinRate10 || 0);
-                            if (limit === 20) return -(card.custom?.avgWinRate20 || 0);
-                            if (limit === 30) return -(card.custom?.avgWinRate30 || 0);
-                            return -(card.custom?.winRate || 0);
-                        case 'Bad Streak':
-                            if (limit === 10) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate10 || 0);
-                            if (limit === 20) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate20 || 0);
-                            if (limit === 30) return (card.custom?.winRate || 0) - (card.custom?.avgWinRate30 || 0);
-                            const badStreakPond = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
-                            return (card.custom?.winRate || 0) - badStreakPond;
-                        case 'Good Streak':
-                            if (limit === 10) return (card.custom?.avgWinRate10 || 0) - (card.custom?.winRate || 0);
-                            if (limit === 20) return (card.custom?.avgWinRate20 || 0) - (card.custom?.winRate || 0);
-                            if (limit === 30) return (card.custom?.avgWinRate30 || 0) - (card.custom?.winRate || 0);
+                        case 'Gacha': {
+                            let val = card.custom?.deposits || 0;
+                            if (limit == 10) val = card.custom?.avgDeposits10 || 0;
+                            if (limit == 20) val = card.custom?.avgDeposits20 || 0;
+                            if (limit == 30) val = card.custom?.avgDeposits30 || 0;
+                            return val - 4;
+                        }
+                        case 'Killer': {
+                            let val = card.custom?.eliminations || 0;
+                            if (limit == 10) val = card.custom?.avgEliminations10 || 0;
+                            if (limit == 20) val = card.custom?.avgEliminations20 || 0;
+                            if (limit == 30) val = card.custom?.avgEliminations30 || 0;
+                            return (val - 1.25) / 0.75;
+                        }
+                        case 'Wart Rider': {
+                            let val = card.custom?.wartDistance || 0;
+                            if (limit == 10) val = card.custom?.avgWartDistance10 || 0;
+                            if (limit == 20) val = card.custom?.avgWartDistance20 || 0;
+                            if (limit == 30) val = card.custom?.avgWartDistance30 || 0;
+                            return (val - 150) / 110;
+                        }
+                        case 'Winner': {
+                            let winVal = card.custom?.winRate || 0;
+                            if (limit == 10) winVal = card.custom?.avgWinRate10 || 0;
+                            if (limit == 20) winVal = card.custom?.avgWinRate20 || 0;
+                            if (limit == 30) winVal = card.custom?.avgWinRate30 || 0;
+                            return ((winVal / 100) - 0.37) / 0.25;
+                        }
+                        case 'Loser': {
+                            let lossVal = card.custom?.winRate || 0;
+                            if (limit == 10) lossVal = card.custom?.avgWinRate10 || 0;
+                            if (limit == 20) lossVal = card.custom?.avgWinRate20 || 0;
+                            if (limit == 30) lossVal = card.custom?.avgWinRate30 || 0;
+                            return ((lossVal / 100) - 0.37) / 0.25;
+                        }
+                        case 'Bad Streak': {
+                            let global = card.custom?.winRate || 0;
+                            let actual = global;
+                            if (limit == 10) actual = card.custom?.avgWinRate10 || 0;
+                            else if (limit == 20) actual = card.custom?.avgWinRate20 || 0;
+                            else if (limit == 30) actual = card.custom?.avgWinRate30 || 0;
+                            else {
+                                actual = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                            }
+                            const ratio = (global + 0.05) / (actual + 0.05);
+                            return ratio - 1;
+                        }
+                        case 'Good Streak': {
+                            let global = card.custom?.winRate || 0;
+                            let actual = global;
+                            if (limit == 10) actual = card.custom?.avgWinRate10 || 0;
+                            else if (limit == 20) actual = card.custom?.avgWinRate20 || 0;
+                            else if (limit == 30) actual = card.custom?.avgWinRate30 || 0;
+                            else {
+                                actual = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
+                            }
+                            const ratio = (global + 0.05) / (actual + 0.05);
+                            return 1 - ratio;
+                        }
                             const goodPondFallback = ((card.custom?.avgWinRate10 || 0) + (card.custom?.avgWinRate20 || 0) + (card.custom?.avgWinRate30 || 0)) / 3;
                             return goodPondFallback - (card.custom?.winRate || 0);
-                        case 'Score':
-                            if (limit === 10) return card.custom?.avgScore10 || 0;
-                            if (limit === 20) return card.custom?.avgScore20 || 0;
-                            if (limit === 30) return card.custom?.avgScore30 || 0;
-                            return card.custom?.score || 0;
+                        case 'Score': {
+                            let val = card.custom?.score || 0;
+                            if (limit == 10) val = card.custom?.avgScore10 || 0;
+                            if (limit == 20) val = card.custom?.avgScore20 || 0;
+                            if (limit == 30) val = card.custom?.avgScore30 || 0;
+                            return (val - 300) / 100;
+                        }
                         default: return 0;
                     }
                 }
 
                 for (let spec of activeSpecs) {
-                    let diff = getA(spec, b) - getA(spec, a);
+                    let diff = spec === 'Loser' ? getA(spec, a) - getA(spec, b) : getA(spec, b) - getA(spec, a);
                     if (diff !== 0) return diff;
                 }
             }
