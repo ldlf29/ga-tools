@@ -82,7 +82,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
 
     const formatDate = (dateString: string) => {
         if (!dateString) return '';
-        const date = new Date(dateString);
+        const date = new Date(dateString.replace(/-/g, '/'));
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
