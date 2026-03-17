@@ -155,6 +155,11 @@ export class AlchemyService {
                 imageUrl = nft.media[0].gateway || nft.media[0].raw || '';
             }
 
+            // Fallback adjustment for outdated Alchemy CDN metadata
+            if (imageUrl) {
+                imageUrl = imageUrl.replace('/season1-launch/', '/season1-v2/');
+            }
+
             // Extract Series Info ONLY if relevant special attributes exist (ignoring season)
             let seriesInfo = null;
             if (categoryValue || seriesValue || editionValue) {

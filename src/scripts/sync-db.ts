@@ -37,7 +37,9 @@ interface MokiStats {
 }
 
 async function main() {
-    console.log("🚀 Starting Synchronization Job...");
+    console.log("🚀 [Sync-DB] Sincronización con Google Sheets DESACTIVADA por el usuario (script conservado para backup).");
+    return; 
+
     const startTime = Date.now();
 
     try {
@@ -57,12 +59,12 @@ async function main() {
             .select('name, class');
 
         if (fetchError) {
-            console.error("⚠️ Could not fetch existing stats for changelog:", fetchError.message);
+            console.error("⚠️ Could not fetch existing stats for changelog:", fetchError?.message);
         }
 
         const existingClassMap: Record<string, string> = {};
-        if (existingStats) {
-            for (const stat of existingStats) {
+        if (existingStats && Array.isArray(existingStats)) {
+            for (const stat of existingStats as any[]) {
                 existingClassMap[stat.name.toUpperCase()] = stat.class || "";
             }
         }
@@ -99,8 +101,8 @@ async function main() {
                 .order('changed_at', { ascending: false });
 
             const mostRecentClass = new Map<string, string>();
-            if (existingChanges) {
-                for (const change of existingChanges) {
+            if (existingChanges && Array.isArray(existingChanges)) {
+                for (const change of existingChanges as any[]) {
                     if (!mostRecentClass.has(change.moki_name)) {
                         mostRecentClass.set(change.moki_name, change.new_class);
                     }
@@ -115,7 +117,7 @@ async function main() {
             if (newChanges.length > 0) {
                 const { error: changelogError } = await supabase.from('class_changes').insert(newChanges);
                 if (changelogError) {
-                    console.error("⚠️ Failed to log class changes:", changelogError.message);
+                    console.error("⚠️ Failed to log class changes:", changelogError?.message);
                 } else {
                     console.log(`✅ Logged ${newChanges.length} class change(s) to changelog.`);
                     // Send Discord notification
@@ -159,7 +161,7 @@ async function main() {
 
     } catch (error) {
         console.error("\n💥 Sync Failed:", error);
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = (error as any)?.message || 'Unknown error';
 
         try {
             await supabase.from('sync_logs').insert({
