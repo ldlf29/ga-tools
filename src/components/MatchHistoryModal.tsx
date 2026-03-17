@@ -46,7 +46,7 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
                         .from('moki_match_history')
                         .select('*')
                         .eq('token_id', tokenId)
-                        .order('created_at', { ascending: false })
+                        .order('match_id', { ascending: false })
                         .limit(historyLimit);
 
                     if (!error && data) {

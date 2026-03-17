@@ -16,6 +16,15 @@ async function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const mapTeamToNumber = (team: any): number => {
+    if (typeof team === 'string') {
+        const t = team.toLowerCase();
+        if (t === 'red') return 1;
+        if (t === 'blue') return 2;
+    }
+    return typeof team === 'number' ? team : 0;
+};
+
 export async function GET(request: NextRequest) {
     // 1. Verify Authentication
     const authHeader = request.headers.get('authorization');
@@ -76,11 +85,22 @@ export async function GET(request: NextRequest) {
                                 const match = perf.match;
                                 if (!match || !match.result) continue;
 
+                                // Normalize player teams inside match_data for consistency with historic DB schema
+                                if (match.players) {
+                                    match.players = match.players.map((p: any) => ({
+                                        ...p,
+                                        team: mapTeamToNumber(p.team)
+                                    }));
+                                }
+                                if (match.result) {
+                                    match.result.teamWon = mapTeamToNumber(match.result.teamWon);
+                                }
+
                                 const targetMokiHash = perf.mokiId;
                                 const playerInfo = match.players?.find((p: any) => p.mokiId === targetMokiHash);
                                 const perfResults = perf.results || {};
                                 
-                                const isWinner = (playerInfo && match.result.teamWon !== undefined)
+                                const isWinner = (playerInfo && match.result.teamWon)
                                     ? playerInfo.team === match.result.teamWon
                                     : false;
 
