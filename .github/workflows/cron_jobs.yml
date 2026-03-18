@@ -1,0 +1,45 @@
+name: Cron Jobs
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_name:
+        description: 'Job to run (matches | moki | train)'
+        required: true
+        default: 'matches'
+
+jobs:
+  run-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Script
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GA_API_KEY: ${{ secrets.GA_API_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.job_name }}" == "matches" ]; then
+            echo "Running Sync Matches..."
+            npx tsx src/scripts/cron_sync_matches.ts
+          elif [ "${{ github.event.inputs.job_name }}" == "moki" ]; then
+            echo "Running Sync Moki API..."
+            npx tsx src/scripts/cron_sync_moki_api.ts
+          elif [ "${{ github.event.inputs.job_name }}" == "train" ]; then
+            echo "Running Sync Train API..."
+            npx tsx src/scripts/cron_sync_train_api.ts
+          else
+            echo "Unknown job name: ${{ github.event.inputs.job_name }}"
+            exit 1
+          fi
