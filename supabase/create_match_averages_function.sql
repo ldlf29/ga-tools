@@ -29,7 +29,7 @@ BEGIN
             m.moki_team,
             ROW_NUMBER() OVER (
                 PARTITION BY UPPER(m.moki_name)
-                ORDER BY m.created_at DESC
+                ORDER BY m.match_id DESC
             ) AS rn
         FROM moki_match_history m
     ),

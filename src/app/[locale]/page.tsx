@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (!t) {
       return {
           title: "Grand Arena Tools",
-          description: "Advanced Lineup Builder Tools, Champions, Stats and Analytics for Grand Arena"
+          description: "Advanced Lineup Builder Tools, Champions, Stats and Analytics for Moku Grand Arena"
       };
   }
 

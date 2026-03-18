@@ -251,24 +251,24 @@ export default function MatchHistoryModal({ tokenId, mokiName, onClose }: MatchH
                                     <div className={styles.avgBoxTitle}>AVERAGE PERFORMANCE</div>
                                     <div className={styles.avgBoxContainer}>
                                         <div className={styles.avgStatBox}>
-                                            <span className={styles.avgNumber} style={{ color: '#FFD753' }}>{avgScore}</span>
-                                            <span className={styles.avgLabel}>Score</span>
-                                        </div>
-                                        <div className={styles.avgStatBox}>
-                                            <span className={styles.avgNumber} style={winRate >= 50 ? { color: '#4ade80' } : { color: '#f87171' }}>{winRate}%</span>
-                                            <span className={styles.avgLabel}>Win Rate</span>
-                                        </div>
-                                        <div className={styles.avgStatBox}>
                                             <span className={styles.avgNumber}>{avgElims}</span>
                                             <span className={styles.avgLabel}>Elims</span>
+                                        </div>
+                                        <div className={styles.avgStatBox}>
+                                            <span className={styles.avgNumber}>{avgWart}</span>
+                                            <span className={styles.avgLabel}>Wart</span>
                                         </div>
                                         <div className={styles.avgStatBox}>
                                             <span className={styles.avgNumber}>{avgDeposits}</span>
                                             <span className={styles.avgLabel}>Balls</span>
                                         </div>
                                         <div className={styles.avgStatBox}>
-                                            <span className={styles.avgNumber}>{avgWart}</span>
-                                            <span className={styles.avgLabel}>Wart</span>
+                                            <span className={styles.avgNumber} style={{ color: '#FFD753' }}>{avgScore}</span>
+                                            <span className={styles.avgLabel}>Score</span>
+                                        </div>
+                                        <div className={styles.avgStatBox}>
+                                            <span className={styles.avgNumber} style={winRate >= 50 ? { color: '#4ade80' } : { color: '#f87171' }}>{winRate}%</span>
+                                            <span className={styles.avgLabel}>Win Rate</span>
                                         </div>
                                     </div>
                                 </div>

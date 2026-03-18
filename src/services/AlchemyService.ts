@@ -119,7 +119,7 @@ export class AlchemyService {
      */
     public parseAlchemyNFTs(nfts: AlchemyNFT[]): EnhancedCard[] {
         return nfts.map(nft => {
-            const metadata = nft.metadata;
+            const metadata = nft.metadata || (nft as any).raw?.metadata;
             const attributes = metadata?.attributes || [];
 
             // Extract key attributes, case-insensitive
@@ -157,7 +157,7 @@ export class AlchemyService {
 
             // Fallback adjustment for outdated Alchemy CDN metadata
             if (imageUrl) {
-                imageUrl = imageUrl.replace('/season1-launch/', '/season1-v2/');
+                imageUrl = imageUrl.replace(/season1-launch/gi, 'season1-v2');
             }
 
             // Extract Series Info ONLY if relevant special attributes exist (ignoring season)

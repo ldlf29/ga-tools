@@ -73,7 +73,7 @@ BEGIN
       (COALESCE(mh.eliminations, 0) * 80) +
       (FLOOR(COALESCE(mh.wart_distance, 0) / 80) * 45) AS match_score,
       CASE WHEN mh.team_won = mh.moki_team THEN 1.0 ELSE 0.0 END AS is_win,
-      ROW_NUMBER() OVER(PARTITION BY mh.moki_id ORDER BY mh.match_date DESC, mh.created_at DESC) as rn
+      ROW_NUMBER() OVER(PARTITION BY mh.moki_id ORDER BY mh.match_id DESC) as rn
     FROM public.moki_match_history mh
   )
   SELECT 

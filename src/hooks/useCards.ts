@@ -19,7 +19,8 @@ export function useCards() {
         const cached = localStorage.getItem('cachedCards_v3');
         if (cached) {
             try {
-                const parsed = JSON.parse(cached);
+                const fixed = cached.replace(/season1-launch/gi, 'season1-v2');
+                const parsed = JSON.parse(fixed);
                 // Validate cache has train field (added recently)
                 const hasTrainField = parsed.length > 0 && parsed.some((c: any) =>
                     c.cardType === 'MOKI' && c.custom?.train !== undefined

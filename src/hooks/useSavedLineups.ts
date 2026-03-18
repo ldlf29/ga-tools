@@ -12,7 +12,8 @@ export function useSavedLineups(storageKey: string = 'grandArenaLineups') {
         try {
             const saved = localStorage.getItem(storageKey);
             if (saved) {
-                setSavedLineups(JSON.parse(saved));
+                const fixed = saved.replace(/season1-launch/gi, 'season1-v2');
+                setSavedLineups(JSON.parse(fixed));
             } else {
                 setSavedLineups([]);
             }

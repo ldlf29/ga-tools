@@ -276,7 +276,8 @@ export const fetchUserCards = async (walletAddress: string, forceRefresh: boolea
         try {
             const cachedValue = localStorage.getItem(CACHE_KEY);
             if (cachedValue) {
-                apiCards = JSON.parse(cachedValue);
+                const fixed = cachedValue.replace(/season1-launch/gi, 'season1-v2');
+                apiCards = JSON.parse(fixed);
                 console.log(`[CardService] Loaded ${apiCards.length} cards from local cache for ${walletAddress}`);
             }
         } catch (e) {
