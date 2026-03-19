@@ -7,8 +7,12 @@ const mokiMetadata = mokiMetadataRaw as Record<string, any>;
 const BATCH_SIZE = 90;
 
 export async function GET(request: NextRequest) {
-    return NextResponse.json({ 
-        success: false, 
-        message: "Endpoint disabled on Vercel. Please trigger through GitHub Actions (Option A)." 
-    }, { status: 403 });
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        'Endpoint disabled on Vercel. Please trigger through GitHub Actions (Option A).',
+    },
+    { status: 403 }
+  );
 }

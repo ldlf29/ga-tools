@@ -1,252 +1,263 @@
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9500;
-    padding: 1rem;
-    box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9500;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .modal {
-    background: #84BCFF;
-    border: 3px solid #333333;
-    border-bottom-width: 8px;
-    border-radius: 1.5rem;
-    width: 100%;
-    max-width: 520px;
-    padding: 2.5rem 2rem;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    color: #333333;
-    animation: slideUp 0.3s ease-out;
-    gap: 1rem;
+  background: #84bcff;
+  border: 3px solid #333333;
+  border-bottom-width: 8px;
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 520px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: #333333;
+  animation: slideUp 0.3s ease-out;
+  gap: 1rem;
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
 }
 
 .header h2 {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #FFD753;
-    margin: 0;
-    text-transform: uppercase;
-    text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
-        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
-    letter-spacing: 0.5px;
-    text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffd753;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow:
+    2px 0 #000,
+    -2px 0 #000,
+    0 2px #000,
+    0 -2px #000,
+    1px 1px #000,
+    -1px -1px #000,
+    1px -1px #000,
+    -1px 1px #000;
+  letter-spacing: 0.5px;
+  text-align: center;
 }
 
 @media (max-width: 480px) {
-    .header h2 {
-        font-size: 1.15rem;
-        white-space: nowrap;
-    }
+  .header h2 {
+    font-size: 1.15rem;
+    white-space: nowrap;
+  }
 
-    .closeBtn {
-        width: 27px !important;
-        height: 27px !important;
-        padding-bottom: 0 !important;
-    }
+  .closeBtn {
+    width: 27px !important;
+    height: 27px !important;
+    padding-bottom: 0 !important;
+  }
 
-    .closeBtn svg {
-        width: 15px !important;
-        height: 15px !important;
-    }
+  .closeBtn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
 
-    .walletCard {
-        padding: 0.85rem 1rem !important;
-    }
+  .walletCard {
+    padding: 0.85rem 1rem !important;
+  }
 
-    .address {
-        font-size: 0.93rem !important;
-    }
+  .address {
+    font-size: 0.93rem !important;
+  }
 
-    .actionBtn {
-        width: 34px !important;
-        height: 34px !important;
-        border-bottom-width: 4px !important;
-    }
+  .actionBtn {
+    width: 34px !important;
+    height: 34px !important;
+    border-bottom-width: 4px !important;
+  }
 
-    .actionBtn svg {
-        width: 17px !important;
-        height: 17px !important;
-    }
+  .actionBtn svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
 }
 
 .closeBtn {
-    position: absolute;
-    right: 0.75rem;
-    top: 0.75rem;
-    width: 32px;
-    height: 32px;
-    background: #FF66CC;
-    border: 3px solid #333333;
-    border-radius: 50%;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, background 0.2s;
-    font-size: 1.5rem;
-    font-weight: bold;
-    padding-bottom: 3px;
-    z-index: 10;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  width: 32px;
+  height: 32px;
+  background: #ff66cc;
+  border: 3px solid #333333;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.2s,
+    background 0.2s;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-bottom: 3px;
+  z-index: 10;
 }
 
 .closeBtn:hover {
-    transform: scale(1.1);
-    background: #FF99DD;
+  transform: scale(1.1);
+  background: #ff99dd;
 }
 
 .disclaimer {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-style: italic;
-    color: #333333;
-    opacity: 0.6;
-    text-align: center;
-    margin: 0;
-    font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #333333;
+  opacity: 0.6;
+  text-align: center;
+  margin: 0;
+  font-weight: 400;
 }
 
 .walletList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .walletCard {
-    background: #FFFFFF;
-    border: 3px solid #333333;
-    padding: 1rem 1.25rem;
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  background: #ffffff;
+  border: 3px solid #333333;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .walletInfo {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .address {
-    font-family: monospace;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #333333;
+  font-family: monospace;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #333333;
 }
 
 .walletActions {
-    display: flex;
-    gap: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
 }
 
 .actionBtn {
-    width: 40px;
-    height: 40px;
-    border-radius: 0.75rem;
-    border: 3px solid #333333;
-    border-bottom-width: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.1s;
-    background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.75rem;
+  border: 3px solid #333333;
+  border-bottom-width: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  background: white;
 }
 
 .actionBtn:hover:not(.disabled) {
-    transform: translateY(2px);
-    border-bottom-width: 3px;
+  transform: translateY(2px);
+  border-bottom-width: 3px;
 }
 
 .actionBtn:active:not(.disabled) {
-    transform: translateY(4px);
-    border-bottom-width: 1px;
+  transform: translateY(4px);
+  border-bottom-width: 1px;
 }
 
 .actionBtn.disabled {
-    opacity: 0.8;
-    cursor: not-allowed;
-    filter: saturate(0.2) brightness(0.9);
+  opacity: 0.8;
+  cursor: not-allowed;
+  filter: saturate(0.2) brightness(0.9);
 }
 
 .btnText {
-    display: none;
+  display: none;
 }
 
 .refreshBtn {
-    background: #1ABF9E !important;
-    /* Emerald */
-    color: white;
+  background: #1abf9e !important;
+  /* Emerald */
+  color: white;
 }
 
 .removeBtn {
-    background: #EF4444 !important;
-    /* Red */
-    color: white;
+  background: #ef4444 !important;
+  /* Red */
+  color: white;
 }
 
 .addWalletBtn {
-    background: #FFD753;
-    color: #333333;
-    border: 3px solid #333333;
-    border-bottom-width: 4px;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-family: var(--font-display, 'Inter', sans-serif);
-    font-size: 0.95rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.1s;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
+  background: #ffd753;
+  color: #333333;
+  border: 3px solid #333333;
+  border-bottom-width: 4px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-family: var(--font-display, 'Inter', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    background 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .addWalletBtn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
-    background: #ffea99;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+  background: #ffea99;
 }
 
 .addWalletBtn:active {
-    transform: translateY(2px);
-    border-bottom-width: 2px;
+  transform: translateY(2px);
+  border-bottom-width: 2px;
 }

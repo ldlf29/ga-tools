@@ -1,145 +1,154 @@
 .container {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
-    height: 40px;
-    /* Hit area height */
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin: 0 auto;
-    user-select: none;
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  height: 40px;
+  /* Hit area height */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 0 auto;
+  user-select: none;
 }
 
 .disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .trackBackground {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100%;
-    height: 6px;
-    background-color: #333333;
-    border-radius: 3px;
-    z-index: 1;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 6px;
+  background-color: #333333;
+  border-radius: 3px;
+  z-index: 1;
 }
 
 .trackFill {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 6px;
-    background-color: #FFD753;
-    /* Yellow */
-    border-radius: 3px;
-    z-index: 2;
-    pointer-events: none;
-    transition: width 0.1s linear;
-    /* Smooth fill update during drag */
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 6px;
+  background-color: #ffd753;
+  /* Yellow */
+  border-radius: 3px;
+  z-index: 2;
+  pointer-events: none;
+  transition: width 0.1s linear;
+  /* Smooth fill update during drag */
 }
 
 .mark {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
-    background-color: var(--color-bg-dark);
-    border: 2px solid #333333;
-    border-radius: 50%;
-    z-index: 3;
-    transition: all 0.2s;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-bg-dark);
+  border: 2px solid #333333;
+  border-radius: 50%;
+  z-index: 3;
+  transition: all 0.2s;
 }
 
 .markActive {
-    border-color: #333333;
-    background-color: #FFD753;
+  border-color: #333333;
+  background-color: #ffd753;
 }
 
 .knob {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 0;
-    height: 0;
-    z-index: 10;
-    transition: left 0.1s linear;
-    /* Smooth drag */
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  z-index: 10;
+  transition: left 0.1s linear;
+  /* Smooth drag */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .character {
-    width: 60px;
-    /* Adjust based on image aspect */
-    height: auto;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
-    /* To offset the character so feet are on the bar, simple translateY might help if needed */
-    transform: translateY(-10px);
-    pointer-events: none;
-    /* Let clicks pass through to container or handle on knob wrapper */
+  width: 60px;
+  /* Adjust based on image aspect */
+  height: auto;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+  /* To offset the character so feet are on the bar, simple translateY might help if needed */
+  transform: translateY(-10px);
+  pointer-events: none;
+  /* Let clicks pass through to container or handle on knob wrapper */
 }
 
 .container:hover .character {
-    transform: translateY(-12px) scale(1.1);
-    transition: transform 0.2s;
+  transform: translateY(-12px) scale(1.1);
+  transition: transform 0.2s;
+}
+
+.knobImageWrapper {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Small Variant */
 .small {
-    height: 30px;
-    /* Reduced hit area */
+  height: 30px;
+  /* Reduced hit area */
 }
 
 .small .trackBackground,
 .small .trackFill {
-    height: 4px;
-    /* Thinner track */
+  height: 4px;
+  /* Thinner track */
 }
 
 .small .mark {
-    width: 6px;
-    height: 6px;
-    border-width: 1px;
+  width: 6px;
+  height: 6px;
+  border-width: 1px;
 }
 
 .small .character {
-    width: 35px;
-    /* Significantly smaller */
-    transform: translateY(-7px);
+  width: 35px;
+  /* Significantly smaller */
+  transform: translateY(-7px);
 }
 
 .small:hover .character {
-    transform: translateY(-9px) scale(1.1);
+  transform: translateY(-9px) scale(1.1);
 }
 @media (max-width: 600px) {
-    .container {
-        height: 30px;
-    }
+  .container {
+    height: 30px;
+  }
 
-    .trackBackground,
-    .trackFill {
-        height: 4px;
-    }
+  .trackBackground,
+  .trackFill {
+    height: 4px;
+  }
 
-    .mark {
-        width: 6px;
-        height: 6px;
-        border-width: 1px;
-    }
+  .mark {
+    width: 6px;
+    height: 6px;
+    border-width: 1px;
+  }
 
-    .character {
-        width: 35px;
-        transform: translateY(-7px);
-    }
+  .character {
+    width: 35px;
+    transform: translateY(-7px);
+  }
 
-    .container:hover .character {
-        transform: translateY(-9px) scale(1.1);
-    }
+  .container:hover .character {
+    transform: translateY(-9px) scale(1.1);
+  }
 }

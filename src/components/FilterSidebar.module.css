@@ -1,393 +1,417 @@
 .sidebar {
-    width: 100%;
-    background: #84BCFF;
-    border: 3px solid #333333;
-    border-bottom-width: 8px;
-    border-radius: 20px;
-    padding: 1.05rem 1.5rem 1.5rem;
-    height: 850px;
-    /* Fixed height */
-    overflow: hidden;
-    /* Hide overflow on container */
-    position: sticky;
-    top: 0;
-    color: #333333;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    margin-bottom: 20px;
+  width: 100%;
+  background: #84bcff;
+  border: 3px solid #333333;
+  border-bottom-width: 8px;
+  border-radius: 20px;
+  padding: 1.05rem 1.5rem 1.5rem;
+  height: 850px;
+  /* Fixed height */
+  overflow: hidden;
+  /* Hide overflow on container */
+  position: sticky;
+  top: 0;
+  color: #333333;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin-bottom: 20px;
 }
 
 @media (max-width: 1180px) {
-    .sidebar {
-        height: 100%;
-        max-height: none;
-        border-radius: 0;
-        border: none;
-        margin-bottom: 0;
-        position: static;
-    }
+  .sidebar {
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    border: none;
+    margin-bottom: 0;
+    position: static;
+  }
 }
 
 .scrollableContent {
-    flex: 1;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding-right: 5px;
-    padding-bottom: 40vh;
-    /* Allow overscroll at the end of filters */
-    /* Prevent scrollbar overlap with content if visible */
-    margin-right: -5px;
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE/Edge */
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 5px;
+  padding-bottom: 40vh;
+  /* Allow overscroll at the end of filters */
+  /* Prevent scrollbar overlap with content if visible */
+  margin-right: -5px;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
 
 .scrollableContent::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .sidebar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 .headerGroup {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
 }
 
 .sectionTitle {
-    font-size: 1.7rem;
-    /* Slightly larger */
-    font-family: var(--font-display);
-    font-weight: 700;
-    color: #FFD753;
-    /* Yellow */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0;
-    /* Handled by group */
-    text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
-        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+  font-size: 1.7rem;
+  /* Slightly larger */
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #ffd753;
+  /* Yellow */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0;
+  /* Handled by group */
+  text-shadow:
+    2px 0 #000,
+    -2px 0 #000,
+    0 2px #000,
+    0 -2px #000,
+    1px 1px #000,
+    -1px -1px #000,
+    1px -1px #000,
+    -1px 1px #000;
 }
 
 .clearFiltersButton {
-    background: none;
-    border: none;
-    color: #EF6666;
-    /* Pastel Red */
-    font-size: 0.75rem;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    /* Inter Bold */
-    text-transform: uppercase;
-    cursor: pointer;
-    text-decoration: none;
-    transition: color 0.2s;
+  background: none;
+  border: none;
+  color: #ef6666;
+  /* Pastel Red */
+  font-size: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  /* Inter Bold */
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .clearFiltersButton:hover {
-    color: #EF4444;
-    /* Red */
+  color: #ef4444;
+  /* Red */
 }
 
 .filterGroup {
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .filterGroup:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .filterSearchInput {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    background: #5097FF;
-    border: 1px dashed var(--color-border);
-    border-radius: 0.75rem;
-    font-size: 0.9rem;
-    color: #333333;
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    outline: none;
-    transition: all 0.2s;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: #5097ff;
+  border: 1px dashed var(--color-border);
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  color: #333333;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  outline: none;
+  transition: all 0.2s;
 }
 
 .filterSearchInput::placeholder {
-    color: #333333;
+  color: #333333;
 }
 
 .filterSearchInput:hover,
 .filterSearchInput:focus {
-    border: 1px solid #2673E8;
-    outline: none;
+  border: 1px solid #2673e8;
+  outline: none;
 }
 
 .last10ToggleWrapper {
-    margin-top: 0.75rem;
-    padding: 0.5rem 0.25rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.25rem;
 }
 
 .toggleLabel {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
 }
 
 .toggleLabel input {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    border: 2px solid #333333;
-    border-radius: 6px;
-    background: #84BCFF;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-    margin-top: 1px;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 2px solid #333333;
+  border-radius: 6px;
+  background: #84bcff;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  margin-top: 1px;
 }
 
 .toggleLabel input:checked {
-    background: var(--color-secondary);
-    border-color: var(--color-secondary);
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 .toggleLabel:hover input {
-    border-color: var(--color-secondary);
-    box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
 }
 
 .toggleLabel input:checked::after {
-    content: '✔';
-    position: absolute;
-    top: -3px;
-    left: 1px;
-    font-size: 14px;
-    color: #333333;
-    font-weight: bold;
+  content: '✔';
+  position: absolute;
+  top: -3px;
+  left: 1px;
+  font-size: 14px;
+  color: #333333;
+  font-weight: bold;
 }
 
 .toggleText {
-    font-size: 0.9rem;
-    color: #333333;
-    padding-top: 2px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
+  font-size: 0.9rem;
+  color: #333333;
+  padding-top: 2px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
 }
 
 .accordionHeader {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0 0.5rem;
-    margin-bottom: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .groupTitle {
-    font-size: 1.25rem;
-    font-family: var(--font-display);
-    /* Switch to Grand Arena */
-    font-weight: 600;
-    text-transform: capitalize;
-    /* Capitalize (Title Case) */
-    color: #1ABF9E;
-    /* Teal */
-    pointer-events: none;
-    /* Make click pass to button */
-    text-shadow: 1.5px 0 #000, -1.5px 0 #000, 0 1.5px #000, 0 -1.5px #000,
-        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+  font-size: 1.25rem;
+  font-family: var(--font-display);
+  /* Switch to Grand Arena */
+  font-weight: 600;
+  text-transform: capitalize;
+  /* Capitalize (Title Case) */
+  color: #1abf9e;
+  /* Teal */
+  pointer-events: none;
+  /* Make click pass to button */
+  text-shadow:
+    1.5px 0 #000,
+    -1.5px 0 #000,
+    0 1.5px #000,
+    0 -1.5px #000,
+    1px 1px #000,
+    -1px -1px #000,
+    1px -1px #000,
+    -1px 1px #000;
 }
 
 .arrowIcon {
-    width: 25px;
-    height: 25px;
-    color: #FFD753;
-    /* Yellow stroke */
-    transition: transform 0.2s ease;
-    /* Mimic text-shadow with drop-shadow for SVG */
-    filter:
-        drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
+  width: 25px;
+  height: 25px;
+  color: #ffd753;
+  /* Yellow stroke */
+  transition: transform 0.2s ease;
+  /* Mimic text-shadow with drop-shadow for SVG */
+  filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000)
+    drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
 }
 
 /* ... */
 
 .labelText {
-    font-size: 1.05rem;
-    /* Increased from 0.95 */
-    color: #000000;
-    /* Black text */
-    font-weight: 600;
-    /* Slightly bolder */
-    padding-top: 2px;
-    /* Slight offset to match checkbox visually */
+  font-size: 1.05rem;
+  /* Increased from 0.95 */
+  color: #000000;
+  /* Black text */
+  font-weight: 600;
+  /* Slightly bolder */
+  padding-top: 2px;
+  /* Slight offset to match checkbox visually */
 }
 
 .arrowDown {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .accordionContent {
-    padding-left: 0.5rem;
+  padding-left: 0.5rem;
 }
 
 .toggleGroup {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .toggleButton {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px dashed var(--color-border);
-    /* Dashed border to match inputs */
-    background: #5097FF;
-    /* White bg default */
-    color: #333333;
-    /* Dark text default */
-    border-radius: 0.75rem;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    /* Inter Bold */
-    transition: all 0.2s;
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px dashed var(--color-border);
+  /* Dashed border to match inputs */
+  background: #5097ff;
+  /* White bg default */
+  color: #333333;
+  /* Dark text default */
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  /* Inter Bold */
+  transition: all 0.2s;
 }
 
 .toggleButton:hover {
-    border: 1px solid #2673E8;
-    /* Solid blue border on hover */
+  border: 1px solid #2673e8;
+  /* Solid blue border on hover */
 }
 
 .toggleButton.active {
-    background: #2673E8;
-    /* Blue bg active */
-    border-color: #2673E8;
-    color: white;
-    /* White text active */
-    box-shadow: 0 0 10px rgba(38, 115, 232, 0.4);
+  background: #2673e8;
+  /* Blue bg active */
+  border-color: #2673e8;
+  color: white;
+  /* White text active */
+  box-shadow: 0 0 10px rgba(38, 115, 232, 0.4);
 }
 
 .checkboxLabel {
-    display: flex;
-    align-items: flex-start;
-    /* Align to top if text wraps */
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    cursor: pointer;
-    line-height: 1.2;
-    /* Better line height for long text */
+  display: flex;
+  align-items: flex-start;
+  /* Align to top if text wraps */
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  line-height: 1.2;
+  /* Better line height for long text */
 }
 
 .checkboxLabel input {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    /* Prevent shrinking */
-    flex-shrink: 0;
-    border: 2px solid #333333;
-    /* Thicker border for contrast */
-    border-radius: 6px;
-    background: #84BCFF;
-    /* Match sidebar bg */
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-    margin-top: 1px;
-    /* Align visual center with first line of text */
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  /* Prevent shrinking */
+  flex-shrink: 0;
+  border: 2px solid #333333;
+  /* Thicker border for contrast */
+  border-radius: 6px;
+  background: #84bcff;
+  /* Match sidebar bg */
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  margin-top: 1px;
+  /* Align visual center with first line of text */
 }
 
 /* Hover Reflection Effect */
 .checkboxLabel:hover input {
-    border-color: var(--color-secondary);
-    /* Match tick yellow */
-    box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
-    /* Yellow glow */
+  border-color: var(--color-secondary);
+  /* Match tick yellow */
+  box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
+  /* Yellow glow */
 }
 
 .checkboxLabel input:checked {
-    background: var(--color-secondary);
-    /* Yellow check */
-    border-color: var(--color-secondary);
+  background: var(--color-secondary);
+  /* Yellow check */
+  border-color: var(--color-secondary);
 }
 
 .checkboxLabel input:checked::after {
-    content: '✔';
-    position: absolute;
-    top: -2px;
-    left: 2px;
-    font-size: 14px;
-    color: #333333;
-    font-weight: bold;
+  content: '✔';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  font-size: 14px;
+  color: #333333;
+  font-weight: bold;
 }
 
 .radioInputHidden {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
 }
 
 .radioCustomCheck {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    border: 2px solid #333333;
-    border-radius: 6px;
-    background: #84BCFF;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 2px solid #333333;
+  border-radius: 6px;
+  background: #84bcff;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .checkboxLabel:hover .radioCustomCheck {
-    border-color: var(--color-secondary);
-    box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 8px rgba(224, 255, 0, 0.3);
 }
 
-.radioInputHidden:checked~.radioCustomCheck {
-    background: var(--color-secondary);
-    border-color: var(--color-secondary);
+.radioInputHidden:checked ~ .radioCustomCheck {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
 }
 
 .radioCustomCheck svg {
-    margin-top: -1px;
-    width: 14px;
-    height: 14px;
-    color: #333333;
+  margin-top: -1px;
+  width: 14px;
+  height: 14px;
+  color: #333333;
 }
 
 .labelText {
-    font-size: 0.9rem;
-    color: #333333;
-    /* Dark text */
-    padding-top: 2px;
-    /* Slight offset to match checkbox visually */
-    font-family: 'Inter', sans-serif;
-    /* Use Inter-Regular */
-    font-weight: 700;
-    /* Bold */
+  font-size: 0.9rem;
+  color: #333333;
+  /* Dark text */
+  padding-top: 2px;
+  /* Slight offset to match checkbox visually */
+  font-family: 'Inter', sans-serif;
+  /* Use Inter-Regular */
+  font-weight: 700;
+  /* Bold */
 }
 
 .range {
-    width: 100%;
-    accent-color: var(--color-primary);
+  width: 100%;
+  accent-color: var(--color-primary);
+}
+
+.accordionDivider {
+  width: 85%;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
+  margin: 4px 0 12px 0;
+}
+
+.sliderWrapper {
+  padding: 0 10px;
 }

@@ -5,4 +5,3 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // Standard Client (Read-Only for Client Side)
 export const supabase = createClient(supabaseUrl, supabaseKey);
-

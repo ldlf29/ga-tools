@@ -1,366 +1,389 @@
 .walletInputOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9500;
-    padding: 1rem;
-    box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9500;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .walletInputModal {
-    background: #84BCFF;
-    border: 3px solid #333333;
-    border-bottom-width: 8px;
-    border-radius: 1.5rem;
-    width: 100%;
-    max-width: 500px;
-    padding: 2rem 1.75rem 1.25rem 1.75rem;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    color: #333333;
-    gap: 0.75rem;
+  background: #84bcff;
+  border: 3px solid #333333;
+  border-bottom-width: 8px;
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem 1.75rem 1.25rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: #333333;
+  gap: 0.75rem;
 }
 
 .header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
 }
 
 .walletTitle {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #FFD753;
-    margin: 0;
-    text-transform: uppercase;
-    text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
-        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
-    letter-spacing: 0.5px;
-    text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffd753;
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow:
+    2px 0 #000,
+    -2px 0 #000,
+    0 2px #000,
+    0 -2px #000,
+    1px 1px #000,
+    -1px -1px #000,
+    1px -1px #000,
+    -1px 1px #000;
+  letter-spacing: 0.5px;
+  text-align: center;
 }
 
 @media (max-width: 480px) {
-    .header h2 {
-        font-size: 1.15rem;
-        white-space: nowrap;
-    }
+  .header h2 {
+    font-size: 1.15rem;
+    white-space: nowrap;
+  }
 
-    .closeBtn {
-        width: 27px !important;
-        height: 27px !important;
-        padding-bottom: 0 !important;
-    }
+  .closeBtn {
+    width: 27px !important;
+    height: 27px !important;
+    padding-bottom: 0 !important;
+  }
 
-    .closeBtn svg {
-        width: 15px !important;
-        height: 15px !important;
-    }
+  .closeBtn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
 }
 
 .closeBtn {
-    position: absolute;
-    right: 0.75rem;
-    top: 0.75rem;
-    width: 32px;
-    height: 32px;
-    background: #FF66CC;
-    border: 3px solid #333333;
-    border-radius: 50%;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, background 0.2s;
-    font-size: 1.5rem;
-    font-weight: bold;
-    padding: 0;
-    z-index: 10;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  width: 32px;
+  height: 32px;
+  background: #ff66cc;
+  border: 3px solid #333333;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.2s,
+    background 0.2s;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 0;
+  z-index: 10;
 }
 
 .closeBtn:hover {
-    transform: scale(1.1);
-    background: #FF99DD;
+  transform: scale(1.1);
+  background: #ff99dd;
 }
 
 .walletSubtitle {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-style: italic;
-    color: #333333;
-    opacity: 0.6;
-    text-align: center;
-    margin: 0;
-    font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #333333;
+  opacity: 0.6;
+  text-align: center;
+  margin: 0;
+  font-weight: 400;
 }
 
 .walletForm {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .walletInput {
-    width: 100%;
-    padding: 1rem 1.25rem;
-    background: rgba(255, 255, 255, 0.5);
-    border: 3px solid #333333;
-    border-radius: 0.75rem;
-    font-size: 1rem;
-    color: #333333;
-    font-family: monospace;
-    outline: none;
-    transition: all 0.2s;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 3px solid #333333;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  color: #333333;
+  font-family: monospace;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .walletInput:focus {
-    background: #FFFFFF;
-    border-color: #2673E8;
-    box-shadow: 0 0 0 4px rgba(38, 115, 232, 0.1);
+  background: #ffffff;
+  border-color: #2673e8;
+  box-shadow: 0 0 0 4px rgba(38, 115, 232, 0.1);
 }
 
 .walletInputError {
-    border-color: #ff4466 !important;
-    background: rgba(255, 68, 102, 0.1);
+  border-color: #ff4466 !important;
+  background: rgba(255, 68, 102, 0.1);
 }
 
 .errorText {
-    color: #ff4466;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin: -0.75rem 0 0 0;
-    text-align: left;
+  color: #ff4466;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: -0.75rem 0 0 0;
+  text-align: left;
 }
 
 .walletActions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.25rem;
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 .loadButton {
-    flex: 2;
-    background: #FFD753;
-    color: #333333;
-    border: 3px solid #333333;
-    border-bottom-width: 4px;
-    border-radius: 12px;
-    padding: 0.9rem;
-    font-size: 1.1rem;
-    font-family: var(--font-display, 'Inter', sans-serif);
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.1s;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  flex: 2;
+  background: #ffd753;
+  color: #333333;
+  border: 3px solid #333333;
+  border-bottom-width: 4px;
+  border-radius: 12px;
+  padding: 0.9rem;
+  font-size: 1.1rem;
+  font-family: var(--font-display, 'Inter', sans-serif);
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    background 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .loadButton:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
-    background: #ffea99;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+  background: #ffea99;
 }
 
 .loadButton:active:not(:disabled) {
-    transform: translateY(2px);
-    border-bottom-width: 2px;
+  transform: translateY(2px);
+  border-bottom-width: 2px;
 }
 
 .loadButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    filter: grayscale(0.5);
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
 }
 
 .cancelButton {
-    flex: 1;
-    background: #FFFFFF;
-    color: #333333;
-    border: 3px solid #333333;
-    border-bottom-width: 4px;
-    border-radius: 12px;
-    padding: 0.9rem;
-    font-size: 1rem;
-    font-family: var(--font-display, 'Inter', sans-serif);
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.1s;
-    text-transform: uppercase;
+  flex: 1;
+  background: #ffffff;
+  color: #333333;
+  border: 3px solid #333333;
+  border-bottom-width: 4px;
+  border-radius: 12px;
+  padding: 0.9rem;
+  font-size: 1rem;
+  font-family: var(--font-display, 'Inter', sans-serif);
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    background 0.1s;
+  text-transform: uppercase;
 }
 
 .cancelButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
-    background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+  background: #f8fafc;
 }
 
 .cancelButton:active {
-    transform: translateY(2px);
-    border-bottom-width: 2px;
+  transform: translateY(2px);
+  border-bottom-width: 2px;
 }
 
 .loadingState {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 0;
 }
 
 .loadingSpinner {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #333333;
-    border-top-color: #FFD753;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  width: 60px;
+  height: 60px;
+  border: 6px solid #333333;
+  border-top-color: #ffd753;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loadingText {
-    color: #333333;
-    font-size: 1.2rem;
-    font-family: var(--font-display);
-    font-weight: 700;
-    text-transform: uppercase;
+  color: #333333;
+  font-size: 1.2rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 /* Mode Toggle (All Cards / My Cards) */
 .modeToggle {
-    display: flex;
-    background: rgba(0, 0, 0, 0.4);
-    border: 3px solid #333333;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    flex-shrink: 0;
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border: 3px solid #333333;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .modeButton {
-    background: transparent;
-    color: rgba(255, 255, 255, 0.6);
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    text-transform: uppercase;
-    font-family: inherit;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-family: inherit;
 }
 
 .modeButton:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .modeButtonActive {
-    background: #FF66CC !important;
-    color: white !important;
-    text-shadow: 1px 1px 0 #000;
+  background: #ff66cc !important;
+  color: white !important;
+  text-shadow: 1px 1px 0 #000;
 }
 
 .connectedGroup {
-    display: flex;
-    background: #1ABF9E;
+  display: flex;
+  background: #1abf9e;
 }
 
 .connectedButton {
-    background: transparent;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: background 0.2s;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    text-transform: uppercase;
-    text-shadow: 1px 1px 0 #000;
-    font-family: inherit;
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 #000;
+  font-family: inherit;
 }
 
 .connectedButton:hover {
-    background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .connectedDivider {
-    width: 2px;
-    background: rgba(0, 0, 0, 0.2);
+  width: 2px;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .disconnectIcon {
-    display: flex;
-    align-items: center;
-    padding: 0 0.8rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: white;
 }
 
 .disconnectIcon:hover {
-    background: rgba(255, 68, 102, 0.4);
+  background: rgba(255, 68, 102, 0.4);
 }
 
 .userBanner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    background: #FFD753;
-    border-bottom: 3px solid #333333;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    color: #333333;
-    font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #ffd753;
+  border-bottom: 3px solid #333333;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #333333;
+  font-weight: 700;
 }
 
 .userAddress {
-    font-family: monospace;
-    color: #2673E8;
-    font-weight: 800;
+  font-family: monospace;
+  color: #2673e8;
+  font-weight: 800;
 }
 
 .userCardCount {
-    color: #FF66CC;
-    font-weight: 800;
+  color: #ff66cc;
+  font-weight: 800;
 }
 
 .disconnectButton {
-    background: #FFFFFF;
-    border: 2px solid #333333;
-    color: #ff4466;
-    border-radius: 0.4rem;
-    padding: 0.2rem 0.6rem;
-    font-size: 0.7rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
+  background: #ffffff;
+  border: 2px solid #333333;
+  color: #ff4466;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
 }
 
 .disconnectButton:hover {
-    background: #ff4466;
-    color: white;
+  background: #ff4466;
+  color: white;
+}
+
+.walletTimeNote {
+  margin-top: 0.5rem;
+  font-weight: 700;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 0.75rem;
+  text-align: center;
+  line-height: 1.4;
 }

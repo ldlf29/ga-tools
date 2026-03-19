@@ -47,3 +47,15 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# IDEs and Editors
+.vscode/
+.idea/
+
+# System Files
+Thumbs.db
+desktop.ini
+
+# analytics & supabase
+/supabase/
+/analytics/

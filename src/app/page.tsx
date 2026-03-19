@@ -1,34 +1,49 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import CardGrid from '@/components/CardGrid';
 import FilterSidebar from '@/components/FilterSidebar';
 import LineupBuilder from '@/components/LineupBuilder';
 import WalletInput from '@/components/WalletInput';
 import WalletManagerModal from '@/components/WalletManagerModal';
-import walletStyles from '@/components/WalletInput.module.css';
-import { EnhancedCard, FilterState, SavedLineup, ConnectedWallet } from '@/types';
+
+import {
+  EnhancedCard,
+  FilterState,
+  ConnectedWallet,
+} from '@/types';
 import styles from './page.module.css';
 import Toast, { ToastMessage } from '@/components/Toast';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { fetchUserCards } from '@/utils/cardService';
 import { sortCardsByFilters, getRarityValue } from '@/utils/sortingUtils';
 import { matchesFilter } from '@/utils/filterUtils';
 import AutoLineupsModal, { AutoLineup } from '@/components/AutoLineupsModal';
-import ContestTypeModal, { ContestType, ExactCounts } from '@/components/ContestTypeModal';
+import ContestTypeModal, {
+  ContestType,
+  ExactCounts,
+} from '@/components/ContestTypeModal';
 import { ModeToggle } from '@/components/ModeToggle';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { HeaderControls } from '@/components/HeaderControls';
 
 // Lazy Loaded Components
 const MyLineups = dynamic(() => import('@/components/MyLineups'), {
-  loading: () => <div className={styles.spinnerWrapper}><div className={styles.spinner}></div></div>,
-  ssr: false
+  loading: () => (
+    <div className={styles.spinnerWrapper}>
+      <div className={styles.spinner}></div>
+    </div>
+  ),
+  ssr: false,
 });
 const ChampionsList = dynamic(() => import('@/components/ChampionsList'), {
-  loading: () => <div className={styles.spinnerWrapper}><div className={styles.spinner}></div></div>,
-  ssr: false
+  loading: () => (
+    <div className={styles.spinnerWrapper}>
+      <div className={styles.spinner}></div>
+    </div>
+  ),
+  ssr: false,
 });
 
 // Custom Hooks
@@ -39,7 +54,9 @@ import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 
 export default function Home() {
   /* Global UI State */
-  const [activeTab, setActiveTab] = useState<'builder' | 'lineups' | 'champions'>('builder');
+  const [activeTab, setActiveTab] = useState<
+    'builder' | 'lineups' | 'champions'
+  >('builder');
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const lastToastTimeRef = useRef<{ [key: string]: number }>({});
@@ -55,9 +72,12 @@ export default function Home() {
 
   /* Auto Lineups State */
   const [autoLineupsModalOpen, setAutoLineupsModalOpen] = useState(false);
-  const [currentAutoLineups, setCurrentAutoLineups] = useState<AutoLineup[]>([]);
+  const [currentAutoLineups, setCurrentAutoLineups] = useState<AutoLineup[]>(
+    []
+  );
   const [contestModalOpen, setContestModalOpen] = useState(false);
-  const [pendingAutoFilters, setPendingAutoFilters] = useState<Partial<FilterState> | null>(null);
+  const [pendingAutoFilters, setPendingAutoFilters] =
+    useState<Partial<FilterState> | null>(null);
   const [isSuggestionActive, setIsSuggestionActive] = useState(false);
 
   /* Custom Hooks Integration */
@@ -72,32 +92,38 @@ export default function Home() {
     rateLineup,
     updateBackground,
     bulkDelete,
-    updateLineup
-  } = useSavedLineups(cardMode === 'USER' ? 'myGrandArenaLineups' : 'grandArenaLineups');
+    updateLineup,
+  } = useSavedLineups(
+    cardMode === 'USER' ? 'myGrandArenaLineups' : 'grandArenaLineups'
+  );
 
   const {
     lineup,
     setLineup,
     addCard,
     removeCard: removeFromLineup,
-    clearLineup
+    clearLineup,
   } = useLineupBuilder();
 
   /* Local Helper: Toasts */
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-  const addToast = (text: string, type: 'error' | 'success' | 'warning' | 'suggestion', force: boolean = false) => {
+  const addToast = (
+    text: string,
+    type: 'error' | 'success' | 'warning' | 'suggestion',
+    force: boolean = false
+  ) => {
     if (!notificationsEnabled && !force) return;
     const now = Date.now();
     const lastTime = lastToastTimeRef.current[text] || 0;
     if (now - lastTime < 5000) return;
     lastToastTimeRef.current[text] = now;
     const id = Date.now() + Math.random();
-    setToasts(prev => [...prev, { id, text, type }]);
+    setToasts((prev) => [...prev, { id, text, type }]);
   };
 
   const removeToast = (id: number) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
   /* Data Refresh Wrapper */
@@ -112,35 +138,38 @@ export default function Home() {
   /* Wallet Persistence */
   useEffect(() => {
     const rawWallets = localStorage.getItem('grandArenaWallets_v2');
-    const savedMode = localStorage.getItem('grandArenaCardMode') as 'ALL' | 'USER' | null;
+    const savedMode = localStorage.getItem('grandArenaCardMode') as
+      | 'ALL'
+      | 'USER'
+      | null;
 
     if (rawWallets) {
       try {
         const savedWallets: ConnectedWallet[] = JSON.parse(rawWallets);
         if (savedWallets.length > 0) {
           if (savedMode === 'ALL') {
-             setCardMode('ALL');
+            setCardMode('ALL');
           } else {
-             setCardMode('USER');
+            setCardMode('USER');
           }
           handleLoadWallets(savedWallets);
         }
       } catch (e) {
-        console.error("Failed to parse wallets", e);
+        console.error('Failed to parse wallets', e);
       }
     } else {
       // Legacy compatibility
       const savedWallet = localStorage.getItem('grandArenaWallet');
       if (savedWallet) {
         if (savedMode === 'ALL') {
-             setCardMode('ALL');
+          setCardMode('ALL');
         } else {
-             setCardMode('USER');
+          setCardMode('USER');
         }
         const legacyWallet: ConnectedWallet = {
           address: savedWallet,
-          addedAt: Date.now() - (24 * 60 * 60 * 1000), // Allow immediate removal
-          lastRefresh: Date.now()
+          addedAt: Date.now() - 24 * 60 * 60 * 1000, // Allow immediate removal
+          lastRefresh: Date.now(),
         };
         handleLoadWallets([legacyWallet]);
       }
@@ -156,8 +185,8 @@ export default function Home() {
 
       if (tab === 'champions') {
         setActiveTab('champions');
-      } 
-      
+      }
+
       if (mokiSearch) {
         setActiveTab('builder');
         setSearchQuery(decodeURIComponent(mokiSearch));
@@ -174,7 +203,11 @@ export default function Home() {
   /* Global Scroll Lock for Modals */
   useEffect(() => {
     const isInitialLoading = isLoading && allCards.length === 0;
-    const shouldLock = showWalletManagerModal || showWalletInput || (isLoadingUser && !showWalletInput) || isInitialLoading;
+    const shouldLock =
+      showWalletManagerModal ||
+      showWalletInput ||
+      (isLoadingUser && !showWalletInput) ||
+      isInitialLoading;
     if (shouldLock) {
       document.body.classList.add('modal-open');
       document.documentElement.classList.add('modal-open');
@@ -186,16 +219,24 @@ export default function Home() {
       document.body.classList.remove('modal-open');
       document.documentElement.classList.remove('modal-open');
     };
-  }, [showWalletManagerModal, showWalletInput, isLoadingUser, isLoading, allCards.length]);
+  }, [
+    showWalletManagerModal,
+    showWalletInput,
+    isLoadingUser,
+    isLoading,
+    allCards.length,
+  ]);
 
   const reloadAllWallets = async (wallets: ConnectedWallet[]) => {
     setIsLoadingUser(true);
     try {
-      const allCards = await Promise.all(wallets.map(w => fetchUserCards(w.address)));
+      const allCards = await Promise.all(
+        wallets.map((w) => fetchUserCards(w.address))
+      );
       setUserCards(allCards.flat());
     } catch (e) {
-      console.warn("Failed loading some wallets", e);
-      addToast("Failed to load some wallets", 'error');
+      console.warn('Failed loading some wallets', e);
+      addToast('Failed to load some wallets', 'error');
     } finally {
       setIsLoadingUser(false);
     }
@@ -207,12 +248,14 @@ export default function Home() {
   };
 
   const handleAddWallet = async (address: string) => {
-    if (userWallets.find(w => w.address.toLowerCase() === address.toLowerCase())) {
-      addToast("Wallet already connected", 'warning');
+    if (
+      userWallets.find((w) => w.address.toLowerCase() === address.toLowerCase())
+    ) {
+      addToast('Wallet already connected', 'warning');
       return;
     }
     if (userWallets.length >= 2) {
-      addToast("Maximum 2 wallets allowed", 'error');
+      addToast('Maximum 2 wallets allowed', 'error');
       return;
     }
 
@@ -224,15 +267,21 @@ export default function Home() {
       const newWallet: ConnectedWallet = {
         address: address,
         addedAt: Date.now(),
-        lastRefresh: Date.now()
+        lastRefresh: Date.now(),
       };
 
       const updatedWallets = [...userWallets, newWallet];
       setUserWallets(updatedWallets);
-      localStorage.setItem('grandArenaWallets_v2', JSON.stringify(updatedWallets));
+      localStorage.setItem(
+        'grandArenaWallets_v2',
+        JSON.stringify(updatedWallets)
+      );
 
-      setUserCards(prev => [...prev, ...cards]);
-      addToast(`Added wallet ${address.substring(0, 6)}...${address.substring(address.length - 6)}`, 'success');
+      setUserCards((prev) => [...prev, ...cards]);
+      addToast(
+        `Added wallet ${address.substring(0, 6)}...${address.substring(address.length - 6)}`,
+        'success'
+      );
       setCardMode('USER');
       localStorage.setItem('grandArenaCardMode', 'USER');
     } catch (e) {
@@ -248,7 +297,9 @@ export default function Home() {
   };
 
   const handleRemoveWallet = (address: string) => {
-    const updated = userWallets.filter(w => w.address.toLowerCase() !== address.toLowerCase());
+    const updated = userWallets.filter(
+      (w) => w.address.toLowerCase() !== address.toLowerCase()
+    );
     setUserWallets(updated);
     localStorage.setItem('grandArenaWallets_v2', JSON.stringify(updated));
     if (updated.length === 0) {
@@ -259,7 +310,9 @@ export default function Home() {
   };
 
   const handleRefreshSingleWallet = async (address: string) => {
-    const walletIdx = userWallets.findIndex(w => w.address.toLowerCase() === address.toLowerCase());
+    const walletIdx = userWallets.findIndex(
+      (w) => w.address.toLowerCase() === address.toLowerCase()
+    );
     if (walletIdx === -1) return;
 
     try {
@@ -272,11 +325,11 @@ export default function Home() {
       localStorage.setItem('grandArenaWallets_v2', JSON.stringify(updated));
 
       await reloadAllWallets(updated);
-      addToast("Wallet refreshed successfully", "success");
+      addToast('Wallet refreshed successfully', 'success');
     } catch (e) {
       // Since the API returns 429 for cooldowns, the message will properly inform the user
-      const msg = e instanceof Error ? e.message : "Refresh failed";
-      addToast(msg, "error");
+      const msg = e instanceof Error ? e.message : 'Refresh failed';
+      addToast(msg, 'error');
     } finally {
       setIsLoadingUser(false);
     }
@@ -298,7 +351,7 @@ export default function Home() {
     // Context Isolation: Clear the current lineup when switching contexts
     if (lineup.length > 0) {
       clearLineup();
-      addToast("Lineup builder cleared for new context", 'suggestion');
+      addToast('Lineup builder cleared for new context', 'suggestion');
     }
 
     if (mode === 'USER' && userWallets.length === 0) {
@@ -319,12 +372,12 @@ export default function Home() {
     specialization: [] as string[],
     traits: [] as string[],
     insertionOrder: [] as string[],
-    matchLimit: 'ALL' as 'ALL' | 10 | 20 | 30
+    matchLimit: 'ALL' as 'ALL' | 10 | 20 | 30,
   };
 
   const [filters, setFilters] = useState<FilterState>({
     ...emptyFilters,
-    cardType: 'MOKI'
+    cardType: 'MOKI',
   });
 
   // Stored filters for each card type (MOKI/SCHEME) within current main tab
@@ -341,7 +394,7 @@ export default function Home() {
     filters: { ...emptyFilters, cardType: 'MOKI' },
     search: '',
     mokiFilters: { filters: emptyFilters, search: '' },
-    schemeFilters: { filters: emptyFilters, search: '' }
+    schemeFilters: { filters: emptyFilters, search: '' },
   });
   const lineupsStateRef = useRef<{
     filters: FilterState;
@@ -352,7 +405,7 @@ export default function Home() {
     filters: { ...emptyFilters, cardType: 'MOKI' },
     search: '',
     mokiFilters: { filters: emptyFilters, search: '' },
-    schemeFilters: { filters: emptyFilters, search: '' }
+    schemeFilters: { filters: emptyFilters, search: '' },
   });
 
   // Handle main tab switching (Builder <-> My Lineups <-> Champions)
@@ -366,7 +419,7 @@ export default function Home() {
       filters: filters,
       search: searchQuery,
       mokiFilters: { ...mokiFiltersRef.current },
-      schemeFilters: { ...schemeFiltersRef.current }
+      schemeFilters: { ...schemeFiltersRef.current },
     };
 
     if (activeTab === 'builder') {
@@ -401,20 +454,23 @@ export default function Home() {
     if (filters.cardType === 'MOKI') {
       mokiFiltersRef.current = {
         filters: { ...filters, cardType: undefined } as any,
-        search: searchQuery
+        search: searchQuery,
       };
     } else {
       schemeFiltersRef.current = {
         filters: { ...filters, cardType: undefined } as any,
-        search: searchQuery
+        search: searchQuery,
       };
     }
 
     // Restore target tab's filters and search
-    const targetState = newCardType === 'MOKI' ? mokiFiltersRef.current : schemeFiltersRef.current;
+    const targetState =
+      newCardType === 'MOKI'
+        ? mokiFiltersRef.current
+        : schemeFiltersRef.current;
     setFilters({
       ...targetState.filters,
-      cardType: newCardType
+      cardType: newCardType,
     });
     setSearchQuery(targetState.search);
   };
@@ -431,9 +487,9 @@ export default function Home() {
 
     // --- NEW DYNAMIC RESELECTION LOGIC ---
     if (card && card.cardType === 'MOKI' && isSuggestionActive) {
-      const schemeCard = lineup.find(c => c.cardType === 'SCHEME');
+      const schemeCard = lineup.find((c) => c.cardType === 'SCHEME');
       if (schemeCard && schemeCard.name === "Collect 'Em All") {
-        setFilters(prev => {
+        setFilters((prev) => {
           const currentRarities = prev.rarity || [];
           const cardRarity = card.rarity === 'Common' ? 'Basic' : card.rarity;
 
@@ -441,7 +497,10 @@ export default function Home() {
             return {
               ...prev,
               rarity: [...currentRarities, cardRarity],
-              insertionOrder: [...(prev.insertionOrder || []), `rarity:${cardRarity}`]
+              insertionOrder: [
+                ...(prev.insertionOrder || []),
+                `rarity:${cardRarity}`,
+              ],
             };
           }
           return prev;
@@ -452,7 +511,7 @@ export default function Home() {
 
   const handleAddToLineup = (card: EnhancedCard) => {
     // Toggle-remove: only if the EXACT same card variant (by image) is already in the lineup
-    const indexToRemove = lineup.findIndex(c => c.image === card.image);
+    const indexToRemove = lineup.findIndex((c) => c.image === card.image);
 
     if (indexToRemove !== -1) {
       if (lineup[indexToRemove].locked) return;
@@ -465,17 +524,19 @@ export default function Home() {
       addToast(result.error, 'error');
     } else if (result.success && card.cardType === 'MOKI') {
       // --- NEW DYNAMIC DESELECTION LOGIC ---
-      const schemeCard = lineup.find(c => c.cardType === 'SCHEME');
+      const schemeCard = lineup.find((c) => c.cardType === 'SCHEME');
       if (schemeCard && schemeCard.name === "Collect 'Em All") {
-        setFilters(prev => {
+        setFilters((prev) => {
           const currentRarities = prev.rarity || [];
           const cardRarity = card.rarity === 'Common' ? 'Basic' : card.rarity;
 
           if (currentRarities.includes(cardRarity)) {
             return {
               ...prev,
-              rarity: currentRarities.filter(r => r !== cardRarity),
-              insertionOrder: (prev.insertionOrder || []).filter(o => o !== `rarity:${cardRarity}`)
+              rarity: currentRarities.filter((r) => r !== cardRarity),
+              insertionOrder: (prev.insertionOrder || []).filter(
+                (o) => o !== `rarity:${cardRarity}`
+              ),
             };
           }
           return prev;
@@ -486,15 +547,15 @@ export default function Home() {
 
   const handleSaveLineup = (name: string) => {
     if (name.length > 50) {
-      addToast("Maximum 50 characters for lineup name.", 'error');
+      addToast('Maximum 50 characters for lineup name.', 'error');
       return;
     }
     try {
       saveLineupToStorage(name, lineup);
       // Keep only locked cards after save, remove unlocked ones
-      const lockedCards = lineup.filter(card => card.locked);
+      const lockedCards = lineup.filter((card) => card.locked);
       setLineup(lockedCards);
-      addToast("Lineup Saved Successfully!", 'success');
+      addToast('Lineup Saved Successfully!', 'success');
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Failed to save lineup';
       addToast(message, 'error');
@@ -506,9 +567,12 @@ export default function Home() {
     setIsSuggestionActive(false);
   };
 
-  const handleRemoveFilter = (key: keyof FilterState, value: string | number) => {
+  const handleRemoveFilter = (
+    key: keyof FilterState,
+    value: string | number
+  ) => {
     setIsSuggestionActive(false);
-    setFilters(prev => {
+    setFilters((prev) => {
       const currentValues = prev[key];
       let newValues = currentValues;
       if (key === 'stars') {
@@ -516,11 +580,11 @@ export default function Home() {
       } else if (key === 'matchLimit') {
         newValues = 'ALL';
       } else if (Array.isArray(currentValues)) {
-        newValues = (currentValues as any[]).filter(v => v !== value);
+        newValues = (currentValues as any[]).filter((v) => v !== value);
       }
       let newOrder = prev.insertionOrder ? [...prev.insertionOrder] : [];
       const orderKey = `${key}:${value}`;
-      newOrder = newOrder.filter(k => k !== orderKey);
+      newOrder = newOrder.filter((k) => k !== orderKey);
       return { ...prev, [key]: newValues, insertionOrder: newOrder };
     });
   };
@@ -536,14 +600,14 @@ export default function Home() {
       specialization: [],
       traits: [],
       insertionOrder: [],
-      matchLimit: 'ALL'
+      matchLimit: 'ALL',
     };
 
     // Build insertion order: new filters only
     const newOrder: string[] = [];
     Object.entries(newFilters).forEach(([key, value]) => {
       if (Array.isArray(value)) {
-        value.forEach(val => {
+        value.forEach((val) => {
           const orderKey = key === 'stars' ? 'stars:ACTIVE' : `${key}:${val}`;
           if (!newOrder.includes(orderKey)) {
             newOrder.push(orderKey);
@@ -555,14 +619,14 @@ export default function Home() {
     setFilters({ ...cleared, ...newFilters, insertionOrder: newOrder });
     setIsSuggestionActive(true);
     setSearchQuery(''); // Clear search bar when suggesting
-    addToast("Suggestion Applied!", 'success');
+    addToast('Suggestion Applied!', 'success');
   };
 
   const handleAutoLineups = (suggestionFilters: Partial<FilterState>) => {
     // 1. Get current scheme card if any
-    const schemeCard = lineup.find(c => c.cardType === 'SCHEME');
+    const schemeCard = lineup.find((c) => c.cardType === 'SCHEME');
     if (!schemeCard) {
-      addToast("A Scheme is required for Auto Lineups.", 'error');
+      addToast('A Scheme is required for Auto Lineups.', 'error');
       return;
     }
 
@@ -579,7 +643,10 @@ export default function Home() {
     setContestModalOpen(true);
   };
 
-  const generateCollectEmAllLineups = (suggestionFilters: Partial<FilterState>, schemeCard: EnhancedCard) => {
+  const generateCollectEmAllLineups = (
+    suggestionFilters: Partial<FilterState>,
+    schemeCard: EnhancedCard
+  ) => {
     const sourceCards = cardMode === 'USER' ? userCards : allCards;
 
     // Sort all MOKI cards by score (best first), then remove duplicate names
@@ -593,10 +660,10 @@ export default function Home() {
       specialization: ['Score'],
       traits: [],
       insertionOrder: ['specialization:Score'],
-      matchLimit: filters.matchLimit ?? 'ALL' // Respect active match performance filter
+      matchLimit: filters.matchLimit ?? 'ALL', // Respect active match performance filter
     };
 
-    const allMokis = sourceCards.filter(c => c.cardType === 'MOKI');
+    const allMokis = sourceCards.filter((c) => c.cardType === 'MOKI');
 
     // Merge active Context specs from sidebar (Winner/Loser/Good Streak/Bad Streak)
     // These override the Scheme's default Context.
@@ -604,15 +671,22 @@ export default function Home() {
     const ROLE_SPECS_SET = ['Gacha', 'Killer', 'Wart Rider'];
 
     // 1. Roles come from suggestionFilters (passed by AUTO button)
-    const passedRoleSpecs = (suggestionFilters.specialization || []).filter(s => ROLE_SPECS_SET.includes(s));
+    const passedRoleSpecs = (suggestionFilters.specialization || []).filter(
+      (s) => ROLE_SPECS_SET.includes(s)
+    );
     if (passedRoleSpecs.length > 0) {
-      baseFilters.specialization = [...baseFilters.specialization, ...passedRoleSpecs];
+      baseFilters.specialization = [
+        ...baseFilters.specialization,
+        ...passedRoleSpecs,
+      ];
     }
 
     // 2. Roles from sidebar (Gacha/Killer/Wart Rider)
-    const sidebarRoleSpecs = (filters.specialization || []).filter(s => ROLE_SPECS_SET.includes(s));
+    const sidebarRoleSpecs = (filters.specialization || []).filter((s) =>
+      ROLE_SPECS_SET.includes(s)
+    );
     if (sidebarRoleSpecs.length > 0) {
-      sidebarRoleSpecs.forEach(role => {
+      sidebarRoleSpecs.forEach((role) => {
         if (!baseFilters.specialization.includes(role)) {
           baseFilters.specialization.push(role);
         }
@@ -620,26 +694,42 @@ export default function Home() {
     }
 
     // 3. Context specs come from sidebar
-    const sidebarContextSpecs = (filters.specialization || []).filter(s => CONTEXT_SPECS.includes(s));
+    const sidebarContextSpecs = (filters.specialization || []).filter((s) =>
+      CONTEXT_SPECS.includes(s)
+    );
     if (sidebarContextSpecs.length > 0) {
-      baseFilters.specialization = baseFilters.specialization.filter(s => !CONTEXT_SPECS.includes(s));
+      baseFilters.specialization = baseFilters.specialization.filter(
+        (s) => !CONTEXT_SPECS.includes(s)
+      );
       baseFilters.specialization.push(...sidebarContextSpecs);
     }
 
     // 1. Filter by role/context specs if any are active (STRICT FILTER)
-    const hasActiveSpecs = baseFilters.specialization.some(s => s !== 'Score');
+    const hasActiveSpecs = baseFilters.specialization.some(
+      (s) => s !== 'Score'
+    );
     const filteredMokis = hasActiveSpecs
-      ? allMokis.filter(c => matchesFilter(c, { ...baseFilters, rarity: [] }, ''))
+      ? allMokis.filter((c) =>
+          matchesFilter(c, { ...baseFilters, rarity: [] }, '')
+        )
       : allMokis;
 
     // 2. Sort the filtered pool
-    const sortedMokis = sortCardsByFilters(filteredMokis, baseFilters, 'default');
+    const sortedMokis = sortCardsByFilters(
+      filteredMokis,
+      baseFilters,
+      'default'
+    );
 
     // 3. Separate into rarity groups (they remain sorted by selection criteria)
-    const lPool = sortedMokis.filter(c => c.rarity.toLowerCase() === 'legendary');
-    const ePool = sortedMokis.filter(c => c.rarity.toLowerCase() === 'epic');
-    const rPool = sortedMokis.filter(c => c.rarity.toLowerCase() === 'rare');
-    const bPool = sortedMokis.filter(c => ['basic', 'common'].includes(c.rarity.toLowerCase()));
+    const lPool = sortedMokis.filter(
+      (c) => c.rarity.toLowerCase() === 'legendary'
+    );
+    const ePool = sortedMokis.filter((c) => c.rarity.toLowerCase() === 'epic');
+    const rPool = sortedMokis.filter((c) => c.rarity.toLowerCase() === 'rare');
+    const bPool = sortedMokis.filter((c) =>
+      ['basic', 'common'].includes(c.rarity.toLowerCase())
+    );
 
     const generatedLineups: AutoLineup[] = [];
     const usedIds = new Set<string>();
@@ -671,10 +761,9 @@ export default function Home() {
       generatedLineups.push({
         id: `auto-${Date.now()}-${count}`,
         name: `${schemeCard.name} Auto ${count}`,
-        cards: [legendary, epic, rare, basic, schemeCard]
+        cards: [legendary, epic, rare, basic, schemeCard],
       });
     }
-
 
     if (generatedLineups.length === 0) {
       addToast("Not enough cards of each rarity for Collect 'Em All.", 'error');
@@ -684,12 +773,15 @@ export default function Home() {
     }
   };
 
-  const generateAutoLineups = (contestType: ContestType, exactCounts?: ExactCounts) => {
+  const generateAutoLineups = (
+    contestType: ContestType,
+    exactCounts?: ExactCounts
+  ) => {
     setContestModalOpen(false);
     const suggestionFilters = pendingAutoFilters;
     if (!suggestionFilters) return;
 
-    const schemeCard = lineup.find(c => c.cardType === 'SCHEME');
+    const schemeCard = lineup.find((c) => c.cardType === 'SCHEME');
     if (!schemeCard) return;
 
     // We start with a base filter setting for Moki search
@@ -703,17 +795,29 @@ export default function Home() {
       specialization: ['Score'], // Forcibly inject Score
       traits: [],
       insertionOrder: ['specialization:Score'],
-      matchLimit: filters.matchLimit ?? 'ALL' // Respect active match performance filter
+      matchLimit: filters.matchLimit ?? 'ALL', // Respect active match performance filter
     };
 
     // Apply Contest Rules
     switch (contestType) {
-      case 'ONLY_LEGENDARY': baseFilters.rarity = ['Legendary']; break;
-      case 'ONLY_EPIC': baseFilters.rarity = ['Epic']; break;
-      case 'ONLY_RARE': baseFilters.rarity = ['Rare']; break;
-      case 'ONLY_BASIC': baseFilters.rarity = ['Basic', 'Common']; break;
-      case 'UP_TO_EPIC': baseFilters.rarity = ['Epic', 'Rare', 'Basic', 'Common']; break;
-      case 'UP_TO_RARE': baseFilters.rarity = ['Rare', 'Basic', 'Common']; break;
+      case 'ONLY_LEGENDARY':
+        baseFilters.rarity = ['Legendary'];
+        break;
+      case 'ONLY_EPIC':
+        baseFilters.rarity = ['Epic'];
+        break;
+      case 'ONLY_RARE':
+        baseFilters.rarity = ['Rare'];
+        break;
+      case 'ONLY_BASIC':
+        baseFilters.rarity = ['Basic', 'Common'];
+        break;
+      case 'UP_TO_EPIC':
+        baseFilters.rarity = ['Epic', 'Rare', 'Basic', 'Common'];
+        break;
+      case 'UP_TO_RARE':
+        baseFilters.rarity = ['Rare', 'Basic', 'Common'];
+        break;
       case 'OPEN':
       case 'OTHER':
         break; // No absolute preliminary restrictions, exact rarity counting handles 'OTHER' below.
@@ -725,10 +829,14 @@ export default function Home() {
         // If specialization, we already added Score, so append
         if (key === 'specialization') {
           baseFilters.specialization = ['Score', ...(value as string[])];
-          (value as string[]).forEach(v => baseFilters.insertionOrder?.push(`specialization:${v}`));
+          (value as string[]).forEach((v) =>
+            baseFilters.insertionOrder?.push(`specialization:${v}`)
+          );
         } else {
           (baseFilters as any)[key] = value;
-          (value as string[]).forEach(v => baseFilters.insertionOrder?.push(`${key}:${v}`));
+          (value as string[]).forEach((v) =>
+            baseFilters.insertionOrder?.push(`${key}:${v}`)
+          );
         }
       } else if (key === 'matchLimit') {
         baseFilters.matchLimit = value as 'ALL' | 10 | 20 | 30;
@@ -738,9 +846,13 @@ export default function Home() {
     // Merge active Context specs from sidebar (Winner/Loser/Good Streak/Bad Streak)
     // These override any Context the Scheme's suggestion may already have.
     const CONTEXT_SPECS = ['Winner', 'Loser', 'Good Streak', 'Bad Streak'];
-    const sidebarContextSpecs = (filters.specialization || []).filter(s => CONTEXT_SPECS.includes(s));
+    const sidebarContextSpecs = (filters.specialization || []).filter((s) =>
+      CONTEXT_SPECS.includes(s)
+    );
     if (sidebarContextSpecs.length > 0) {
-      baseFilters.specialization = baseFilters.specialization.filter(s => !CONTEXT_SPECS.includes(s));
+      baseFilters.specialization = baseFilters.specialization.filter(
+        (s) => !CONTEXT_SPECS.includes(s)
+      );
       baseFilters.specialization.push(...sidebarContextSpecs);
     }
 
@@ -753,14 +865,16 @@ export default function Home() {
       'Rainbow Riot',
       'Taking a Dive',
       'Victory Lap',
-      'Whale Watching'
+      'Whale Watching',
     ];
     if (ROLE_WHITELIST.includes(schemeCard.name)) {
       const ROLE_SPECS_SET = ['Gacha', 'Killer', 'Wart Rider'];
-      const sidebarRoleSpecs = (filters.specialization || []).filter(s => ROLE_SPECS_SET.includes(s));
+      const sidebarRoleSpecs = (filters.specialization || []).filter((s) =>
+        ROLE_SPECS_SET.includes(s)
+      );
       if (sidebarRoleSpecs.length > 0) {
         // Add roles from sidebar without removing existing roles from the scheme itself
-        sidebarRoleSpecs.forEach(role => {
+        sidebarRoleSpecs.forEach((role) => {
           if (!baseFilters.specialization.includes(role)) {
             baseFilters.specialization.push(role);
           }
@@ -771,13 +885,17 @@ export default function Home() {
     const sourceCards = cardMode === 'USER' ? userCards : allCards;
 
     // Filter them
-    const validMokis = sourceCards.filter(c => c.cardType === 'MOKI' && matchesFilter(c, baseFilters, ''));
+    const validMokis = sourceCards.filter(
+      (c) => c.cardType === 'MOKI' && matchesFilter(c, baseFilters, '')
+    );
 
     // Sort them (score & specialization happens here)
     const sortedMokis = sortCardsByFilters(validMokis, baseFilters, 'default');
 
     // Force Rarity to have the absolute highest priority on top of score
-    sortedMokis.sort((a, b) => getRarityValue(b.rarity) - getRarityValue(a.rarity));
+    sortedMokis.sort(
+      (a, b) => getRarityValue(b.rarity) - getRarityValue(a.rarity)
+    );
 
     // Remove duplicates
     const uniqueMokis: EnhancedCard[] = [];
@@ -795,28 +913,37 @@ export default function Home() {
 
     if (contestType === 'OTHER' && exactCounts) {
       // Exact count distribution logic
-      const legendaryList = uniqueMokis.filter(c => c.rarity.toLowerCase() === 'legendary');
-      const epicList = uniqueMokis.filter(c => c.rarity.toLowerCase() === 'epic');
-      const rareList = uniqueMokis.filter(c => c.rarity.toLowerCase() === 'rare');
-      const basicList = uniqueMokis.filter(c => ['basic', 'common'].includes(c.rarity.toLowerCase()));
+      const legendaryList = uniqueMokis.filter(
+        (c) => c.rarity.toLowerCase() === 'legendary'
+      );
+      const epicList = uniqueMokis.filter(
+        (c) => c.rarity.toLowerCase() === 'epic'
+      );
+      const rareList = uniqueMokis.filter(
+        (c) => c.rarity.toLowerCase() === 'rare'
+      );
+      const basicList = uniqueMokis.filter((c) =>
+        ['basic', 'common'].includes(c.rarity.toLowerCase())
+      );
 
       for (let count = 1; count <= 5; count++) {
-        if (legendaryList.length >= exactCounts.legendary &&
+        if (
+          legendaryList.length >= exactCounts.legendary &&
           epicList.length >= exactCounts.epic &&
           rareList.length >= exactCounts.rare &&
-          basicList.length >= exactCounts.basic) {
-
+          basicList.length >= exactCounts.basic
+        ) {
           const chunk: EnhancedCard[] = [
             ...legendaryList.splice(0, exactCounts.legendary),
             ...epicList.splice(0, exactCounts.epic),
             ...rareList.splice(0, exactCounts.rare),
-            ...basicList.splice(0, exactCounts.basic)
+            ...basicList.splice(0, exactCounts.basic),
           ];
 
           generatedLineups.push({
             id: `auto-${Date.now()}-${count}`,
             name: `${schemeCard.name} Auto ${count}`,
-            cards: [...chunk, schemeCard]
+            cards: [...chunk, schemeCard],
           });
         } else {
           break; // Insufficient cards to fill the exact rarity combo for the next lineup
@@ -825,13 +952,17 @@ export default function Home() {
     } else {
       // Standard full greedy grouping
       let count = 1;
-      for (let i = 0; i < uniqueMokis.length && generatedLineups.length < 5; i += 4) {
+      for (
+        let i = 0;
+        i < uniqueMokis.length && generatedLineups.length < 5;
+        i += 4
+      ) {
         const chunk = uniqueMokis.slice(i, i + 4);
         if (chunk.length === 4) {
           generatedLineups.push({
             id: `auto-${Date.now()}-${count}`,
             name: `${schemeCard.name} Auto ${count}`,
-            cards: [...chunk, schemeCard]
+            cards: [...chunk, schemeCard],
           });
           count++;
         }
@@ -840,7 +971,10 @@ export default function Home() {
 
     // Results
     if (generatedLineups.length === 0) {
-      addToast("Not enough matching Mokis found for these restrictions.", 'error');
+      addToast(
+        'Not enough matching Mokis found for these restrictions.',
+        'error'
+      );
     } else {
       setCurrentAutoLineups(generatedLineups);
       setAutoLineupsModalOpen(true);
@@ -885,7 +1019,10 @@ export default function Home() {
 
       // Close on click outside
       const handleClickOutside = (event: MouseEvent) => {
-        if (infoWrapperRef.current && !infoWrapperRef.current.contains(event.target as Node)) {
+        if (
+          infoWrapperRef.current &&
+          !infoWrapperRef.current.contains(event.target as Node)
+        ) {
           setShowInfo(false);
         }
       };
@@ -912,38 +1049,64 @@ export default function Home() {
       />
 
       {/* Mobile Navigation Drawer */}
-      <div className={`${styles.navContainer} ${styles.mobileOnly} ${mobileMenuOpen ? styles.navContainerVisible : ''}`}>
+      <div
+        className={`${styles.navContainer} ${styles.mobileOnly} ${mobileMenuOpen ? styles.navContainerVisible : ''}`}
+      >
         <div className={`${styles.drawerHeader} ${styles.mobileOnly}`}>
-          <img src="/logo-ga-tools.png" alt="Grand Arena" className={styles.drawerLogo} />
+          <img
+            src="/icons/logo-ga-tools.png"
+            alt="Grand Arena"
+            className={styles.drawerLogo}
+          />
           <button
             className={styles.closeMenuButton}
             onClick={() => setMobileMenuOpen(false)}
             aria-label="Close Menu"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
 
         <nav className={styles.navTabs}>
           <button
             className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
-            onClick={() => { handleMainTabChange('builder'); closeDrawers(); }}
+            onClick={() => {
+              handleMainTabChange('builder');
+              closeDrawers();
+            }}
           >
             Builder
           </button>
           <button
             className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
-            onClick={() => { handleMainTabChange('lineups'); closeDrawers(); }}
+            onClick={() => {
+              handleMainTabChange('lineups');
+              closeDrawers();
+            }}
           >
             My Lineups
           </button>
           <button
             className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
-            onClick={() => { handleMainTabChange('champions'); closeDrawers(); }}
+            onClick={() => {
+              handleMainTabChange('champions');
+              closeDrawers();
+            }}
           >
             Champions
           </button>
-
         </nav>
 
         <div className={styles.authWrapper}>
@@ -956,27 +1119,55 @@ export default function Home() {
       </div>
 
       {/* Mobile Filters Drawer */}
-      <div className={`${styles.mobileDrawer} ${styles.filterDrawer} ${styles.mobileOnly} ${mobileFiltersOpen ? styles.filterDrawerOpen : ''}`}>
+      <div
+        className={`${styles.mobileDrawer} ${styles.filterDrawer} ${styles.mobileOnly} ${mobileFiltersOpen ? styles.filterDrawerOpen : ''}`}
+      >
         <button
           className={`${styles.drawerCloseButton} ${styles.filterCloseButton}`}
           onClick={() => setMobileFiltersOpen(false)}
           aria-label="Close Filters"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={activeTab === 'lineups'} storagePrefix={activeTab} />
+        <FilterSidebar
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onCardTypeChange={handleCardTypeChange}
+          hideMatchPerformance={activeTab === 'lineups'}
+          storagePrefix={activeTab}
+        />
       </div>
 
       {/* Mobile Builder Drawer */}
-      <div className={`${styles.mobileDrawer} ${styles.builderDrawer} ${styles.mobileOnly} ${mobileBuilderOpen ? styles.builderDrawerOpen : ''}`}>
+      <div
+        className={`${styles.mobileDrawer} ${styles.builderDrawer} ${styles.mobileOnly} ${mobileBuilderOpen ? styles.builderDrawerOpen : ''}`}
+      >
         <button
           className={`${styles.drawerCloseButton} ${styles.builderCloseButton}`}
           onClick={() => setMobileBuilderOpen(false)}
           aria-label="Close Builder"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </button>
@@ -996,16 +1187,34 @@ export default function Home() {
       <header className={styles.header}>
         <div className={styles.headerMain}>
           <div className={styles.headerLeft}>
-            <img src="/logo-ga-tools.png" alt="Grand Arena Builder" className={styles.logo} />
+            <img
+              src="/icons/logo-ga-tools.png"
+              alt="Grand Arena Builder"
+              className={styles.logo}
+            />
 
             <div className={styles.infoWrapper} ref={infoWrapperRef}>
               <button
                 className={styles.infoButton}
                 onClick={() => setShowInfo(!showInfo)}
                 title="Disclaimer"
-                style={{ background: showInfo ? 'rgba(255,255,255,0.2)' : 'transparent', color: showInfo ? 'white' : 'rgba(255,255,255,0.6)' }}
+                style={{
+                  background: showInfo
+                    ? 'rgba(255,255,255,0.2)'
+                    : 'transparent',
+                  color: showInfo ? 'white' : 'rgba(255,255,255,0.6)',
+                }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="16" x2="12" y2="12"></line>
                   <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -1013,7 +1222,8 @@ export default function Home() {
               </button>
               {showInfo && (
                 <div className={styles.infoPopup}>
-                  This tool was created by a community member unrelated to Moku's Team. All assets used are the property of Moku Studios.
+                  This tool was created by a community member unrelated to
+                  Moku's Team. All assets used are the property of Moku Studios.
                 </div>
               )}
             </div>
@@ -1039,7 +1249,6 @@ export default function Home() {
                 >
                   Champions
                 </button>
-
               </div>
             </nav>
           </div>
@@ -1083,31 +1292,74 @@ export default function Home() {
       </header>
       {/* User Wallet Banner */}
 
-
       <div className={styles.content}>
         {activeTab === 'builder' && (
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+            }}
+          >
             {/* Mobile Floating Action Buttons */}
             <div className={styles.fabContainer}>
-              <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
+              <button
+                className={`${styles.fabButton} ${styles.fabFilters}`}
+                onClick={() => setMobileFiltersOpen(true)}
+              >
                 {/* Filter Icon */}
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
               </button>
-              <button className={`${styles.fabButton} ${styles.fabBuilder}`} onClick={() => setMobileBuilderOpen(true)}>
+              <button
+                className={`${styles.fabButton} ${styles.fabBuilder}`}
+                onClick={() => setMobileBuilderOpen(true)}
+              >
                 {/* Hammer Icon PNG from public */}
-                <img src="/hammer.png" alt="Hammer" width={27} height={27} style={{ filter: 'brightness(0) invert(1)' }} />
+                <img
+                  src="/icons/hammer.png"
+                  alt="Hammer"
+                  width={27}
+                  height={27}
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                />
               </button>
             </div>
 
             <div className={styles.mainLayout}>
               {/* Column 1: FilterSidebar (Desktop only) */}
               <div className={styles.desktopOnly}>
-                <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={false} storagePrefix="builder" />
+                <FilterSidebar
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onCardTypeChange={handleCardTypeChange}
+                  hideMatchPerformance={false}
+                  storagePrefix="builder"
+                />
               </div>
 
               {/* Column 2: CardGrid */}
-              <div style={{ width: '100%', minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+              <div
+                style={{
+                  width: '100%',
+                  minWidth: 0,
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0,
+                }}
+              >
                 <CardGrid
                   cards={filteredCards}
                   onAddCard={handleAddToLineup}
@@ -1118,7 +1370,6 @@ export default function Home() {
                   filters={filters}
                   onRemoveFilter={handleRemoveFilter}
                   isUserMode={cardMode === 'USER'}
-                  userCardCount={cardMode === 'USER' ? filteredCards.length : undefined}
                 />
               </div>
 
@@ -1141,23 +1392,58 @@ export default function Home() {
         )}
 
         {activeTab === 'lineups' && (
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+            }}
+          >
             {/* Mobile Floating Action Buttons */}
             <div className={styles.fabContainer}>
-              <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
+              <button
+                className={`${styles.fabButton} ${styles.fabFilters}`}
+                onClick={() => setMobileFiltersOpen(true)}
+              >
                 {/* Filter Icon */}
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
               </button>
             </div>
 
             <div className={styles.mainLayoutLineups}>
               {/* Column 1: Sidebar */}
               <div className={styles.desktopOnly}>
-                <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={handleCardTypeChange} hideMatchPerformance={true} storagePrefix="lineups" />
+                <FilterSidebar
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onCardTypeChange={handleCardTypeChange}
+                  hideMatchPerformance={true}
+                  storagePrefix="lineups"
+                />
               </div>
 
               {/* Column 2: Lineups List */}
-              <div style={{ gridColumn: '2 / span 2', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+              <div
+                style={{
+                  gridColumn: '2 / span 2',
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0,
+                }}
+              >
                 <MyLineups
                   lineups={savedLineups}
                   onDelete={deleteLineup}
@@ -1183,7 +1469,14 @@ export default function Home() {
         )}
 
         {activeTab === 'champions' && (
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+            }}
+          >
             <ChampionsList />
           </div>
         )}
@@ -1194,17 +1487,24 @@ export default function Home() {
         onClick={scrollToTop}
         title="Scroll to Top"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <line x1="12" y1="19" x2="12" y2="5"></line>
           <polyline points="5 12 12 5 19 12"></polyline>
         </svg>
       </button>
 
-      {
-        isLoading && allCards.length === 0 && (
-          <LoadingOverlay message="Loading cards..." />
-        )
-      }
+      {isLoading && allCards.length === 0 && (
+        <LoadingOverlay message="Loading cards..." />
+      )}
 
       {/* Request Contest Type Modal */}
       <ContestTypeModal
@@ -1259,6 +1559,6 @@ export default function Home() {
       )}
 
       <Toast messages={toasts} onClose={removeToast} />
-    </main >
+    </main>
   );
 }

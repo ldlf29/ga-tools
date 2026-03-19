@@ -23,9 +23,9 @@
 /* Default Theme (Dark) defined in :root */
 /* Default Theme (Dark) defined in :root */
 :root {
-  --color-primary: #FF66CC;
-  --color-secondary: #FFD753;
-  --color-teal: #26C2A3;
+  --color-primary: #ff66cc;
+  --color-secondary: #ffd753;
+  --color-teal: #26c2a3;
 
   --color-bg-dark: #232842;
   --color-bg-darker: #1a1e32;
@@ -46,8 +46,6 @@
   --font-body: 'Inter', sans-serif;
 }
 
-
-
 * {
   box-sizing: border-box;
   padding: 0;
@@ -63,7 +61,7 @@ body {
 
 body {
   background-color: var(--color-bg-dark);
-  background-image: url('/bg-pattern.webp');
+  background-image: url('/backgrounds/bg-pattern.webp');
   background-size: auto;
   /* Use native resolution for best quality */
   background-repeat: repeat;
@@ -121,13 +119,13 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1ABF9E;
+  background: #1abf9e;
   border-radius: 5px;
   border: 2px solid var(--color-bg-darker);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #15A085;
+  background: #15a085;
 }
 
 /* Hide body scrollbar when modals are open */

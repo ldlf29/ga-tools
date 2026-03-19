@@ -1,3 +1,3 @@
 # Grand Arena Tools
 
-*Documentación pendiente*
+_Documentación pendiente_
