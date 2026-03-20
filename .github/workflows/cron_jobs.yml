@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       job_name:
-        description: 'Job to run (matches | moki | train)'
+        description: 'Job to run (matches | moki | s1_scores | upcoming)'
         required: true
         default: 'matches'
 
@@ -38,9 +38,12 @@ jobs:
           elif [ "${{ github.event.inputs.job_name }}" == "moki" ]; then
             echo "Running Sync Moki API..."
             npx tsx src/scripts/cron_sync_moki_api.ts
-          elif [ "${{ github.event.inputs.job_name }}" == "train" ]; then
-            echo "Running Sync Train API..."
-            npx tsx src/scripts/cron_sync_train_api.ts
+          elif [ "${{ github.event.inputs.job_name }}" == "s1_scores" ]; then
+            echo "Running Sync Season 1 Scores API..."
+            npx tsx src/scripts/cron_sync_s1_scores.ts
+          elif [ "${{ github.event.inputs.job_name }}" == "upcoming" ]; then
+            echo "Running Sync Upcoming Matches..."
+            npx tsx src/scripts/cron_sync_upcoming.ts
           else
             echo "Unknown job name: ${{ github.event.inputs.job_name }}"
             exit 1
