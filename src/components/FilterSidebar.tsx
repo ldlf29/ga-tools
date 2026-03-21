@@ -11,6 +11,8 @@ interface FilterSidebarProps {
   onFilterChange: (newFilters: FilterState) => void;
   onCardTypeChange?: (newCardType: 'MOKI' | 'SCHEME') => void;
   hideMatchPerformance?: boolean;
+  hideRarity?: boolean;
+  hideTypeToggle?: boolean;
   storagePrefix?: string;
 }
 
@@ -39,6 +41,8 @@ export default function FilterSidebar({
   onFilterChange,
   onCardTypeChange,
   hideMatchPerformance,
+  hideRarity = false,
+  hideTypeToggle = false,
   storagePrefix = 'default',
 }: FilterSidebarProps) {
   // Independent search state for each card type tab
@@ -229,28 +233,30 @@ export default function FilterSidebar({
       </div>
 
       {/* Card Type Toggle - Always Visible */}
-      <div className={styles.filterGroup}>
-        <div className={styles.toggleGroup}>
-          {['MOKI', 'SCHEME'].map((type) => (
-            <button
-              key={type}
-              className={`${styles.toggleButton} ${filters.cardType === type ? styles.active : ''}`}
-              onClick={() => {
-                if (onCardTypeChange) {
-                  onCardTypeChange(type as 'MOKI' | 'SCHEME');
-                } else {
-                  onFilterChange({
-                    ...filters,
-                    cardType: type as 'MOKI' | 'SCHEME',
-                  });
-                }
-              }}
-            >
-              {type === 'MOKI' ? 'MOKIS' : type}
-            </button>
-          ))}
+      {!hideTypeToggle && (
+        <div className={styles.filterGroup}>
+          <div className={styles.toggleGroup}>
+            {['MOKI', 'SCHEME'].map((type) => (
+              <button
+                key={type}
+                className={`${styles.toggleButton} ${filters.cardType === type ? styles.active : ''}`}
+                onClick={() => {
+                  if (onCardTypeChange) {
+                    onCardTypeChange(type as 'MOKI' | 'SCHEME');
+                  } else {
+                    onFilterChange({
+                      ...filters,
+                      cardType: type as 'MOKI' | 'SCHEME',
+                    });
+                  }
+                }}
+              >
+                {type === 'MOKI' ? 'MOKIS' : type}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Filter Search Bar */}
       <div className={styles.filterGroup}>
@@ -272,7 +278,7 @@ export default function FilterSidebar({
         {filters.cardType !== 'SCHEME' && (
           <>
             {/* Rarity - only show if no search or has matches */}
-            {(!filterSearch.trim() || rarityMatches) && (
+            {!hideRarity && (!filterSearch.trim() || rarityMatches) && (
               <FilterAccordion
                 storagePrefix={storagePrefix}
                 title="Rarity"

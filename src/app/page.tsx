@@ -45,6 +45,14 @@ const ChampionsList = dynamic(() => import('@/components/ChampionsList'), {
   ),
   ssr: false,
 });
+const UpcomingMatches = dynamic(() => import('@/components/UpcomingMatches'), {
+  loading: () => (
+    <div className={styles.spinnerWrapper}>
+      <div className={styles.spinner}></div>
+    </div>
+  ),
+  ssr: false,
+});
 
 // Custom Hooks
 import { useCards } from '@/hooks/useCards';
@@ -55,7 +63,7 @@ import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 export default function Home() {
   /* Global UI State */
   const [activeTab, setActiveTab] = useState<
-    'builder' | 'lineups' | 'champions'
+    'builder' | 'lineups' | 'champions' | 'upcoming'
   >('builder');
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -409,7 +417,9 @@ export default function Home() {
   });
 
   // Handle main tab switching (Builder <-> My Lineups <-> Champions)
-  const handleMainTabChange = (newTab: 'builder' | 'lineups' | 'champions') => {
+  const handleMainTabChange = (
+    newTab: 'builder' | 'lineups' | 'champions' | 'upcoming'
+  ) => {
     if (newTab === activeTab) {
       return;
     }
@@ -1107,6 +1117,15 @@ export default function Home() {
           >
             Champions
           </button>
+          <button
+            className={`${styles.navTab} ${activeTab === 'upcoming' ? styles.activeTab : ''}`}
+            onClick={() => {
+              handleMainTabChange('upcoming');
+              closeDrawers();
+            }}
+          >
+            Upcoming
+          </button>
         </nav>
 
         <div className={styles.authWrapper}>
@@ -1248,6 +1267,12 @@ export default function Home() {
                   onClick={() => handleMainTabChange('champions')}
                 >
                   Champions
+                </button>
+                <button
+                  className={`${styles.navTab} ${activeTab === 'upcoming' ? styles.activeTab : ''}`}
+                  onClick={() => handleMainTabChange('upcoming')}
+                >
+                  Upcoming
                 </button>
               </div>
             </nav>
@@ -1478,6 +1503,19 @@ export default function Home() {
             }}
           >
             <ChampionsList />
+          </div>
+        )}
+
+        {activeTab === 'upcoming' && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+            }}
+          >
+            <UpcomingMatches allCards={allCards} />
           </div>
         )}
       </div>

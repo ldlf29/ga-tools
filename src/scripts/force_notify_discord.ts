@@ -42,7 +42,7 @@ async function run() {
     console.log(`✅ Obtenidos ${changes.length} registros. Formateando...`);
     
     // Adaptar nombres de campos si difieren (el de DiscordService usa snake_case tal como lo inyectamos)
-    const formattedChanges = changes.map((c) => ({
+    const formattedChanges = changes.map((c: any) => ({
        moki_name: c.moki_name,
        old_class: c.old_class,
        new_class: c.new_class

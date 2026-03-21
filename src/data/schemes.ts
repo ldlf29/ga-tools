@@ -132,8 +132,8 @@ export const SCHEME_SUGGESTIONS: Record<string, Suggestion> = {
     filters: { traits: ['Crying Eye'] },
   },
   'Touching the Wart': {
-    title: 'Specialization: Gacha',
-    filters: { specialization: ['Gacha'] },
+    title: 'Specialization: Wart Rider',
+    filters: { specialization: ['Wart Rider'] },
   },
   'Victory Lap': {
     title: 'Specialization: Winner (+53.50%)',
