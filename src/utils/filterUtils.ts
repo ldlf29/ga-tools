@@ -50,8 +50,8 @@ export const matchesFilter = (
       return false;
   }
   // STARS
-  if (filters.stars.length > 0) {
-    if (!filters.stars.includes(card.custom.stars)) return false;
+  if (filters.stars && filters.stars.length > 0) {
+    if (!filters.stars.map(String).includes(String(card.custom.stars))) return false;
   }
   // CLASS (Custom)
   if (filters.customClass.length > 0) {
