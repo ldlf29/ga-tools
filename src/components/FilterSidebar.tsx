@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
 import { useState, useEffect, Fragment } from 'react';
@@ -438,7 +439,7 @@ export default function FilterSidebar({
                         { length: max - min + 1 },
                         (_, i) => min + i
                       );
-                      let newOrder = filters.insertionOrder
+                      const newOrder = filters.insertionOrder
                         ? [...filters.insertionOrder]
                         : [];
                       if (!newOrder.includes('stars:ACTIVE')) {

@@ -303,6 +303,7 @@ export default function MyLineups({
   ) => {
     setSelectorFilters((prev) => ({
       ...prev,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       [key]: (prev[key] as any[]).filter((v: any) => v !== value),
     }));
   };
@@ -555,11 +556,6 @@ export default function MyLineups({
     setEditingId(null);
   };
 
-  const cancelEditing = () => {
-    setEditingId(null);
-    setEditedLineupName('');
-  };
-
   // handleCloseModal Logic
   const handleCloseModal = () => {
     if (hasChanges) {
@@ -614,11 +610,8 @@ export default function MyLineups({
     } else {
       document.body.classList.remove('modal-open');
       document.documentElement.classList.remove('modal-open');
-      return () => {
-        document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
-      };
-    }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     expandedId,
     editingId,

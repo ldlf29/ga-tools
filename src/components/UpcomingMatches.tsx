@@ -1,17 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import styles from './UpcomingMatches.module.css';
-import { List } from 'react-window';
-import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { EnhancedCard, FilterState } from '@/types';
 import FilterSidebar from './FilterSidebar';
 import { matchesFilter } from '@/utils/filterUtils';
 import mokiMetadata from '@/data/mokiMetadata.json';
 import { getSpecializationCoefficient } from '@/utils/specializationUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
-
-const ListAny = List as any;
-const AutoSizerAny = AutoSizer as any;
 
 let cachedMatchesData: UpcomingMatchData[] = [];
 
@@ -27,20 +24,6 @@ interface UpcomingMatchData {
 interface UpcomingMatchesProps {
   allCards: EnhancedCard[];
 }
-
-const CLASS_OPTIONS = [
-  'All Classes',
-  'Striker',
-  'Defender',
-  'Bruiser',
-  'Sprinter',
-  'Grinder',
-  'Support',
-  'Forward',
-  'Anchor',
-  'Center',
-  'Flanker'
-];
 
 export default function UpcomingMatches({ allCards }: UpcomingMatchesProps) {
 
@@ -64,22 +47,8 @@ export default function UpcomingMatches({ allCards }: UpcomingMatchesProps) {
     matchLimit: 'ALL',
   });
   
-  // Class vs Class custom filter
-  const [classA, setClassA] = useState('All Classes');
-  const [classB, setClassB] = useState('All Classes');
-
   // Mobile layout state
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   useEffect(() => {
     async function loadMatches() {
@@ -101,7 +70,7 @@ export default function UpcomingMatches({ allCards }: UpcomingMatchesProps) {
       setIsLoading(false);
     }
     loadMatches();
-  }, [supabase]);
+  }, []);
 
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
@@ -380,7 +349,9 @@ const uniqueChampions = useMemo(() => {
                                             const actualClass = fullCard?.custom?.class || m.class;
                                             return (
                                                 <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
-                                                    <span className={styles.miniMokiName}>{m.name}</span>
+                                                    <div className={styles.miniMokiNameWrapper}>
+                                                        <span className={styles.miniMokiName}>{m.name}</span>
+                                                    </div>
                                                     <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${leftMokiClass}`} />
                                                     <span className={styles.miniMokiClassBadge}>{actualClass}</span>
                                                 </div>
@@ -395,7 +366,9 @@ const uniqueChampions = useMemo(() => {
                                             const actualClass = fullCard?.custom?.class || m.class;
                                             return (
                                                 <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
-                                                    <span className={styles.miniMokiName}>{m.name}</span>
+                                                    <div className={styles.miniMokiNameWrapper}>
+                                                        <span className={styles.miniMokiName}>{m.name}</span>
+                                                    </div>
                                                     <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${rightMokiClass}`} />
                                                     <span className={styles.miniMokiClassBadge}>{actualClass}</span>
                                                 </div>

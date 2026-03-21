@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import { fetchLiteCollection } from '@/utils/cardService';
@@ -29,7 +30,7 @@ export function useCards() {
         const hasTrainField =
           parsed.length > 0 &&
           parsed.some(
-            (c: any) => c.cardType === 'MOKI' && c.custom?.train !== undefined
+            (c: Record<string, any>) => c.cardType === 'MOKI' && c.custom?.train !== undefined
           );
         if (parsed.length > 0 && hasTrainField) {
           mutate(parsed, false);

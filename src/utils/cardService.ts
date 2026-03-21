@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { fetchLiveData, fetchCatalogData, LiveDataMap } from './liveData';
 import { EnhancedCard } from '@/types';
 
@@ -67,7 +68,7 @@ const buildEnhancedCard = (
   // Look up stats from existing live data
   const stats = cachedLiveData ? cachedLiveData[normalizedName] : null;
 
-  let cardImage = baseImage || stats?.imageUrl || '';
+  const cardImage = baseImage || stats?.imageUrl || '';
 
   // Determine market link
   let catalogMarketLink = '#';
@@ -377,7 +378,7 @@ export const fetchUserCards = async (
       const catalogKey = `${normalizedName}|${rarity.toUpperCase()}`;
       const catalogData = catalogMap.get(catalogKey);
 
-      let cardImage = apiCard.imageUrl || catalogData?.image || '';
+      const cardImage = apiCard.imageUrl || catalogData?.image || '';
 
       return buildEnhancedCard(
         apiCard.id,

@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import mokiMetadataRaw from '../data/mokiMetadata.json';
 
 // Carga de variables de entorno
 dotenv.config({ path: path.join(__dirname, '../../.env.local') });

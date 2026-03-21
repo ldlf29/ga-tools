@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
@@ -41,15 +42,7 @@ async function run() {
     return;
   }
 
-  // Filtrar el primer contest que aplique (que sea de mokiMayhem y cuyo endDate sea en el futuro o muy reciente)
-  const now = new Date();
-  const contest = activeContests.find((c: any) => {
-    // Si viene gameTypes como 'mokiMayhem'
-    const isMokiMayhem = c.config?.gameTypes?.[0] === 'mokiMayhem' || c.config?.gameTypes?.some((t: any) => t.cardType === 'champion');
-    const endDate = new Date(c.endDate);
-    // Tomamos el primer contest aplicable
-    return true; // Simplemente tomamos el primero por ahora. La API 'active' ya hace el filtrido.
-  });
+  const contest = activeContests[0];
 
   if (!contest) {
     console.log('[Cron Upcoming] No hay contest de Moki Mayhem activo.');

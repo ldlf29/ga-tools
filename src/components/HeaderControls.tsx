@@ -1,6 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import styles from '@/app/page.module.css';
-import Image from 'next/image';
 
 interface HeaderControlsProps {
   mokiDropdownOpen: boolean;

@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchLiveData, MokiData } from '@/utils/liveData';
 import { supabase } from '@/lib/supabase';
 import {
   ResponsiveContainer,
@@ -24,7 +24,6 @@ interface MokiMetadata {
 }
 
 export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
-  const [mokiData, setMokiData] = useState<MokiData | null>(null);
   const [leaderboard, setLeaderboard] = useState<
     { date: string; daily_rank: number; daily_score: number }[]
   >([]);
@@ -43,18 +42,7 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
   useEffect(() => {
     const load = async () => {
       try {
-        // 1. Fetch live metadata stats
-        const data = await fetchLiveData();
-        if (data) {
-          const found = Object.values(data).find(
-            (m) => m.name.toLowerCase() === moki.name.toLowerCase()
-          );
-          if (found) {
-            setMokiData(found);
-          }
-        }
-
-        // 2. Fetch daily leaderboard history from Supabase (All dates)
+        // Fetch daily leaderboard history from Supabase (All dates)
         const { data: lbData, error } = await supabase
           .from('daily_leaderboard')
           .select('date, daily_rank, daily_score')

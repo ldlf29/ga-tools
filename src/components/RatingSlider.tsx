@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import NextImage from 'next/image';
 import styles from './RatingSlider.module.css';

@@ -51,13 +51,9 @@ export const metadata: Metadata = {
       'The ultimate Grand Arena tools. Discover the best striker Moki teams, auto lineup builder, synergy calculators, and Grand Arena tier list to increase your win rate.',
   },
   icons: {
-    icon: [
-      { url: '/icons/logo-ga-tools.png' },
-      { url: '/icons/logo-ga-tools.png', sizes: '32x32' },
-      { url: '/icons/logo-ga-tools.png', sizes: '16x16' },
-    ],
-    apple: '/icons/logo-ga-tools.png',
-    shortcut: '/icons/logo-ga-tools.png',
+    icon: '/icons/logo-ga-tools-2.png',
+    apple: '/icons/logo-ga-tools-2.png',
+    shortcut: '/icons/logo-ga-tools-2.png',
   },
   appleWebApp: {
     title: 'Grand Arena Tools',

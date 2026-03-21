@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './WalletManagerModal.module.css';
 import { ConnectedWallet } from '@/types';
 
@@ -24,7 +24,7 @@ export default function WalletManagerModal({
   onRefreshWallet,
   onToast,
 }: WalletManagerModalProps) {
-  const now = Date.now();
+  const [now] = useState(() => Date.now());
 
   const formatTimeLeft = (ms: number) => {
     if (ms <= 0) return 'Ready';

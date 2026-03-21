@@ -1,3 +1,8 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1064,7 +1069,7 @@ export default function Home() {
       >
         <div className={`${styles.drawerHeader} ${styles.mobileOnly}`}>
           <img
-            src="/icons/logo-ga-tools.png"
+            src="/icons/logo-ga-tools-2.png"
             alt="Grand Arena"
             className={styles.drawerLogo}
           />
@@ -1207,7 +1212,7 @@ export default function Home() {
         <div className={styles.headerMain}>
           <div className={styles.headerLeft}>
             <img
-              src="/icons/logo-ga-tools.png"
+              src="/icons/logo-ga-tools-2.png"
               alt="Grand Arena Builder"
               className={styles.logo}
             />

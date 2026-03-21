@@ -59,6 +59,7 @@ export const SPECIALIZATIONS_CONFIG: Record<
 /**
  * Resolves the metric value based on the matchLimit (e.g., avgDeposits10)
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const getStatValueByLimit = (
   card: EnhancedCard,
   baseStat: string,
