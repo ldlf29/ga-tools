@@ -88,7 +88,7 @@ async function run() {
         upcomingInserts.push({
           id: match.id,
           contest_id: contestId,
-          match_date: match.matchDate ? new Date(match.matchDate).toISOString() : new Date().toISOString(),
+          match_date: contest.startDate ? new Date(contest.startDate).toISOString() : new Date().toISOString(),
           team_red: teamRed,
           team_blue: teamBlue,
         });

@@ -7,6 +7,7 @@ import { EnhancedCard, FilterState } from '@/types';
 import FilterSidebar from './FilterSidebar';
 import { matchesFilter } from '@/utils/filterUtils';
 import mokiMetadata from '@/data/mokiMetadata.json';
+import { getSpecializationCoefficient } from '@/utils/specializationUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 
 const ListAny = List as any;
@@ -152,6 +153,7 @@ const uniqueChampions = useMemo(() => {
 
     return {
       ...champ,
+      class: fullCard?.custom?.class || champ.class,
       score: fullCard?.custom?.score || 0,
       imageUrl: metadata?.portraitUrl || fullCard?.custom?.imageUrl || champ.imageUrl,
     };
@@ -162,7 +164,7 @@ const uniqueChampions = useMemo(() => {
 
   // Filter ONLY derived Champions list based on active filters
   const filteredChampions = useMemo(() => {
-    return uniqueChampions.filter(champ => {
+    const filtered = uniqueChampions.filter(champ => {
        // Search query
        if (searchQuery.trim()) {
          if (!champ.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -175,6 +177,48 @@ const uniqueChampions = useMemo(() => {
 
        return true;
     });
+
+    if (hasSidebarFilters && filters.specialization?.length > 0) {
+      return filtered.sort((a, b) => {
+         const fullA = allCards.find(c => c.name.trim().toUpperCase() === a.name.trim().toUpperCase());
+         const fullB = allCards.find(c => c.name.trim().toUpperCase() === b.name.trim().toUpperCase());
+         if (!fullA || !fullB) return b.score - a.score;
+
+         const activeSpecs = filters.specialization;
+         const perfSpecs = ['Gacha', 'Killer', 'Wart Rider'];
+         const contextSpecs = ['Winner', 'Loser', 'Bad Streak', 'Good Streak'];
+         const scoreSpecs = ['Score'];
+
+         const activePerf = activeSpecs.find(s => perfSpecs.includes(s));
+         const activeContext = activeSpecs.find(s => contextSpecs.includes(s));
+         const activeScore = activeSpecs.find(s => scoreSpecs.includes(s));
+         const activeCategories = [activePerf, activeContext, activeScore].filter(Boolean);
+
+         if (activeCategories.length > 1) {
+            const calcCoeff = (c: any) => {
+               let coeff = 1;
+               activeCategories.forEach(spec => {
+                 if (spec) coeff *= getSpecializationCoefficient(c, spec, filters.matchLimit);
+               });
+               return coeff;
+            };
+            const coeffA = calcCoeff(fullA);
+            const coeffB = calcCoeff(fullB);
+            const isLoserActive = activeSpecs.includes('Loser');
+            if (coeffB !== coeffA) return isLoserActive ? coeffA - coeffB : coeffB - coeffA;
+         }
+
+         for (const spec of activeSpecs) {
+            const valA = getSpecializationCoefficient(fullA, spec, filters.matchLimit);
+            const valB = getSpecializationCoefficient(fullB, spec, filters.matchLimit);
+            const diff = spec === 'Loser' ? valA - valB : valB - valA;
+            if (diff !== 0) return diff;
+         }
+         return b.score - a.score;
+      });
+    }
+
+    return filtered;
   }, [uniqueChampions, searchQuery, filters, hasSidebarFilters, allCards]);
 
   const championMatches = useMemo(() => {
@@ -184,7 +228,7 @@ const uniqueChampions = useMemo(() => {
       const blueChamp = match.team_blue[0];
       return (redChamp && redChamp.name === selectedChampion.name) || 
              (blueChamp && blueChamp.name === selectedChampion.name);
-    }).slice(0, 10);
+    }).slice(0, 10).reverse();
   }, [selectedChampion, matches]);
 
   const formattedDate = useMemo(() => {
@@ -287,7 +331,6 @@ const uniqueChampions = useMemo(() => {
       {showModal && selectedChampion && (
         <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-             <button className={styles.modalClose} onClick={() => setShowModal(false)}>✕</button>
              <div className={styles.modalHeader}>
                 <div className={styles.modalHeaderInfo}>
                    <h2 className={styles.modalName}>UPCOMING MATCHES (NEXT 10)</h2>
@@ -295,6 +338,25 @@ const uniqueChampions = useMemo(() => {
                    <p className={styles.updateFreq}>The data is updated at the end of each block of games.</p>
                    <h3 className={styles.mokiSubtitle}>{selectedChampion.name}</h3>
                 </div>
+                <button
+                  className={styles.modalClose}
+                  onClick={() => setShowModal(false)}
+                  title="Close Modal"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
              </div>
              
              <div className={styles.modalMatchesList}>
@@ -312,13 +374,15 @@ const uniqueChampions = useMemo(() => {
                             <div key={match.id} className={styles.modalMatchRow}>
                                 <div className={`${styles.modalTeamsGrid} ${gridEdgeClass}`}>
                                     <div className={styles.playersRow}>
-                                        {leftTeam.map((m: any, i: number) => {
+                                          {leftTeam.map((m: any, i: number) => {
                                             const portrait = (mokiMetadata as any)[m.name.toUpperCase()]?.portraitUrl || m.imageUrl;
+                                            const fullCard = allCards.find(c => c.name.trim().toUpperCase() === m.name.trim().toUpperCase());
+                                            const actualClass = fullCard?.custom?.class || m.class;
                                             return (
                                                 <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                                     <span className={styles.miniMokiName}>{m.name}</span>
                                                     <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${leftMokiClass}`} />
-                                                    <span className={styles.miniMokiClassBadge}>{m.class}</span>
+                                                    <span className={styles.miniMokiClassBadge}>{actualClass}</span>
                                                 </div>
                                             )
                                         })}
@@ -327,11 +391,13 @@ const uniqueChampions = useMemo(() => {
                                     <div className={styles.playersRow}>
                                         {rightTeam.map((m: any, i: number) => {
                                             const portrait = (mokiMetadata as any)[m.name.toUpperCase()]?.portraitUrl || m.imageUrl;
+                                            const fullCard = allCards.find(c => c.name.trim().toUpperCase() === m.name.trim().toUpperCase());
+                                            const actualClass = fullCard?.custom?.class || m.class;
                                             return (
                                                 <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                                     <span className={styles.miniMokiName}>{m.name}</span>
                                                     <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${rightMokiClass}`} />
-                                                    <span className={styles.miniMokiClassBadge}>{m.class}</span>
+                                                    <span className={styles.miniMokiClassBadge}>{actualClass}</span>
                                                 </div>
                                             )
                                         })}
