@@ -42,7 +42,7 @@ const MyLineups = dynamic(() => import('@/components/MyLineups'), {
   ),
   ssr: false,
 });
-const ChampionsList = dynamic(() => import('@/components/ChampionsList'), {
+const Champions = dynamic(() => import('@/components/Champions'), {
   loading: () => (
     <div className={styles.spinnerWrapper}>
       <div className={styles.spinner}></div>
@@ -50,14 +50,7 @@ const ChampionsList = dynamic(() => import('@/components/ChampionsList'), {
   ),
   ssr: false,
 });
-const UpcomingMatches = dynamic(() => import('@/components/UpcomingMatches'), {
-  loading: () => (
-    <div className={styles.spinnerWrapper}>
-      <div className={styles.spinner}></div>
-    </div>
-  ),
-  ssr: false,
-});
+import ChangelogModal from '@/components/ChangelogModal';
 
 // Custom Hooks
 import { useCards } from '@/hooks/useCards';
@@ -68,7 +61,7 @@ import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 export default function Home() {
   /* Global UI State */
   const [activeTab, setActiveTab] = useState<
-    'builder' | 'lineups' | 'champions' | 'upcoming'
+    'builder' | 'lineups' | 'champions' | 'changelog'
   >('builder');
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -421,9 +414,21 @@ export default function Home() {
     schemeFilters: { filters: emptyFilters, search: '' },
   });
 
+  const championsStateRef = useRef<{
+    filters: FilterState;
+    search: string;
+    mokiFilters: { filters: typeof emptyFilters; search: string };
+    schemeFilters: { filters: typeof emptyFilters; search: string };
+  }>({
+    filters: { ...emptyFilters, cardType: 'MOKI' },
+    search: '',
+    mokiFilters: { filters: emptyFilters, search: '' },
+    schemeFilters: { filters: emptyFilters, search: '' },
+  });
+
   // Handle main tab switching (Builder <-> My Lineups <-> Champions)
   const handleMainTabChange = (
-    newTab: 'builder' | 'lineups' | 'champions' | 'upcoming'
+    newTab: 'builder' | 'lineups' | 'champions' | 'changelog'
   ) => {
     if (newTab === activeTab) {
       return;
@@ -441,6 +446,8 @@ export default function Home() {
       builderStateRef.current = currentState;
     } else if (activeTab === 'lineups') {
       lineupsStateRef.current = currentState;
+    } else if (activeTab === 'champions') {
+      championsStateRef.current = currentState;
     }
 
     // Restore target tab's state
@@ -452,6 +459,12 @@ export default function Home() {
       schemeFiltersRef.current = targetState.schemeFilters;
     } else if (newTab === 'lineups') {
       const targetState = lineupsStateRef.current;
+      setFilters(targetState.filters);
+      setSearchQuery(targetState.search);
+      mokiFiltersRef.current = targetState.mokiFilters;
+      schemeFiltersRef.current = targetState.schemeFilters;
+    } else if (newTab === 'champions') {
+      const targetState = championsStateRef.current;
       setFilters(targetState.filters);
       setSearchQuery(targetState.search);
       mokiFiltersRef.current = targetState.mokiFilters;
@@ -1123,13 +1136,13 @@ export default function Home() {
             Champions
           </button>
           <button
-            className={`${styles.navTab} ${activeTab === 'upcoming' ? styles.activeTab : ''}`}
+            className={`${styles.navTab} ${activeTab === 'changelog' ? styles.activeTab : ''}`}
             onClick={() => {
-              handleMainTabChange('upcoming');
+              handleMainTabChange('changelog');
               closeDrawers();
             }}
           >
-            Upcoming
+            Changelog
           </button>
         </nav>
 
@@ -1274,10 +1287,10 @@ export default function Home() {
                   Champions
                 </button>
                 <button
-                  className={`${styles.navTab} ${activeTab === 'upcoming' ? styles.activeTab : ''}`}
-                  onClick={() => handleMainTabChange('upcoming')}
+                  className={`${styles.navTab} ${activeTab === 'changelog' ? styles.activeTab : ''}`}
+                  onClick={() => handleMainTabChange('changelog')}
                 >
-                  Upcoming
+                  Changelog
                 </button>
               </div>
             </nav>
@@ -1507,20 +1520,27 @@ export default function Home() {
               minHeight: 0,
             }}
           >
-            <ChampionsList />
+            <Champions
+              allCards={allCards}
+              filters={filters}
+              onFilterChange={setFilters}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
           </div>
         )}
 
-        {activeTab === 'upcoming' && (
+        {activeTab === 'changelog' && (
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               flex: 1,
               minHeight: 0,
+              overflow: 'hidden',
             }}
           >
-            <UpcomingMatches allCards={allCards} />
+            <ChangelogModal onClose={() => handleMainTabChange('builder')} />
           </div>
         )}
       </div>

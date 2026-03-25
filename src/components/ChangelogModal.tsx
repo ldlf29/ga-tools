@@ -44,16 +44,9 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
     document.body.classList.add('modal-open');
     document.documentElement.classList.add('modal-open');
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
     return () => {
       document.body.classList.remove('modal-open');
       document.documentElement.classList.remove('modal-open');
-      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [onClose]);
 
@@ -76,8 +69,8 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
         <div className={styles.header}>
           <div className={styles.titleArea}>
             <div className={styles.title}>Changelog</div>
@@ -93,19 +86,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className={styles.closeButton} onClick={onClose}>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+            {/* Close button removed */}
           </div>
         </div>
 

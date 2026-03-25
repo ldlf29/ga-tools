@@ -1,0 +1,1026 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
+import { supabase } from '@/lib/supabase';
+import styles from './Champions.module.css';
+import { EnhancedCard, FilterState } from '@/types';
+import FilterSidebar from './FilterSidebar';
+import { matchesFilter } from '@/utils/filterUtils';
+import mokiMetadata from '@/data/mokiMetadata.json';
+import { getSpecializationCoefficient } from '@/utils/specializationUtils';
+import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from 'recharts';
+
+// ─── Cache ────────────────────────────────────────────────────────────────────
+let cachedMatchesData: UpcomingMatchData[] = [];
+
+// ─── Types ─────────────────────────────────────────────────────────────────────
+interface UpcomingMatchData {
+  id: string;
+  contest_id: string;
+  match_date: string;
+  team_red: any[];
+  team_blue: any[];
+  created_at: string;
+}
+
+interface ChampionsProps {
+  allCards: EnhancedCard[];
+  filters: FilterState;
+  onFilterChange: (filters: FilterState) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+}
+
+type ModalTab = 'stats' | 'history' | 'upcoming' | 'daily';
+
+// ─── Component ─────────────────────────────────────────────────────────────────
+export default function Champions({
+  allCards,
+  filters,
+  onFilterChange,
+  searchQuery,
+  onSearchChange,
+}: ChampionsProps) {
+  // Upcoming matches data
+  const [matches, setMatches] = useState<UpcomingMatchData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Modal state
+  const [selectedChampion, setSelectedChampion] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<ModalTab>('stats');
+
+  // Match History state
+  const [matchHistory, setMatchHistory] = useState<any[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyLimit, setHistoryLimit] = useState<10 | 20 | 30>(10);
+  const [selectedMatchDetails, setSelectedMatchDetails] = useState<any | null>(null);
+
+  // Live Leaderboard state
+  const [leaderboard, setLeaderboard] = useState<{ date: string; daily_rank: number; daily_score: number }[]>([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveView, setLiveView] = useState<'7' | '14' | 'all'>('14');
+
+  // Filters state
+  // Filters state managed via props
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [sortOption, setSortOption] = useState<string>('default');
+  const [sortDropdownOpen, setSortDropdownOpen] = useState<boolean>(false);
+
+  // ─── Load upcoming matches ─────────────────────────────────────────────────
+  useEffect(() => {
+    async function loadMatches() {
+      if (cachedMatchesData.length > 0) {
+        setMatches(cachedMatchesData);
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('upcoming_matches_ga')
+        .select('*')
+        .order('match_date', { ascending: true });
+
+      if (!error && data) {
+        setMatches(data);
+        cachedMatchesData = data;
+      }
+      setIsLoading(false);
+    }
+    loadMatches();
+  }, []);
+
+  // ─── Load match history when champion is selected ─────────────────────────
+  useEffect(() => {
+    if (!selectedChampion || activeTab !== 'history') return;
+    const tokenId = selectedChampion.tokenId ?? selectedChampion.token_id ?? null;
+    if (tokenId === null) return;
+
+    const fetchHistory = async () => {
+      setHistoryLoading(true);
+      const { data, error } = await supabase
+        .from('moki_match_history')
+        .select('*')
+        .eq('token_id', tokenId)
+        .order('match_id', { ascending: false })
+        .limit(historyLimit);
+      if (!error && data) setMatchHistory(data);
+      setHistoryLoading(false);
+    };
+    fetchHistory();
+  }, [selectedChampion, activeTab, historyLimit]);
+
+  // ─── Load live leaderboard when tab is active ─────────────────────────────
+  useEffect(() => {
+    if (!selectedChampion || activeTab !== 'daily') return;
+    // moki_id in daily_leaderboard corresponds to the metadata .id field (string)
+    const mokiId = selectedChampion.id ?? null;
+    if (!mokiId) return;
+
+    const fetchLive = async () => {
+      setLiveLoading(true);
+      const { data, error } = await supabase
+        .from('daily_leaderboard')
+        .select('date, daily_rank, daily_score')
+        .eq('moki_id', mokiId)
+        .order('date', { ascending: false });
+      if (!error && data) setLeaderboard([...data].reverse());
+      setLiveLoading(false);
+    };
+    fetchLive();
+  }, [selectedChampion, activeTab]);
+
+  // ─── Filters Helpers ──────────────────────────────────────────────────────
+  const handleFilterChange = (newFilters: FilterState) => onFilterChange(newFilters);
+
+  const handleRemoveFilter = (key: keyof FilterState, value: string | number) => {
+    const currentValues = filters[key];
+    let newValues = currentValues;
+    if (key === 'stars') newValues = [];
+    else if (key === 'matchLimit') newValues = 'ALL';
+    else if (Array.isArray(currentValues)) newValues = (currentValues as any[]).filter((v) => v !== value);
+    let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
+    const orderKey = `${String(key)}:${value}`;
+    newOrder = newOrder.filter((k) => k !== orderKey);
+    
+    onFilterChange({ ...filters, [key]: newValues, insertionOrder: newOrder });
+  };
+
+  const activeFilters = getActiveFiltersDisplay(filters);
+
+  const hasSidebarFilters =
+    filters.fur!.length > 0 ||
+    filters.traits!.length > 0 ||
+    filters.specialization!.length > 0 ||
+    filters.customClass!.length > 0 ||
+    (filters.stars && filters.stars.length > 0);
+
+  // ─── Unique Champions aggregation ─────────────────────────────────────────
+  const uniqueChampions = useMemo(() => {
+    const map = new Map();
+    matches.forEach((match) => {
+      const redChamp = match.team_red[0];
+      const blueChamp = match.team_blue[0];
+      if (redChamp && !map.has(redChamp.name)) map.set(redChamp.name, redChamp);
+      if (blueChamp && !map.has(blueChamp.name)) map.set(blueChamp.name, blueChamp);
+    });
+
+    const list = Array.from(map.values()).map((champ) => {
+      const fullCard = allCards.find((c) => c.name.trim().toUpperCase() === champ.name.trim().toUpperCase());
+      const normalizedName = champ.name.trim().toUpperCase();
+      const metadata = (mokiMetadata as any)[normalizedName];
+
+      return {
+        ...champ,
+        id: metadata?.id ?? fullCard?.id ?? champ.id,
+        tokenId: metadata?.id ? parseInt(metadata.id, 10) : null,
+        class: fullCard?.custom?.class || champ.class,
+        score: fullCard?.custom?.score || 0,
+        imageUrl: metadata?.portraitUrl || fullCard?.custom?.imageUrl || champ.imageUrl,
+        marketLink: metadata?.marketLink || null,
+        fur: fullCard?.custom?.fur || metadata?.fur || null,
+        fullCard,
+      };
+    }).sort((a, b) => b.score - a.score);
+
+    return list;
+  }, [matches, allCards]);
+
+  // ─── Filtered champions ───────────────────────────────────────────────────
+  const filteredChampions = useMemo(() => {
+    const filtered = uniqueChampions.filter((champ) => {
+      if (searchQuery.trim()) {
+        if (!champ.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      }
+      const fullCard = allCards.find((c) => c.name.trim().toUpperCase() === champ.name.trim().toUpperCase());
+      if (fullCard) {
+        if (!matchesFilter(fullCard, filters)) return false;
+      }
+      return true;
+    });
+
+    const getStatValue = (champ: any, option: string) => {
+      const custom = champ.fullCard?.custom;
+      if (!custom) return 0;
+      switch (option) {
+        case 'str': return custom.strength || 0;
+        case 'spd': return custom.speed || 0;
+        case 'def': return custom.defense || 0;
+        case 'dex': return custom.dexterity || 0;
+        case 'for': return custom.fortitude || 0;
+        case 'total': return custom.totalStats || 0;
+        case 'train': return custom.train || 0;
+        case 'win_rate': return custom.winRate ?? custom.avgWinRate ?? 0;
+        default: return 0;
+      }
+    };
+
+    let sorted = [...filtered];
+
+    if (sortOption !== 'default') {
+      sorted.sort((a, b) => {
+        if (sortOption === 'name') return a.name.localeCompare(b.name);
+        return getStatValue(b, sortOption) - getStatValue(a, sortOption);
+      });
+    } else if (filters.specialization && filters.specialization.length > 0) {
+      sorted.sort((a, b) => {
+        const fullA = a.fullCard;
+        const fullB = b.fullCard;
+        if (!fullA || !fullB) return b.score - a.score;
+
+        const activeSpecs = filters.specialization!;
+        const perfSpecs = ['Gacha', 'Killer', 'Wart Rider'];
+        const contextSpecs = ['Winner', 'Loser', 'Bad Streak', 'Good Streak'];
+        const scoreSpecs = ['Score'];
+
+        const activePerf = activeSpecs.find((s) => perfSpecs.includes(s));
+        const activeContext = activeSpecs.find((s) => contextSpecs.includes(s));
+        const activeScore = activeSpecs.find((s) => scoreSpecs.includes(s));
+        const activeCategories = [activePerf, activeContext, activeScore].filter(Boolean);
+
+        if (activeCategories.length > 1) {
+          const calcCoeff = (c: any) => {
+            let coeff = 1;
+            activeCategories.forEach((spec) => {
+              if (spec) coeff *= getSpecializationCoefficient(c, spec, filters.matchLimit);
+            });
+            return coeff;
+          };
+          const coeffA = calcCoeff(fullA);
+          const coeffB = calcCoeff(fullB);
+          const isLoserActive = activeSpecs.includes('Loser');
+          if (coeffB !== coeffA) return isLoserActive ? coeffA - coeffB : coeffB - coeffA;
+        }
+
+        for (const spec of activeSpecs) {
+          const valA = getSpecializationCoefficient(fullA, spec, filters.matchLimit);
+          const valB = getSpecializationCoefficient(fullB, spec, filters.matchLimit);
+          const diff = spec === 'Loser' ? valA - valB : valB - valA;
+          if (diff !== 0) return diff;
+        }
+        return b.score - a.score;
+      });
+    } else {
+      sorted.sort((a, b) => b.score - a.score);
+    }
+
+    return sorted;
+  }, [uniqueChampions, searchQuery, filters, hasSidebarFilters, allCards, sortOption]);
+
+  // ─── Upcoming matches for selected champion ───────────────────────────────
+  const championUpcomingMatches = useMemo(() => {
+    if (!selectedChampion) return [];
+    return matches
+      .filter((match) => {
+        const redChamp = match.team_red[0];
+        const blueChamp = match.team_blue[0];
+        return (
+          (redChamp && redChamp.name === selectedChampion.name) ||
+          (blueChamp && blueChamp.name === selectedChampion.name)
+        );
+      })
+      .slice(0, 10)
+      .reverse();
+  }, [selectedChampion, matches]);
+
+  const formattedDate = useMemo(() => {
+    const firstMatch = championUpcomingMatches[0];
+    if (!firstMatch) return '';
+    const d = new Date(firstMatch.match_date);
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const year = d.getUTCFullYear();
+    const hours = String(d.getUTCHours()).padStart(2, '0');
+    const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} - ${hours}:${minutes} UTC`;
+  }, [championUpcomingMatches]);
+
+  // ─── Modal open handler ───────────────────────────────────────────────────
+  const handleChampionClick = (champ: any) => {
+    setSelectedChampion(champ);
+    setShowModal(true);
+    setActiveTab('stats');
+    setMatchHistory([]);
+    setLeaderboard([]);
+    setSelectedMatchDetails(null);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedChampion(null);
+  };
+
+  // ─── ESC Key close handler ───────────────────────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (selectedMatchDetails) {
+          setSelectedMatchDetails(null);
+        } else if (showModal) {
+          handleCloseModal();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedMatchDetails, showModal]);
+
+  // ─── History helpers ──────────────────────────────────────────────────────
+  const formatDuration = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}m ${s}s`;
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString.replace(/-/g, '/'));
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  // ─── Stats display helpers ────────────────────────────────────────────────
+  const getStat = (card: EnhancedCard | null | undefined, field: string) => {
+    if (!card) return '—';
+    const val = (card as any)[field] ?? (card.custom as any)?.[field];
+    if (val === undefined || val === null) return '—';
+    return typeof val === 'number' ? val.toFixed(2) : val;
+  };
+
+  // ─── Render ───────────────────────────────────────────────────────────────
+  return (
+    <div className={styles.championsContainer}>
+      {/* Mobile FAB + Drawer */}
+      <div className={styles.mobileOnly}>
+        <div className={styles.fabContainer}>
+          <button className={`${styles.fabButton} ${styles.fabFilters}`} onClick={() => setMobileFiltersOpen(true)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+          </button>
+        </div>
+        <div className={`${styles.drawerOverlay} ${mobileFiltersOpen ? styles.drawerOverlayVisible : ''}`} onClick={() => setMobileFiltersOpen(false)} />
+        <div className={`${styles.mobileDrawer} ${styles.filterDrawer} ${mobileFiltersOpen ? styles.filterDrawerOpen : ''}`}>
+          <button className={`${styles.drawerCloseButton} ${styles.filterCloseButton}`} onClick={() => setMobileFiltersOpen(false)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={() => { }} hideMatchPerformance={false} hideRarity={true} hideTypeToggle={true} storagePrefix="champions_unified" />
+        </div>
+      </div>
+
+      {/* Main layout */}
+      <div className={styles.mainLayout}>
+        <div className={styles.desktopOnly}>
+          <FilterSidebar filters={filters} onFilterChange={handleFilterChange} onCardTypeChange={() => { }} hideMatchPerformance={false} hideRarity={true} hideTypeToggle={true} storagePrefix="champions_unified" />
+        </div>
+
+        <div className={styles.championsView}>
+          <div className={styles.topControls}>
+            <div className={styles.headerTopRow}>
+              <h1 className={styles.pageTitle}>CHAMPIONS</h1>
+              <div className={styles.headerRight}>
+                <div className={styles.orderByContainer}>
+                  <button
+                    className={styles.orderByButton}
+                    onClick={() => {
+                      if (filters.specialization && filters.specialization.length > 0) return;
+                      setSortDropdownOpen(!sortDropdownOpen);
+                    }}
+                    style={{
+                      opacity: filters.specialization && filters.specialization.length > 0 ? 0.7 : 1,
+                      cursor: filters.specialization && filters.specialization.length > 0 ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {filters.specialization && filters.specialization.length > 0
+                      ? `BY ${filters.specialization[0].toUpperCase()}`
+                      : sortOption === 'default'
+                        ? 'SORT BY...'
+                        : `BY ${sortOption === 'win_rate' ? 'WIN RATE' : sortOption.toUpperCase()}`}
+                    {!(filters.specialization && filters.specialization.length > 0) && (
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{
+                          transform: sortDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.2s',
+                          marginLeft: '0.2rem'
+                        }}
+                      >
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    )}
+                  </button>
+                  {sortDropdownOpen && (
+                    <ul className={styles.orderByMenu}>
+                      {[
+                        { label: 'Default', value: 'default' },
+                        { label: 'STR', value: 'str' },
+                        { label: 'SPD', value: 'spd' },
+                        { label: 'DEF', value: 'def' },
+                        { label: 'DEX', value: 'dex' },
+                        { label: 'FOR', value: 'for' },
+                        { label: 'Total', value: 'total' },
+                        { label: 'Train', value: 'train' },
+                        { label: 'Win Rate', value: 'win_rate' },
+                        { label: 'Name', value: 'name' },
+                      ].map((item) => (
+                        <li
+                          key={item.value}
+                          onClick={() => {
+                            setSortOption(item.value);
+                            setSortDropdownOpen(false);
+                          }}
+                          className={sortOption === item.value ? styles.activeSort : ''}
+                        >
+                          {item.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder="Search Champion..."
+                  className={styles.searchInput}
+                />
+              </div>
+            </div>
+            {activeFilters.length > 0 && (
+              <div className={styles.activeFilters}>
+                {activeFilters.map((f, i) => (
+                  <div key={`${f.key}-${f.value}-${i}`} className={styles.filterChip}>
+                    <span className={styles.filterLabel}>{f.label}: </span>
+                    <span className={styles.filterValue}>{f.displayValue || f.value}</span>
+                    <button onClick={() => handleRemoveFilter(f.key, f.value)} className={styles.removeFilterButton}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {isLoading ? (
+            <div className={styles.loading}>Loading Champions...</div>
+          ) : filteredChampions.length === 0 ? (
+            <div className={styles.empty}>No Champions found matching these filters.</div>
+          ) : (
+            <div className={styles.championsGrid}>
+              {filteredChampions.map((champ) => {
+                const globalRank = uniqueChampions.findIndex((c) => c.name === champ.name) + 1;
+                return (
+                  <button key={champ.name} className={styles.championButton} onClick={() => handleChampionClick(champ)}>
+                    <div className={styles.imgBadgeWrapper}>
+                      <img src={champ.imageUrl} alt={champ.name} className={styles.champImg} loading="lazy" />
+                      <span className={styles.champRank}>#{globalRank}</span>
+                    </div>
+                    <div className={styles.champInfo}>
+                      <span className={styles.champName}>{champ.name}</span>
+                      <span className={styles.champClass}>{champ.class}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ─── FULL CHAMPION MODAL ─────────────────────────────────────────── */}
+      {showModal && selectedChampion && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+
+            {/* Modal Header (Sticky) */}
+            <div className={styles.modalHeader}>
+              <img src={selectedChampion.imageUrl} alt={selectedChampion.name} className={styles.modalHeaderImg} />
+              <div className={styles.modalHeaderInfo}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'nowrap', minWidth: 0 }}>
+                  <h2 className={styles.modalName}>{selectedChampion.name}</h2>
+                  {selectedChampion.marketLink && (
+                    <a
+                      href={selectedChampion.marketLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.marketLinkIconOnly}
+                      onClick={(e) => e.stopPropagation()}
+                      title="View on Marketplace"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+                    </a>
+                  )}
+                </div>
+                <span className={styles.modalRank}>
+                  #{uniqueChampions.findIndex((c) => c.name === selectedChampion.name) + 1} LEADERBOARD
+                </span>
+              </div>
+              <button className={styles.modalClose} onClick={handleCloseModal} title="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            {/* Tab Switcher */}
+            <div className={styles.tabBar}>
+              {(['stats', 'history', 'upcoming', 'daily'] as ModalTab[]).map((tab) => (
+                <button
+                  key={tab}
+                  className={`${styles.tabBtn} ${activeTab === tab ? styles.tabBtnActive : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab === 'stats' && 'INFO'}
+                  {tab === 'history' && 'HISTORY'}
+                  {tab === 'upcoming' && 'UPCOMING'}
+                  {tab === 'daily' && 'DAILY'}
+                </button>
+              ))}
+            </div>
+
+            {/* Modal Body */}
+            <div className={styles.modalBody}>
+
+              {/* ── TAB: STATS & PERFORMANCES ─────────────────────────── */}
+              {activeTab === 'stats' && (() => {
+                const fc = selectedChampion.fullCard as EnhancedCard | undefined;
+                const c = fc?.custom;
+                return (
+                  <div className={styles.statsGrid}>
+                    <div className={styles.statsSection}>
+                      <h3 className={styles.statsSectionTitle}>IDENTITY</h3>
+                      <div className={styles.statsRow}>
+                        {[
+                          { label: 'Class', value: fc?.custom?.class || '-' },
+                          { label: 'Fur', value: fc?.custom?.fur || '-' },
+                          { label: 'Stars', value: fc?.custom?.stars ? `${fc.custom.stars} ★` : '-' },
+                          ...(fc?.custom?.traits && fc.custom.traits.length > 0
+                            ? fc.custom.traits.map((t) => ({ label: 'Trait', value: t }))
+                            : []
+                          ),
+                        ].map((s, idx) => (
+                          <div key={idx} className={styles.statPill} style={{ background: '#ffa834' }}>
+                            <span className={styles.statLabel}>{s.label}</span>
+                            <span className={styles.statValue} style={s.label !== 'Stars' ? { textTransform: 'capitalize', fontSize: '0.85rem' } : {}}>{s.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className={styles.statsSection}>
+                      <h3 className={styles.statsSectionTitle}>STATS</h3>
+                      <div className={styles.statsRow}>
+                        {[
+                          { label: 'STR', value: getStat(fc, 'strength') },
+                          { label: 'SPD', value: getStat(fc, 'speed') },
+                          { label: 'DEF', value: getStat(fc, 'defense') },
+                          { label: 'DEX', value: getStat(fc, 'dexterity') },
+                          { label: 'FOR', value: getStat(fc, 'fortitude') },
+                          { label: 'TOTAL', value: getStat(fc, 'totalStats') },
+                          { label: 'TRAIN', value: getStat(fc, 'train') },
+                        ].map((s) => (
+                          <div key={s.label} className={styles.statPill}>
+                            <span className={styles.statLabel}>{s.label}</span>
+                            <span className={styles.statValue}>{s.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className={styles.statsSection}>
+                      <h3 className={styles.statsSectionTitle}>AVERAGE PERFORMANCE (ALL SEASON)</h3>
+                      <div className={styles.statsRow}>
+                        {[
+                          { label: 'Score', value: c?.score !== undefined ? c.score.toFixed(2) : '—' },
+                          { label: 'Win Rate', value: c?.winRate !== undefined ? c.winRate.toFixed(1) + '%' : '—' },
+                          { label: 'Elims', value: c?.eliminations !== undefined ? c.eliminations.toFixed(2) : '—' },
+                          { label: 'Wart', value: c?.wartDistance !== undefined ? c.wartDistance.toFixed(0) : '—' },
+                          { label: 'Balls', value: c?.deposits !== undefined ? c.deposits.toFixed(2) : '—' },
+                        ].map((s) => (
+                          <div key={s.label} className={`${styles.statPill} ${styles.statPillPerf}`}>
+                            <span className={styles.statLabel}>{s.label}</span>
+                            <span className={styles.statValue}>{s.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+
+                  </div>
+                );
+              })()}
+
+              {/* ── TAB: MATCH HISTORY ───────────────────────────────── */}
+              {activeTab === 'history' && (
+                <div className={styles.historyContainer}>
+                  {/* Controls */}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.35rem' }}>
+
+                    {/* LEFT Column: Average performance box + Update Freq */}
+                    <div>
+                      {!historyLoading && matchHistory.length > 0 && (() => {
+                        let wins = 0, totalElims = 0, totalDeposits = 0, totalWart = 0, totalScore = 0;
+                        matchHistory.forEach((m: any) => {
+                          const isWinner = m.team_won === m.moki_team;
+                          if (isWinner) wins++;
+                          totalElims += m.eliminations || 0;
+                          totalDeposits += m.deposits || 0;
+                          totalWart += m.wart_distance || 0;
+                          totalScore += (isWinner ? 300 : 0) + (m.deposits || 0) * 50 + (m.eliminations || 0) * 80 + Math.floor((m.wart_distance || 0) / 80) * 45;
+                        });
+                        const n = matchHistory.length;
+                        const winRate = Math.round((wins / n) * 100);
+                        const avgScore = Math.round(totalScore / n);
+                        const avgElims = (totalElims / n).toFixed(1);
+                        const avgDeposits = (totalDeposits / n).toFixed(1);
+                        const avgWart = Math.round(totalWart / n);
+                        return (
+                          <div className={styles.mhAvgWrapper} style={{ margin: 0 }}>
+                            <div className={styles.mhAvgTitle}>AVERAGE PERFORMANCE</div>
+                            <div className={styles.mhAvgBox}>
+                              {[
+                                { label: 'Elims', value: avgElims },
+                                { label: 'Wart', value: avgWart },
+                                { label: 'Balls', value: avgDeposits },
+                                { label: 'Score', value: avgScore, gold: true },
+                                { label: 'Win Rate', value: `${winRate}%`, color: winRate >= 50 ? '#46C767' : '#f87171' },
+                              ].map((s) => (
+                                <div key={s.label} className={styles.mhAvgStat}>
+                                  <span className={styles.mhAvgNum} style={s.gold ? { color: '#FFD753' } : s.color ? { color: s.color } : {}}>{s.value}</span>
+                                  <span className={styles.mhAvgLabel}>{s.label}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                      <p className={styles.mhUpdateFreq} style={{ marginTop: '0.4rem', marginBottom: 0 }}>The data is updated every 5 minutes.</p>
+                    </div>
+
+                    {/* RIGHT Column: Limit Toggle Buttons */}
+                    <div className={styles.mhLimitToggle} style={{ alignSelf: 'flex-start' }}>
+                      {([10, 20, 30] as const).map((limit) => (
+                        <button
+                          key={limit}
+                          className={`${styles.mhLimitBtn} ${historyLimit === limit ? styles.mhLimitBtnActive : ''}`}
+                          onClick={() => setHistoryLimit(limit)}
+                          disabled={historyLoading}
+                        >
+                          LAST {limit}
+                        </button>
+                      ))}
+                    </div>
+
+                  </div>
+
+                  {/* Match list */}
+                  {historyLoading ? (
+                    <div className={styles.mhLoading}>
+                      <div className={styles.mhSpinner}></div>
+                      <p>Loading match data...</p>
+                    </div>
+                  ) : matchHistory.length === 0 ? (
+                    <div className={styles.mhEmpty}>No match history found for this Moki.</div>
+                  ) : (
+                    <div className={styles.mhMatchesList}>
+                      {matchHistory.map((m: any) => {
+                        const isWinner = m.team_won === m.moki_team;
+                        const score = (isWinner ? 300 : 0) + (m.deposits || 0) * 50 + (m.eliminations || 0) * 80 + Math.floor((m.wart_distance || 0) / 80) * 45;
+                        const players: any[] = m.match_data?.players || [];
+                        const targetMoki = players.filter((p: any) => p.mokiId === m.moki_id);
+                        const teammates = players.filter((p: any) => p.team === m.moki_team && p.mokiId !== m.moki_id);
+                        const opponents = players.filter((p: any) => p.team !== m.moki_team);
+                        const isExpanded = selectedMatchDetails?.match_id === m.match_id;
+
+                        const getPlayerPerf = (mokiId: string, team: number) => {
+                          const pr = m.match_data?.result?.players?.find((p: any) => p.mokiId === mokiId);
+                          const elims = pr?.eliminations || 0;
+                          const deps = pr?.deposits || 0;
+                          const wart = pr?.wartDistance || 0;
+                          const sc = (team === m.team_won ? 300 : 0) + deps * 50 + elims * 80 + Math.floor(wart / 80) * 45;
+                          return { elims, deps, wart: Math.round(wart), score: sc };
+                        };
+
+                        return (
+                          <div key={m.match_id} className={`${styles.mhMatchCard} ${isWinner ? styles.mhWinCard : styles.mhLossCard}`}>
+                            {/* Meta */}
+                            <div className={styles.mhMatchMeta}>
+                              <div className={`${styles.mhResultBadge} ${isWinner ? styles.mhWinText : styles.mhLossText}`}>
+                                {isWinner ? 'VICTORY' : 'DEFEAT'}
+                              </div>
+                              <div className={styles.mhMetaRow}><span className={styles.mhMetaLabel}>Date:</span> {formatDate(m.match_date)}</div>
+                              {m.duration != null && <div className={styles.mhMetaRow}><span className={styles.mhMetaLabel}>Duration:</span> {formatDuration(m.duration)}</div>}
+                              {m.win_type && <div className={styles.mhMetaRow}><span className={styles.mhMetaLabel}>Win Type:</span> <span style={{ textTransform: 'capitalize' }}>{m.win_type.toLowerCase() === 'eliminations' ? 'combat' : m.win_type.toLowerCase()}</span></div>}
+                            </div>
+
+                            {/* Performance */}
+                            <div className={styles.mhPerfSection}>
+                              <div className={styles.mhSectionTitle}>Performance</div>
+                              <div className={styles.mhStatsGrid}>
+                                {[
+                                  { label: 'Elims', value: m.eliminations },
+                                  { label: 'Balls', value: m.deposits },
+                                  { label: 'Wart', value: m.wart_distance != null ? Math.round(m.wart_distance) : 0 },
+                                ].map((s) => (
+                                  <div key={s.label} className={styles.mhStatBox}>
+                                    <span className={styles.mhStatNumber}>{s.value}</span>
+                                    <span className={styles.mhStatLabel}>{s.label}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className={styles.mhScoreBox}>
+                                <span className={styles.mhScoreLabel}>Score</span>
+                                <span className={styles.mhScoreValue}>{score}</span>
+                              </div>
+                            </div>
+
+                            {/* Teams */}
+                            <div className={styles.mhTeamsSectionContainer}>
+                              <div className={styles.mhTeamsSection}>
+                                <div className={styles.mhTeamContainer}>
+                                  <div className={styles.mhSectionTitle}>Team</div>
+                                  <div className={styles.mhPlayersRow}>
+                                    {[...targetMoki, ...teammates].map((p: any, idx: number) => (
+                                      <div key={idx} className={`${styles.mhPlayerAvatar} ${idx === 0 && targetMoki.length > 0 ? styles.mhCurrentPlayer : ''}`} title={p.name}>
+                                        {p.imageUrl && <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} />}
+                                      </div>
+                                    ))}
+                                    {targetMoki.length === 0 && teammates.length === 0 && <span className={styles.mhNoData}>Unknown</span>}
+                                  </div>
+                                </div>
+                                <div className={styles.mhTeamContainer}>
+                                  <div className={styles.mhSectionTitle}>Opponents</div>
+                                  <div className={styles.mhPlayersRow}>
+                                    {opponents.map((p: any, idx: number) => (
+                                      <div key={idx} className={`${styles.mhPlayerAvatar} ${idx === 0 ? styles.mhLeadOpponent : ''}`} title={p.name}>
+                                        {p.imageUrl && <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} />}
+                                      </div>
+                                    ))}
+                                    {opponents.length === 0 && <span className={styles.mhNoData}>Unknown</span>}
+                                  </div>
+                                </div>
+                              </div>
+                              {/* Expand toggle */}
+                              <button
+                                className={`${styles.mhExpandBtn} ${isExpanded ? styles.mhExpandBtnActive : ''}`}
+                                onClick={() => setSelectedMatchDetails(isExpanded ? null : m)}
+                                title="View Detailed Performance"
+                              >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                              </button>
+                            </div>
+
+                            {/* Replay btn */}
+                            <div className={styles.mhActionSection}>
+                              <a href={`https://train.grandarena.gg/matches/${m.match_id}`} target="_blank" rel="noopener noreferrer" className={styles.mhReplayBtn} onClick={(e) => e.stopPropagation()}>
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z" /></svg>
+                                REPLAY
+                              </a>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Detail overlay when expanded */}
+                  {selectedMatchDetails && (() => {
+                    const m = selectedMatchDetails;
+                    const players: any[] = m.match_data?.players || [];
+                    const targetMoki = players.filter((p: any) => p.mokiId === m.moki_id);
+                    const teammates = players.filter((p: any) => p.team === m.moki_team && p.mokiId !== m.moki_id);
+                    const opponents = players.filter((p: any) => p.team !== m.moki_team);
+                    const allTeam = [...targetMoki, ...teammates];
+
+                    const getPlayerPerf = (mokiId: string, team: number) => {
+                      const pr = m.match_data?.result?.players?.find((p: any) => p.mokiId === mokiId);
+                      const elims = pr?.eliminations || 0;
+                      const deps = pr?.deposits || 0;
+                      const wart = pr?.wartDistance || 0;
+                      const sc = (team === m.team_won ? 300 : 0) + deps * 50 + elims * 80 + Math.floor(wart / 80) * 45;
+                      return { elims, deps, wart: Math.round(wart), score: sc };
+                    };
+
+                    const renderDetailCard = (p: any) => {
+                      const perf = getPlayerPerf(p.mokiId, p.team);
+                      return (
+                        <div key={p.mokiId} className={styles.mhDetailCard}>
+                          <div className={styles.mhDetailCardName}>{p.name}</div>
+                          <div className={styles.mhDetailCardImgWrapper}>
+                            {p.imageUrl && <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />}
+                            <span className={styles.mhDetailClassBadge}>{p.class}</span>
+                          </div>
+                          <div className={styles.mhDetailStatsBox}>
+                            <div className={styles.mhDetailPerfLabel}>PERFORMANCE</div>
+                            <div className={styles.mhDetailStatsRow}>
+                              {[{ l: 'ELIMS', v: perf.elims }, { l: 'BALLS', v: perf.deps }, { l: 'WART', v: perf.wart }].map((s) => (
+                                <div key={s.l} className={styles.mhDetailStatCol}>
+                                  <span className={styles.mhDetailStatVal}>{s.v}</span>
+                                  <span className={styles.mhDetailStatLabel}>{s.l}</span>
+                                </div>
+                              ))}
+                            </div>
+                            <div className={styles.mhDetailDivider}></div>
+                            <div className={styles.mhDetailScoreRow}>
+                              <span className={styles.mhDetailScoreLabel}>SCORE</span>
+                              <span className={styles.mhDetailScoreVal}>{perf.score}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    };
+
+                    return (
+                      <div className={styles.mhDetailOverlay} onClick={() => setSelectedMatchDetails(null)}>
+                        <div className={styles.mhDetailContent} onClick={(e) => e.stopPropagation()}>
+                          <button className={styles.mhDetailClose} onClick={() => setSelectedMatchDetails(null)}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                          </button>
+                          <div>
+                            <h4 className={styles.mhDetailSubtitle}>TEAM</h4>
+                            <div className={styles.mhDetailGrid}>{allTeam.map(renderDetailCard)}</div>
+                          </div>
+                          <div style={{ marginTop: '1rem' }}>
+                            <h4 className={styles.mhDetailSubtitle}>OPPONENTS</h4>
+                            <div className={styles.mhDetailGrid}>{opponents.map(renderDetailCard)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* ── TAB: UPCOMING MATCHES ────────────────────────────── */}
+              {activeTab === 'upcoming' && (
+                <div className={styles.upcomingContainer}>
+                  {formattedDate && (
+                    <p className={styles.upcomingDate}>Next block: {formattedDate}</p>
+                  )}
+                  <p className={styles.upcomingNote}>The data is updated at the end of each block of games.</p>
+                  {championUpcomingMatches.length === 0 ? (
+                    <div className={styles.empty}>No upcoming matches found for this champion.</div>
+                  ) : (
+                    <div className={styles.modalRows}>
+                      {championUpcomingMatches.map((match) => {
+                        const isRedTeam = match.team_red.some((m: any) => m.name === selectedChampion.name);
+                        const leftTeam = isRedTeam ? match.team_red : match.team_blue;
+                        const rightTeam = isRedTeam ? match.team_blue : match.team_red;
+                        const leftMokiClass = isRedTeam ? styles.redMoki : styles.blueMoki;
+                        const rightMokiClass = isRedTeam ? styles.blueMoki : styles.redMoki;
+                        const gridEdgeClass = isRedTeam ? styles.redOnLeft : styles.blueOnLeft;
+
+                        return (
+                          <div key={match.id} className={styles.modalMatchRow}>
+                            <div className={`${styles.modalTeamsGrid} ${gridEdgeClass}`}>
+                              <div className={styles.playersRow}>
+                                {leftTeam.map((m: any, i: number) => {
+                                  const portrait = (mokiMetadata as any)[m.name.toUpperCase()]?.portraitUrl || m.imageUrl;
+                                  const fc = allCards.find((c) => c.name.trim().toUpperCase() === m.name.trim().toUpperCase());
+                                  const actualClass = fc?.custom?.class || m.class;
+                                  return (
+                                    <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
+                                      <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
+                                      <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${leftMokiClass}`} />
+                                      <span className={styles.miniMokiClassBadge}>{actualClass}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <div className={styles.modalVsBadge}>VS</div>
+                              <div className={styles.playersRow}>
+                                {rightTeam.map((m: any, i: number) => {
+                                  const portrait = (mokiMetadata as any)[m.name.toUpperCase()]?.portraitUrl || m.imageUrl;
+                                  const fc = allCards.find((c) => c.name.trim().toUpperCase() === m.name.trim().toUpperCase());
+                                  const actualClass = fc?.custom?.class || m.class;
+                                  return (
+                                    <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
+                                      <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
+                                      <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${rightMokiClass}`} />
+                                      <span className={styles.miniMokiClassBadge}>{actualClass}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── TAB: LIVE LEADERBOARD (Ahora DAILY) ─────────────── */}
+              {activeTab === 'daily' && (
+                <div className={styles.liveContainer}>
+                  <div className={styles.mhLimitToggle} style={{ marginBottom: '1rem', marginLeft: 'auto', width: 'fit-content' }}>
+                    {(['7', '14', 'all'] as const).map((type) => (
+                      <button
+                        key={type}
+                        className={`${styles.mhLimitBtn} ${liveView === type ? styles.mhLimitBtnActive : ''}`}
+                        onClick={() => setLiveView(type)}
+                      >
+                        {type === 'all' ? 'ALL' : `${type}D`}
+                      </button>
+                    ))}
+                  </div>
+
+                  {liveLoading ? (
+                    <div className={styles.loading}>Loading live data...</div>
+                  ) : leaderboard.length === 0 ? (
+                    <div className={styles.empty}>No live data available yet.</div>
+                  ) : (() => {
+                    const data = (liveView === 'all' ? leaderboard : leaderboard.slice(-Number(liveView))).map((d) => ({
+                      ...d,
+                      formatted_date: new Date(d.date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                    }));
+
+                    const ticks: string[] = [];
+                    if (liveView === 'all' && data.length > 0) {
+                      data.forEach((d, i) => {
+                        if (i === 0 || i === data.length - 1 || i % 7 === 0) {
+                          ticks.push(d.formatted_date);
+                        }
+                      });
+                    }
+
+                    return (
+                      <div className={styles.chartWrapper}>
+                        <h3 className={styles.chartTitle}>Leaderboard Position</h3>
+                        <div style={{ height: '240px', width: '100%' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={data} margin={{ top: 10, right: 25, left: -20, bottom: 0 }}>
+                              <defs>
+                                <linearGradient id="colorRankChamp" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#FFD753" stopOpacity={0.8} />
+                                  <stop offset="95%" stopColor="#FFD753" stopOpacity={0.0} />
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                              <XAxis
+                                dataKey="formatted_date"
+                                stroke="#555"
+                                fontSize={9}
+                                fontWeight={600}
+                                tickLine={false}
+                                interval={liveView === 'all' ? 'preserveStartEnd' : 0}
+                                ticks={ticks.length > 1 ? ticks : undefined}
+                              />
+                              <YAxis stroke="#555" fontSize={10} fontWeight={600} tickLine={false} allowDecimals={false} />
+                              <Tooltip
+                                contentStyle={{ backgroundColor: '#1C1C1E', border: '2px solid #333', borderRadius: '0.5rem', color: '#fff', fontSize: '0.85rem' }}
+                                formatter={((value: any, name: any) => {
+                                  const label = String(name || '');
+                                  if (label === 'daily_rank') return [`Rank #${value}`, 'Position'];
+                                  if (label === 'daily_score') return [`${value} pts`, 'Score'];
+                                  return [value, label];
+                                }) as any}
+                              />
+                              <Area type="monotone" dataKey="daily_rank" stroke="#FFD753" strokeWidth={3} fillOpacity={1} fill="url(#colorRankChamp)" animationDuration={1500} />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
