@@ -68,6 +68,30 @@ export interface EnhancedCard extends GrandArenaCard {
     avgWartDistance30?: number;
     avgScore30?: number;
     avgWinRate30?: number;
+    avgEndedGame10?: number;
+    avgDeaths10?: number;
+    avgEatingWhileRiding10?: number;
+    avgBuffTime10?: number;
+    avgWartTime10?: number;
+    avgLooseBallPickups10?: number;
+    avgEatenByWart10?: number;
+    avgWartCloser10?: number;
+    avgEndedGame20?: number;
+    avgDeaths20?: number;
+    avgEatingWhileRiding20?: number;
+    avgBuffTime20?: number;
+    avgWartTime20?: number;
+    avgLooseBallPickups20?: number;
+    avgEatenByWart20?: number;
+    avgWartCloser20?: number;
+    avgEndedGame30?: number;
+    avgDeaths30?: number;
+    avgEatingWhileRiding30?: number;
+    avgBuffTime30?: number;
+    avgWartTime30?: number;
+    avgLooseBallPickups30?: number;
+    avgEatenByWart30?: number;
+    avgWartCloser30?: number;
   };
 }
 
@@ -88,6 +112,7 @@ export interface FilterState {
   traits: string[];
   insertionOrder?: string[];
   matchLimit?: 10 | 20 | 30 | 'ALL';
+  extraSort?: string;
 }
 
 export const TRAIT_GROUPS = [

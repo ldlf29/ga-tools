@@ -603,17 +603,32 @@ export default function Home() {
     setFilters((prev) => {
       const currentValues = prev[key];
       let newValues = currentValues;
+      let newExtraSort = prev.extraSort;
+
       if (key === 'stars') {
         newValues = [];
       } else if (key === 'matchLimit') {
         newValues = 'ALL';
+        newExtraSort = undefined; // Clear extraSort when matchLimit is removed
       } else if (Array.isArray(currentValues)) {
         newValues = (currentValues as any[]).filter((v) => v !== value);
       }
+
       let newOrder = prev.insertionOrder ? [...prev.insertionOrder] : [];
       const orderKey = `${key}:${value}`;
       newOrder = newOrder.filter((k) => k !== orderKey);
-      return { ...prev, [key]: newValues, insertionOrder: newOrder };
+
+      // Also clean up extraSort chips from insertionOrder if matchLimit was removed
+      if (key === 'matchLimit') {
+        newOrder = newOrder.filter((k) => !k.startsWith('extraSort:'));
+      }
+
+      return {
+        ...prev,
+        [key]: newValues,
+        extraSort: newExtraSort,
+        insertionOrder: newOrder,
+      };
     });
   };
 

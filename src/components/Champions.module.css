@@ -42,6 +42,7 @@
   flex: 1;
   gap: 1.5rem;
   min-height: 0;
+  overflow-x: hidden;
 }
 
 /* ─── Top Controls ──────────────────────────────────────────────────────────── */
@@ -66,6 +67,46 @@
   min-height: 44px;
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.viewToggle {
+  display: flex;
+  background: #5097ff;
+  border: 2px solid #333333;
+  border-radius: 0.75rem;
+  padding: 2px;
+  margin-left: 0.5rem;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.toggleIcon {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #333333;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleActive {
+  background: #ffd753;
+  color: #000;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggleIcon:hover:not(.toggleActive) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+
 .pageTitle {
   font-size: 1.7rem;
   font-family: var(--font-display);
@@ -75,8 +116,12 @@
   text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
 
+.desktopSearch {
+  display: none;
+}
+
 .searchInput {
-  width: 240px;
+  width: 100%;
   padding: 0.5rem 1rem;
   background: #5097ff;
   border: 1px dashed rgba(0, 0, 0, 0.25);
@@ -93,8 +138,30 @@
 .searchInput:hover, .searchInput:focus { border: 1px solid #2673e8; outline: none; }
 
 @media (max-width: 1024px) {
-  .headerTopRow { flex-direction: column; align-items: flex-start; gap: 0.75rem; min-height: auto; }
-  .searchInput { width: 100% !important; }
+  .headerTopRow { flex-direction: row; align-items: center; justify-content: space-between; gap: 0.5rem; min-height: auto; width: 100%; }
+  .headerRight { gap: 0.25rem; align-items: center; }
+  .pageTitle { font-size: 1.3rem; }
+  .searchInput { width: 100% !important; margin-top: 0.5rem; }
+  .championsView { padding: 0 0.75rem; }
+  .topControls { padding: 1rem; }
+  .championsGrid { padding: 0.25rem 0 1rem 0; width: 100%; }
+}
+
+@media (min-width: 1024px) {
+  .desktopSearch {
+    display: block;
+    width: 220px;
+    height: 38px;
+    margin: 0 0.5rem;
+    border: 1px dashed rgba(0, 0, 0, 0.25);
+  }
+  .searchRow {
+    display: none;
+  }
+}
+
+.searchRow {
+  width: 100%;
 }
 
 /* ─── Active Filters ────────────────────────────────────────────────────────── */
@@ -143,6 +210,293 @@
 .champInfo { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
 .champName { font-size: 0.72rem; font-weight: 700; color: #ffffff; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000, 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000; text-transform: none !important; }
 .champClass { font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: #333333; background: #ffd753; padding: 2px 8px; border-radius: 4px; border: 1.5px solid #333333; box-shadow: 1px 1px 0 #333333; text-align: center; white-space: nowrap; }
+
+/* ─── Champions List ────────────────────────────────────────────────────────── */
+.championsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.25rem 0.75rem 1rem 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 180px);
+}
+
+.listCard {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 2px solid #333333;
+  border-bottom-width: 5px;
+  border-radius: 12px;
+  overflow-x: auto;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  width: 100%;
+}
+
+
+.listCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  border-color: #000;
+}
+
+.listHeader, .listData {
+  display: grid;
+  grid-template-columns: 35px 230px 90px repeat(12, minmax(60px, 1fr));
+  width: max-content;
+  min-width: 100%;
+  align-items: center;
+  text-align: center;
+  padding: 0.6rem 1rem;
+  gap: 0.4rem;
+  min-height: 40px;
+}
+
+
+.listHeader {
+  background: #5097ff;
+  border-bottom: 2px solid #333333;
+}
+
+.listHeader span {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+  font-family: var(--font-display);
+}
+
+.listData {
+  background: #ffffff;
+}
+
+.listData span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #333333;
+}
+
+.listRank {
+  color: #000 !important;
+  font-weight: 900 !important;
+}
+
+.listNameCell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding-left: 0.5rem;
+  text-align: left !important;
+}
+
+.listPhoto {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1.5px solid #333333;
+  object-fit: cover;
+  box-shadow: 1px 1px 0 #333333;
+  flex-shrink: 0;
+}
+
+.listName {
+  font-weight: 800 !important;
+  color: #2673e8 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listClassCell {
+  display: flex;
+  justify-content: center;
+}
+
+.listClassValue {
+   background: #ffd753;
+   padding: 1px 6px;
+   border-radius: 4px;
+   border: 1px solid #333333;
+   font-size: 0.6rem !important;
+   font-weight: 800 !important;
+   text-transform: uppercase;
+   box-shadow: 1px 1px 0 #333333;
+   color: #333333 !important;
+}
+
+.listStatValue {
+  font-family: 'Inter', sans-serif;
+}
+
+.listScore {
+  color: #ffd753 !important;
+}
+
+.listWRGreen {
+  color: #22c55e !important;
+  font-weight: 800 !important;
+}
+
+.listWRRed {
+  color: #ef4444 !important;
+  font-weight: 800 !important;
+}
+
+@media (max-width: 1024px) {
+  .controlsHeader {
+    padding: 0.25rem 0.5rem;
+    gap: 0.4rem;
+  }
+
+  .orderByContainer, .viewToggle {
+    flex-shrink: 0;
+  }
+
+  .listCard {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  /* Make scrollbar more visible on mobile list items */
+  .listCard::-webkit-scrollbar {
+    height: 4px;
+    background: transparent;
+  }
+  .listCard::-webkit-scrollbar-thumb {
+    background: #5097ff;
+    border-radius: 10px;
+  }
+
+  .listHeader, .listData {
+    grid-template-columns: 35px 200px 90px repeat(12, 60px);
+    width: max-content;
+    min-width: 100%;
+    padding: 0.3rem 0.6rem;
+    gap: 0.3rem;
+  }
+  
+  .listHeader span {
+    font-size: 0.6rem;
+  }
+  
+  .listData span {
+    font-size: 0.75rem;
+  }
+
+  .listPhoto {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ─── PC/Mobile View Management ────────────────────────────────────────── */
+.pcOnly { display: block; width: 100%; }
+.mobileOnly { display: none; width: 100%; }
+
+@media (max-width: 1024px) {
+  .pcOnly { display: none !important; }
+  .mobileOnly { display: flex !important; flex-direction: column; gap: 0.6rem; padding: 0.75rem; min-width: 0 !important; width: 100% !important; }
+
+  /* New 3-Row Mobile Layout */
+  .mobileRow1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #2673e8; /* Blue background */
+    margin: -0.75rem -0.75rem 0.25rem -0.75rem; /* Pull out to edges */
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px 10px 0 0;
+    width: auto;
+  }
+
+  .mobileRank {
+    background: #ffd753;
+    border: 1.5px solid #333;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    box-shadow: 1px 1px 0 #333;
+    min-width: 24px;
+    text-align: center;
+    color: #333333 !important;
+  }
+
+  .mobilePhoto {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1.5px solid #ffd753;
+  }
+
+  .mobileName {
+    flex: 1;
+    font-weight: 800;
+    color: #ffffff !important;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Stats Grid (Row 2 - 7 stats / 5 cols) */
+  .mobileStatsGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.35rem;
+    background: rgba(80, 151, 255, 0.08); /* Faint blue bg */
+    padding: 0.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  /* Perf Grid (Row 3 - 5 stats / 5 cols) */
+  .mobilePerfGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.35rem;
+    background: rgba(80, 151, 255, 0.08); /* Match Stats BG */
+    padding: 0.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.08);
+    margin-top: 0.2rem;
+  }
+
+  /* Shared Stat Item */
+  .mobileStatItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .mobileStatLabel {
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: -1px;
+  }
+
+  .mobileStatValue {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #333;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Row 3 Special values */
+  .mobScore { color: #ffd753 !important; font-weight: 800; }
+  .mobWRGreen { color: #22c55e !important; font-weight: 800; }
+  .mobWRRed { color: #ef4444 !important; font-weight: 800; }
+}
 
 /* ─── State messages ────────────────────────────────────────────────────────── */
 .loading, .empty { text-align: center; color: #949ba4; padding: 3rem; font-size: 1.1rem; }
@@ -400,8 +754,44 @@
 /* ─── History Tab (mh = MatchHistory replica) ───────────────────────────────── */
 .historyContainer { display: flex; flex-direction: column; gap: 1rem; }
 
-.mhTitleRow { display: flex; align-items: center; gap: 1.25rem; }
-.mhLimitToggle { display: flex; gap: 0.5rem; }
+.mhControlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.35rem;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .mhControlsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .mhLimitToggle {
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .mhAvgWrapper {
+    align-items: center;
+    width: 100%;
+  }
+
+  .mhAvgBox {
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .mhAvgNum {
+    font-size: 1.1rem;
+  }
+}
+
+.mhTitleRow { display: flex; align-items: center; gap: 1rem; }
+.mhLimitToggle { display: flex; gap: 0.4rem; }
 
 .mhLimitBtn {
   background: #ffd753;
@@ -425,7 +815,7 @@
 /* Average box */
 .mhAvgWrapper { display: flex; flex-direction: column; align-items: flex-start; }
 .mhAvgTitle { font-size: 0.85rem; font-family: var(--font-display); font-weight: 700; color: #ffd753; text-transform: uppercase; margin-bottom: 0.4rem; letter-spacing: 0.5px; text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000; }
-.mhAvgBox { display: flex; gap: 1.5rem; background: #ffffff; padding: 0.5rem 1.5rem; border-radius: 1rem; border: 3px solid #333333; border-bottom-width: 6px; }
+.mhAvgBox { display: flex; gap: 1.5rem; background: #ffffff; padding: 0.5rem 1.5rem; border-radius: 1rem; border: 3px solid #333333; border-bottom-width: 6px; flex-wrap: wrap; }
 .mhAvgStat { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .mhAvgNum { font-family: var(--font-display); font-size: 1.35rem; color: #333; }
 .mhAvgLabel { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #666; margin-top: -2px; }

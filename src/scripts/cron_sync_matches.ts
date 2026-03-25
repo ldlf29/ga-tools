@@ -107,6 +107,14 @@ async function run() {
               eliminations: perfResults.eliminations || 0,
               deposits: perfResults.deposits || 0,
               wart_distance: perfResults.wartDistance || 0,
+              ended_game: !!perfResults.endedGame,
+              deaths: perfResults.deaths || 0,
+              eating_while_riding: perfResults.eatingWhileRiding || 0,
+              buff_time_seconds: perfResults.buffTimeSeconds || 0,
+              wart_ride_time_seconds: perfResults.wartTimeSeconds || perfResults.wartRideTimeSeconds || 0,
+              loose_ball_pickups: perfResults.looseBallPickups || 0,
+              eaten_by_wart: perfResults.eatenByWart || perfResults.eatenbyWart || 0,
+              wart_closer: !!perfResults.wartCloser,
               win_type:
                 match.result.winType === 'Eliminations'
                   ? 'Combat'
@@ -150,7 +158,8 @@ async function run() {
         .upsert(chunk, { onConflict: 'moki_id, match_id' });
 
       if (upsertErr) {
-        console.error('[Cron Matches] Upsert error:', upsertErr);
+        console.error('[Cron Matches] Upsert error for chunk:', chunk.length);
+        console.dir(upsertErr, { depth: null });
         throw upsertErr;
       }
       recordsUpserted += chunk.length;

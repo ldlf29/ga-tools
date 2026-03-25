@@ -1,5 +1,5 @@
 import { EnhancedCard, FilterState } from '@/types';
-import { getSpecializationCoefficient } from './specializationUtils';
+import { getSpecializationCoefficient, getStatValueByLimit } from './specializationUtils';
 
 export type SortOption =
   | 'default'
@@ -41,8 +41,15 @@ export const sortCardsByFilters = (
       return true;
     })
     .sort((a, b) => {
-      // 1. Specialization Sorting (Takes highest priority if active)
-      if (filters.specialization && filters.specialization.length > 0) {
+    // 0. Extra Sorting (New metrics like deaths, pickups, etc.)
+    if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+      const valA = getStatValueByLimit(a, filters.extraSort, filters.matchLimit);
+      const valB = getStatValueByLimit(b, filters.extraSort, filters.matchLimit);
+      if (valB !== valA) return valB - valA;
+    }
+
+    // 1. Specialization Sorting (Takes highest priority if active)
+    if (filters.specialization && filters.specialization.length > 0) {
         const activeSpecs = filters.specialization;
         const perfSpecs = ['Gacha', 'Killer', 'Wart Rider'];
         const contextSpecs = ['Winner', 'Loser', 'Bad Streak', 'Good Streak'];

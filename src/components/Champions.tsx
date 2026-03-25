@@ -10,7 +10,7 @@ import { EnhancedCard, FilterState } from '@/types';
 import FilterSidebar from './FilterSidebar';
 import { matchesFilter } from '@/utils/filterUtils';
 import mokiMetadata from '@/data/mokiMetadata.json';
-import { getSpecializationCoefficient } from '@/utils/specializationUtils';
+import { getSpecializationCoefficient, getStatValueByLimit } from '@/utils/specializationUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 import {
   ResponsiveContainer,
@@ -78,6 +78,7 @@ export default function Champions({
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortOption, setSortOption] = useState<string>('default');
   const [sortDropdownOpen, setSortDropdownOpen] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // ─── Load upcoming matches ─────────────────────────────────────────────────
   useEffect(() => {
@@ -154,7 +155,7 @@ export default function Champions({
     let newOrder = filters.insertionOrder ? [...filters.insertionOrder] : [];
     const orderKey = `${String(key)}:${value}`;
     newOrder = newOrder.filter((k) => k !== orderKey);
-    
+
     onFilterChange({ ...filters, [key]: newValues, insertionOrder: newOrder });
   };
 
@@ -187,16 +188,34 @@ export default function Champions({
         id: metadata?.id ?? fullCard?.id ?? champ.id,
         tokenId: metadata?.id ? parseInt(metadata.id, 10) : null,
         class: fullCard?.custom?.class || champ.class,
-        score: fullCard?.custom?.score || 0,
+        score: fullCard ? getStatValueByLimit(fullCard, 'score', filters.matchLimit) : 0,
+        globalScore: fullCard ? getStatValueByLimit(fullCard, 'score', 'ALL') : 0,
         imageUrl: metadata?.portraitUrl || fullCard?.custom?.imageUrl || champ.imageUrl,
         marketLink: metadata?.marketLink || null,
         fur: fullCard?.custom?.fur || metadata?.fur || null,
         fullCard,
       };
-    }).sort((a, b) => b.score - a.score);
+    });
 
-    return list;
-  }, [matches, allCards]);
+    // Create a stable rank map based on default GLOBAL score sorting
+    const defaultSorted = [...list].sort((a, b) => (b.globalScore || 0) - (a.globalScore || 0));
+    const rankMap = new Map();
+    defaultSorted.forEach((c, i) => rankMap.set(c.name, i + 1));
+
+    return list.sort((a, b) => {
+      const fA = a.fullCard;
+      const fB = b.fullCard;
+      if (filters.extraSort && fA && fB) {
+        const valA = getStatValueByLimit(fA, filters.extraSort, filters.matchLimit);
+        const valB = getStatValueByLimit(fB, filters.extraSort, filters.matchLimit);
+        if (valB !== valA) return valB - valA;
+      }
+      return (b.score || 0) - (a.score || 0);
+    }).map(champ => ({
+      ...champ,
+      rank: rankMap.get(champ.name)
+    }));
+  }, [matches, allCards, filters.extraSort, filters.matchLimit]);
 
   // ─── Filtered champions ───────────────────────────────────────────────────
   const filteredChampions = useMemo(() => {
@@ -222,23 +241,39 @@ export default function Champions({
         case 'for': return custom.fortitude || 0;
         case 'total': return custom.totalStats || 0;
         case 'train': return custom.train || 0;
-        case 'win_rate': return custom.winRate ?? custom.avgWinRate ?? 0;
+        case 'win_rate':
+          if (filters.matchLimit && filters.matchLimit !== 'ALL' && champ.fullCard) {
+            return getStatValueByLimit(champ.fullCard, 'winRate', filters.matchLimit);
+          }
+          return custom.winRate || 0;
+        case 'name': return champ.name;
         default: return 0;
       }
     };
 
     let sorted = [...filtered];
 
-    if (sortOption !== 'default') {
+    // Priority 1: Extra Sorting (e.g., deaths, wart eat)
+    if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+      sorted.sort((a, b) => {
+        const valA = getStatValueByLimit(a.fullCard, filters.extraSort as string, filters.matchLimit as any);
+        const valB = getStatValueByLimit(b.fullCard, filters.extraSort as string, filters.matchLimit as any);
+        return valB - valA;
+      });
+    }
+    // Priority 2: Manual dropdown sorting (name, total, spd, etc.)
+    else if (sortOption !== 'default') {
       sorted.sort((a, b) => {
         if (sortOption === 'name') return a.name.localeCompare(b.name);
         return getStatValue(b, sortOption) - getStatValue(a, sortOption);
       });
-    } else if (filters.specialization && filters.specialization.length > 0) {
+    }
+    // Priority 3: Specialization sorting
+    else if (filters.specialization && filters.specialization.length > 0) {
       sorted.sort((a, b) => {
         const fullA = a.fullCard;
         const fullB = b.fullCard;
-        if (!fullA || !fullB) return b.score - a.score;
+        if (!fullA || !fullB) return (b.score || 0) - (a.score || 0);
 
         const activeSpecs = filters.specialization!;
         const perfSpecs = ['Gacha', 'Killer', 'Wart Rider'];
@@ -461,10 +496,50 @@ export default function Champions({
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
                   placeholder="Search Champion..."
-                  className={styles.searchInput}
+                  className={`${styles.searchInput} ${styles.desktopSearch}`}
                 />
+
+                <div className={styles.viewToggle}>
+                  <button
+                    className={`${styles.toggleIcon} ${viewMode === 'grid' ? styles.toggleActive : ''}`}
+                    onClick={() => setViewMode('grid')}
+                    title="Gallery View"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                  </button>
+                  <button
+                    className={`${styles.toggleIcon} ${viewMode === 'list' ? styles.toggleActive : ''}`}
+                    onClick={() => setViewMode('list')}
+                    title="List View"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="8" y1="6" x2="21" y2="6"></line>
+                      <line x1="8" y1="12" x2="21" y2="12"></line>
+                      <line x1="8" y1="18" x2="21" y2="18"></line>
+                      <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                      <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                      <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
+            
+            <div className={styles.searchRow}>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Search Champion..."
+                className={styles.searchInput}
+              />
+            </div>
+
             {activeFilters.length > 0 && (
               <div className={styles.activeFilters}>
                 {activeFilters.map((f, i) => (
@@ -487,10 +562,10 @@ export default function Champions({
             <div className={styles.loading}>Loading Champions...</div>
           ) : filteredChampions.length === 0 ? (
             <div className={styles.empty}>No Champions found matching these filters.</div>
-          ) : (
+          ) : viewMode === 'grid' ? (
             <div className={styles.championsGrid}>
               {filteredChampions.map((champ) => {
-                const globalRank = uniqueChampions.findIndex((c) => c.name === champ.name) + 1;
+                const globalRank = champ.rank;
                 return (
                   <button key={champ.name} className={styles.championButton} onClick={() => handleChampionClick(champ)}>
                     <div className={styles.imgBadgeWrapper}>
@@ -502,6 +577,74 @@ export default function Champions({
                       <span className={styles.champClass}>{champ.class}</span>
                     </div>
                   </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={styles.championsList}>
+              {filteredChampions.map((champ) => {
+                const wr = getStatValueByLimit(champ.fullCard, 'winRate', filters.matchLimit);
+                const wrClass = wr >= 50 ? styles.mobWRGreen : styles.mobWRRed;
+                
+                return (
+                  <div key={champ.name} className={styles.listCard} onClick={() => handleChampionClick(champ)}>
+                    {/* PC View (Table Row) */}
+                    <div className={styles.pcOnly}>
+                      <div className={styles.listHeader}>
+                        <span>#</span><span>Name</span><span>Class</span><span>Str</span><span>Spd</span><span>Def</span><span>Dex</span><span>For</span><span>Total</span><span>Train</span><span>Elims</span><span>Wart</span><span>Balls</span><span>Score</span><span>W/R</span>
+                      </div>
+                      <div className={styles.listData}>
+                        <span className={styles.listRank}>{champ.rank}</span>
+                        <div className={styles.listNameCell}>
+                          <img src={champ.imageUrl} alt={champ.name} className={styles.listPhoto} loading="lazy" />
+                          <span className={styles.listName}>{champ.name}</span>
+                        </div>
+                        <div className={styles.listClassCell}><span className={styles.listClassValue}>{champ.class}</span></div>
+                        <span className={styles.listStatValue}>{getStat(champ.fullCard, 'strength')}</span>
+                        <span className={styles.listStatValue}>{getStat(champ.fullCard, 'speed')}</span>
+                        <span className={styles.listStatValue}>{getStat(champ.fullCard, 'defense')}</span>
+                        <span className={styles.listStatValue}>{getStat(champ.fullCard, 'dexterity')}</span>
+                        <span className={styles.listStatValue}>{getStat(champ.fullCard, 'fortitude')}</span>
+                        <span className={styles.listStatValue}>{getStat(champ.fullCard, 'totalStats')}</span>
+                        <span className={styles.listStatValue}>{getStat(champ.fullCard, 'train')}</span>
+                        <span className={styles.listStatValue}>{getStatValueByLimit(champ.fullCard, 'eliminations', filters.matchLimit).toFixed(2)}</span>
+                        <span className={styles.listStatValue}>{getStatValueByLimit(champ.fullCard, 'wartDistance', filters.matchLimit).toFixed(0)}</span>
+                        <span className={styles.listStatValue}>{getStatValueByLimit(champ.fullCard, 'deposits', filters.matchLimit).toFixed(1)}</span>
+                        <span className={`${styles.listStatValue} ${styles.listScore}`}>{champ.score.toFixed(2)}</span>
+                        <span className={`${styles.listStatValue} ${wr >= 50 ? styles.listWRGreen : styles.listWRRed}`}>
+                          {wr.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Mobile View (3-Row Card) */}
+                    <div className={styles.mobileOnly}>
+                      <div className={styles.mobileRow1}>
+                        <span className={styles.mobileRank}>#{champ.rank}</span>
+                        <img src={champ.imageUrl} alt={champ.name} className={styles.mobilePhoto} loading="lazy" />
+                        <span className={styles.mobileName}>{champ.name}</span>
+                        <span className={styles.listClassValue}>{champ.class}</span>
+                      </div>
+
+                      <div className={styles.mobileStatsGrid}>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>STR</span><span className={styles.mobileStatValue}>{getStat(champ.fullCard, 'strength')}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>SPD</span><span className={styles.mobileStatValue}>{getStat(champ.fullCard, 'speed')}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>DEF</span><span className={styles.mobileStatValue}>{getStat(champ.fullCard, 'defense')}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>DEX</span><span className={styles.mobileStatValue}>{getStat(champ.fullCard, 'dexterity')}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>FOR</span><span className={styles.mobileStatValue}>{getStat(champ.fullCard, 'fortitude')}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>TOTAL</span><span className={styles.mobileStatValue}>{getStat(champ.fullCard, 'totalStats')}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>TRAIN</span><span className={styles.mobileStatValue}>{getStat(champ.fullCard, 'train')}</span></div>
+                      </div>
+
+                      <div className={styles.mobilePerfGrid}>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>ELIMS</span><span className={styles.mobileStatValue}>{getStatValueByLimit(champ.fullCard, 'eliminations', filters.matchLimit).toFixed(1)}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>WART</span><span className={styles.mobileStatValue}>{getStatValueByLimit(champ.fullCard, 'wartDistance', filters.matchLimit).toFixed(0)}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>BALLS</span><span className={styles.mobileStatValue}>{getStatValueByLimit(champ.fullCard, 'deposits', filters.matchLimit).toFixed(1)}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>SCORE</span><span className={`${styles.mobileStatValue} ${styles.mobScore}`}>{champ.score.toFixed(1)}</span></div>
+                        <div className={styles.mobileStatItem}><span className={styles.mobileStatLabel}>W/R</span><span className={`${styles.mobileStatValue} ${wrClass}`}>{wr.toFixed(1)}%</span></div>
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -534,7 +677,7 @@ export default function Champions({
                   )}
                 </div>
                 <span className={styles.modalRank}>
-                  #{uniqueChampions.findIndex((c) => c.name === selectedChampion.name) + 1} LEADERBOARD
+                  #{selectedChampion?.rank || 0} LEADERBOARD
                 </span>
               </div>
               <button className={styles.modalClose} onClick={handleCloseModal} title="Close">
@@ -566,8 +709,9 @@ export default function Champions({
 
               {/* ── TAB: STATS & PERFORMANCES ─────────────────────────── */}
               {activeTab === 'stats' && (() => {
-                const fc = selectedChampion.fullCard as EnhancedCard | undefined;
-                const c = fc?.custom;
+                const fc = selectedChampion?.fullCard;
+                if (!fc) return null;
+                const c = fc.custom;
                 return (
                   <div className={styles.statsGrid}>
                     <div className={styles.statsSection}>
@@ -578,7 +722,7 @@ export default function Champions({
                           { label: 'Fur', value: fc?.custom?.fur || '-' },
                           { label: 'Stars', value: fc?.custom?.stars ? `${fc.custom.stars} ★` : '-' },
                           ...(fc?.custom?.traits && fc.custom.traits.length > 0
-                            ? fc.custom.traits.map((t) => ({ label: 'Trait', value: t }))
+                            ? fc.custom.traits.map((t: string) => ({ label: 'Trait', value: t }))
                             : []
                           ),
                         ].map((s, idx) => (
@@ -611,14 +755,18 @@ export default function Champions({
                     </div>
 
                     <div className={styles.statsSection}>
-                      <h3 className={styles.statsSectionTitle}>AVERAGE PERFORMANCE (ALL SEASON)</h3>
+                      <h3 className={styles.statsSectionTitle}>
+                        {filters.matchLimit === 'ALL' || !filters.matchLimit
+                          ? 'AVERAGE PERFORMANCE (ALL SEASON)'
+                          : `AVERAGE PERFORMANCE (LAST ${filters.matchLimit})`}
+                      </h3>
                       <div className={styles.statsRow}>
                         {[
-                          { label: 'Score', value: c?.score !== undefined ? c.score.toFixed(2) : '—' },
-                          { label: 'Win Rate', value: c?.winRate !== undefined ? c.winRate.toFixed(1) + '%' : '—' },
-                          { label: 'Elims', value: c?.eliminations !== undefined ? c.eliminations.toFixed(2) : '—' },
-                          { label: 'Wart', value: c?.wartDistance !== undefined ? c.wartDistance.toFixed(0) : '—' },
-                          { label: 'Balls', value: c?.deposits !== undefined ? c.deposits.toFixed(2) : '—' },
+                          { label: 'Elims', value: getStatValueByLimit(fc, 'eliminations', filters.matchLimit).toFixed(2) },
+                          { label: 'Wart', value: getStatValueByLimit(fc, 'wartDistance', filters.matchLimit).toFixed(0) },
+                          { label: 'Balls', value: getStatValueByLimit(fc, 'deposits', filters.matchLimit).toFixed(2) },
+                          { label: 'Score', value: getStatValueByLimit(fc, 'score', filters.matchLimit).toFixed(2) },
+                          { label: 'Win Rate', value: getStatValueByLimit(fc, 'winRate', filters.matchLimit).toFixed(1) + '%' },
                         ].map((s) => (
                           <div key={s.label} className={`${styles.statPill} ${styles.statPillPerf}`}>
                             <span className={styles.statLabel}>{s.label}</span>
@@ -628,7 +776,28 @@ export default function Champions({
                       </div>
                     </div>
 
-
+                    {(filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30) && (
+                      <div className={styles.statsSection}>
+                        <h3 className={styles.statsSectionTitle}>EXTRA (LAST {filters.matchLimit})</h3>
+                        <div className={styles.statsRow} style={{ gap: '0.4rem' }}>
+                          {[
+                            { label: 'Ended', value: (getStatValueByLimit(fc, 'endedGame', filters.matchLimit) * 100).toFixed(0) + '%' },
+                            { label: 'Deaths', value: getStatValueByLimit(fc, 'deaths', filters.matchLimit).toFixed(2) },
+                            { label: 'WART EAT', value: getStatValueByLimit(fc, 'eatingWhileRiding', filters.matchLimit).toFixed(2) },
+                            { label: 'Buff Time', value: getStatValueByLimit(fc, 'buffTime', filters.matchLimit).toFixed(1) + 's' },
+                            { label: 'Wart Time', value: getStatValueByLimit(fc, 'wartTime', filters.matchLimit).toFixed(1) + 's' },
+                            { label: 'Pickups', value: getStatValueByLimit(fc, 'looseBallPickups', filters.matchLimit).toFixed(2) },
+                            { label: 'Eaten', value: getStatValueByLimit(fc, 'eatenByWart', filters.matchLimit).toFixed(2) },
+                            { label: 'WART CLOSER', value: (getStatValueByLimit(fc, 'wartCloser', filters.matchLimit) * 100).toFixed(0) + '%' },
+                          ].map((s) => (
+                            <div key={s.label} className={`${styles.statPill} ${styles.statPillPerf}`} style={{ padding: '0.4rem 0.4rem', minWidth: '75px', flex: '1 1 content' }}>
+                              <span className={styles.statLabel} style={{ fontSize: '0.6rem', whiteSpace: 'nowrap' }}>{s.label}</span>
+                              <span className={styles.statValue} style={{ fontSize: '0.85rem' }}>{s.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -638,7 +807,7 @@ export default function Champions({
                 <div className={styles.historyContainer}>
                   {/* Controls */}
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.35rem' }}>
+                  <div className={styles.mhControlsRow}>
 
                     {/* LEFT Column: Average performance box + Update Freq */}
                     <div>
@@ -967,12 +1136,35 @@ export default function Champions({
                     }));
 
                     const ticks: string[] = [];
-                    if (liveView === 'all' && data.length > 0) {
-                      data.forEach((d, i) => {
-                        if (i === 0 || i === data.length - 1 || i % 7 === 0) {
-                          ticks.push(d.formatted_date);
+                    if (data.length > 0) {
+                      const n = data.length;
+                      const interval = liveView === 'all' ? 7 : (liveView === '14' ? 2 : 0);
+                      
+                      if (interval > 0) {
+                        const tickIndexes: number[] = [];
+                        // Start from most recent (index n-1) and go backwards
+                        for (let i = n - 1; i >= 0; i -= interval) {
+                          tickIndexes.push(i);
                         }
-                      });
+                        
+                        // Also try to include the oldest (index 0) if it's at least half an interval away
+                        const oldestIdx = 0;
+                        const lastGap = tickIndexes[tickIndexes.length - 1] - oldestIdx;
+                        if (lastGap > interval / 2 && !tickIndexes.includes(oldestIdx)) {
+                          tickIndexes.push(oldestIdx);
+                        } else if (!tickIndexes.includes(oldestIdx) && tickIndexes.length > 1) {
+                          // If too close, replace the oldest tick we have with index 0
+                          // actually better to just keep it as is, or just ensure index 0 is used instead of the very close one
+                          tickIndexes[tickIndexes.length - 1] = oldestIdx;
+                        } else if (!tickIndexes.includes(oldestIdx)) {
+                          tickIndexes.push(oldestIdx);
+                        }
+                        
+                        // Sort indexes chronologically and get the labels
+                        tickIndexes.sort((a, b) => a - b).forEach(idx => {
+                          ticks.push(data[idx].formatted_date);
+                        });
+                      }
                     }
 
                     return (
@@ -994,8 +1186,8 @@ export default function Champions({
                                 fontSize={9}
                                 fontWeight={600}
                                 tickLine={false}
-                                interval={liveView === 'all' ? 'preserveStartEnd' : 0}
-                                ticks={ticks.length > 1 ? ticks : undefined}
+                                interval={ticks.length > 0 ? 0 : 'preserveStartEnd'}
+                                ticks={ticks.length > 0 ? ticks : undefined}
                               />
                               <YAxis stroke="#555" fontSize={10} fontWeight={600} tickLine={false} allowDecimals={false} />
                               <Tooltip
@@ -1024,3 +1216,4 @@ export default function Champions({
     </div>
   );
 }
+
