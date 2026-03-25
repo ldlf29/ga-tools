@@ -278,7 +278,7 @@ export default function FilterSidebar({
         {/* --- MOKI SECTION --- */}
         {filters.cardType !== 'SCHEME' && (
           <>
-            {/* Rarity - only show if no search or has matches */}
+            {/* Rarity */}
             {!hideRarity && (!filterSearch.trim() || rarityMatches) && (
               <FilterAccordion
                 storagePrefix={storagePrefix}
@@ -317,6 +317,56 @@ export default function FilterSidebar({
                     <span className={styles.labelText}>{c}</span>
                   </label>
                 ))}
+              </FilterAccordion>
+            )}
+
+            {/* Fur */}
+            {(!filterSearch.trim() || furMatches) && (
+              <FilterAccordion
+                storagePrefix={storagePrefix}
+                title="Fur"
+                isOpenDefault={false}
+                forceOpen={furMatches}
+              >
+                {filterOptions(FUR_OPTIONS).map((f) => (
+                  <label key={f} className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={filters.fur.includes(f)}
+                      onChange={() => handleFurChange(f)}
+                    />
+                    <span className={styles.labelText}>{f}</span>
+                  </label>
+                ))}
+              </FilterAccordion>
+            )}
+
+            {/* Traits (Grouped) */}
+            {(!filterSearch.trim() || traitsMatches) && (
+              <FilterAccordion
+                storagePrefix={storagePrefix}
+                title="Traits"
+                isOpenDefault={false}
+                forceOpen={traitsMatches}
+              >
+                {TRAIT_GROUPS.filter((group) => {
+                  if (!filterSearch.trim()) return true;
+                  return group.label
+                    .toLowerCase()
+                    .includes(filterSearch.toLowerCase());
+                }).map((group) => {
+                  const isChecked = filters.traits.includes(group.label);
+                  return (
+                    <label key={group.label} className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox" // Keep as checkbox visually so they can toggle it off, but logic handles it exclusively
+                        checked={isChecked}
+                        onChange={() => handleTraitGroupChange(group)}
+                      />
+                      <span className={styles.labelText}>{group.label}</span>
+                    </label>
+                  );
+                })}
               </FilterAccordion>
             )}
 
@@ -373,36 +423,84 @@ export default function FilterSidebar({
                         .includes(filterSearch.toLowerCase())
                   )
                   .map((opt) => (
+                    <label key={opt.value} className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        name="matchLimitFilter"
+                        checked={filters.matchLimit === opt.value}
+                        onChange={() => {
+                          const currentLimit = filters.matchLimit || 'ALL';
+                          const newLimit =
+                            currentLimit === opt.value
+                              ? 'ALL'
+                              : (opt.value as 10 | 20 | 30);
+
+                          // Handle insertion order logic so the chip appears/disappears
+                          let updatedOrder = filters.insertionOrder
+                            ? [...filters.insertionOrder]
+                            : [];
+                          updatedOrder = updatedOrder.filter(
+                            (k) =>
+                              k !== 'matchLimit:10' &&
+                              k !== 'matchLimit:20' &&
+                              k !== 'matchLimit:30'
+                          );
+                          if (newLimit !== 'ALL') {
+                            updatedOrder.push(`matchLimit:${newLimit}`);
+                          }
+
+                          const updatedExtraSort = newLimit === 'ALL' ? undefined : filters.extraSort;
+
+                          if (newLimit === 'ALL') {
+                            updatedOrder = updatedOrder.filter(k => !k.startsWith('extraSort:'));
+                          }
+
+                          onFilterChange({
+                            ...filters,
+                            matchLimit: newLimit,
+                            extraSort: updatedExtraSort,
+                            insertionOrder: updatedOrder,
+                          });
+                        }}
+                      />
+                      <span className={styles.labelText}>{opt.label}</span>
+                    </label>
+                  ))}
+              </FilterAccordion>
+            )}
+
+            {/* Extra Sorting - Only if matchLimit is active */}
+            {(filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30) && (
+              <FilterAccordion
+                storagePrefix={storagePrefix}
+                title="Extra"
+                isOpenDefault={false}
+                noAnimate={true}
+                noStorage={true}
+              >
+                {[
+                  { label: 'Ended', value: 'endedGame' },
+                  { label: 'Deaths', value: 'deaths' },
+                  { label: 'Wart Eat', value: 'eatingWhileRiding' },
+                  { label: 'Buff Time', value: 'buffTime' },
+                  { label: 'Wart Time', value: 'wartTime' },
+                  { label: 'Pickups', value: 'looseBallPickups' },
+                  { label: 'Eaten', value: 'eatenByWart' },
+                  { label: 'Wart Closer', value: 'wartCloser' },
+                ].map((opt) => (
                   <label key={opt.value} className={styles.checkboxLabel}>
                     <input
                       type="checkbox"
-                      name="matchLimitFilter"
-                      checked={filters.matchLimit === opt.value}
+                      checked={filters.extraSort === opt.value}
                       onChange={() => {
-                        const currentLimit = filters.matchLimit || 'ALL';
-                        const newLimit =
-                          currentLimit === opt.value
-                            ? 'ALL'
-                            : (opt.value as 10 | 20 | 30);
-
-                        // Handle insertion order logic so the chip appears/disappears
-                        let updatedOrder = filters.insertionOrder
-                          ? [...filters.insertionOrder]
-                          : [];
-                        updatedOrder = updatedOrder.filter(
-                          (k) =>
-                            k !== 'matchLimit:10' &&
-                            k !== 'matchLimit:20' &&
-                            k !== 'matchLimit:30'
-                        );
-                        if (newLimit !== 'ALL') {
-                          updatedOrder.push(`matchLimit:${newLimit}`);
-                        }
-
+                        const newExtraSort = filters.extraSort === opt.value ? undefined : opt.value;
+                        
                         onFilterChange({
                           ...filters,
-                          matchLimit: newLimit,
-                          insertionOrder: updatedOrder,
+                          extraSort: newExtraSort,
+                          // Remove previous extraSort from insertionOrder if any
+                          insertionOrder: (filters.insertionOrder || []).filter(k => !k.startsWith('extraSort:'))
+                            .concat(newExtraSort ? [`extraSort:${newExtraSort}`] : [])
                         });
                       }}
                     />
@@ -456,55 +554,6 @@ export default function FilterSidebar({
               </FilterAccordion>
             )}
 
-            {/* Fur */}
-            {(!filterSearch.trim() || furMatches) && (
-              <FilterAccordion
-                storagePrefix={storagePrefix}
-                title="Fur"
-                isOpenDefault={false}
-                forceOpen={furMatches}
-              >
-                {filterOptions(FUR_OPTIONS).map((f) => (
-                  <label key={f} className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      checked={filters.fur.includes(f)}
-                      onChange={() => handleFurChange(f)}
-                    />
-                    <span className={styles.labelText}>{f}</span>
-                  </label>
-                ))}
-              </FilterAccordion>
-            )}
-
-            {/* Traits (Grouped) */}
-            {(!filterSearch.trim() || traitsMatches) && (
-              <FilterAccordion
-                storagePrefix={storagePrefix}
-                title="Traits"
-                isOpenDefault={false}
-                forceOpen={traitsMatches}
-              >
-                {TRAIT_GROUPS.filter((group) => {
-                  if (!filterSearch.trim()) return true;
-                  return group.label
-                    .toLowerCase()
-                    .includes(filterSearch.toLowerCase());
-                }).map((group) => {
-                  const isChecked = filters.traits.includes(group.label);
-                  return (
-                    <label key={group.label} className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox" // Keep as checkbox visually so they can toggle it off, but logic handles it exclusively
-                        checked={isChecked}
-                        onChange={() => handleTraitGroupChange(group)}
-                      />
-                      <span className={styles.labelText}>{group.label}</span>
-                    </label>
-                  );
-                })}
-              </FilterAccordion>
-            )}
           </>
         )}
 
@@ -544,12 +593,16 @@ function FilterAccordion({
   isOpenDefault = false,
   forceOpen = false,
   storagePrefix = 'default',
+  noAnimate = false,
+  noStorage = false,
 }: {
   title: string;
   children: React.ReactNode;
   isOpenDefault?: boolean;
   forceOpen?: boolean;
   storagePrefix?: string;
+  noAnimate?: boolean;
+  noStorage?: boolean;
 }) {
   const key = `accordion_${storagePrefix}_${title}`;
   const [isOpen, setIsOpen] = useState<boolean>(isOpenDefault);
@@ -557,20 +610,20 @@ function FilterAccordion({
 
   useEffect(() => {
     setIsMounted(true);
-    if (typeof sessionStorage !== 'undefined') {
+    if (!noStorage && typeof sessionStorage !== 'undefined') {
       const saved = sessionStorage.getItem(key);
       if (saved !== null) {
         setIsOpen(saved === 'true');
       }
     }
-  }, [key]);
+  }, [key, noStorage]);
 
   const shouldBeOpen = forceOpen || isOpen;
 
   const toggleOpen = () => {
     const nextState = !isOpen;
     setIsOpen(nextState);
-    if (typeof sessionStorage !== 'undefined') {
+    if (!noStorage && typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem(key, String(nextState));
     }
   };
@@ -599,21 +652,25 @@ function FilterAccordion({
 
       <AnimatePresence initial={false}>
         {(isMounted ? shouldBeOpen : isOpenDefault || forceOpen) && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              transition: { duration: 0.3, ease: 'easeInOut' },
-            }}
-            exit={{
-              opacity: 0,
-              y: -10,
-              transition: { duration: 0.15, ease: 'easeInOut' },
-            }}
-          >
+          noAnimate ? (
             <div className={styles.accordionContent}>{children}</div>
-          </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.3, ease: 'easeInOut' },
+              }}
+              exit={{
+                opacity: 0,
+                y: -10,
+                transition: { duration: 0.15, ease: 'easeInOut' },
+              }}
+            >
+              <div className={styles.accordionContent}>{children}</div>
+            </motion.div>
+          )
         )}
       </AnimatePresence>
     </div>

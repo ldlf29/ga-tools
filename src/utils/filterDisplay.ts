@@ -91,11 +91,26 @@ export function getActiveFiltersDisplay(filters: FilterState): DisplayFilter[] {
       if (key === 'specialization') label = 'SPEC';
       if (key === 'traits') label = 'TRAIT';
       if (key === 'matchLimit') label = 'MATCHES';
+      if (key === 'extraSort') label = 'EXTRA';
 
       // For matchLimit, format the display properly
       let displayValue: string | undefined = undefined;
       if (key === 'matchLimit') {
         displayValue = `Last ${value}`;
+      }
+
+      if (key === 'extraSort') {
+        const extraLabels: Record<string, string> = {
+          endedGame: 'Ended',
+          deaths: 'Deaths',
+          eatingWhileRiding: 'Wart Eat',
+          buffTime: 'Buff Time',
+          wartTime: 'Wart Time',
+          looseBallPickups: 'Pickups',
+          eatenByWart: 'Eaten',
+          wartCloser: 'Wart Closer',
+        };
+        displayValue = extraLabels[value as string] || (value as string);
       }
 
       return { key, label, value, displayValue };
