@@ -74,6 +74,17 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
       day: 'numeric',
     }),
   }));
+  
+  const ticks = (() => {
+    if (chartData.length === 0) return [];
+    if (view === '7') return chartData.map(d => d.formatted_date);
+    const t: string[] = [];
+    const step = view === '14' ? 3 : 6;
+    for (let i = chartData.length - 1; i >= 0; i -= step) {
+      t.push(chartData[i].formatted_date);
+    }
+    return t.reverse();
+  })();
 
   return (
     <div
@@ -170,7 +181,8 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={chartData}
-                margin={{ top: 10, right: 25, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 0, left: -32, bottom: 0 }}
+                style={{ overflow: 'visible' }}
               >
                 <defs>
                   <linearGradient id="colorRank" x1="0" y1="0" x2="0" y2="1">
@@ -182,15 +194,10 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
                 <XAxis
                   dataKey="formatted_date"
                   stroke="#555"
-                  fontSize={9}
-                  fontWeight={600}
                   tickLine={false}
-                  interval={(index: number) => {
-                    if (view === '7') return true;
-                    if (view === '14') return index % 3 === 0 || index === chartData.length - 1;
-                    return index % 6 === 0 || index === chartData.length - 1;
-                  }}
-                  minTickGap={5}
+                  tick={{ textAnchor: 'end', fontSize: 9, fontWeight: 600, fill: '#555' }}
+                  interval={0}
+                  ticks={ticks}
                 />
                 <YAxis
                   direction="invert" // Rank 1 should be at the top!
