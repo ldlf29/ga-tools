@@ -1197,7 +1197,9 @@ export default function Home() {
           onFilterChange={handleFilterChange}
           onCardTypeChange={handleCardTypeChange}
           hideMatchPerformance={activeTab === 'lineups'}
-          storagePrefix={activeTab}
+          hideRarity={activeTab === 'champions'}
+          hideTypeToggle={activeTab === 'champions'}
+          storagePrefix={activeTab === 'champions' ? 'champions_unified' : activeTab}
         />
       </div>
 
@@ -1527,21 +1529,62 @@ export default function Home() {
         )}
 
         {activeTab === 'champions' && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              flex: 1,
-              minHeight: 0,
-            }}
-          >
-            <Champions
-              allCards={allCards}
-              filters={filters}
-              onFilterChange={setFilters}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-            />
+          <div className={styles.mainLayout}>
+            {/* Mobile Floating Action Buttons */}
+            <div className={styles.fabContainer}>
+              <button
+                className={`${styles.fabButton} ${styles.fabFilters}`}
+                onClick={() => setMobileFiltersOpen(true)}
+              >
+                {/* Filter Icon */}
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </button>
+            </div>
+
+            {/* Column 1: FilterSidebar (Desktop only) */}
+            <div className={styles.desktopOnly}>
+              <FilterSidebar
+                filters={filters}
+                onFilterChange={setFilters}
+                onCardTypeChange={() => {}}
+                hideMatchPerformance={false}
+                hideRarity={true}
+                hideTypeToggle={true}
+                storagePrefix="champions_unified"
+              />
+            </div>
+
+            {/* Column 2: Champions */}
+            <div
+              style={{
+                gridColumn: '2 / span 2',
+                width: '100%',
+                minWidth: 0,
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: 0,
+              }}
+            >
+              <Champions
+                allCards={allCards}
+                filters={filters}
+                onFilterChange={setFilters}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
+            </div>
           </div>
         )}
 

@@ -3,7 +3,7 @@
   padding: 2rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1181px) {
   .main {
     padding: 0;
     height: 100vh;
@@ -169,7 +169,7 @@
   display: none;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1181px) {
   .header {
     flex-direction: column;
     align-items: stretch;
@@ -678,7 +678,7 @@
 }
 
 /* Responsive Drawer Logic */
-@media (max-width: 1024px) {
+@media (max-width: 1181px) {
   .mainLayout {
     display: flex;
     flex-direction: column;

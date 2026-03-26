@@ -62,6 +62,19 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
     load();
   }, [moki.id, moki.name]);
 
+  const chartData = (view === 'all'
+    ? leaderboard
+    : leaderboard.slice(-Number(view))
+  ).map((d) => ({
+    ...d,
+    formatted_date: new Date(
+      d.date.replace(/-/g, '/')
+    ).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    }),
+  }));
+
   return (
     <div
       style={{
@@ -156,18 +169,7 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
           <div style={{ height: '220px', width: '100%', marginTop: '0.5rem' }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={(view === 'all'
-                  ? leaderboard
-                  : leaderboard.slice(-Number(view))
-                ).map((d) => ({
-                  ...d,
-                  formatted_date: new Date(
-                    d.date.replace(/-/g, '/')
-                  ).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                  }),
-                }))}
+                data={chartData}
                 margin={{ top: 10, right: 25, left: -20, bottom: 0 }}
               >
                 <defs>
@@ -183,8 +185,12 @@ export default function MokiLiveStats({ moki }: { moki: MokiMetadata }) {
                   fontSize={9}
                   fontWeight={600}
                   tickLine={false}
-                  tick={!isMobile && view !== 'all'} // Hide individual dates description on mobile or "ALL" view
-                  interval={0} // Force show all dates for 7D / 14D
+                  interval={(index: number) => {
+                    if (view === '7') return true;
+                    if (view === '14') return index % 3 === 0 || index === chartData.length - 1;
+                    return index % 6 === 0 || index === chartData.length - 1;
+                  }}
+                  minTickGap={5}
                 />
                 <YAxis
                   direction="invert" // Rank 1 should be at the top!
