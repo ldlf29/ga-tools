@@ -50,6 +50,14 @@ const Champions = dynamic(() => import('@/components/Champions'), {
   ),
   ssr: false,
 });
+const PredictionsTab = dynamic(() => import('@/components/PredictionsTab'), {
+  loading: () => (
+    <div className={styles.spinnerWrapper}>
+      <div className={styles.spinner}></div>
+    </div>
+  ),
+  ssr: false,
+});
 import ChangelogModal from '@/components/ChangelogModal';
 
 // Custom Hooks
@@ -61,7 +69,7 @@ import { useWorkerFilter } from '@/hooks/useWorkerFilter';
 export default function Home() {
   /* Global UI State */
   const [activeTab, setActiveTab] = useState<
-    'builder' | 'lineups' | 'champions' | 'changelog'
+    'builder' | 'lineups' | 'predictions' | 'champions' | 'changelog'
   >('builder');
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -428,9 +436,9 @@ export default function Home() {
 
   // Handle main tab switching (Builder <-> My Lineups <-> Champions)
   const handleMainTabChange = (
-    newTab: 'builder' | 'lineups' | 'champions' | 'changelog'
+    tab: 'builder' | 'lineups' | 'predictions' | 'champions' | 'changelog'
   ) => {
-    if (newTab === activeTab) {
+    if (tab === activeTab) {
       return;
     }
 
@@ -451,19 +459,19 @@ export default function Home() {
     }
 
     // Restore target tab's state
-    if (newTab === 'builder') {
+    if (tab === 'builder') {
       const targetState = builderStateRef.current;
       setFilters(targetState.filters);
       setSearchQuery(targetState.search);
       mokiFiltersRef.current = targetState.mokiFilters;
       schemeFiltersRef.current = targetState.schemeFilters;
-    } else if (newTab === 'lineups') {
+    } else if (tab === 'lineups') {
       const targetState = lineupsStateRef.current;
       setFilters(targetState.filters);
       setSearchQuery(targetState.search);
       mokiFiltersRef.current = targetState.mokiFilters;
       schemeFiltersRef.current = targetState.schemeFilters;
-    } else if (newTab === 'champions') {
+    } else if (tab === 'champions') {
       const targetState = championsStateRef.current;
       setFilters(targetState.filters);
       setSearchQuery(targetState.search);
@@ -471,7 +479,7 @@ export default function Home() {
       schemeFiltersRef.current = targetState.schemeFilters;
     }
 
-    setActiveTab(newTab);
+    setActiveTab(tab);
   };
 
   // Handle tab switching with filter preservation
@@ -1142,6 +1150,15 @@ export default function Home() {
             My Lineups
           </button>
           <button
+            className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
+            onClick={() => {
+              handleMainTabChange('predictions');
+              closeDrawers();
+            }}
+          >
+            Predictions
+          </button>
+          <button
             className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
             onClick={() => {
               handleMainTabChange('champions');
@@ -1296,6 +1313,12 @@ export default function Home() {
                   onClick={() => handleMainTabChange('lineups')}
                 >
                   My Lineups
+                </button>
+                <button
+                  className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
+                  onClick={() => handleMainTabChange('predictions')}
+                >
+                  Predictions
                 </button>
                 <button
                   className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
@@ -1525,6 +1548,19 @@ export default function Home() {
                 />
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'predictions' && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+            }}
+          >
+            <PredictionsTab />
           </div>
         )}
 

@@ -1,0 +1,20 @@
+{
+  "moki_token_id": "2284",
+  "match_id": "6996ea3a9e2bde4f324ca94d",
+  "match_date": "2026-02-20",
+  "is_win": "1",
+  "total_points": "523.3",
+  "win_condition": "eliminations",
+  "champ_class": "Defender",
+  "ally1_class": "Defender",
+  "ally2_class": "Flanker",
+  "enemy_champ_class": "Defender",
+  "enemy_ally1_class": "Striker",
+  "enemy_ally2_class": "Anchor",
+  "kills": "0",
+  "deposits": "0",
+  "wart_distance": "496.3",
+  "deaths": "2",
+  "ended_game": "False",
+  "my_team": "blue"
+}

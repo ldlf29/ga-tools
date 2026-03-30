@@ -58,4 +58,24 @@ desktop.ini
 
 # analytics & supabase
 /supabase/
-/analytics/
+/sync_logs/
+
+# Machine Learning & Python
+.venv/
+__pycache__/
+ml/catboost_info/
+ml/models/*.cbm
+ml/data/*.csv
+!ml/data/upcoming_180_ranking.csv
+ml/data/scheme_analysis/
+ml/processed_cols.txt
+ml/eda.json
+ml/eda_output.txt
+ml/*.txt
+ml/tmp_*.py
+*.pyc
+
+# Heavy Data
+*.csv
+!ml/data/upcoming_180_ranking.csv
+!src/data/*.json

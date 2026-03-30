@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import { execSync } from 'child_process';
 
 dotenv.config({ path: path.join(__dirname, '../../.env.local') });
 
@@ -42,7 +43,25 @@ async function run() {
     return;
   }
 
-  const contest = activeContests[0];
+  console.log('[Cron Upcoming] Buscando el próximo contest Moki Mayhem (Hacia adelante)...');
+  const now = Date.now();
+  
+  let closestContest = null;
+  let minDiff = Infinity;
+  for (const c of activeContests) {
+    if (c.startDate) {
+      const contestTime = new Date(c.startDate).getTime();
+      const diff = contestTime - now;
+      // Solo evaluar los torneos en el futuro
+      if (diff > 0 && diff < minDiff) {
+        minDiff = diff;
+        closestContest = c;
+      }
+    }
+  }
+
+  // Fallback a [0] solo en caso anómalo de que todos hayan empezado
+  const contest = closestContest || activeContests[0];
 
   if (!contest) {
     console.log('[Cron Upcoming] No hay contest de Moki Mayhem activo.');
@@ -50,7 +69,25 @@ async function run() {
   }
 
   const contestId = contest.id;
-  console.log(`[Cron Upcoming] Contest Seleccionado ID: ${contestId}`);
+  console.log(`[Cron Upcoming] Contest Seleccionado ID: ${contestId} (StartDate UTC: ${contest.startDate})`);
+
+  console.log('[Cron Upcoming] Fetching moki_stats to override classes...');
+  const { data: mokiStatsData, error: mokiStatsErr } = await supabaseAdmin
+    .from('moki_stats')
+    .select('*');
+
+  if (mokiStatsErr) {
+    console.error('[Cron Upcoming] Error fetching moki_stats:', mokiStatsErr);
+    throw mokiStatsErr;
+  }
+
+  const mokiStatsMap = new Map<string, string>();
+  for (const row of mokiStatsData || []) {
+    if (row.name) {
+      mokiStatsMap.set(row.name.trim().toLowerCase(), row.class);
+    }
+  }
+  console.log(`[Cron Upcoming] Loaded ${mokiStatsMap.size} moki stats for class override.`);
 
   // 2. Extraer Partidos
   console.log('[Cron Upcoming] Extrayendo 900 partidos (9 páginas)...');
@@ -75,8 +112,22 @@ async function run() {
         if (match.isBye) continue; // Ignoramos byes (faltas)
         if (!match.players || match.players.length === 0) continue;
 
-        const teamRed = match.players.filter((p: any) => p.team === 'red');
-        const teamBlue = match.players.filter((p: any) => p.team === 'blue');
+        const overrideClass = (p: any) => {
+          if (p.name) {
+            const key = p.name.trim().toLowerCase();
+            const statsClass = mokiStatsMap.get(key);
+            if (statsClass) {
+              if (key === 'vagabond' || key === 'hoppi') console.log(`[DEBUG] Overriding ${key} to ${statsClass}`);
+              p.class = statsClass;
+            } else if (key === 'vagabond' || key === 'hoppi') {
+              console.log(`[DEBUG] ${key} MATCHED IN API BUT MISSING IN MOKISTATSMAP!`);
+            }
+          }
+          return p;
+        };
+
+        const teamRed = match.players.filter((p: any) => p.team === 'red').map(overrideClass);
+        const teamBlue = match.players.filter((p: any) => p.team === 'blue').map(overrideClass);
 
         upcomingInserts.push({
           id: match.id,
@@ -96,7 +147,7 @@ async function run() {
   if (upcomingInserts.length > 0) {
     // 3. Recarga Pura a Supabase
     console.log('[Cron Upcoming] Haciendo limpieza (Truncate) e insertando frescos en Supabase...');
-    
+
     // Primero borramos todo para evitar acumular basura. 
     // Como truncar desde RLS a veces trae problemas, podemos hacer delete * con eq a un valor q no haga match, 
     // o borrar por contest_id != algo, o en Bulk Delete
@@ -128,12 +179,26 @@ async function run() {
     }
 
     console.log(`[Cron Upcoming] Carga completada. Insertados: ${recordsUpserted} partidos.`);
-    
+
     await supabaseAdmin.from('sync_logs').insert({
       status: 'success',
       cards_updated: recordsUpserted,
       details: `GitHub Action Upcoming Matches: Processed ${recordsUpserted} matches for contest ${contestId}.`,
     });
+
+    // 4. Trigger Automático para el ML Ranking de Python
+    console.log('[Cron Upcoming] Disparando script de generación de Ranking ML...');
+    try {
+      const projectRoot = path.resolve(__dirname, '../../');
+      const mlDir = path.join(projectRoot, 'ml');
+      const mlOutput = execSync('python 8_generate_rank.py', { cwd: mlDir });
+      console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
+    } catch (mlErr: any) {
+      console.error('[Cron Upcoming] Error corriendo la IA:', mlErr.message);
+      if (mlErr.stdout) console.log(mlErr.stdout.toString());
+      if (mlErr.stderr) console.error(mlErr.stderr.toString());
+      // No lanzamos (throw) para no matar la actualización de datos principal
+    }
   } else {
     console.log('[Cron Upcoming] No hay partidos válidos para insertar.');
   }

@@ -105,6 +105,13 @@
   background: #ff99dd;
 }
 
+.closeBtn svg {
+  stroke: currentColor;
+  stroke-width: 3px;
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333)
+    drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+}
+
 .walletSubtitle {
   font-family: 'Inter', sans-serif;
   font-size: 0.75rem;

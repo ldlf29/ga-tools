@@ -1,0 +1,1018 @@
+{
+  "baseline_trait_per_block": 1000,
+  "avg_base_score_per_block": 3453.6,
+  "base_score_by_class": {
+    "Anchor": 3133.8,
+    "Bruiser": 3252.2,
+    "Center": 3222.2,
+    "Defender": 3498.6,
+    "Flanker": 3239.8,
+    "Forward": 3273.7,
+    "Grinder": 3438.9,
+    "Sprinter": 3438.0,
+    "Striker": 3422.9,
+    "Support": 3231.9
+  },
+  "block_size": 10,
+  "classes": [
+    "Anchor",
+    "Bruiser",
+    "Center",
+    "Defender",
+    "Flanker",
+    "Forward",
+    "Grinder",
+    "Sprinter",
+    "Striker",
+    "Support"
+  ],
+  "schemes": [
+    {
+      "scheme": "Taking a Dive",
+      "category": "win-result",
+      "global_ev": 919.6,
+      "by_class": {
+        "Anchor": {
+          "bonus": 938.4,
+          "total": 4072.2
+        },
+        "Bruiser": {
+          "bonus": 867.4,
+          "total": 4119.6
+        },
+        "Center": {
+          "bonus": 870.1,
+          "total": 4092.3
+        },
+        "Defender": {
+          "bonus": 785.1,
+          "total": 4283.7
+        },
+        "Flanker": {
+          "bonus": 920.2,
+          "total": 4160.0
+        },
+        "Forward": {
+          "bonus": 963.5,
+          "total": 4237.2
+        },
+        "Grinder": {
+          "bonus": 980.1,
+          "total": 4419.0
+        },
+        "Sprinter": {
+          "bonus": 860.9,
+          "total": 4298.9
+        },
+        "Striker": {
+          "bonus": 1038.9,
+          "total": 4461.8
+        },
+        "Support": {
+          "bonus": 971.2,
+          "total": 4203.1
+        }
+      }
+    },
+    {
+      "scheme": "Running Interference",
+      "category": "stat",
+      "global_ev": 597.6,
+      "by_class": {
+        "Anchor": {
+          "bonus": 557.2,
+          "total": 3691.0
+        },
+        "Bruiser": {
+          "bonus": 576.4,
+          "total": 3828.6
+        },
+        "Center": {
+          "bonus": 627.6,
+          "total": 3849.8
+        },
+        "Defender": {
+          "bonus": 702.8,
+          "total": 4201.4
+        },
+        "Flanker": {
+          "bonus": 626.6,
+          "total": 3866.4
+        },
+        "Forward": {
+          "bonus": 549.2,
+          "total": 3822.9
+        },
+        "Grinder": {
+          "bonus": 534.1,
+          "total": 3973.0
+        },
+        "Sprinter": {
+          "bonus": 692.5,
+          "total": 4130.5
+        },
+        "Striker": {
+          "bonus": 512.0,
+          "total": 3934.9
+        },
+        "Support": {
+          "bonus": 597.8,
+          "total": 3829.7
+        }
+      }
+    },
+    {
+      "scheme": "Moki Smash",
+      "category": "win-type",
+      "global_ev": 572.0,
+      "by_class": {
+        "Anchor": {
+          "bonus": 596.0,
+          "total": 3729.8
+        },
+        "Bruiser": {
+          "bonus": 679.8,
+          "total": 3932.0
+        },
+        "Center": {
+          "bonus": 694.6,
+          "total": 3916.8
+        },
+        "Defender": {
+          "bonus": 691.0,
+          "total": 4189.6
+        },
+        "Flanker": {
+          "bonus": 620.2,
+          "total": 3860.0
+        },
+        "Forward": {
+          "bonus": 540.4,
+          "total": 3814.1
+        },
+        "Grinder": {
+          "bonus": 410.4,
+          "total": 3849.3
+        },
+        "Sprinter": {
+          "bonus": 629.3,
+          "total": 4067.3
+        },
+        "Striker": {
+          "bonus": 334.8,
+          "total": 3757.7
+        },
+        "Support": {
+          "bonus": 523.1,
+          "total": 3755.0
+        }
+      }
+    },
+    {
+      "scheme": "Cage Match",
+      "category": "stat",
+      "global_ev": 518.1,
+      "by_class": {
+        "Anchor": {
+          "bonus": 625.8,
+          "total": 3759.6
+        },
+        "Bruiser": {
+          "bonus": 670.0,
+          "total": 3922.2
+        },
+        "Center": {
+          "bonus": 602.6,
+          "total": 3824.8
+        },
+        "Defender": {
+          "bonus": 369.1,
+          "total": 3867.7
+        },
+        "Flanker": {
+          "bonus": 529.0,
+          "total": 3768.8
+        },
+        "Forward": {
+          "bonus": 637.8,
+          "total": 3911.5
+        },
+        "Grinder": {
+          "bonus": 447.8,
+          "total": 3886.7
+        },
+        "Sprinter": {
+          "bonus": 354.1,
+          "total": 3792.1
+        },
+        "Striker": {
+          "bonus": 459.3,
+          "total": 3882.2
+        },
+        "Support": {
+          "bonus": 485.6,
+          "total": 3717.5
+        }
+      }
+    },
+    {
+      "scheme": "Touching the Wart",
+      "category": "position",
+      "global_ev": 466.5,
+      "by_class": {
+        "Anchor": {
+          "bonus": 414.9,
+          "total": 3548.7
+        },
+        "Bruiser": {
+          "bonus": 503.3,
+          "total": 3755.5
+        },
+        "Center": {
+          "bonus": 571.5,
+          "total": 3793.7
+        },
+        "Defender": {
+          "bonus": 721.0,
+          "total": 4219.6
+        },
+        "Flanker": {
+          "bonus": 516.5,
+          "total": 3756.3
+        },
+        "Forward": {
+          "bonus": 369.5,
+          "total": 3643.2
+        },
+        "Grinder": {
+          "bonus": 255.6,
+          "total": 3694.5
+        },
+        "Sprinter": {
+          "bonus": 639.1,
+          "total": 4077.1
+        },
+        "Striker": {
+          "bonus": 212.1,
+          "total": 3635.0
+        },
+        "Support": {
+          "bonus": 461.5,
+          "total": 3693.4
+        }
+      }
+    },
+    {
+      "scheme": "Victory Lap",
+      "category": "win-result",
+      "global_ev": 464.4,
+      "by_class": {
+        "Anchor": {
+          "bonus": 444.9,
+          "total": 3578.7
+        },
+        "Bruiser": {
+          "bonus": 492.4,
+          "total": 3744.6
+        },
+        "Center": {
+          "bonus": 495.5,
+          "total": 3717.7
+        },
+        "Defender": {
+          "bonus": 541.4,
+          "total": 4040.0
+        },
+        "Flanker": {
+          "bonus": 467.6,
+          "total": 3707.4
+        },
+        "Forward": {
+          "bonus": 441.2,
+          "total": 3714.9
+        },
+        "Grinder": {
+          "bonus": 431.8,
+          "total": 3870.7
+        },
+        "Sprinter": {
+          "bonus": 495.4,
+          "total": 3933.4
+        },
+        "Striker": {
+          "bonus": 397.1,
+          "total": 3820.0
+        },
+        "Support": {
+          "bonus": 436.3,
+          "total": 3668.2
+        }
+      }
+    },
+    {
+      "scheme": "Gacha Gouging",
+      "category": "stat",
+      "global_ev": 427.0,
+      "by_class": {
+        "Anchor": {
+          "bonus": 447.1,
+          "total": 3580.9
+        },
+        "Bruiser": {
+          "bonus": 378.0,
+          "total": 3630.2
+        },
+        "Center": {
+          "bonus": 350.2,
+          "total": 3572.4
+        },
+        "Defender": {
+          "bonus": 230.6,
+          "total": 3729.2
+        },
+        "Flanker": {
+          "bonus": 381.1,
+          "total": 3620.9
+        },
+        "Forward": {
+          "bonus": 507.5,
+          "total": 3781.2
+        },
+        "Grinder": {
+          "bonus": 597.5,
+          "total": 4036.4
+        },
+        "Sprinter": {
+          "bonus": 293.8,
+          "total": 3731.8
+        },
+        "Striker": {
+          "bonus": 641.4,
+          "total": 4064.3
+        },
+        "Support": {
+          "bonus": 442.3,
+          "total": 3674.2
+        }
+      }
+    },
+    {
+      "scheme": "Flexing",
+      "category": "time",
+      "global_ev": 286.1,
+      "by_class": {
+        "Anchor": {
+          "bonus": 406.4,
+          "total": 3540.2
+        },
+        "Bruiser": {
+          "bonus": 500.3,
+          "total": 3752.5
+        },
+        "Center": {
+          "bonus": 470.2,
+          "total": 3692.4
+        },
+        "Defender": {
+          "bonus": 244.4,
+          "total": 3743.0
+        },
+        "Flanker": {
+          "bonus": 345.5,
+          "total": 3585.3
+        },
+        "Forward": {
+          "bonus": 379.4,
+          "total": 3653.1
+        },
+        "Grinder": {
+          "bonus": 61.3,
+          "total": 3500.2
+        },
+        "Sprinter": {
+          "bonus": 156.2,
+          "total": 3594.2
+        },
+        "Striker": {
+          "bonus": 37.8,
+          "total": 3460.7
+        },
+        "Support": {
+          "bonus": 259.5,
+          "total": 3491.4
+        }
+      }
+    },
+    {
+      "scheme": "Final Blow",
+      "category": "game-ender",
+      "global_ev": 224.0,
+      "by_class": {
+        "Anchor": {
+          "bonus": 300.7,
+          "total": 3434.5
+        },
+        "Bruiser": {
+          "bonus": 399.7,
+          "total": 3651.9
+        },
+        "Center": {
+          "bonus": 362.7,
+          "total": 3584.9
+        },
+        "Defender": {
+          "bonus": 200.3,
+          "total": 3698.9
+        },
+        "Flanker": {
+          "bonus": 254.1,
+          "total": 3493.9
+        },
+        "Forward": {
+          "bonus": 302.2,
+          "total": 3575.9
+        },
+        "Grinder": {
+          "bonus": 48.8,
+          "total": 3487.7
+        },
+        "Sprinter": {
+          "bonus": 147.8,
+          "total": 3585.8
+        },
+        "Striker": {
+          "bonus": 31.0,
+          "total": 3453.9
+        },
+        "Support": {
+          "bonus": 192.3,
+          "total": 3424.2
+        }
+      }
+    },
+    {
+      "scheme": "Wart Rodeo",
+      "category": "time",
+      "global_ev": 155.1,
+      "by_class": {
+        "Anchor": {
+          "bonus": 65.6,
+          "total": 3199.4
+        },
+        "Bruiser": {
+          "bonus": 122.3,
+          "total": 3374.5
+        },
+        "Center": {
+          "bonus": 160.3,
+          "total": 3382.5
+        },
+        "Defender": {
+          "bonus": 354.4,
+          "total": 3853.0
+        },
+        "Flanker": {
+          "bonus": 185.3,
+          "total": 3425.1
+        },
+        "Forward": {
+          "bonus": 64.0,
+          "total": 3337.7
+        },
+        "Grinder": {
+          "bonus": 46.3,
+          "total": 3485.2
+        },
+        "Sprinter": {
+          "bonus": 365.1,
+          "total": 3803.1
+        },
+        "Striker": {
+          "bonus": 30.6,
+          "total": 3453.5
+        },
+        "Support": {
+          "bonus": 157.4,
+          "total": 3389.3
+        }
+      }
+    },
+    {
+      "scheme": "Grabbing Balls",
+      "category": "win-type",
+      "global_ev": 141.4,
+      "by_class": {
+        "Anchor": {
+          "bonus": 119.2,
+          "total": 3253.0
+        },
+        "Bruiser": {
+          "bonus": 65.5,
+          "total": 3317.7
+        },
+        "Center": {
+          "bonus": 52.3,
+          "total": 3274.5
+        },
+        "Defender": {
+          "bonus": 30.5,
+          "total": 3529.1
+        },
+        "Flanker": {
+          "bonus": 94.2,
+          "total": 3334.0
+        },
+        "Forward": {
+          "bonus": 178.8,
+          "total": 3452.5
+        },
+        "Grinder": {
+          "bonus": 312.7,
+          "total": 3751.6
+        },
+        "Sprinter": {
+          "bonus": 77.9,
+          "total": 3515.9
+        },
+        "Striker": {
+          "bonus": 337.0,
+          "total": 3759.9
+        },
+        "Support": {
+          "bonus": 146.2,
+          "total": 3378.1
+        }
+      }
+    },
+    {
+      "scheme": "Baiting the Trap",
+      "category": "win-type",
+      "global_ev": 99.2,
+      "by_class": {
+        "Anchor": {
+          "bonus": 63.4,
+          "total": 3197.2
+        },
+        "Bruiser": {
+          "bonus": 116.3,
+          "total": 3368.5
+        },
+        "Center": {
+          "bonus": 120.3,
+          "total": 3342.5
+        },
+        "Defender": {
+          "bonus": 226.0,
+          "total": 3724.6
+        },
+        "Flanker": {
+          "bonus": 103.8,
+          "total": 3343.6
+        },
+        "Forward": {
+          "bonus": 52.9,
+          "total": 3326.6
+        },
+        "Grinder": {
+          "bonus": 32.6,
+          "total": 3471.5
+        },
+        "Sprinter": {
+          "bonus": 159.8,
+          "total": 3597.8
+        },
+        "Striker": {
+          "bonus": 23.1,
+          "total": 3446.0
+        },
+        "Support": {
+          "bonus": 94.2,
+          "total": 3326.1
+        }
+      }
+    },
+    {
+      "scheme": "Big Game Hunt",
+      "category": "game-ender",
+      "global_ev": 87.4,
+      "by_class": {
+        "Anchor": {
+          "bonus": 18.1,
+          "total": 3151.9
+        },
+        "Bruiser": {
+          "bonus": 69.4,
+          "total": 3321.6
+        },
+        "Center": {
+          "bonus": 82.4,
+          "total": 3304.6
+        },
+        "Defender": {
+          "bonus": 280.4,
+          "total": 3779.0
+        },
+        "Flanker": {
+          "bonus": 72.8,
+          "total": 3312.6
+        },
+        "Forward": {
+          "bonus": 12.4,
+          "total": 3286.1
+        },
+        "Grinder": {
+          "bonus": 32.3,
+          "total": 3471.2
+        },
+        "Sprinter": {
+          "bonus": 206.3,
+          "total": 3644.3
+        },
+        "Striker": {
+          "bonus": 17.9,
+          "total": 3440.8
+        },
+        "Support": {
+          "bonus": 82.4,
+          "total": 3314.3
+        }
+      }
+    },
+    {
+      "scheme": "Saccing",
+      "category": "stat",
+      "global_ev": 85.8,
+      "by_class": {
+        "Anchor": {
+          "bonus": 68.1,
+          "total": 3201.9
+        },
+        "Bruiser": {
+          "bonus": 84.2,
+          "total": 3336.4
+        },
+        "Center": {
+          "bonus": 114.9,
+          "total": 3337.1
+        },
+        "Defender": {
+          "bonus": 174.6,
+          "total": 3673.2
+        },
+        "Flanker": {
+          "bonus": 102.7,
+          "total": 3342.5
+        },
+        "Forward": {
+          "bonus": 48.4,
+          "total": 3322.1
+        },
+        "Grinder": {
+          "bonus": 23.4,
+          "total": 3462.3
+        },
+        "Sprinter": {
+          "bonus": 137.3,
+          "total": 3575.3
+        },
+        "Striker": {
+          "bonus": 16.1,
+          "total": 3439.0
+        },
+        "Support": {
+          "bonus": 87.9,
+          "total": 3319.8
+        }
+      }
+    },
+    {
+      "scheme": "Beat the Buzzer",
+      "category": "game-ender",
+      "global_ev": 80.2,
+      "by_class": {
+        "Anchor": {
+          "bonus": 32.6,
+          "total": 3166.4
+        },
+        "Bruiser": {
+          "bonus": 18.0,
+          "total": 3270.2
+        },
+        "Center": {
+          "bonus": 3.5,
+          "total": 3225.7
+        },
+        "Defender": {
+          "bonus": 19.2,
+          "total": 3517.8
+        },
+        "Flanker": {
+          "bonus": 33.0,
+          "total": 3272.8
+        },
+        "Forward": {
+          "bonus": 97.5,
+          "total": 3371.2
+        },
+        "Grinder": {
+          "bonus": 217.0,
+          "total": 3655.9
+        },
+        "Sprinter": {
+          "bonus": 50.8,
+          "total": 3488.8
+        },
+        "Striker": {
+          "bonus": 231.8,
+          "total": 3654.7
+        },
+        "Support": {
+          "bonus": 98.9,
+          "total": 3330.8
+        }
+      }
+    },
+    {
+      "scheme": "Cursed Dinner",
+      "category": "stat",
+      "global_ev": 75.5,
+      "by_class": {
+        "Anchor": {
+          "bonus": 20.7,
+          "total": 3154.5
+        },
+        "Bruiser": {
+          "bonus": 56.6,
+          "total": 3308.8
+        },
+        "Center": {
+          "bonus": 74.6,
+          "total": 3296.8
+        },
+        "Defender": {
+          "bonus": 184.9,
+          "total": 3683.5
+        },
+        "Flanker": {
+          "bonus": 96.8,
+          "total": 3336.6
+        },
+        "Forward": {
+          "bonus": 24.7,
+          "total": 3298.4
+        },
+        "Grinder": {
+          "bonus": 24.3,
+          "total": 3463.2
+        },
+        "Sprinter": {
+          "bonus": 192.5,
+          "total": 3630.5
+        },
+        "Striker": {
+          "bonus": 15.1,
+          "total": 3438.0
+        },
+        "Support": {
+          "bonus": 65.1,
+          "total": 3297.0
+        }
+      }
+    },
+    {
+      "scheme": "Litter Collection",
+      "category": "stat",
+      "global_ev": 74.8,
+      "by_class": {
+        "Anchor": {
+          "bonus": 65.2,
+          "total": 3199.0
+        },
+        "Bruiser": {
+          "bonus": 48.3,
+          "total": 3300.5
+        },
+        "Center": {
+          "bonus": 57.5,
+          "total": 3279.7
+        },
+        "Defender": {
+          "bonus": 66.0,
+          "total": 3564.6
+        },
+        "Flanker": {
+          "bonus": 70.9,
+          "total": 3310.7
+        },
+        "Forward": {
+          "bonus": 64.3,
+          "total": 3338.0
+        },
+        "Grinder": {
+          "bonus": 109.9,
+          "total": 3548.8
+        },
+        "Sprinter": {
+          "bonus": 74.8,
+          "total": 3512.8
+        },
+        "Striker": {
+          "bonus": 111.2,
+          "total": 3534.1
+        },
+        "Support": {
+          "bonus": 79.9,
+          "total": 3311.8
+        }
+      }
+    },
+    {
+      "scheme": "Collective Specialization",
+      "category": "replace",
+      "global_ev": -662.9,
+      "by_class": {
+        "Anchor": {
+          "bonus": -792.5,
+          "total": 2341.3
+        },
+        "Bruiser": {
+          "bonus": -1452.2,
+          "total": 1800.0
+        },
+        "Center": {
+          "bonus": -1368.8,
+          "total": 1853.4
+        },
+        "Defender": {
+          "bonus": -1528.8,
+          "total": 1969.8
+        },
+        "Flanker": {
+          "bonus": -962.2,
+          "total": 2277.6
+        },
+        "Forward": {
+          "bonus": -535.8,
+          "total": 2737.9
+        },
+        "Grinder": {
+          "bonus": 658.4,
+          "total": 4097.3
+        },
+        "Sprinter": {
+          "bonus": -1076.0,
+          "total": 2362.0
+        },
+        "Striker": {
+          "bonus": 856.6,
+          "total": 4279.5
+        },
+        "Support": {
+          "bonus": -427.3,
+          "total": 2804.6
+        }
+      }
+    },
+    {
+      "scheme": "Aggressive Specialization",
+      "category": "replace",
+      "global_ev": -696.4,
+      "by_class": {
+        "Anchor": {
+          "bonus": -78.4,
+          "total": 3055.4
+        },
+        "Bruiser": {
+          "bonus": 419.1,
+          "total": 3671.3
+        },
+        "Center": {
+          "bonus": 202.2,
+          "total": 3424.4
+        },
+        "Defender": {
+          "bonus": -743.7,
+          "total": 2754.9
+        },
+        "Flanker": {
+          "bonus": -394.0,
+          "total": 2845.8
+        },
+        "Forward": {
+          "bonus": -377.8,
+          "total": 2895.9
+        },
+        "Grinder": {
+          "bonus": -1883.5,
+          "total": 1555.4
+        },
+        "Sprinter": {
+          "bonus": -1121.2,
+          "total": 2316.8
+        },
+        "Striker": {
+          "bonus": -2065.3,
+          "total": 1357.6
+        },
+        "Support": {
+          "bonus": -921.6,
+          "total": 2310.3
+        }
+      }
+    },
+    {
+      "scheme": "Gacha Hoarding",
+      "category": "replace",
+      "global_ev": -2437.5,
+      "by_class": {
+        "Anchor": {
+          "bonus": -2700.8,
+          "total": 433.0
+        },
+        "Bruiser": {
+          "bonus": -3006.6,
+          "total": 245.6
+        },
+        "Center": {
+          "bonus": -3189.3,
+          "total": 32.9
+        },
+        "Defender": {
+          "bonus": -3273.6,
+          "total": 225.0
+        },
+        "Flanker": {
+          "bonus": -2822.8,
+          "total": 417.0
+        },
+        "Forward": {
+          "bonus": -2364.5,
+          "total": 909.2
+        },
+        "Grinder": {
+          "bonus": -1111.5,
+          "total": 2327.4
+        },
+        "Sprinter": {
+          "bonus": -2787.2,
+          "total": 650.8
+        },
+        "Striker": {
+          "bonus": -825.2,
+          "total": 2597.7
+        },
+        "Support": {
+          "bonus": -2293.7,
+          "total": 938.2
+        }
+      }
+    },
+    {
+      "scheme": "Enforcing the Naughty List",
+      "category": "replace",
+      "global_ev": -2676.9,
+      "by_class": {
+        "Anchor": {
+          "bonus": -1776.2,
+          "total": 1357.6
+        },
+        "Bruiser": {
+          "bonus": -1734.6,
+          "total": 1517.6
+        },
+        "Center": {
+          "bonus": -2157.9,
+          "total": 1064.3
+        },
+        "Defender": {
+          "bonus": -3221.8,
+          "total": 276.8
+        },
+        "Flanker": {
+          "bonus": -2608.5,
+          "total": 631.3
+        },
+        "Forward": {
+          "bonus": -2236.5,
+          "total": 1037.2
+        },
+        "Grinder": {
+          "bonus": -3343.6,
+          "total": 95.3
+        },
+        "Sprinter": {
+          "bonus": -3329.7,
+          "total": 108.3
+        },
+        "Striker": {
+          "bonus": -3349.6,
+          "total": 73.3
+        },
+        "Support": {
+          "bonus": -3010.5,
+          "total": 221.4
+        }
+      }
+    }
+  ]
+}
