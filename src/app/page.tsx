@@ -32,6 +32,8 @@ import ContestTypeModal, {
 import { ModeToggle } from '@/components/ModeToggle';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { HeaderControls } from '@/components/HeaderControls';
+import { checkAdminAction } from '@/app/actions/auth';
+import AdminLoginModal from '@/components/AdminLoginModal';
 
 // Lazy Loaded Components
 const MyLineups = dynamic(() => import('@/components/MyLineups'), {
@@ -93,6 +95,27 @@ export default function Home() {
   const [pendingAutoFilters, setPendingAutoFilters] =
     useState<Partial<FilterState> | null>(null);
   const [isSuggestionActive, setIsSuggestionActive] = useState(false);
+
+  /* Admin Access State */
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [logoClicks, setLogoClicks] = useState(0);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+
+  useEffect(() => {
+    // Initial check for persisted admin session
+    checkAdminAction().then((status) => {
+      setIsAdmin(status);
+    });
+  }, []);
+
+  const handleLogoClick = () => {
+    const nextCount = logoClicks + 1;
+    setLogoClicks(nextCount);
+    if (nextCount >= 5) {
+      setShowAdminLogin(true);
+      setLogoClicks(0);
+    }
+  };
 
   /* Custom Hooks Integration */
   const { allCards, isLoading, handleRefresh: refreshCards } = useCards();
@@ -1108,6 +1131,7 @@ export default function Home() {
             src="/icons/logo-ga-tools-2.png"
             alt="Grand Arena"
             className={styles.drawerLogo}
+            onClick={handleLogoClick}
           />
           <button
             className={styles.closeMenuButton}
@@ -1149,15 +1173,17 @@ export default function Home() {
           >
             My Lineups
           </button>
-          <button
-            className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
-            onClick={() => {
-              handleMainTabChange('predictions');
-              closeDrawers();
-            }}
-          >
-            Predictions
-          </button>
+          {isAdmin && (
+            <button
+              className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
+              onClick={() => {
+                handleMainTabChange('predictions');
+                closeDrawers();
+              }}
+            >
+              Predictions
+            </button>
+          )}
           <button
             className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
             onClick={() => {
@@ -1262,6 +1288,8 @@ export default function Home() {
               src="/icons/logo-ga-tools-2.png"
               alt="Grand Arena Builder"
               className={styles.logo}
+              onClick={handleLogoClick}
+              style={{ cursor: 'pointer' }}
             />
 
             <div className={styles.infoWrapper} ref={infoWrapperRef}>
@@ -1314,12 +1342,14 @@ export default function Home() {
                 >
                   My Lineups
                 </button>
-                <button
-                  className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
-                  onClick={() => handleMainTabChange('predictions')}
-                >
-                  Predictions
-                </button>
+                {isAdmin && (
+                  <button
+                    className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
+                    onClick={() => handleMainTabChange('predictions')}
+                  >
+                    Predictions
+                  </button>
+                )}
                 <button
                   className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
                   onClick={() => handleMainTabChange('champions')}
@@ -1551,7 +1581,7 @@ export default function Home() {
           </div>
         )}
 
-        {activeTab === 'predictions' && (
+        {isAdmin && activeTab === 'predictions' && (
           <div
             style={{
               display: 'flex',
@@ -1560,7 +1590,7 @@ export default function Home() {
               minHeight: 0,
             }}
           >
-            <PredictionsTab />
+            <PredictionsTab allCards={allCards} userCards={userCards} cardMode={cardMode} />
           </div>
         )}
 
@@ -1714,6 +1744,12 @@ export default function Home() {
       {isLoadingUser && !showWalletInput && (
         <LoadingOverlay message="Loading cards..." />
       )}
+
+      <AdminLoginModal
+        isOpen={showAdminLogin}
+        onClose={() => setShowAdminLogin(false)}
+        onSuccess={() => setIsAdmin(true)}
+      />
 
       <Toast messages={toasts} onClose={removeToast} />
     </main>

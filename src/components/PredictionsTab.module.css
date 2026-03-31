@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   background: #84bcff;
   padding: 1rem 1.5rem;
   border-radius: 1rem;
@@ -180,7 +180,7 @@
   gap: 20px;
   flex: 1;
   min-height: 0;
-  padding: 10px 0;
+  padding: 0;
 }
 
 .mainContent {
@@ -357,7 +357,7 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
 .rankingHeader {
@@ -393,7 +393,7 @@
   font-weight: 700;
   color: #ffd753;
   text-transform: uppercase;
-  margin: 0 0 8px 0;
+  margin: 0 0 4px 0;
   text-shadow:
     1.5px 0 #000,
     -1.5px 0 #000,
@@ -405,7 +405,51 @@
   font-size: 11px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 1.25rem;
+  margin-top: 2px;
+}
+
+.filterByRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.sortControls {
+  display: flex;
+  gap: 6px;
+}
+
+.metaSchemesBtn {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1.5px solid #ff66cc;
+  color: #ff66cc;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.activeMeta {
+  background: #ff66cc !important;
+  color: white !important;
+  border-color: white !important;
+}
+
+.metaSchemesBtn:hover {
+  background: rgba(255, 102, 204, 0.1);
+}
+
+.filterLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
 .rankingList {
@@ -559,14 +603,36 @@
 }
 
 /* Modal */
+:global(html.modal-open),
+:global(body.modal-open) {
+  overflow: hidden !important;
+  height: 100vh !important;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+:global(html.modal-open)::-webkit-scrollbar,
+:global(body.modal-open)::-webkit-scrollbar {
+  display: none !important; /* Chrome/Safari */
+}
+
+/* Specific to PredictionsTab containers that might be scrolling */
+:global(body.modal-open) [class*="mainContent"] {
+  overflow: hidden !important;
+}
+
+:global(body.modal-open) [class*="main"] {
+  overflow: hidden !important;
+}
+
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -733,6 +799,24 @@
   border: 2px solid #333333;
 }
 
+.modalInfoBox {
+  background: rgba(0, 0, 0, 0.1);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.modalInfoText {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #333333;
+  font-weight: 600;
+  margin: 0;
+  font-style: italic;
+  opacity: 0.9;
+}
+
 .schemeImg {
   width: 100%;
   height: 100%;
@@ -767,10 +851,10 @@
   background: white;
   border: 2px solid #333333;
   border-radius: 10px;
-  padding: 8px;
+  padding: 6px;
   color: #333333;
-  width: 70px;
-  font-size: 18px;
+  width: 56px;
+  font-size: 15px;
   font-weight: 900;
   text-align: center;
   outline: none;
@@ -789,6 +873,17 @@
   font-size: 14px;
   font-weight: 800;
   opacity: 0.7;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 18px;
+  border-radius: 18px;
+  border: 2px solid #333333;
+  margin: 5px 0;
 }
 
 .modalRow {
@@ -866,10 +961,11 @@
 }
 
 .checkboxLabel {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 800;
   color: #333333;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .counterControls {
@@ -883,24 +979,43 @@
 .counterBtn {
   background: #ffd753;
   color: #333333;
-  border: 2px solid #333333;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
+  border: 3px solid #333333;
+  border-bottom-width: 6px;
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  font-size: 20px;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
+  line-height: 0;
+}
+
+.maxBtn {
+  background: #ffd753;
+  color: #333333;
+  border: 2px solid #333333;
+  border-bottom-width: 4px;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.maxBtn:hover {
+  transform: translateY(-2px);
+  background: #ffea99;
 }
 
 .counterBtn:hover:not(:disabled) {
   background: #ffea99;
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
 }
 
 .counterBtn:disabled {
@@ -982,6 +1097,101 @@
   to { transform: rotate(360deg); }
 }
 
+.nestedRow {
+  background: rgba(255, 255, 255, 0.4);
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1.5px dashed rgba(0, 0, 0, 0.2);
+  margin-top: 0;
+}
+
+.nestedLabel {
+  font-size: 10px;
+  font-weight: 900;
+  color: #333333;
+  letter-spacing: 0.5px;
+}
+
+.nestedInput {
+  background: white;
+  border: 2px solid #333333;
+  border-radius: 8px;
+  padding: 4px;
+  color: #333333;
+  width: 45px;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  outline: none;
+  appearance: none;
+  -moz-appearance: textfield;
+}
+
+.nestedInput::-webkit-outer-spin-button,
+.nestedInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.counterControlsSmall {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counterBtnSmall {
+  background: #ff66cc;
+  color: white;
+  border: 1.5px solid #333333;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  padding: 0;
+}
+
+.counterBtnSmall svg {
+  stroke-width: 4px;
+}
+
+.counterBtnSmall:hover:not(:disabled) {
+  transform: scale(1.1);
+  background: #ff85d5;
+}
+
+.counterBtnSmall:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.maxBtnSmall {
+  background: #ff66cc;
+  color: white;
+  border: 1.5px solid #333333;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 8px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+
+.maxBtnSmall:hover {
+  transform: scale(1.05);
+  background: #ff85d5;
+}
+
 @media (max-width: 1000px) {
   .mainLayout {
     flex-direction: column;
@@ -990,3 +1200,429 @@
     width: 100%;
   }
 }
+
+/* ─── RESULTS MODAL ────────────────────────────────────────────────────────── */
+
+.resultsModal {
+  width: fit-content !important;
+  max-width: 98vw !important;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  margin: 0 auto;
+}
+
+.lineupsList {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+  flex: 1;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.lineupCard {
+  background: #fff;
+  border: 3px solid #333;
+  border-bottom-width: 6px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  width: fit-content;
+}
+
+.lineupCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  background: #3a80ef;
+  border-bottom: 3px solid #333;
+  flex-shrink: 0;
+}
+
+.lineupNumber {
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: #333;
+  letter-spacing: 0.05em;
+  opacity: 1;
+}
+
+.lineupScoreBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.1);
+  padding: 1px 8px;
+  border-radius: 4px;
+}
+
+.lineupScoreLabel {
+  font-size: 0.4rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #333;
+  margin: 0;
+}
+
+.lineupScoreValue {
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+}
+
+.lineupMokisGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 160px);
+  gap: 4px;
+  padding: 4px;
+  background: #fff;
+}
+
+.mokiSlotCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+}
+
+.mokiCardImgWrapper {
+  position: relative;
+  width: 160px;
+  height: 215px;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mokiCardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.nonOwnedSchemeCard {
+  border: 4px solid #ff4d4d !important;
+  box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+  border-radius: 12px;
+  z-index: 5;
+}
+
+.nonOwnedSchemeCard::after {
+  content: 'NOT OWNED';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #ff4d4d;
+  color: white;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 6px;
+  z-index: 20;
+  border: 2px solid #333;
+  box-shadow: 2px 2px 0 #000;
+  text-transform: uppercase;
+}
+
+.resultsModalHeader {
+  width: 100%;
+  padding: 1.25rem 1.5rem; /* Reduced horizontal padding */
+  background: #84bcff;
+  border-bottom: 3.5px solid #333;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.modalTitleGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.modalSubtitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modalTitle {
+  font-size: 1.6rem;
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-weight: 800;
+  color: #ffd753;
+  text-transform: uppercase;
+  margin: 0;
+  text-align: left;
+  line-height: 1.1;
+  /* Black outline/border, no shadow */
+  text-shadow:
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+}
+
+.modalSubtitle {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #666;
+  margin: 0;
+  font-weight: 400; /* Explicitly non-bold */
+  text-align: left;
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+}
+
+.contestLink {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #ff66cc;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  border: 1px solid #000;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+
+.contestLink:hover {
+  transform: scale(1.05);
+  background: #ff99dd;
+}
+
+.contestLink svg {
+  margin-top: -1px;
+}
+
+.resultsEmpty {
+  padding: 2.5rem;
+  text-align: center;
+  color: #555;
+  font-size: 0.9rem;
+  background: #fff;
+}
+
+.generating {
+  opacity: 0.8;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+.spinner {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.mokiCardScoreBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-top: 2px;
+  z-index: 10;
+  min-width: 70px;
+}
+
+.mokiCardScoreLabel {
+  display: none;
+}
+
+.mokiCardScoreValue {
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+}
+
+/* Admin Login Modal Styles */
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.loginInput {
+  background: #fff;
+  border: 3.5px solid #333;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.loginInput:focus {
+  border-color: #ff66cc;
+  box-shadow: 4px 4px 0 rgba(255, 102, 204, 0.2);
+}
+
+.loginError {
+  color: #ff4d4d;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  background: rgba(255, 77, 77, 0.1);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 77, 77, 0.2);
+}
+
+.autoLineupsModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.autoLineupsModalContent {
+  background: #84bcff;
+  border: 4px solid #333;
+  border-bottom-width: 10px;
+  border-radius: 2rem;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+}
+
+.autoLineupsModalHeader {
+  padding: 1.5rem 2rem;
+  background: #ffd753;
+  border-bottom: 3.5px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.autoLineupsModalTitle {
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #333;
+  text-transform: uppercase;
+  margin: 0;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.autoLineupsModalSubtitle {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+  font-style: italic;
+}
+
+.autoLineupsModalActions {
+  padding: 1.5rem 2rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-top: 3.5px solid #333;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.autoLineupsModalCloseBtn {
+  background: #fff;
+  border: 3.5px solid #333;
+  border-bottom-width: 6px;
+  padding: 0.6rem 1.5rem;
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.1s;
+}
+
+.autoLineupsModalCloseBtn:active {
+  transform: translateY(2px);
+  border-bottom-width: 3.5px;
+}
+
+.autoLineupsSaveAllBtn {
+  background: #ff66cc;
+  color: white;
+  border: 3.5px solid #333;
+  border-bottom-width: 6px;
+  padding: 0.6rem 2rem;
+  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.1s;
+}
+
+.autoLineupsSaveAllBtn:active {
+  transform: translateY(2px);
+  border-bottom-width: 3.5px;
+}
+
+.autoLineupsSaveAllBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+

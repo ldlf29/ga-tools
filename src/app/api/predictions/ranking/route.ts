@@ -21,9 +21,14 @@ export async function GET() {
       skip_empty_lines: true,
       cast: (value, context) => {
         if (context.header) return value;
-        // Intentar convertir a número si parece uno
-        const num = parseFloat(value);
-        return isNaN(num) ? value : num;
+        
+        // Strict number validation: only cast if the string is purely a number
+        // This prevents "1 of 1" from becoming 1 and "24K" from becoming 24
+        if (/^-?\d+(\.\d+)?$/.test(value)) {
+          return parseFloat(value);
+        }
+        
+        return value;
       }
     });
 

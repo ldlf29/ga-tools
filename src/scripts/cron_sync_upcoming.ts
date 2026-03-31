@@ -117,10 +117,7 @@ async function run() {
             const key = p.name.trim().toLowerCase();
             const statsClass = mokiStatsMap.get(key);
             if (statsClass) {
-              if (key === 'vagabond' || key === 'hoppi') console.log(`[DEBUG] Overriding ${key} to ${statsClass}`);
               p.class = statsClass;
-            } else if (key === 'vagabond' || key === 'hoppi') {
-              console.log(`[DEBUG] ${key} MATCHED IN API BUT MISSING IN MOKISTATSMAP!`);
             }
           }
           return p;
@@ -191,7 +188,8 @@ async function run() {
     try {
       const projectRoot = path.resolve(__dirname, '../../');
       const mlDir = path.join(projectRoot, 'ml');
-      const mlOutput = execSync('python 8_generate_rank.py', { cwd: mlDir });
+      const pythonPath = process.platform === 'win32' ? '.\\venv\\Scripts\\python.exe' : './venv/bin/python';
+      const mlOutput = execSync(`${pythonPath} 8_generate_rank.py`, { cwd: mlDir });
       console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
     } catch (mlErr: any) {
       console.error('[Cron Upcoming] Error corriendo la IA:', mlErr.message);
