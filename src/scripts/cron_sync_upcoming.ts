@@ -189,11 +189,20 @@ async function run() {
     console.log('[Cron Upcoming] Disparando script de generación de Ranking ML...');
     try {
       const projectRoot = path.resolve(__dirname, '../../');
-      const mlDir = path.join(projectRoot, 'ml');
+      
+      // Intentar encontrar la carpeta ml/ML de forma robusta para Linux
+      let mlDir = path.join(projectRoot, 'ml');
+      if (!fs.existsSync(mlDir)) {
+        mlDir = path.join(projectRoot, 'ML');
+      }
+
+      if (!fs.existsSync(mlDir)) {
+        throw new Error(`Could not find 'ml' or 'ML' directory in ${projectRoot}`);
+      }
+
+      console.log(`[Cron Upcoming] Usando directorio ML: ${mlDir}`);
       
       // Determinar el comando de Python: 
-      // En GitHub Actions usamos el python3 global instalado por el setup-python
-      // Localmente seguimos usando el venv
       let pythonCommand = process.platform === 'win32' 
         ? '.\\venv\\Scripts\\python.exe' 
         : './venv/bin/python';
@@ -207,7 +216,8 @@ async function run() {
       console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
 
       // 5. Sync Generated CSV to Supabase
-      const csvPath = path.join(projectRoot, 'ml', 'data', 'upcoming_180_ranking.csv');
+      // Buscar el CSV ignorando casing de la carpeta
+      const csvPath = path.join(mlDir, 'data', 'upcoming_180_ranking.csv');
       if (fs.existsSync(csvPath)) {
         console.log('[Cron Upcoming] Reading Ranking CSV for Supabase Sync...');
         const fileContent = fs.readFileSync(csvPath, 'utf8');
