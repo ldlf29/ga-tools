@@ -72,6 +72,7 @@ ml/processed_cols.txt
 ml/eda.json
 ml/eda_output.txt
 ml/*.txt
+!ml/requirements.txt
 ml/tmp_*.py
 *.pyc
 
