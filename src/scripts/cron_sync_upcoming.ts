@@ -190,8 +190,20 @@ async function run() {
     try {
       const projectRoot = path.resolve(__dirname, '../../');
       const mlDir = path.join(projectRoot, 'ml');
-      const pythonPath = process.platform === 'win32' ? '.\\venv\\Scripts\\python.exe' : './venv/bin/python';
-      const mlOutput = execSync(`${pythonPath} 8_generate_rank.py`, { cwd: mlDir });
+      
+      // Determinar el comando de Python: 
+      // En GitHub Actions usamos el python3 global instalado por el setup-python
+      // Localmente seguimos usando el venv
+      let pythonCommand = process.platform === 'win32' 
+        ? '.\\venv\\Scripts\\python.exe' 
+        : './venv/bin/python';
+
+      if (process.env.GITHUB_ACTIONS === 'true') {
+        pythonCommand = 'python3';
+      }
+
+      console.log(`[Cron Upcoming] Usando comando: ${pythonCommand}`);
+      const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, { cwd: mlDir });
       console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
 
       // 5. Sync Generated CSV to Supabase
