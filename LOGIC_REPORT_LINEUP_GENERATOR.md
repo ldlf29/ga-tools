@@ -1,82 +1,80 @@
-# [LOGIC REPORT] Auto Generador de Lineups
+# [LOGIC REPORT] Arquitectura Detallada y Operación del Generador de Lineups
 
-Este documento detalla el funcionamiento interno del generador de lineups basado en el ranking de predicciones de Grand Arena. El código principal reside en `src/utils/lineupGenerator.ts`.
-
-## 1. Entrada de Datos (Inputs)
-El generador recibe los siguientes parámetros críticos:
-*   **Ranking Data (`MokiRankingRow[]`):** Datos provenientes del ML (Score, WinRate, Wart Closer, etc.).
-*   **Contest Config:** Configuración del torneo (rareza permitida, número de slots).
-*   **User Cards:** Inventario del usuario (si se usa el modo "MY CARDS").
-*   **Upcoming Matches:** Datos de los próximos enfrentamientos para detectar conflictos de matchups.
+Este documento proporciona un desglose técnico exhaustivo de los componentes arquitectónicos, las mecánicas de puntuación (Scoring) y los parámetros de control del generador de lineups.
 
 ---
 
-## 2. Fórmulas de Puntaje (Scoring Logic)
+## 1. Fórmulas de Puntuación (Scoring Mechanics)
 
-El generador calcula un **Effective Score** para cada Moki dependiendo del "Scheme" (estrategia) que se esté evaluando.
+El sistema utiliza dos niveles de puntuación para filtrar y ordenar los candidatos.
 
-### Multiplicadores de Rareza
-```typescript
-Basic: 1.0
-Rare: 1.25
-Epic: 1.5
-Legendary: 1.75
-```
+### A. Multiplicadores de Rarity (Invariables)
+Se aplican al puntaje base (`Base Score`) del ranking para reflejar la ventaja competitiva de las cartas de mayor nivel:
+*   **Basic**: `x1.0`
+*   **Rare**: `x1.25`
+*   **Epic**: `x1.5`
+*   **Legendary**: `x1.75`
 
-### Fórmulas por Estrategia
-Calculadas en la función `calcEffective`:
+### B. Cálculo del Effective Score (Ranking Score)
+Es el valor final utilizado para ordenar a los Mokis de mejor a peor dentro de cada estrategia.
 
-| Estrategia | Fórmula de Puntaje Efectiva |
+| Estrategia (Scheme) | Fórmula de Cálculo Completa |
 | :--- | :--- |
-| **Trait / Fur** | `(Base Score * Multiplicador) + 1000` |
+| **Trait / Fur** | `(Base Score * Multiplicador) + 1,000` |
 | **Touching The Wart** | `(Base Score * Multiplicador) + (Wart Closer * 175)` |
 | **Taking A Dive** | `(Base Score * Multiplicador) + (Losses * 175)` |
-| **Collective Specialization** | `((Gacha Pts + (WinRate / 10) * 300) * Multiplicador) + (Gacha Pts * 0.5)` |
-| **One-Of-Each** | `(Base Score * Multiplicador) + 1450` |
+| **Gacha / Collective** | `((Gacha Pts + (WinRate/10)*300) * Multiplicador) + (Gacha Pts * 0.5)` |
+| **One-Of-Each** | `(Base Score * Multiplicador) + 1,450` |
+
+### C. Evaluación de Calidad (Validation Score)
+Antes de aceptar un lineup, el sistema verifica que cumpla con un estándar mínimo de calidad:
+*   **Esquemas Trait/Fur**: El `Base Score` sumado de los 4 Mokis (sin multiplicadores) debe ser `>= 14,000`.
+*   **Esquemas Relegated**: El `Validation Score` (Base + Bonos, sin Multiplicadores) debe ser `>= 18,000`.
 
 ---
 
-## 3. Lógica Paso a Paso (Algoritmo)
+## 2. Configuración del Generador (SETUP PREDICTION Modal)
 
-El proceso de generación sigue este flujo lógico:
+Cada opción en el modal de generación afecta directamente la lógica de filtrado del pool y la construcción de los lineups.
 
-### Paso 1: Construcción del Pool (`buildPool`)
-*   Se filtran los Strikers si la opción está activa.
-*   Se determina la mejor rareza disponible para cada Moki.
-    *   **Modo ALL:** Se usa la rareza máxima permitida por el torneo.
-    *   **Modo USER:** Se busca la rareza más alta que el usuario posea dentro del rango del torneo.
-*   Se extraen las imágenes del `catalog.json` para las rarezas seleccionadas.
+### A. Card Source (ALL vs MY)
+*   **ALL (Simulación)**: El generador asume que tienes acceso a todas las cartas del catálogo. Útil para ver "qué sería lo ideal". El stock por personaje se fija en 1.
+*   **MY (Inventario Real)**: El generador solo utiliza cartas que existan en tu inventario (`userCards`). El stock se extrae de tus copias físicas reales.
 
-### Paso 2: Detección de Conflictos (`buildConflictSet`)
-*   Se analiza la lista de `upcomingMatches`.
-*   Si dos Mokis del pool van a enfrentarse entre sí en el torneo real, se marcan como "en conflicto".
-*   *Lógica:* El generador evitará poner a Moki A y Moki B en el mismo lineup si están en conflicto (si la opción `avoidMatchupConflicts` está activa).
+### B. Allow Repeated (Permitir Repetidos)
+*   **Desactivado**: El generador solo producirá lineups únicos (basados en diferentes combinaciones de personajes).
+*   **Activado**: Si la cantidad de lineups únicos generados es menor al límite del torneo, el sistema clonará los mejores lineups. **Importante**: Sigue respetando el stock físico. No clonará un lineup si no tienes suficientes cartas físicas para cubrirlo (en modo MY).
 
-### Paso 3: Fase 1 - Esquemas de Trait / Fur
-*   El código recorre todos los esquemas (ej: Whale Watching, Divine Intervention).
-*   Filtra los Mokis que cumplen con el Trait o Fur requerido (ej: Fur "Shadow").
-*   **Selección Greedy:** Ordena por Puntaje Efectivo y toma los mejores 4 que no tengan conflictos entre sí ni con nombres ya usados.
-*   **Score Cut (Mandatorio):** La suma de los `Base Score` originales de los 4 Mokis debe ser `>= 14,000`. Si es menor, el lineup se descarta.
+### C. Max Repeated (Límite por Personaje)
+Define cuántas veces puede aparecer el **mismo personaje** en el total de los lineups generados. Si tienes 10 lineups y pones `Max Repeated: 2`, un Moki X solo podrá aparecer en 2 de ellos.
 
-### Paso 4: Fase 2 - Esquemas Relegated
-*   Evalúa esquemas especiales: **Wart** (Wart Closer), **Dive** (Losses), **Gacha** (Puntos Gacha).
-*   Toma Mokis que no fueron usados en la Fase 1 (para maximizar variedad).
-*   **Score Cut (Mandatorio):** El `Total Effective Score` del lineup debe ser `>= 18,000`.
+### D. Exclude Strikers
+Filtra y elimina del pool a cualquier Moki cuya clase sea "Striker". Esto previene que se sugieran cartas de ataque en torneos donde no prefieras usarlas.
 
-### Paso 5: Manejo de Torneos "One-Of-Each"
-*   Detecta si el torneo requiere exactamente un Moki de cada rareza (Basic, Rare, Epic, Legendary).
-*   En este caso, ignora las fases 1 y 2 y usa un generador especializado que reserva slots por rareza y selecciona el mejor Moki disponible para cada "hueco" sin repetir nombres.
+### E. Avoid Matchup Conflicts
+Utiliza la base de datos de combates próximos (`upcomingMatches`). Si Moki A y Moki B tienen un combate programado entre sí, el generador **nunca** los pondrá en el mismo lineup, evitando que tus cartas se resten puntos entre sí.
 
-### Paso 6: Consolidación y Repeticiones
-*   Se juntan todos los lineups válidos.
-*   Se ordenan por `Total Effective Score` de mayor a menor.
-*   Si el usuario permitió repetidos, el generador clona los mejores lineups basándose en la cantidad de copias que el usuario tenga (o el límite `maxRepeated`).
+### F. Use Only My Schemes (Filtrar Estrategias)
+Por defecto, el generador evalúa todas las estrategias (Whale Watching, Midnight Strike, etc.). Si activas esta opción, el sistema solo evaluará y generará lineups para las estrategias de las cuales **tengas la carta SCHEME** en tu inventario.
 
 ---
 
-## 4. Resumen de Reglas Críticas en el Código
+## 3. Flujo Lógico de Generación
 
-> [!IMPORTANT]
-> **Conflicto de Matchups:** `groupHasConflict` asegura que si Moki A pelea contra Moki B, no aparezcan juntos.
-> **Prioridad de Rareza:** `bestRarityWithinConstraint` siempre apunta a lo más alto permitido para maximizar el multiplicador.
-> **Cortes de Puntaje:** Los valores **14,000** (Trait/Fur) y **18,000** (Relegated) actúan como filtros de calidad mínimos para que el lineup sea sugerido.
+### Fase 1: Inicialización del Stock Literal
+Se crea un mapa de inventario usando la clave `NOMBRE:RAREZA`. Esto garantiza que tus cartas Rare y Epic se cuenten por separado y no se mezclen.
+
+### Fase 2: Aplicación del MaxRarity
+Para cada slot, se define cuál es el nivel máximo permitido. El generador filtra el pool y **solo acepta** candidatos que tengan esa rareza exacta. Si el slot pide Epic, el sistema ignorará tus versiones Rare del mismo personaje.
+
+### Fase 3: Construcción Greedy (Codiciosa)
+1.  **Ordenamiento**: Se ordenan los candidatos de la fase actual por su `Effective Score`.
+2.  **Selección**: Se intentan llenar los 4 slots con los mejores candidatos disponibles que:
+    *   Coincidan con la `maxRarity` del slot.
+    *   No se repitan (un mismo personaje no puede estar dos veces en el mismo lineup).
+    *   Tengan stock disponible (`NAME:RARITY`).
+    *   No tengan conflictos de combate (si la opción está activa).
+3.  **Consumo**: Si el lineup es válido, se resta **-1** al stock del personaje en esa rareza específica.
+
+### Fase 4: Deduplicación (Fingerprints)
+Antes de añadir un lineup a la lista final, se genera una huella dactilar (`Fingerprint`) de los nombres de los 4 personajes. Si ya existe un lineup con esos mismos 4 personajes para ese esquema, se descarta para evitar sugerencias redundantes.

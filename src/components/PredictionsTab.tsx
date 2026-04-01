@@ -1261,11 +1261,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                                     const mokiSum = lineup.mokis.reduce((sum, m) => sum + (m.baseScore * getRarityMultiplier(m.rarity)), 0);
                                     const schemeScore = Math.max(0, lineup.totalEffectiveScore - mokiSum);
                                     
-                                    // Check if user owns this scheme card
-                                    const isOwned = userCards.some(c => 
-                                      c.cardType === 'SCHEME' && 
-                                      String(c.name).toUpperCase().trim() === lineup.schemeName?.toUpperCase().trim()
-                                    );
+                                    // Check if user owns this scheme card (using generator's stock-aware flag)
+                                    const isOwned = lineup.hasScheme;
 
                                     return (
                                       <div className={`${styles.mokiSlotCard} ${styles.schemeSlotCard}`}>

@@ -1,41 +1,49 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { parse } from 'csv-parse/sync';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    // Definir la ruta al CSV generado por Python
-    // Estructura: GA-TOOLS-CLEAN/ml/data/upcoming_180_ranking.csv
-    const csvPath = path.join(process.cwd(), 'ml', 'data', 'upcoming_180_ranking.csv');
+    // Fetch from Supabase instead of local CSV
+    const { data: records, error } = await supabaseAdmin
+      .from('moki_predictions_ranking')
+      .select('*')
+      .order('score', { ascending: false });
 
-    if (!fs.existsSync(csvPath)) {
-      return NextResponse.json({ error: 'Ranking file not found. Please run 8_generate_rank.py first.' }, { status: 404 });
+    if (error) {
+      console.error('Supabase error fetching rankings:', error);
+      return NextResponse.json({ error: 'Failed to fetch ranking from database' }, { status: 500 });
     }
 
-    const fileContent = fs.readFileSync(csvPath, 'utf8');
-    
-    // Parsear CSV
-    const records = parse(fileContent, {
-      columns: true,
-      skip_empty_lines: true,
-      cast: (value, context) => {
-        if (context.header) return value;
-        
-        // Strict number validation: only cast if the string is purely a number
-        // This prevents "1 of 1" from becoming 1 and "24K" from becoming 24
-        if (/^-?\d+(\.\d+)?$/.test(value)) {
-          return parseFloat(value);
-        }
-        
-        return value;
-      }
-    });
+    if (!records || records.length === 0) {
+      return NextResponse.json({ error: 'No ranking data found in database.' }, { status: 404 });
+    }
 
-    // Devolver los 180 registros mapeados
+    // Map database columns back to the expected frontend format if necessary
+    // or return as is if the frontend can handle the snake_case names.
+    // Looking at PredictionsTab.tsx, it likely expects the CSV header names.
+    const mappedRecords = records.map((r: any) => ({
+      'Moki ID': r.moki_id,
+      'Name': r.name,
+      'Class': r.class,
+      'Score': r.score,
+      'WinRate': r.win_rate,
+      'Wart Closer': r.wart_closer,
+      'Losses': r.losses,
+      'Gacha Pts': r.gacha_pts,
+      'Deaths': r.deaths,
+      'Win By Combat': r.win_by_combat,
+      'Fur': r.fur,
+      'Traits': r.traits,
+      'Win Cond: Eliminations (%)': r.eliminations_pct,
+      'Win Cond: Wart (%)': r.wart_pct,
+      'Win Cond: Gacha (%)': r.gacha_pct
+    }));
+
     return NextResponse.json({ 
         success: true, 
-        data: records,
+        data: mappedRecords,
         timestamp: new Date().toISOString()
     });
 

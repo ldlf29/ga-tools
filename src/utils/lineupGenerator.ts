@@ -44,6 +44,7 @@ export interface GeneratedLineup {
   mokis: MokiCandidate[];
   totalBaseScore: number;
   totalEffectiveScore: number;
+  hasScheme: boolean;
 }
 
 export interface UpcomingMatchData {
@@ -289,7 +290,7 @@ function lineupBaseOnly(mokis: MokiCandidate[]): number {
 
 // ─── Pool Builder ────────────────────────────────────────────────────────────
 
-function buildPool(params: GenerateParams, catalogLookup: CatalogLookup, maxRarity: string): MokiCandidate[] {
+function buildPool(params: GenerateParams, catalogLookup: CatalogLookup): MokiCandidate[] {
   const pool: MokiCandidate[] = [];
 
   for (const row of params.rankingData) {
@@ -298,24 +299,7 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup, maxRari
     const name = row.Name;
     if (!name) continue;
 
-    let rarity: string;
-    let cardImage: string;
-    let copies: number;
-
-    if (params.cardMode === 'ALL') {
-      rarity = bestRarityWithinConstraint(maxRarity);
-      cardImage = getImageFromCatalog(name, rarity, catalogLookup);
-      if (!cardImage) continue; // Not in catalog
-      copies = 1;
-    } else {
-      const owned = getBestOwnedRarityForSlot(name, maxRarity, params.userCards);
-      if (!owned) continue;
-      rarity = owned.rarity;
-      cardImage = owned.image;
-      copies = owned.copies;
-    }
-
-    pool.push({
+    const baseMoki = {
       name,
       class: row.Class || '',
       fur: row.Fur || '',
@@ -325,10 +309,23 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup, maxRari
       wartCloser: typeof row['Wart Closer'] === 'number' ? row['Wart Closer'] : parseFloat(String(row['Wart Closer'] || '0')),
       gachaPts: typeof row['Gacha Pts'] === 'number' ? row['Gacha Pts'] : parseFloat(String(row['Gacha Pts'] || '0')),
       winRate: typeof row.WinRate === 'number' ? row.WinRate : parseFloat(String(row.WinRate || '0').replace('%', '')),
-      rarity,
-      cardImage,
-      copies,
-    });
+    };
+
+    if (params.cardMode === 'ALL') {
+      // Add all 4 possible rarities to the pool (if in catalog)
+      for (const r of RARITY_ORDER) {
+        const img = getImageFromCatalog(name, r, catalogLookup);
+        if (img) {
+          pool.push({ ...baseMoki, rarity: r, cardImage: img, copies: 1 });
+        }
+      }
+    } else {
+      // Add all owned rarities to the pool with their specific copy counts
+      const owned = getOwnedRarities(name, params.userCards);
+      for (const o of owned) {
+        pool.push({ ...baseMoki, rarity: o.rarity, cardImage: o.image, copies: o.copies });
+      }
+    }
   }
 
   return pool;
@@ -336,39 +333,58 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup, maxRari
 
 // ─── Greedy Lineup Builder ───────────────────────────────────────────────────
 
-function getLineupFingerprint(mokis: MokiCandidate[]): string {
-  return [...mokis]
-    .sort((a, b) => String(a.name).localeCompare(String(b.name)))
-    .map(m => `${String(m.name).toUpperCase()}:${m.rarity.toLowerCase()}`)
-    .join('|');
-}
-
 function buildGreedyLineup(
   candidates: MokiCandidate[],
   usedNames: Set<string>,
   conflictSet: Set<string>,
   avoidConflicts: boolean,
   scoreType: ScoreType,
-  minRarity: string,
-  maxRarity: string,
+  slots: any[],
+  stockMap: Map<string, number>,
 ): MokiCandidate[] | null {
   const selected: MokiCandidate[] = [];
+  const localUsedNames = new Set<string>();
 
-  for (const candidate of candidates) {
-    if (selected.length === 4) break;
-    if (usedNames.has(String(candidate.name).toUpperCase())) continue;
-    if (!meetsRarityConstraint(String(candidate.rarity), minRarity, maxRarity)) continue;
+  for (const slot of slots) {
+    const minR = slot.minRarity.toLowerCase();
+    const maxR = slot.maxRarity.toLowerCase();
 
-    if (avoidConflicts && selected.length > 0) {
-      const conflicts = selected.some(s => hasConflict(candidate.name, s.name, conflictSet));
-      if (conflicts) continue; // Greedy swap: skip and try next
+    let foundForSlot = false;
+
+    // Use a secondary loop to pick the best candidate that fits the current slot
+    for (const candidate of candidates) {
+      const nameKey = String(candidate.name).toUpperCase();
+      const stockKey = `${nameKey}:${candidate.rarity.toUpperCase()}`;
+      
+      if (usedNames.has(nameKey) || localUsedNames.has(nameKey)) continue;
+      
+      // Stock check: LITERAL check for this specific rarity in the inventory
+      if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
+
+      // Verify rarity: LITERAL check to always use the maxRarity allowed for the slot
+      if (candidate.rarity.toLowerCase() !== maxR.toLowerCase()) continue;
+
+      if (avoidConflicts && selected.length > 0) {
+        if (selected.some(s => hasConflict(candidate.name, s.name, conflictSet))) continue;
+      }
+
+      selected.push(candidate);
+      localUsedNames.add(nameKey);
+      foundForSlot = true;
+      break;
     }
 
-    selected.push(candidate);
+    if (!foundForSlot) return null;
   }
 
-  if (selected.length < 4) return null;
   return selected;
+}
+
+function getLineupFingerprint(mokis: MokiCandidate[]): string {
+  return [...mokis]
+    .map(m => String(m.name).toUpperCase())
+    .sort((a, b) => a.localeCompare(b))
+    .join('|');
 }
 
 function buildLineup(
@@ -377,25 +393,22 @@ function buildLineup(
   conflictSet: Set<string>,
   avoidConflicts: boolean,
   scoreType: ScoreType,
-  minRarity: string,
-  maxRarity: string,
+  slots: any[],
   scoreMin: number,
   schemeName: string,
   schemeImage: string,
   schemeType: 'trait-fur' | 'relegated' | 'one-of-each',
   id: string,
+  stockMap: Map<string, number>,
 ): GeneratedLineup | null {
-  // Sort by effective (Ranking) score but validate by Validation score
   const sorted = [...candidates].sort(
     (a, b) => calcRankingScore(b, scoreType) - calcRankingScore(a, scoreType)
   );
 
-  const mokis = buildGreedyLineup(sorted, usedNames, conflictSet, avoidConflicts, scoreType, minRarity, maxRarity);
+  const mokis = buildGreedyLineup(sorted, usedNames, conflictSet, avoidConflicts, scoreType, slots, stockMap);
   if (!mokis) return null;
 
-  // Apply score cut based on Validation score (Base + Bonuses, no multiplier)
   if (schemeType === 'trait-fur') {
-    // Cut on raw sum of base scores (unmultiplied)
     const rawSum = mokis.reduce((s, m) => s + m.baseScore, 0);
     if (rawSum < 14000) return null;
   } else if (schemeType === 'relegated') {
@@ -406,7 +419,7 @@ function buildLineup(
   const totalEffectiveScore = lineupTotalEffective(mokis, scoreType);
   const totalBaseScore = lineupBaseOnly(mokis);
 
-  return { id, schemeName, schemeImage, schemeType, mokis, totalBaseScore, totalEffectiveScore };
+  return { id, schemeName, schemeImage, schemeType, mokis, totalBaseScore, totalEffectiveScore, hasScheme: true };
 }
 
 // ─── One-Of-Each Generator ───────────────────────────────────────────────────
@@ -416,10 +429,11 @@ function generateOneOfEach(
   catalogLookup: CatalogLookup,
   params: GenerateParams,
   conflictSet: Set<string>,
+  schemeStockMap: Map<string, number>
 ): GeneratedLineup[] {
   const stockMap = new Map<string, number>();
   for (const m of pool) {
-    const key = String(m.name).toUpperCase();
+    const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
     stockMap.set(key, (stockMap.get(key) ?? 0) + m.copies);
   }
 
@@ -429,6 +443,12 @@ function generateOneOfEach(
   const raritySlots = ['legendary', 'epic', 'rare', 'basic'];
 
   while (uniqueLineups.length < SAFETY_LIMIT) {
+    // If using only my schemes, check if we have "Collect Em All" cards left
+    if (params.useOnlyMySchemes) {
+      const stock = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
+      if (stock <= 0) break;
+    }
+
     const selected: MokiCandidate[] = [];
     const usedNamesInLineup = new Set<string>();
 
@@ -445,11 +465,13 @@ function generateOneOfEach(
           }))
           .filter(m => m.cardImage !== '');
       } else {
-        // USER mode: find owned cards for this rarity that have current stock
         for (const row of params.rankingData) {
           const name = String(row.Name).toUpperCase();
           if (usedNamesInLineup.has(name)) continue;
-          if ((stockMap.get(name) ?? 0) <= 0) continue;
+          
+          const stockKey = `${name}:${targetRarity.toUpperCase()}`;
+          if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
+          
           if (params.excludeStrikers && String(row.Class).toLowerCase() === 'striker') continue;
 
           const ownedEntry = params.userCards.find(
@@ -491,7 +513,7 @@ function generateOneOfEach(
         selected.push(chosen);
         usedNamesInLineup.add(String(chosen.name).toUpperCase());
       } else {
-        break; // Couldn't fill this rarity slot
+        break;
       }
     }
 
@@ -503,6 +525,13 @@ function generateOneOfEach(
           const totalEffectiveScore = lineupTotalEffective(selected, 'one-of-each');
           const totalBaseScore = lineupBaseOnly(selected);
           
+          // Consume "Collect Em All" scheme card stock if it exists
+          const current = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
+          const hasSchemeCard = current > 0;
+          if (hasSchemeCard) {
+            schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), current - 1);
+          }
+
           uniqueLineups.push({
             id: `ooe-u-${uniqueLineups.length}`,
             schemeName: COLLECT_EM_ALL.name,
@@ -510,14 +539,14 @@ function generateOneOfEach(
             schemeType: 'one-of-each',
             mokis: selected,
             totalBaseScore,
-            totalEffectiveScore
+            totalEffectiveScore,
+            hasScheme: hasSchemeCard
           });
           seenFingerprints.add(fingerprint);
         }
 
-        // ALWAYS consume stock
         selected.forEach(m => {
-          const key = String(m.name).toUpperCase();
+          const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
           stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 0) - 1));
         });
       } else {
@@ -542,7 +571,18 @@ function generateOneOfEach(
       
       const toAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
       for (let i = 0; i < toAdd; i++) {
-        finalResults.push({ ...original, id: `${original.id}-rep-${i + 1}` });
+        // Repeated lineups also consume scheme stock if available
+        const currentStock = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
+        const hasSchemeCard = currentStock > 0;
+        if (hasSchemeCard) {
+          schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), currentStock - 1);
+        }
+
+        finalResults.push({ 
+          ...original, 
+          id: `${original.id}-rep-${i + 1}`,
+          hasScheme: hasSchemeCard
+        });
       }
     }
   }
@@ -556,12 +596,15 @@ function generateStandard(
   pool: MokiCandidate[],
   params: GenerateParams,
   conflictSet: Set<string>,
-  minRarity: string,
-  maxRarity: string,
+  schemeStockMap: Map<string, number>
 ): GeneratedLineup[] {
+  const championSlots = params.contest.lineupConfig.slots.filter(s => s.cardType === 'champion');
+
   const stockMap = new Map<string, number>();
+
   for (const m of pool) {
-    const key = String(m.name).toUpperCase();
+    // LITERAL Rarity Distinction: OneCharacter:OneRarity = One Stock Unit
+    const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
     stockMap.set(key, (stockMap.get(key) ?? 0) + m.copies);
   }
 
@@ -570,7 +613,6 @@ function generateStandard(
   const globalSeenFingerprints = new Set<string>();
   const SAFETY_LIMIT = 100;
 
-  // Filter schemes if "USE ONLY MY SCHEMES" is active
   let traitSchemes = TRAIT_FUR_SCHEMES;
   let relegatedSchemes = RELEGATED_SCHEMES;
 
@@ -584,32 +626,46 @@ function generateStandard(
     relegatedSchemes = RELEGATED_SCHEMES.filter(s => ownedSchemeNames.has(s.name.toUpperCase().trim()));
   }
 
-  const getAvailablePool = () => pool.filter(m => (stockMap.get(String(m.name).toUpperCase()) ?? 0) > 0);
+  const getAvailablePool = () => pool.filter(m => (stockMap.get(`${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`) ?? 0) > 0);
 
-  // Phase 1: Trait/Fur Discovery (Priority Group A)
   for (const scheme of traitSchemes) {
     if (traitPool.length + specPool.length >= SAFETY_LIMIT) break;
 
     let canBuildAnother = true;
     while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT)) {
+      // Check scheme stock if "Only My Schemes" is on
+      if (params.useOnlyMySchemes) {
+        if ((schemeStockMap.get(scheme.name.toUpperCase()) ?? 0) <= 0) {
+          canBuildAnother = false;
+          break;
+        }
+      }
+
       const currentPool = getAvailablePool().filter(m => mokiMatchesScheme(m as unknown as MokiRankingRow, scheme));
       const lineup = buildLineup(
         currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
-        'trait-fur', minRarity, maxRarity, 14000,
-        scheme.name, scheme.image, 'trait-fur', `tf-${scheme.name}-${traitPool.length}`
+        'trait-fur', championSlots, 14000,
+        scheme.name, scheme.image, 'trait-fur', `tf-${scheme.name}-${traitPool.length}`,
+        stockMap
       );
 
       if (lineup) {
         const fingerprint = getLineupFingerprint(lineup.mokis);
         if (!globalSeenFingerprints.has(fingerprint)) {
-          traitPool.push(lineup);
+          const currentStock = schemeStockMap.get(scheme.name.toUpperCase()) ?? 0;
+          const hasSchemeCard = currentStock > 0;
+          if (hasSchemeCard) {
+            schemeStockMap.set(scheme.name.toUpperCase(), currentStock - 1);
+          }
+
+          const lineupWithOwnership = { ...lineup, hasScheme: hasSchemeCard };
+          traitPool.push(lineupWithOwnership);
           globalSeenFingerprints.add(fingerprint);
         }
         
-        // ALWAYS consume stock for the names picked in this iteration (even if identical strategy)
-        // to force discovery of other combinations in the next loop.
         lineup.mokis.forEach(m => {
-          const key = String(m.name).toUpperCase();
+          // ALWAYS consume stock specifically for the Moki:Rarity used
+          const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
           stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 0) - 1));
         });
       } else {
@@ -618,7 +674,6 @@ function generateStandard(
     }
   }
 
-  // Phase 2: Specialized Discovery (Priority Group B)
   for (const schemeDef of relegatedSchemes) {
     if (traitPool.length + specPool.length >= SAFETY_LIMIT) break;
 
@@ -626,9 +681,16 @@ function generateStandard(
 
     let canBuildAnother = true;
     while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT)) {
+      // Check scheme stock if "Only My Schemes" is on
+      if (params.useOnlyMySchemes) {
+        if ((schemeStockMap.get(schemeDef.name.toUpperCase()) ?? 0) <= 0) {
+          canBuildAnother = false;
+          break;
+        }
+      }
+
       let currentPool = getAvailablePool();
       
-      // Strict Stat Filters
       if (schemeDef.scoreType === 'wart') {
         currentPool = currentPool.filter(m => m.wartCloser > 5 && (m.class.toLowerCase() !== 'striker' && m.class.toLowerCase() !== 'sprinter'));
       } else if (schemeDef.scoreType === 'dive') {
@@ -639,21 +701,28 @@ function generateStandard(
 
       const lineup = buildLineup(
         currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
-        schemeDef.scoreType, minRarity, maxRarity, 18000,
-        schemeDef.name, schemeDef.image, 'relegated', `rel-${schemeDef.name}-${specPool.length}`
+        schemeDef.scoreType, championSlots, 18000,
+        schemeDef.name, schemeDef.image, 'relegated', `rel-${schemeDef.name}-${specPool.length}`,
+        stockMap
       );
 
       if (lineup) {
         const fingerprint = getLineupFingerprint(lineup.mokis);
         if (!globalSeenFingerprints.has(fingerprint)) {
-          specPool.push(lineup);
+          const currentStock = schemeStockMap.get(schemeDef.name.toUpperCase()) ?? 0;
+          const hasSchemeCard = currentStock > 0;
+          if (hasSchemeCard) {
+            schemeStockMap.set(schemeDef.name.toUpperCase(), currentStock - 1);
+          }
+
+          const lineupWithOwnership = { ...lineup, hasScheme: hasSchemeCard };
+          specPool.push(lineupWithOwnership);
           globalSeenFingerprints.add(fingerprint);
         }
         
-        // ALWAYS consume stock for the names picked in this iteration (even if identical strategy)
-        // to force discovery of other combinations in the next loop.
         lineup.mokis.forEach(m => {
-          const key = String(m.name).toUpperCase();
+          // ALWAYS consume stock specifically for the Moki:Rarity used
+          const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
           stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 0) - 1));
         });
       } else {
@@ -662,29 +731,21 @@ function generateStandard(
     }
   }
 
-  // Local Ranking inside pools
   traitPool.sort((a, b) => b.totalEffectiveScore - a.totalEffectiveScore);
   specPool.sort((a, b) => b.totalEffectiveScore - a.totalEffectiveScore);
 
-  // Combine and sort by GLOBAL SCORE (User requested)
-  // No truncation here: we return ALL unique candidates discovered.
   const uniqueMasterList = [...traitPool, ...specPool].sort((a, b) => b.totalEffectiveScore - a.totalEffectiveScore);
 
   const finalResults: GeneratedLineup[] = [];
   
-  // First Pass: Fill with EVERY UNIQUE lineup found (No truncation by lineupCount)
   for (const lineup of uniqueMasterList) {
-    // Note: lineupID already unique from discovery.
     finalResults.push({ ...lineup, id: `${lineup.id}-unique` });
   }
 
-  // Second Pass (Repetitions): ONLY if requested and we haven't met the contest entry limit
   if (params.allowRepeated && finalResults.length < params.lineupCount) {
-    // Attempt to repeat the absolute best ones to fill the entries up to lineupCount
     for (const original of uniqueMasterList) {
       if (finalResults.length >= params.lineupCount) break;
 
-      // How many copies of this combination can we EXTREMELY make?
       const physicalCopies = params.cardMode === 'USER'
         ? Math.min(...original.mokis.map(m => {
             const entry = params.userCards.find(c => String(c.name).toUpperCase() === String(m.name).toUpperCase() && String(c.rarity).toLowerCase() === String(m.rarity).toLowerCase());
@@ -692,11 +753,20 @@ function generateStandard(
           }))
         : 999;
       
-      // We already used 1 copy in the first pass
       const remainingToAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
 
       for (let i = 0; i < remainingToAdd; i++) {
-        finalResults.push({ ...original, id: `${original.id}-rep-${i + 1}` });
+        const currentStock = schemeStockMap.get(original.schemeName.toUpperCase()) ?? 0;
+        const hasSchemeCard = currentStock > 0;
+        if (hasSchemeCard) {
+          schemeStockMap.set(original.schemeName.toUpperCase(), currentStock - 1);
+        }
+
+        finalResults.push({ 
+          ...original, 
+          id: `${original.id}-rep-${i + 1}`,
+          hasScheme: hasSchemeCard
+        });
       }
     }
   }
@@ -728,20 +798,25 @@ export function generateLineups(params: GenerateParams): GeneratedLineup[] {
   const catalogLookup = buildCatalogLookup(params.catalog);
   const conflictSet = buildConflictSet(params.upcomingMatches);
 
+  // Initialize Strategy Card Stock (Schemes)
+  const schemeStockMap = new Map<string, number>();
+  for (const card of params.userCards) {
+    if (card.cardType === 'SCHEME') {
+      const key = String(card.name).toUpperCase().trim();
+      schemeStockMap.set(key, (schemeStockMap.get(key) ?? 0) + (card.stackCount ?? 1));
+    }
+  }
+
   const championSlots = params.contest.lineupConfig.slots.filter(s => s.cardType === 'champion');
   if (championSlots.length === 0) return [];
 
   const isOOE = isOneOfEachContest(params.contest);
 
   if (isOOE) {
-    const pool = buildPool(params, catalogLookup, 'legendary');
-    return generateOneOfEach(pool, catalogLookup, params, conflictSet);
+    const pool = buildPool(params, catalogLookup);
+    return generateOneOfEach(pool, catalogLookup, params, conflictSet, schemeStockMap);
   }
 
-  const firstSlot = championSlots[0];
-  const minRarity = firstSlot.minRarity.toLowerCase();
-  const maxRarity = firstSlot.maxRarity.toLowerCase();
-
-  const pool = buildPool(params, catalogLookup, maxRarity);
-  return generateStandard(pool, params, conflictSet, minRarity, maxRarity);
+  const pool = buildPool(params, catalogLookup);
+  return generateStandard(pool, params, conflictSet, schemeStockMap);
 }

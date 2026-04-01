@@ -2,7 +2,9 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
 import { execSync } from 'child_process';
+import { parse } from 'csv-parse/sync';
 
 dotenv.config({ path: path.join(__dirname, '../../.env.local') });
 
@@ -191,8 +193,65 @@ async function run() {
       const pythonPath = process.platform === 'win32' ? '.\\venv\\Scripts\\python.exe' : './venv/bin/python';
       const mlOutput = execSync(`${pythonPath} 8_generate_rank.py`, { cwd: mlDir });
       console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
+
+      // 5. Sync Generated CSV to Supabase
+      const csvPath = path.join(projectRoot, 'ml', 'data', 'upcoming_180_ranking.csv');
+      if (fs.existsSync(csvPath)) {
+        console.log('[Cron Upcoming] Reading Ranking CSV for Supabase Sync...');
+        const fileContent = fs.readFileSync(csvPath, 'utf8');
+        const records = parse(fileContent, {
+          columns: true,
+          skip_empty_lines: true,
+          trim: true,
+          bom: true
+        });
+
+        console.log(`[Cron Upcoming] Found ${records.length} ranking records. Mapping and Refreshing Table...`);
+
+        const rankingUpserts = records.map((r: any) => ({
+          moki_id: parseInt(r['Moki ID']),
+          name: r['Name'],
+          class: r['Class'],
+          score: parseFloat(r['Score']),
+          win_rate: parseFloat(r['WinRate']),
+          wart_closer: parseFloat(r['Wart Closer']),
+          losses: parseFloat(r['Losses']),
+          gacha_pts: parseFloat(r['Gacha Pts']),
+          deaths: parseFloat(r['Deaths']),
+          win_by_combat: parseFloat(r['Win By Combat']),
+          fur: r['Fur'],
+          traits: r['Traits'],
+          eliminations_pct: parseFloat(r['Win Cond: Eliminations (%)']),
+          wart_pct: parseFloat(r['Win Cond: Wart (%)']),
+          gacha_pct: parseFloat(r['Win Cond: Gacha (%)']),
+          updated_at: new Date().toISOString()
+        }));
+
+        // 5a. Clear Old Ranking
+        const { error: clearErr } = await supabaseAdmin
+          .from('moki_predictions_ranking')
+          .delete()
+          .neq('id', 0); // Workaround to delete all rows
+
+        if (clearErr) {
+          console.error('[Cron Upcoming] Error clearing old rankings:', clearErr);
+        }
+
+        // 5b. Insert Fresh Ranking
+        const { error: rankErr } = await supabaseAdmin
+          .from('moki_predictions_ranking')
+          .insert(rankingUpserts);
+
+        if (rankErr) {
+          console.error('[Cron Upcoming] Error inserting rankings to Supabase:', rankErr);
+        } else {
+          console.log(`[Cron Upcoming] Successfully synced ${rankingUpserts.length} ranking records to Supabase.`);
+        }
+      } else {
+        console.warn('[Cron Upcoming] Ranking CSV not found at', csvPath);
+      }
     } catch (mlErr: any) {
-      console.error('[Cron Upcoming] Error corriendo la IA:', mlErr.message);
+      console.error('[Cron Upcoming] Error corriendo la IA o sincronizando rankings:', mlErr.message);
       if (mlErr.stdout) console.log(mlErr.stdout.toString());
       if (mlErr.stderr) console.error(mlErr.stderr.toString());
       // No lanzamos (throw) para no matar la actualización de datos principal

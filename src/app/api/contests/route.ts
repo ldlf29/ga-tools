@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const GA_API_KEY = process.env.GA_API_KEY;
 
@@ -17,6 +19,7 @@ export async function GET() {
         'Accept': 'application/json',
         'Authorization': `Bearer ${GA_API_KEY}`,
       },
+      cache: 'no-store'
     });
 
     if (!response.ok) {
