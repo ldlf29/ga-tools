@@ -25,6 +25,8 @@ SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
 # En CI, usamos la Service Role Key para mayor seguridad de escritura/lectura interna
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
 
+print(f"[DEBUG] Supabase Keys: {'Service Role' if os.getenv('SUPABASE_SERVICE_ROLE_KEY') else 'Anon'}")
+
 if not SUPABASE_URL or not SUPABASE_KEY:
     print("[ERROR] NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no están configurados.")
     exit(1)
@@ -83,7 +85,11 @@ def main():
         return
         
     data = response.json()
-    print(f"[INFO] {len(data)} partidas descargadas.")
+    print(f"[INFO] {len(data)} partidas descargadas de Supabase para procesar.")
+    
+    if len(data) == 0:
+        print("[WARNING] No hay partidas en 'upcoming_matches_ga'. No se generará ranking.")
+        return
 
     # 0. Cargar overrides de moki_stats
     class_overrides = get_moki_stats_overrides()

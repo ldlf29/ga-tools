@@ -153,6 +153,10 @@ async function run() {
 
   console.log(`[Cron Upcoming] Partidos procesados estructurados: ${upcomingInserts.length}`);
 
+  if (upcomingInserts.length === 0) {
+    console.warn('[Cron Upcoming] ADVERTENCIA: No se encontraron partidos programados para este contest.');
+  }
+
   if (upcomingInserts.length > 0) {
     // 3. Recarga Pura a Supabase
     console.log('[Cron Upcoming] Haciendo limpieza (Truncate) e insertando frescos en Supabase...');
@@ -231,11 +235,12 @@ async function run() {
       console.log(`[Cron Upcoming] Usando comando: ${pythonCommand}`);
       
       // Aseguramos herencia de variables de entorno (Secrets) para el script de Python
+      console.log('[Cron Upcoming] Ejecutando IA...');
       const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, { 
         cwd: mlDir,
         env: { ...process.env }
       });
-      console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
+      console.log(`[Cron Upcoming] Ranking exitoso. Output completo:\n${mlOutput.toString()}`);
 
       // 5. Sync Generated CSV to Supabase
       console.log(`[Cron Upcoming] Verificando CSV en: ${csvPath}`);
