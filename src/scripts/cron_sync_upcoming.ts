@@ -39,39 +39,54 @@ async function run() {
 
   const contestsJson = (await contestsRes.json()) as any;
   const activeContests = contestsJson.data || [];
+  console.log('[Cron Upcoming] Raw Active Contests:', JSON.stringify(activeContests.map((c: any) => ({
+    id: c.id,
+    name: c.name,
+    startDate: c.startDate
+  })), null, 2));
 
   if (activeContests.length === 0) {
     console.log('[Cron Upcoming] No se encontraron contests activos.');
     return;
   }
 
-  console.log('[Cron Upcoming] Buscando el próximo contest Moki Mayhem (Hacia adelante)...');
+  console.log('[Cron Upcoming] Buscando el contest principal (Moki Mayhem o 10-Round)...');
   const now = Date.now();
   
-  let closestContest = null;
-  let minDiff = Infinity;
-  for (const c of activeContests) {
-    if (c.startDate) {
-      const contestTime = new Date(c.startDate).getTime();
-      const diff = contestTime - now;
-      // Solo evaluar los torneos en el futuro
-      if (diff > 0 && diff < minDiff) {
-        minDiff = diff;
-        closestContest = c;
+  let selectedContest = null;
+  
+  // 1. Prioridad Absoluta: 10 Rondas (los de 900+ partidos)
+  selectedContest = activeContests.find((c: any) => c.name?.toLowerCase().includes('10-round'));
+
+  // 2. Fallback: Moki Mayhem (si no hay de 10 rondas, pero priorizando el nombre)
+  if (!selectedContest) {
+    selectedContest = activeContests.find((c: any) => c.name?.toLowerCase().includes('moki mayhem'));
+  }
+
+  // 3. Tercera Prioridad: El más cercano en el futuro (mínimo 3-round)
+  if (!selectedContest) {
+    let minDiff = Infinity;
+    for (const c of activeContests) {
+      if (c.startDate) {
+        const contestTime = new Date(c.startDate).getTime();
+        const diff = contestTime - now;
+        if (diff > 0 && diff < minDiff) {
+          minDiff = diff;
+          selectedContest = c;
+        }
       }
     }
   }
 
-  // Fallback a [0] solo en caso anómalo de que todos hayan empezado
-  const contest = closestContest || activeContests[0];
+  const contest = selectedContest || activeContests[0];
 
   if (!contest) {
-    console.log('[Cron Upcoming] No hay contest de Moki Mayhem activo.');
+    console.log('[Cron Upcoming] No se encontró ningún contest válido.');
     return;
   }
 
   const contestId = contest.id;
-  console.log(`[Cron Upcoming] Contest Seleccionado ID: ${contestId} (StartDate UTC: ${contest.startDate})`);
+  console.log(`[Cron Upcoming] Contest Seleccionado: "${contest.name}" (ID: ${contestId})`);
 
   console.log('[Cron Upcoming] Fetching moki_stats to override classes...');
   const { data: mokiStatsData, error: mokiStatsErr } = await supabaseAdmin
@@ -107,6 +122,7 @@ async function run() {
 
       const json = (await response.json()) as any;
       const matches = json.data || [];
+      console.log(`[Cron Upcoming] Page ${page}: Found ${matches.length} matches.`);
       if (matches.length === 0) break;
 
       for (const match of matches) {
@@ -212,12 +228,18 @@ async function run() {
       }
 
       console.log(`[Cron Upcoming] Usando comando: ${pythonCommand}`);
-      const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, { cwd: mlDir });
+      
+      // Aseguramos herencia de variables de entorno (Secrets) para el script de Python
+      const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, { 
+        cwd: mlDir,
+        env: { ...process.env }
+      });
       console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
 
       // 5. Sync Generated CSV to Supabase
-      // Buscar el CSV ignorando casing de la carpeta
       const csvPath = path.join(mlDir, 'data', 'upcoming_180_ranking.csv');
+      console.log(`[Cron Upcoming] Verificando CSV en: ${csvPath}`);
+
       if (fs.existsSync(csvPath)) {
         console.log('[Cron Upcoming] Reading Ranking CSV for Supabase Sync...');
         const fileContent = fs.readFileSync(csvPath, 'utf8');
@@ -260,14 +282,15 @@ async function run() {
         }
 
         // 5b. Insert Fresh Ranking
+        console.log(`[Cron Upcoming] Insertando ${rankingUpserts.length} registros en Supabase...`);
         const { error: rankErr } = await supabaseAdmin
           .from('moki_predictions_ranking')
           .insert(rankingUpserts);
 
         if (rankErr) {
-          console.error('[Cron Upcoming] Error inserting rankings to Supabase:', rankErr);
+          console.error('[Cron Upcoming] ERROR FATAL DE INSERCIÓN:', JSON.stringify(rankErr, null, 2));
         } else {
-          console.log(`[Cron Upcoming] Successfully synced ${rankingUpserts.length} ranking records to Supabase.`);
+          console.log('[Cron Upcoming] Successfully synced ranking records to Supabase.');
         }
       } else {
         console.warn('[Cron Upcoming] Ranking CSV not found at', csvPath);
