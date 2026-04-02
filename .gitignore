@@ -66,7 +66,6 @@ __pycache__/
 ml/catboost_info/
 ml/models/*.cbm
 ml/data/*.csv
-!ml/data/upcoming_180_ranking.csv
 ml/data/scheme_analysis/
 ml/processed_cols.txt
 ml/eda.json
@@ -80,5 +79,4 @@ ml/tmp_*.py
 *.csv
 *.db
 /analytics/
-!ml/data/upcoming_180_ranking.csv
 !src/data/*.json

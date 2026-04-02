@@ -212,6 +212,13 @@ async function run() {
 
       console.log(`[Cron Upcoming] Usando directorio ML: ${mlDir}`);
       
+      // Borrar CSV anterior si existe antes de generar el nuevo
+      const csvPath = path.join(mlDir, 'data', 'upcoming_180_ranking.csv');
+      if (fs.existsSync(csvPath)) {
+        console.log('[Cron Upcoming] Borrando CSV anterior para asegurar frescura...');
+        fs.unlinkSync(csvPath);
+      }
+
       // Determinar el comando de Python: 
       let pythonCommand = process.platform === 'win32' 
         ? '.\\venv\\Scripts\\python.exe' 
@@ -231,7 +238,6 @@ async function run() {
       console.log(`[Cron Upcoming] Ranking exitoso:\n${mlOutput.toString()}`);
 
       // 5. Sync Generated CSV to Supabase
-      const csvPath = path.join(mlDir, 'data', 'upcoming_180_ranking.csv');
       console.log(`[Cron Upcoming] Verificando CSV en: ${csvPath}`);
 
       if (fs.existsSync(csvPath)) {

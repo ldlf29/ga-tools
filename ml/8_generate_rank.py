@@ -16,10 +16,18 @@ from dotenv import load_dotenv
 
 # Cargar variables de entorno
 ENV_PATH = Path(__file__).parent.parent / ".env.local"
-load_dotenv(ENV_PATH)
+if ENV_PATH.exists():
+    load_dotenv(ENV_PATH)
+else:
+    load_dotenv() # Fallback a variables de sistema (CI)
 
 SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
-SUPABASE_KEY = os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+# En CI, usamos la Service Role Key para mayor seguridad de escritura/lectura interna
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    print("[ERROR] NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY no están configurados.")
+    exit(1)
 
 MODELS_DIR = Path(__file__).parent / "models"
 
