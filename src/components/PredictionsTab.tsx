@@ -69,6 +69,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   }
 
   const [rankingData, setRankingData] = useState<MokiRanking[]>([]);
+  const [rankingEffectiveDate, setRankingEffectiveDate] = useState<string | null>(null);
   const [rankingLoading, setRankingLoading] = useState(false);
   const [rankingPage, setRankingPage] = useState(0);
   const RANKING_PAGE_SIZE = 10;
@@ -86,18 +87,21 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
 
   const formatContestDate = (dateString: string) => {
     const d = new Date(dateString);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+
     if (!useLocalTime) {
-      const day = d.getUTCDate().toString().padStart(2, '0');
-      const month = (d.getUTCMonth() + 1).toString().padStart(2, '0');
-      const year = d.getUTCFullYear();
-      const hours = d.getUTCHours().toString().padStart(2, '0');
-      const minutes = d.getUTCMinutes().toString().padStart(2, '0');
-      return `${day}/${month}/${year} ${hours}:${minutes} UTC`;
+      return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
     }
     
+    const day = pad(d.getDate());
+    const month = pad(d.getMonth() + 1);
+    const year = d.getFullYear();
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
     const offset = -d.getTimezoneOffset() / 60;
     const offsetStr = offset >= 0 ? `+${offset}` : `${offset}`;
-    return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (UTC${offsetStr})`;
+    
+    return `${day}/${month}/${year} ${hours}:${minutes} (UTC${offsetStr})`;
   };
 
   const META_SCHEMES = [
@@ -221,6 +225,9 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         const json = await res.json();
         if (json.success) {
           setRankingData(json.data);
+          if (json.effectiveDate) {
+            setRankingEffectiveDate(json.effectiveDate);
+          }
         }
       } catch (err) {
         console.error('Error fetching ranking:', err);
@@ -765,6 +772,20 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
           <div className={styles.rankingBox}>
             <h2 className={styles.rankingTitle}>PREDICTION RANKING</h2>
             
+            {rankingEffectiveDate && (
+              <p className={styles.rankingDateLabel} style={{ 
+                color: '#333333', 
+                fontSize: '0.72rem', 
+                marginBottom: '0.4rem',
+                marginTop: '-0.2rem',
+                fontWeight: 600,
+                letterSpacing: '0.01em',
+                textTransform: 'uppercase'
+              }}>
+                FOR {formatContestDate(rankingEffectiveDate)} CONTEST
+              </p>
+            )}
+
             <div className={styles.filterByRow}>
               <span className={styles.filterLabel}>Filter by:</span>
               <div className={styles.sortControls}>

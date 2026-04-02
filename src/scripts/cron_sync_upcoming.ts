@@ -39,11 +39,6 @@ async function run() {
 
   const contestsJson = (await contestsRes.json()) as any;
   const activeContests = contestsJson.data || [];
-  console.log('[Cron Upcoming] Raw Active Contests:', JSON.stringify(activeContests.map((c: any) => ({
-    id: c.id,
-    name: c.name,
-    startDate: c.startDate
-  })), null, 2));
 
   if (activeContests.length === 0) {
     console.log('[Cron Upcoming] No se encontraron contests activos.');
@@ -122,7 +117,6 @@ async function run() {
 
       const json = (await response.json()) as any;
       const matches = json.data || [];
-      console.log(`[Cron Upcoming] Page ${page}: Found ${matches.length} matches.`);
       if (matches.length === 0) break;
 
       for (const match of matches) {
@@ -268,6 +262,7 @@ async function run() {
           eliminations_pct: parseFloat(r['Win Cond: Eliminations (%)']),
           wart_pct: parseFloat(r['Win Cond: Wart (%)']),
           gacha_pct: parseFloat(r['Win Cond: Gacha (%)']),
+          effective_date: contest.startDate,
           updated_at: new Date().toISOString()
         }));
 

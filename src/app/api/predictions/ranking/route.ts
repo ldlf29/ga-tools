@@ -44,6 +44,7 @@ export async function GET() {
     return NextResponse.json({ 
         success: true, 
         data: mappedRecords,
+        effectiveDate: records[0]?.effective_date || null,
         timestamp: new Date().toISOString()
     });
 
