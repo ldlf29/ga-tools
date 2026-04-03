@@ -40,7 +40,7 @@ import requests
 # ─── Config ──────────────────────────────────────────────────────────────────
 
 BASE_URL      = "https://api.grandarena.gg/api/v1/mokis"
-CUTOFF_DATE   = date(2026, 2, 20)          # Desde este día en adelante (inclusive)
+CUTOFF_DATE   = date(2026, 3, 29)          # Desde este día en adelante (inclusive)
 METADATA_PATH = Path(__file__).parent.parent / "src" / "data" / "mokiMetadata.json"
 ENV_PATH      = Path(__file__).parent.parent / ".env.local"
 OUTPUT_DIR    = Path(__file__).parent / "data"

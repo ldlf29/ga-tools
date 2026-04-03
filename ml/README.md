@@ -1,112 +1,40 @@
 # Grand Arena — ML Pipeline
 
-Pipeline de Data Science para análisis predictivo de Grand Arena.
+Data Science pipeline for predictive analysis of Grand Arena matches.
 
-## Estructura
+## Structure
 
 ```
 ml/
-├── 1_collect_data.py    # Descarga performances de la API (requiere Bearer Token)
-├── 2_preprocess.py      # Feature engineering y limpieza
-├── 3_train.py           # Entrenamiento CatBoost (clasificador + regresor)
-├── 4_analyze.py         # Análisis, SHAP values y simulación de matchups
-├── data/
-│   ├── raw_matches.csv          # Salida del script 1
-│   ├── processed_matches.csv    # Salida del script 2
-│   ├── empirical_winrates.csv   # Salida del script 4
-│   └── model_metrics.json       # Métricas de evaluación (script 3)
-└── models/
-    ├── catboost_classifier.cbm  # Modelo WinRate
-    └── catboost_regressor.cbm   # Modelo Expected Points
+├── 1_collect_data.py      # Initial data collection from GA API
+├── _2_preprocess.py       # Cleans raw data and derives features (Team Comps, etc.)
+├── _5_prepare_features.py  # Generates numerical matrices for CatBoost
+├── _6_train_models.py     # Trains Cascade Stacking models (Score, WinRate, Deaths, etc.)
+├── 7_api_server.py        # FastAPI inference server (Cascade Architecture)
+├── 8_generate_rank.py     # Generates ranking for 180 Moki Champions
+├── 9_evaluate_results.py  # Validation & Backtesting (MAE/Accuracy)
+├── 10_retrain_from_supabase.py # Automated Feedback Loop & Incremental Learning
+├── 11_optimize_hyperparameters.py # Bayesian Tuning with Optuna
+├── data/                  # Raw and processed datasets
+└── models/                # Exported CatBoost models (.cbm)
 ```
 
-## Instalación de dependencias
+## Advanced Architecture: Cascade Stacking
 
-```bash
-pip install catboost scikit-learn pandas numpy shap requests
-```
+To maximize accuracy, we use a two-phase prediction system:
 
-## Ejecución paso a paso
+1.  **Auxiliary Models**: Predict specific game metrics (`Deaths`, `Deposits`, `WartCloser`).
+2.  **Primary Models**: The `Score` and `WinRate` models use the outputs of the auxiliary models as additional numerical features (Stacking).
 
-### Paso 1 — Recolectar datos
-Necesitás un **Bearer Token** de la API de Grand Arena.
+## Key Features
+- **Identity-Based Learning**: Models learn individual Moki performance patterns using `Moki ID`.
+- **Matchup Interactions**: Explicit interaction feature `moki_vs_enemy` to capture specific counters.
+- **Time Weighting**: Recent matches have higher importance (2.0x weight for last 7 days).
+- **Automated Feedback Loop**: Script 10 allows the models to learn from the results of the matches they previously predicted.
 
-```bash
-python 1_collect_data.py --token TU_TOKEN_AQUI
-```
+## Automation
+The pipeline is integrated with the webapp's cron system. When upcoming matches are synced, the model automatically retrains itself with the latest historical data from Supabase before generating new rankings.
 
-Esto itera sobre los **180 mokis** del `mokiMetadata.json`, descarga todos sus
-performances y filtra hasta el **2026-02-20** inclusive. Puede tardar varios
-minutos (rate-limiting incluido).
-
-### Paso 2 — Preprocesar
-```bash
-python 2_preprocess.py
-```
-
-Transforma `raw_matches.csv` en `processed_matches.csv` con:
-- Aliados ordenados alfabéticamente (invarianza de orden)
-- Feature crosses: `team_comp` y `enemy_comp`
-- Tipos correctos para CatBoost
-
-### Paso 3 — Entrenar modelos
-```bash
-python 3_train.py
-```
-
-Entrena:
-- **CatBoostClassifier** → predice `is_win` (WinRate)
-- **CatBoostRegressor** → predice `total_points` (Expected Points)
-
-Split 80/20 estratificado. Los modelos se guardan en `models/`.
-
-### Paso 4 — Analizar y simular
-
-#### Análisis general
-```bash
-python 4_analyze.py
-```
-Muestra:
-- Top 20 composiciones por WinRate empírico
-- Feature Importance de ambos modelos
-- SHAP values del clasificador
-
-#### Simular un matchup específico
-```bash
-python 4_analyze.py --simulate "STRIKER_DEFENDER_GACHA" "RUNNER_HEALER_STRIKER"
-```
-
-Formato de composición: `CHAMP_ALLY1_ALLY2` (en mayúsculas, separado por `_`)
-
-#### Simular mi comp contra todas las enemigas del dataset
-```bash
-python 4_analyze.py --vs-all "STRIKER_DEFENDER_GACHA"
-```
-
-## Notas sobre la API
-
-- Endpoint: `GET /api/v1/mokis/{tokenId}/performances?page=1&limit=100`
-- Autenticación: `Authorization: Bearer <token>`
-- El script maneja paginación automáticamente
-- Se incluye rate-limiting (0.5s entre requests) para evitar bloqueos
-
-## Arquitectura del modelo
-
-```
-Features:
-    team_comp       ← cruce (champ + ally1 + ally2)
-    enemy_comp      ← cruce (enemy_champ + enemy_ally1 + enemy_ally2)
-    champ_class
-    ally1_class, ally2_class
-    enemy_champ_class
-    enemy_ally1_class, enemy_ally2_class
-    win_condition
-
-Targets:
-    is_win          → CatBoostClassifier (Logloss + AUC)
-    total_points    → CatBoostRegressor  (RMSE + MAE)
-```
-
-CatBoost fue elegido sobre XGBoost porque maneja features categóricas
-**nativas** sin necesidad de One-Hot Encoding, lo cual es ideal dado que
-todos nuestros features son strings de clases.
+## Requirements
+- Python 3.10+
+- `pip install -r requirements.txt` (includes catboost, optuna, pandas, scikit-learn, etc.)

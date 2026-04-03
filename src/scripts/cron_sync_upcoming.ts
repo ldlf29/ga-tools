@@ -234,8 +234,20 @@ async function run() {
 
       console.log(`[Cron Upcoming] Usando comando: ${pythonCommand}`);
       
-      // Aseguramos herencia de variables de entorno (Secrets) para el script de Python
-      console.log('[Cron Upcoming] Ejecutando IA...');
+      // 4a. Feedback Loop: Retrain with latest historical matches from Supabase
+      console.log('[Cron Upcoming] Ejecutando Retraining (Feedback Loop)...');
+      try {
+        const retrainOutput = execSync(`${pythonCommand} 10_retrain_from_supabase.py`, { 
+          cwd: mlDir,
+          env: { ...process.env }
+        });
+        console.log(`[Cron Upcoming] Retraining completado:\n${retrainOutput.toString()}`);
+      } catch (retrainErr: any) {
+        console.warn('[Cron Upcoming] Advertencia: El re-entrenamiento falló, se usará el modelo previo.', retrainErr.message);
+      }
+
+      // 4b. Ranking Generation
+      console.log('[Cron Upcoming] Ejecutando Generación de Ranking (Cascade IA)...');
       const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, { 
         cwd: mlDir,
         env: { ...process.env }
