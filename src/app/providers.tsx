@@ -31,7 +31,8 @@ const config = getDefaultConfig({
   },
   keylessWalletConfig: {
     chainId: 2020,
-    clientId: CLIENT_ID,
+    clientId: CLIENT_ID || 'dummy-build-id',
+    enable: !!CLIENT_ID,
   },
   walletConnectConfig: {
     enable: true,
