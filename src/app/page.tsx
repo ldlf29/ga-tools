@@ -417,6 +417,37 @@ export default function Home() {
     cardType: 'MOKI',
   });
 
+  // Sorting state for Builder tab
+  const [mokiSortOption, setMokiSortOption] = useState<any>('default');
+  const [schemeSortOption, setSchemeSortOption] = useState<any>('default');
+
+  // Reset local sortOption when sidebar-driven sorts are activated
+  useEffect(() => {
+    const hasSpecialization = filters.specialization && filters.specialization.length > 0;
+    const hasExtraSort = !!filters.extraSort;
+
+    if (hasSpecialization || hasExtraSort) {
+      if (filters.cardType === 'SCHEME') setSchemeSortOption('default');
+      else setMokiSortOption('default');
+    }
+  }, [filters.specialization, filters.extraSort, filters.cardType]);
+
+  const handleSortChange = (option: any) => {
+    if (filters.cardType === 'SCHEME') setSchemeSortOption(option);
+    else setMokiSortOption(option);
+
+    // If selecting a manual sort, clear specialization and extraSort from global state
+    if (option !== 'default') {
+      const newFilters = { ...filters, specialization: [], extraSort: undefined };
+      if (newFilters.insertionOrder) {
+        newFilters.insertionOrder = newFilters.insertionOrder.filter(
+          (k) => !k.startsWith('specialization:') && !k.startsWith('extraSort:')
+        );
+      }
+      handleFilterChange(newFilters);
+    }
+  };
+
   // Stored filters for each card type (MOKI/SCHEME) within current main tab
   const mokiFiltersRef = useRef({ filters: emptyFilters, search: '' });
   const schemeFiltersRef = useRef({ filters: emptyFilters, search: '' });
@@ -1483,6 +1514,9 @@ export default function Home() {
                   filters={filters}
                   onRemoveFilter={handleRemoveFilter}
                   isUserMode={cardMode === 'USER'}
+                  mokiSortOption={mokiSortOption}
+                  schemeSortOption={schemeSortOption}
+                  onSortChange={handleSortChange}
                 />
               </div>
 

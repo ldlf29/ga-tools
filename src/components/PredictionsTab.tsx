@@ -46,6 +46,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [isSchemeMenuOpen, setIsSchemeMenuOpen] = useState(false);
   const [selectedMetaScheme, setSelectedMetaScheme] = useState<string | null>(null);
   const [activeSort, setActiveSort] = useState<'SCORE' | 'WINRATE' | 'META'>('SCORE');
+  const [mobileRankingOpen, setMobileRankingOpen] = useState(false);
   const [filters, setFilters] = useState({
     distribution: 'All',
     price: 'All',
@@ -66,6 +67,9 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     'Win By Combat': number;
     Fur: string;
     Traits: string;
+    _metric?: number;
+    _displayScore?: number;
+    _metricLabel?: string;
   }
 
   const [rankingData, setRankingData] = useState<MokiRanking[]>([]);
@@ -76,7 +80,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
 
   // Build lookup: moki name (uppercase) -> metadata entry
   const metadataByName = React.useMemo(() => {
-    const map: Record<string, any> = {};
+    const map: Record<string, Record<string, any>> = {};
     for (const val of Object.values(mokiMetadata as Record<string, any>)) {
       if (val?.name) {
         map[val.name.toString().toUpperCase()] = val;
@@ -548,8 +552,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
               c3.minRarity === 'epic' && c3.maxRarity === 'epic' &&
               c4.minRarity === 'legendary' && c4.maxRarity === 'legendary')) return false;
       } else if (type === 'mix') {
-        const configs = champions.map(s => `${s.minRarity}-${s.maxRarity}`);
-        const uniqueConfigs = new Set(configs);
+        const championsConfigs = champions.map(s => `${s.minRarity}-${s.maxRarity}`);
+        const uniqueConfigs = new Set(championsConfigs);
         
         // MIX is flexible: more than one rarity config, but NOT one-of-each
         if (uniqueConfigs.size < 2) return false;
@@ -590,6 +594,12 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   return (
     <>
     <div className={styles.container}>
+      {/* Backdrop for Mobile Ranking Drawer */}
+      <div 
+        className={`${styles.drawerOverlay} ${mobileRankingOpen ? styles.drawerOverlayVisible : ''}`}
+        onClick={() => setMobileRankingOpen(false)}
+      />
+
       <div className={styles.mainLayout}>
         <div className={styles.mainContent}>
           <div className={styles.headerContainer}>
@@ -768,20 +778,22 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
           </div>
         </div>
 
-        <aside className={styles.sidebar}>
-          <div className={styles.rankingBox}>
+        <aside className={`${styles.sidebar} ${mobileRankingOpen ? styles.sidebarOpen : ''}`}>
+        <button 
+          className={styles.drawerCloseButton}
+          onClick={() => setMobileRankingOpen(false)}
+          aria-label="Close Ranking"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <div className={styles.rankingBox}>
             <h2 className={styles.rankingTitle}>PREDICTION RANKING</h2>
             
             {rankingEffectiveDate && (
-              <p className={styles.rankingDateLabel} style={{ 
-                color: '#333333', 
-                fontSize: '0.72rem', 
-                marginBottom: '0.4rem',
-                marginTop: '-0.2rem',
-                fontWeight: 600,
-                letterSpacing: '0.01em',
-                textTransform: 'uppercase'
-              }}>
+              <p className={styles.rankingDateLabel}>
                 FOR {formatContestDate(rankingEffectiveDate)} CONTEST
               </p>
             )}
@@ -886,6 +898,27 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
             </div>
           </div>
         </aside>
+        
+        {/* Toggle Button placed outside aside for proper sibling CSS rules if needed, 
+            though position: fixed handles it mostly. Moving it here for clean JSX. */}
+        <button
+          className={styles.drawerToggleButton}
+          onClick={() => setMobileRankingOpen(!mobileRankingOpen)}
+          aria-label={mobileRankingOpen ? "Close Ranking" : "Open Ranking"}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
       </div>
 
       {mounted && createPortal(
@@ -1311,4 +1344,3 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     </>
   );
 }
-

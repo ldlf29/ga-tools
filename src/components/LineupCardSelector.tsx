@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '@/components/MyLineups.module.css';
 import FilterSidebar from '@/components/FilterSidebar';
 import CardGrid from '@/components/CardGrid';
 import { EnhancedCard, FilterState, SavedLineup } from '@/types';
+import { SortOption } from '@/utils/sortingUtils';
 
 interface LineupCardSelectorProps {
   selectorFilters: FilterState;
@@ -36,6 +37,37 @@ export const LineupCardSelector: React.FC<LineupCardSelectorProps> = ({
   selectorMobileFiltersOpen,
   setSelectorMobileFiltersOpen,
 }) => {
+  // Internal sorting state
+  const [mokiSortOption, setMokiSortOption] = useState<SortOption>('default');
+  const [schemeSortOption, setSchemeSortOption] = useState<SortOption>('default');
+
+  // Reset local sortOption when sidebar-driven sorts are activated
+  useEffect(() => {
+    const hasSpecialization = selectorFilters.specialization && selectorFilters.specialization.length > 0;
+    const hasExtraSort = !!selectorFilters.extraSort;
+
+    if (hasSpecialization || hasExtraSort) {
+      if (selectorFilters.cardType === 'SCHEME') setSchemeSortOption('default');
+      else setMokiSortOption('default');
+    }
+  }, [selectorFilters.specialization, selectorFilters.extraSort, selectorFilters.cardType]);
+
+  const handleSortChange = (option: SortOption) => {
+    if (selectorFilters.cardType === 'SCHEME') setSchemeSortOption(option);
+    else setMokiSortOption(option);
+
+    // If selecting a manual sort, clear specialization and extraSort from global state
+    if (option !== 'default') {
+      const newFilters = { ...selectorFilters, specialization: [], extraSort: undefined };
+      if (newFilters.insertionOrder) {
+        newFilters.insertionOrder = newFilters.insertionOrder.filter(
+          (k) => !k.startsWith('specialization:') && !k.startsWith('extraSort:')
+        );
+      }
+      setSelectorFilters(newFilters);
+    }
+  };
+
   return (
     <div
       className={styles.selectorBackdrop}
@@ -90,6 +122,9 @@ export const LineupCardSelector: React.FC<LineupCardSelectorProps> = ({
               filters={selectorFilters}
               onRemoveFilter={handleSelectorRemoveFilter}
               isUserMode={true}
+              mokiSortOption={mokiSortOption}
+              schemeSortOption={schemeSortOption}
+              onSortChange={handleSortChange}
             />
           </div>
         </div>

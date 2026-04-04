@@ -32,6 +32,9 @@ interface CardGridProps {
     type: 'error' | 'success' | 'warning' | 'suggestion',
     force?: boolean
   ) => void;
+  mokiSortOption: SortOption;
+  schemeSortOption: SortOption;
+  onSortChange: (option: SortOption) => void;
 }
 
 interface CardRowProps {
@@ -288,20 +291,15 @@ export default function CardGrid({
   onRefresh,
   isUserMode,
   addToast,
+  mokiSortOption,
+  schemeSortOption,
+  onSortChange,
 }: CardGridProps) {
-  const [mokiSortOption, setMokiSortOption] = useState<SortOption>('default');
-  const [schemeSortOption, setSchemeSortOption] =
-    useState<SortOption>('default');
-
   const sortOption =
     filters.cardType === 'SCHEME' ? schemeSortOption : mokiSortOption;
 
   const handleSortChange = (option: SortOption) => {
-    if (filters.cardType === 'SCHEME') {
-      setSchemeSortOption(option);
-    } else {
-      setMokiSortOption(option);
-    }
+    onSortChange(option);
     setDropdownOpen(false);
   };
 
@@ -435,125 +433,92 @@ export default function CardGrid({
             <div className={styles.orderByContainer}>
               <button
                 className={styles.orderByButton}
-                onClick={() => {
-                  if (
-                    filters.specialization &&
-                    filters.specialization.length > 0
-                  ) {
-                    if (addToast)
-                      addToast(
-                        'Sorting is controlled by Specialization filter',
-                        'suggestion'
-                      );
-                    return;
-                  }
-                  setDropdownOpen(!dropdownOpen);
-                }}
-                style={{
-                  opacity:
-                    filters.specialization && filters.specialization.length > 0
-                      ? 0.7
-                      : 1,
-                  cursor:
-                    filters.specialization && filters.specialization.length > 0
-                      ? 'not-allowed'
-                      : 'pointer',
-                }}
+                onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 {filters.specialization && filters.specialization.length > 0
                   ? `BY ${filters.specialization[0].toUpperCase()}`
-                  : 'ORDER BY...'}
-                {!(
-                  filters.specialization && filters.specialization.length > 0
-                ) && (
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      transform: dropdownOpen
-                        ? 'rotate(180deg)'
-                        : 'rotate(0deg)',
-                      transition: 'transform 0.2s',
-                    }}
-                  >
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                )}
+                  : filters.extraSort
+                    ? `BY ${filters.extraSort === 'eatingWhileRiding' ? 'WART EAT' : filters.extraSort === 'looseBallPickups' ? 'PICKUPS' : filters.extraSort.toUpperCase()}`
+                    : sortOption === 'default'
+                      ? 'ORDER BY...'
+                      : `BY ${sortOption.replace('_asc', '').replace('_desc', '').replace('rarity', 'RARITY').replace('stars', 'STARS').replace('name', 'NAME').toUpperCase()}`}
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s',
+                  }}
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </button>
-              {dropdownOpen &&
-                (!filters.specialization ||
-                  filters.specialization.length === 0) && (
-                  <ul className={styles.orderByMenu}>
-                    <li
-                      onClick={() => handleSortChange('default')}
-                      className={
-                        sortOption === 'default' ? styles.activeSort : ''
-                      }
-                    >
-                      Default
-                    </li>
-                    <li
-                      onClick={() => handleSortChange('name_asc')}
-                      className={
-                        sortOption === 'name_asc' ? styles.activeSort : ''
-                      }
-                    >
-                      Name A → Z
-                    </li>
-                    <li
-                      onClick={() => handleSortChange('name_desc')}
-                      className={
-                        sortOption === 'name_desc' ? styles.activeSort : ''
-                      }
-                    >
-                      Name Z → A
-                    </li>
-                    {filters.cardType !== 'SCHEME' && (
-                      <>
-                        <li
-                          onClick={() => handleSortChange('rarity_desc')}
-                          className={
-                            sortOption === 'rarity_desc'
-                              ? styles.activeSort
-                              : ''
-                          }
-                        >
-                          Rarity High → Low
-                        </li>
-                        <li
-                          onClick={() => handleSortChange('rarity_asc')}
-                          className={
-                            sortOption === 'rarity_asc' ? styles.activeSort : ''
-                          }
-                        >
-                          Rarity Low → High
-                        </li>
-                        <li
-                          onClick={() => handleSortChange('stars_desc')}
-                          className={
-                            sortOption === 'stars_desc' ? styles.activeSort : ''
-                          }
-                        >
-                          Stars High → Low
-                        </li>
-                        <li
-                          onClick={() => handleSortChange('stars_asc')}
-                          className={
-                            sortOption === 'stars_asc' ? styles.activeSort : ''
-                          }
-                        >
-                          Stars Low → High
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                )}
+              {dropdownOpen && (
+                <ul className={styles.orderByMenu}>
+                  <li
+                    onClick={() => handleSortChange('default')}
+                    className={sortOption === 'default' ? styles.activeSort : ''}
+                  >
+                    Default
+                  </li>
+                  <li
+                    onClick={() => handleSortChange('name_asc')}
+                    className={sortOption === 'name_asc' ? styles.activeSort : ''}
+                  >
+                    Name A → Z
+                  </li>
+                  <li
+                    onClick={() => handleSortChange('name_desc')}
+                    className={
+                      sortOption === 'name_desc' ? styles.activeSort : ''
+                    }
+                  >
+                    Name Z → A
+                  </li>
+                  {filters.cardType !== 'SCHEME' && (
+                    <>
+                      <li
+                        onClick={() => handleSortChange('rarity_desc')}
+                        className={
+                          sortOption === 'rarity_desc' ? styles.activeSort : ''
+                        }
+                      >
+                        Rarity High → Low
+                      </li>
+                      <li
+                        onClick={() => handleSortChange('rarity_asc')}
+                        className={
+                          sortOption === 'rarity_asc' ? styles.activeSort : ''
+                        }
+                      >
+                        Rarity Low → High
+                      </li>
+                      <li
+                        onClick={() => handleSortChange('stars_desc')}
+                        className={
+                          sortOption === 'stars_desc' ? styles.activeSort : ''
+                        }
+                      >
+                        Stars High → Low
+                      </li>
+                      <li
+                        onClick={() => handleSortChange('stars_asc')}
+                        className={
+                          sortOption === 'stars_asc' ? styles.activeSort : ''
+                        }
+                      >
+                        Stars Low → High
+                      </li>
+                    </>
+                  )}
+                </ul>
+              )}
             </div>
 
             <input

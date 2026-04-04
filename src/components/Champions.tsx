@@ -78,6 +78,34 @@ export default function Champions({
   const [sortDropdownOpen, setSortDropdownOpen] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
+  // ─── Filter Interaction Logic ──────────────────────────────────────────────
+  // Reset local sortOption when sidebar-driven sorts (specialization/extraSort) are activated
+  useEffect(() => {
+    const hasSpecialization = filters.specialization && filters.specialization.length > 0;
+    const hasExtraSort = !!filters.extraSort;
+
+    if (hasSpecialization || hasExtraSort) {
+      setSortOption('default');
+    }
+  }, [filters.specialization, filters.extraSort]);
+
+  const handleSortSelection = (option: string) => {
+    setSortOption(option);
+    setSortDropdownOpen(false);
+
+    // If selecting a manual sort, clear specialization and extraSort from global state
+    if (option !== 'default') {
+      const newFilters = { ...filters, specialization: [], extraSort: undefined };
+      // Also clean up insertionOrder
+      if (newFilters.insertionOrder) {
+        newFilters.insertionOrder = newFilters.insertionOrder.filter(
+          (k) => !k.startsWith('specialization:') && !k.startsWith('extraSort:')
+        );
+      }
+      onFilterChange(newFilters);
+    }
+  };
+
   // ─── Load upcoming matches ─────────────────────────────────────────────────
   useEffect(() => {
     async function loadMatches() {
@@ -286,22 +314,74 @@ export default function Champions({
 
     let sorted = [...filtered];
 
-    // Priority 1: Extra Sorting (e.g., deaths, wart eat)
-    if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+    // Determine priority between specialization and extraSort based on insertionOrder
+    const sortKeys = filters.insertionOrder?.filter(k => 
+      k.startsWith('specialization:') || k.startsWith('extraSort:')
+    ) || [];
+    const lastSortKey = sortKeys[sortKeys.length - 1];
+
+    // Priority 1: The last selected sidebar sort (Specialization or Extra)
+    if (lastSortKey?.startsWith('specialization:') && filters.specialization && filters.specialization.length > 0) {
+      sorted.sort((a, b) => {
+        const fullA = a.fullCard;
+        const fullB = b.fullCard;
+        if (!fullA || !fullB) return (b.score || 0) - (a.score || 0);
+
+        const activeSpecs = filters.specialization!;
+        const perfSpecs = ['Gacha', 'Killer', 'Wart Rider'];
+        const contextSpecs = ['Winner', 'Loser', 'Bad Streak', 'Good Streak'];
+        const scoreSpecs = ['Score'];
+
+        const activePerf = activeSpecs.find((s) => perfSpecs.includes(s));
+        const activeContext = activeSpecs.find((s) => contextSpecs.includes(s));
+        const activeScore = activeSpecs.find((s) => scoreSpecs.includes(s));
+        const activeCategories = [activePerf, activeContext, activeScore].filter(Boolean);
+
+        if (activeCategories.length > 1) {
+          const calcCoeff = (c: any) => {
+            let coeff = 1;
+            activeCategories.forEach((spec) => {
+              if (spec) coeff *= getSpecializationCoefficient(c, spec, filters.matchLimit);
+            });
+            return coeff;
+          };
+          const coeffA = calcCoeff(fullA);
+          const coeffB = calcCoeff(fullB);
+          const isLoserActive = activeSpecs.includes('Loser');
+          if (coeffB !== coeffA) return isLoserActive ? coeffA - coeffB : coeffB - coeffA;
+        }
+
+        for (const spec of activeSpecs) {
+          const valA = getSpecializationCoefficient(fullA, spec, filters.matchLimit);
+          const valB = getSpecializationCoefficient(fullB, spec, filters.matchLimit);
+          const diff = spec === 'Loser' ? valA - valB : valB - valA;
+          if (diff !== 0) return diff;
+        }
+        return b.score - a.score;
+      });
+    }
+    else if (lastSortKey?.startsWith('extraSort:') && filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
       sorted.sort((a, b) => {
         const valA = getStatValueByLimit(a.fullCard, filters.extraSort as string, filters.matchLimit as any);
         const valB = getStatValueByLimit(b.fullCard, filters.extraSort as string, filters.matchLimit as any);
         return valB - valA;
       });
     }
-    // Priority 2: Manual dropdown sorting (name, total, spd, etc.)
+    // Priority 2: Manual dropdown sorting (name, total, spd, etc.) - Only if no sidebar sort is active or if it was cleared
     else if (sortOption !== 'default') {
       sorted.sort((a, b) => {
         if (sortOption === 'name') return a.name.localeCompare(b.name);
         return getStatValue(b, sortOption) - getStatValue(a, sortOption);
       });
     }
-    // Priority 3: Specialization sorting
+    // Fallbacks if insertionOrder is missing but filters are present
+    else if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+      sorted.sort((a, b) => {
+        const valA = getStatValueByLimit(a.fullCard, filters.extraSort as string, filters.matchLimit as any);
+        const valB = getStatValueByLimit(b.fullCard, filters.extraSort as string, filters.matchLimit as any);
+        return valB - valA;
+      });
+    }
     else if (filters.specialization && filters.specialization.length > 0) {
       sorted.sort((a, b) => {
         const fullA = a.fullCard;
@@ -437,39 +517,32 @@ export default function Champions({
               <div className={styles.orderByContainer}>
                 <button
                   className={styles.orderByButton}
-                  onClick={() => {
-                    if (filters.specialization && filters.specialization.length > 0) return;
-                    setSortDropdownOpen(!sortDropdownOpen);
-                  }}
-                  style={{
-                    opacity: filters.specialization && filters.specialization.length > 0 ? 0.7 : 1,
-                    cursor: filters.specialization && filters.specialization.length > 0 ? 'not-allowed' : 'pointer',
-                  }}
+                  onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
                 >
                   {filters.specialization && filters.specialization.length > 0
                     ? `BY ${filters.specialization[0].toUpperCase()}`
-                    : sortOption === 'default'
-                      ? 'SORT BY...'
-                      : `BY ${sortOption === 'win_rate' ? 'WIN RATE' : sortOption.toUpperCase()}`}
-                  {!(filters.specialization && filters.specialization.length > 0) && (
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{
-                        transform: sortDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.2s',
-                        marginLeft: '0.2rem'
-                      }}
-                    >
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                  )}
+                    : filters.extraSort
+                      ? `BY ${filters.extraSort === 'eatingWhileRiding' ? 'WART EAT' : filters.extraSort === 'looseBallPickups' ? 'PICKUPS' : filters.extraSort.toUpperCase()}`
+                      : sortOption === 'default'
+                        ? 'SORT BY...'
+                        : `BY ${sortOption === 'win_rate' ? 'WIN RATE' : sortOption.toUpperCase()}`}
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      transform: sortDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s',
+                      marginLeft: '0.2rem'
+                    }}
+                  >
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
                 </button>
                 {sortDropdownOpen && (
                   <ul className={styles.orderByMenu}>
@@ -487,10 +560,7 @@ export default function Champions({
                     ].map((item) => (
                       <li
                         key={item.value}
-                        onClick={() => {
-                          setSortOption(item.value);
-                          setSortDropdownOpen(false);
-                        }}
+                        onClick={() => handleSortSelection(item.value)}
                         className={sortOption === item.value ? styles.activeSort : ''}
                       >
                         {item.label}

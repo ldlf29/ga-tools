@@ -41,15 +41,14 @@ export const sortCardsByFilters = (
       return true;
     })
     .sort((a, b) => {
-    // 0. Extra Sorting (New metrics like deaths, pickups, etc.)
-    if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
-      const valA = getStatValueByLimit(a, filters.extraSort, filters.matchLimit);
-      const valB = getStatValueByLimit(b, filters.extraSort, filters.matchLimit);
-      if (valB !== valA) return valB - valA;
-    }
+      // Determine priority between specialization and extraSort based on insertionOrder
+      const sortKeys = filters.insertionOrder?.filter(k => 
+        k.startsWith('specialization:') || k.startsWith('extraSort:')
+      ) || [];
+      const lastSortKey = sortKeys[sortKeys.length - 1];
 
-    // 1. Specialization Sorting (Takes highest priority if active)
-    if (filters.specialization && filters.specialization.length > 0) {
+      // Priority 1: The last selected sidebar sort (Specialization or Extra)
+      if (lastSortKey?.startsWith('specialization:') && filters.specialization && filters.specialization.length > 0) {
         const activeSpecs = filters.specialization;
         const perfSpecs = ['Gacha', 'Killer', 'Wart Rider'];
         const contextSpecs = ['Winner', 'Loser', 'Bad Streak', 'Good Streak'];
@@ -58,37 +57,53 @@ export const sortCardsByFilters = (
         const activePerf = activeSpecs.find((s) => perfSpecs.includes(s));
         const activeContext = activeSpecs.find((s) => contextSpecs.includes(s));
         const activeScore = activeSpecs.find((s) => scoreSpecs.includes(s));
+        const activeCategories = [activePerf, activeContext, activeScore].filter(Boolean);
 
-        const activeCategories = [
-          activePerf,
-          activeContext,
-          activeScore,
-        ].filter(Boolean);
-
-        // CASE: At least two are active - Calculation of Coeff
         if (activeCategories.length > 1) {
           const calcCoeff = (card: EnhancedCard) => {
             let coeff = 1;
             activeCategories.forEach((spec) => {
-              if (spec) {
-                coeff *= getSpecializationCoefficient(
-                  card,
-                  spec,
-                  filters.matchLimit
-                );
-              }
+              if (spec) coeff *= getSpecializationCoefficient(card, spec, filters.matchLimit);
             });
             return coeff;
           };
-
           const coeffA = calcCoeff(a);
           const coeffB = calcCoeff(b);
           const isLoserActive = activeSpecs.includes('Loser');
-          if (coeffB !== coeffA)
-            return isLoserActive ? coeffA - coeffB : coeffB - coeffA;
+          if (coeffB !== coeffA) return isLoserActive ? coeffA - coeffB : coeffB - coeffA;
         }
 
-        // FALLBACK: Individual Sorting (if only one or coeff is same)
+        for (const spec of activeSpecs) {
+          const valA = getSpecializationCoefficient(a, spec, filters.matchLimit);
+          const valB = getSpecializationCoefficient(b, spec, filters.matchLimit);
+          const diff = spec === 'Loser' ? valA - valB : valB - valA;
+          if (diff !== 0) return diff;
+        }
+      }
+      else if (lastSortKey?.startsWith('extraSort:') && filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+        const valA = getStatValueByLimit(a, filters.extraSort, filters.matchLimit);
+        const valB = getStatValueByLimit(b, filters.extraSort, filters.matchLimit);
+        if (valB !== valA) return valB - valA;
+      }
+      // Priority 2: Manual dropdown sorting (if no sidebar sort is active or fallbacks)
+      else if (sortOption !== 'default') {
+        switch (sortOption) {
+          case 'name_asc': return a.name.localeCompare(b.name);
+          case 'name_desc': return b.name.localeCompare(a.name);
+          case 'rarity_desc': return getRarityValue(b.rarity) - getRarityValue(a.rarity);
+          case 'rarity_asc': return getRarityValue(a.rarity) - getRarityValue(b.rarity);
+          case 'stars_desc': return (b.custom?.stars || 0) - (a.custom?.stars || 0);
+          case 'stars_asc': return (a.custom?.stars || 0) - (b.custom?.stars || 0);
+        }
+      }
+      // Fallbacks if insertionOrder is missing but filters are present
+      else if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+        const valA = getStatValueByLimit(a, filters.extraSort, filters.matchLimit);
+        const valB = getStatValueByLimit(b, filters.extraSort, filters.matchLimit);
+        if (valB !== valA) return valB - valA;
+      }
+      else if (filters.specialization && filters.specialization.length > 0) {
+        const activeSpecs = filters.specialization;
         for (const spec of activeSpecs) {
           const valA = getSpecializationCoefficient(a, spec, filters.matchLimit);
           const valB = getSpecializationCoefficient(b, spec, filters.matchLimit);
@@ -97,24 +112,6 @@ export const sortCardsByFilters = (
         }
       }
 
-      // 2. Default Sort Option (Order by Menu)
-      switch (sortOption) {
-        case 'default':
-          return 0;
-        case 'name_asc':
-          return a.name.localeCompare(b.name);
-        case 'name_desc':
-          return b.name.localeCompare(a.name);
-        case 'rarity_desc':
-          return getRarityValue(b.rarity) - getRarityValue(a.rarity);
-        case 'rarity_asc':
-          return getRarityValue(a.rarity) - getRarityValue(b.rarity);
-        case 'stars_desc':
-          return (b.custom?.stars || 0) - (a.custom?.stars || 0);
-        case 'stars_asc':
-          return (a.custom?.stars || 0) - (b.custom?.stars || 0);
-        default:
-          return 0;
-      }
+      return 0;
     });
 };

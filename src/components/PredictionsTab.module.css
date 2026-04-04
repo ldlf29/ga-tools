@@ -33,7 +33,7 @@
 
 .resultsTitle {
   font-size: 1.7rem;
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-weight: 700;
   color: #ffd753;
   text-transform: uppercase;
@@ -102,7 +102,7 @@
   border: none;
   color: #1abf9e;
   font-size: 0.8rem;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 800;
   cursor: pointer;
   display: flex;
@@ -126,8 +126,7 @@
   height: 18px;
   stroke-width: 3px;
   stroke: #ffd753;
-  filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black)
-    drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
+  filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
 }
 
 .orderByButton:hover {
@@ -153,7 +152,7 @@
 .orderByMenu li {
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 500;
   color: #333333;
   cursor: pointer;
@@ -192,6 +191,96 @@
   padding: 10px 10px 10px 0;
 }
 
+/* Mobile Ranking Drawer & Toggle Button */
+.drawerOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 900;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.drawerOverlayVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* FAB Toggle Button for Ranking */
+.drawerToggleButton {
+  display: none;
+  position: fixed;
+  top: 55dvh;
+  right: 0;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 54px;
+  background: #ffd753;
+  border: 3px solid #333333;
+  border-right: none;
+  border-radius: 1.5rem 0 0 1.5rem;
+  color: #333333;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1001;
+  box-shadow: -4px 6px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drawerToggleButton:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Close Button on Drawer Edge */
+.drawerCloseButton {
+  position: absolute;
+  top: 55dvh;
+  left: -29px;
+  /* Outside on left edge */
+  transform: translateY(-50%);
+  width: 28px;
+  height: 52px;
+  background: #ffd753;
+  border: 3px solid #333333;
+  border-right: none;
+  border-radius: 1.5rem 0 0 1.5rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.2s;
+}
+
+.sidebarOpen .drawerCloseButton {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebarOpen+.drawerToggleButton {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 1000px) {
+
+  .confirmButton {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
 .contestGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -227,12 +316,12 @@
   font-weight: 800;
   color: white;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   text-shadow:
     -1px -1px 0 #000,
     1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
+    -1px 1px #000,
+    1px 1px #000;
 }
 
 .priceRow {
@@ -331,7 +420,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 3rem;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 700;
   font-size: 1.1rem;
   color: #333333;
@@ -358,6 +447,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: 100%;
 }
 
 .rankingHeader {
@@ -389,7 +479,7 @@
 
 .rankingTitle {
   font-size: 1.4rem;
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-weight: 700;
   color: #ffd753;
   text-transform: uppercase;
@@ -399,6 +489,17 @@
     -1.5px 0 #000,
     0 1.5px #000,
     0 -1.5px #000;
+}
+
+.rankingDateLabel {
+  color: #333333;
+  font-size: 0.72rem;
+  margin-bottom: 0.4rem;
+  margin-top: -0.2rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
 .rankingSubtitle {
@@ -466,7 +567,7 @@
   padding: 10px 14px;
   border-radius: 12px;
   border: 2px solid #333333;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .rankNum {
@@ -523,10 +624,6 @@
   opacity: 0.7;
 }
 
-.rankingPlaceholder:hover {
-  transform: translateX(4px);
-  border-color: #ffd753;
-}
 
 .rankingStatus {
   text-align: center;
@@ -573,7 +670,7 @@
 .rankingPageLabel {
   font-size: 12px;
   font-weight: 700;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   min-width: 48px;
   text-align: center;
 }
@@ -607,13 +704,16 @@
 :global(body.modal-open) {
   overflow: hidden !important;
   height: 100vh !important;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
 }
 
 :global(html.modal-open)::-webkit-scrollbar,
 :global(body.modal-open)::-webkit-scrollbar {
-  display: none !important; /* Chrome/Safari */
+  display: none !important;
+  /* Chrome/Safari */
 }
 
 /* Specific to PredictionsTab containers that might be scrolling */
@@ -657,8 +757,15 @@
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.9) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .modalHeader {
@@ -669,7 +776,7 @@
 
 .modalTitle {
   font-size: 1.7rem;
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-weight: 700;
   color: #ffd753;
   text-transform: uppercase;
@@ -708,18 +815,12 @@
   padding: 0;
 }
 
-.modalCloseButton:hover {
-  transform: scale(1.1);
-  background: #ff99dd !important;
-}
-
 .modalCloseButton svg {
   width: 15px;
   height: 15px;
   stroke: currentColor;
   stroke-width: 3px;
-  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333)
-    drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }
 
 .modalBody {
@@ -1049,7 +1150,7 @@
   border-bottom-width: 4px;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  font-family: var(--font-display, 'Inter', sans-serif);
+  font-family: var(--font-display, "Inter", sans-serif);
   font-size: 0.95rem;
   font-weight: 800;
   cursor: pointer;
@@ -1094,7 +1195,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .nestedRow {
@@ -1192,16 +1295,7 @@
   background: #ff85d5;
 }
 
-@media (max-width: 1000px) {
-  .mainLayout {
-    flex-direction: column;
-  }
-  .sidebar {
-    width: 100%;
-  }
-}
-
-/* ─── RESULTS MODAL ────────────────────────────────────────────────────────── */
+/* --- RESULTS MODAL ---------------------------------------------------------- */
 
 .resultsModal {
   width: fit-content !important;
@@ -1234,7 +1328,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: fit-content;
 }
 
@@ -1249,7 +1343,7 @@
 }
 
 .lineupNumber {
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-weight: 800;
   font-size: 0.75rem;
   color: #333;
@@ -1261,7 +1355,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   padding: 1px 8px;
   border-radius: 4px;
 }
@@ -1275,7 +1369,7 @@
 }
 
 .lineupScoreValue {
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-size: 0.85rem;
   font-weight: 700;
   color: #333;
@@ -1323,7 +1417,7 @@
 }
 
 .nonOwnedSchemeCard::after {
-  content: 'NOT OWNED';
+  content: "NOT OWNED";
   position: absolute;
   top: 6px;
   right: 6px;
@@ -1341,7 +1435,7 @@
 
 .resultsModalHeader {
   width: 100%;
-  padding: 1.25rem 1.5rem; /* Reduced horizontal padding */
+  padding: 1.25rem 1.5rem;
   background: #84bcff;
   border-bottom: 3.5px solid #333;
   display: flex;
@@ -1367,19 +1461,18 @@
 
 .modalTitle {
   font-size: 1.6rem;
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-weight: 800;
   color: #ffd753;
   text-transform: uppercase;
   margin: 0;
   text-align: left;
   line-height: 1.1;
-  /* Black outline/border, no shadow */
   text-shadow:
     1px 1px 0 #000,
     -1px -1px 0 #000,
     1px -1px 0 #000,
-    -1px 1px 0 #000;
+    -1px 1px #000;
 }
 
 .modalSubtitle {
@@ -1387,9 +1480,9 @@
   font-style: italic;
   color: #666;
   margin: 0;
-  font-weight: 400; /* Explicitly non-bold */
+  font-weight: 400;
   text-align: left;
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
 }
 
 .contestLink {
@@ -1403,7 +1496,7 @@
   font-size: 0.65rem;
   font-weight: 900;
   text-decoration: none;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   text-transform: uppercase;
   border: 1px solid #000;
   transition: all 0.2s;
@@ -1460,7 +1553,7 @@
 }
 
 .mokiCardScoreValue {
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-size: 0.9rem;
   font-weight: 700;
   color: #333;
@@ -1482,7 +1575,7 @@
 }
 
 .formGroup label {
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-size: 0.9rem;
   color: #333;
   font-weight: 700;
@@ -1495,7 +1588,7 @@
   border: 3.5px solid #333;
   border-radius: 12px;
   padding: 0.8rem 1rem;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 1rem;
   color: #333;
   outline: none;
@@ -1559,7 +1652,7 @@
 }
 
 .autoLineupsModalTitle {
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-size: 1.8rem;
   font-weight: 800;
   color: #333;
@@ -1589,7 +1682,7 @@
   border: 3.5px solid #333;
   border-bottom-width: 6px;
   padding: 0.6rem 1.5rem;
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-weight: 800;
   text-transform: uppercase;
   cursor: pointer;
@@ -1608,7 +1701,7 @@
   border: 3.5px solid #333;
   border-bottom-width: 6px;
   padding: 0.6rem 2rem;
-  font-family: var(--font-display, 'Grand Arena', sans-serif);
+  font-family: var(--font-display, "Grand Arena", sans-serif);
   font-weight: 800;
   text-transform: uppercase;
   cursor: pointer;
@@ -1626,3 +1719,402 @@
   cursor: not-allowed;
 }
 
+/* Mobile Overrides (moved to end for correct specificity) */
+@media (max-width: 1000px) {
+  .headerContainer {
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .resultsTitle {
+    font-size: 1.15rem;
+    text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000;
+    letter-spacing: 0.5px;
+  }
+
+  .headerTopRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .filterSection {
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .orderByButton {
+    font-size: 0.65rem;
+    gap: 0.1rem;
+  }
+
+  .orderByButton svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .hideFullBtn {
+    padding: 2px 8px;
+    font-size: 9px;
+    height: 28px;
+    border-radius: 8px;
+    min-width: 0;
+  }
+
+  .mainLayout {
+    flex-direction: column;
+    padding: 0 8px;
+  }
+
+  .mainContent {
+    padding: 8px 0;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 320px;
+    max-width: 85vw;
+    background: #5097ff;
+    z-index: 1000;
+    transform: translateX(110%);
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
+    border-left: 4px solid #333333;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    overflow: visible; /* Important: Allow close button to stick out */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .drawerOverlay {
+    display: block;
+    z-index: 1000;
+    /* Behind drawer but above content */
+  }
+
+  .drawerToggleButton {
+    display: flex;
+  }
+
+  .rankingBox {
+    background: none;
+    border: none;
+    height: 100%;
+    width: 100%;
+    padding: 1.25rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+
+  .rankingBox::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .drawerCloseButton {
+    position: absolute;
+    top: 55dvh;
+    left: -29px;
+    right: auto;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 52px;
+    background: #ffd753;
+    border: 3px solid #333333;
+    border-right: none;
+    border-radius: 1.5rem 0 0 1.5rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1010;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.2s;
+  }
+
+  .drawerCloseButton:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .sidebarOpen .drawerCloseButton {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .rankingTitle {
+    font-size: 0.85rem !important;
+    /* Enlarged a bit as requested */
+    margin-bottom: 2px;
+    text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000;
+  }
+
+  .rankingDateLabel {
+    font-size: 0.62rem !important;
+    /* Enlarged a bit as requested */
+    margin-bottom: 4px !important;
+    margin-top: -4px !important;
+  }
+
+  .filterByRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .filterLabel {
+    font-size: 9px;
+    opacity: 0.7;
+  }
+
+  .sortControls {
+    gap: 4px;
+    width: 100%;
+  }
+
+  .metaSchemesBtn {
+    font-size: 8px;
+    padding: 3px 5px;
+    flex: 1;
+    /* Stretch buttons to fill row if needed */
+    text-align: center;
+  }
+
+  .rankingPlaceholder {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .rankNum {
+    font-size: 11px;
+    min-width: 20px;
+  }
+
+  .rankMokiImage {
+    width: 32px;
+    height: 32px;
+  }
+
+  .rankName {
+    font-size: 13px;
+  }
+
+  .rankClass {
+    font-size: 9px;
+  }
+
+  .rankScore {
+    min-width: 60px;
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+
+  .rankScore small {
+    font-size: 7px;
+  }
+
+  .rankingPagination {
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .rankingPageBtn {
+    width: 36px;
+    /* Slightly larger for easier touch */
+    height: 36px;
+  }
+
+  .contestGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .contestCard {
+    padding: 0.85rem;
+    border-radius: 16px;
+    gap: 0.75rem;
+  }
+
+  .contestName {
+    font-size: 0.85rem;
+  }
+
+  .infoItem {
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .priceDisplay {
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  .amount {
+    font-size: 12px;
+  }
+
+  .currency {
+    font-size: 9px;
+  }
+
+  .entriesCount {
+    font-size: 10px;
+  }
+
+  /* Results Modal Mobile Overrides */
+  .resultsModal {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+  }
+
+  .resultsModalHeader {
+    padding: 0.75rem 1rem;
+    gap: 2px;
+  }
+
+  .modalTitle {
+    font-size: 1.2rem;
+  }
+
+  .modalSubtitleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .modalSubtitle {
+    font-size: 0.7rem;
+  }
+
+  .contestLink {
+    font-size: 0.6rem;
+    padding: 1px 6px;
+  }
+
+  .lineupsList {
+    padding: 0.5rem;
+    gap: 0.75rem;
+  }
+
+  .lineupCard {
+    border-width: 2.5px;
+    border-bottom-width: 5px;
+    width: 100%;
+  }
+
+  .lineupMokisGrid {
+    grid-template-columns: repeat(5, 1fr);
+    width: 100%;
+    gap: 2px;
+    padding: 2px;
+  }
+
+  .mokiCardImgWrapper {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 160 / 215;
+  }
+
+  .mokiCardScoreBadge {
+    min-width: 0;
+    width: 95%;
+    padding: 2px;
+    border-radius: 4px;
+  }
+
+  .mokiCardScoreValue {
+    font-size: 0.55rem;
+  }
+
+  .lineupCardHeader {
+    padding: 0.2rem 0.5rem;
+    border-bottom-width: 2.5px;
+  }
+
+  .lineupNumber {
+    font-size: 0.6rem;
+  }
+
+  .lineupScoreBadge {
+    padding: 1px 6px;
+    gap: 4px;
+  }
+
+  .lineupScoreValue {
+    font-size: 0.75rem;
+  }
+
+  .lineupScoreLabel {
+    font-size: 0.35rem;
+  }
+
+  /* Setup Modal Mobile Overrides */
+  .modalContent {
+    padding: 1rem;
+    border-radius: 1.5rem;
+    max-width: 95vw;
+    gap: 0.75rem;
+  }
+
+  .modalTitle {
+    font-size: 1.4rem;
+  }
+
+  .modalDesc {
+    font-size: 12px;
+  }
+
+  .modalInfoText {
+    font-size: 10px;
+  }
+
+  .modalRow {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+
+  .rowLabel {
+    font-size: 11px;
+  }
+
+  .toggleBtn {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+
+  .checkboxGroup {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .checkboxLabel {
+    font-size: 9px;
+  }
+
+  .customCheckbox {
+    width: 18px;
+    height: 18px;
+  }
+}
