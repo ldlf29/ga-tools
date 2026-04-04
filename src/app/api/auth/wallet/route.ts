@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     let recoveredAddress: string;
     try {
       const messageString = siweMessage.prepareMessage();
-      recoveredAddress = ethers.utils.verifyMessage(messageString, signature).toLowerCase();
+      recoveredAddress = ethers.verifyMessage(messageString, signature).toLowerCase();
     } catch {
       return NextResponse.json({ error: 'Signature verification failed' }, { status: 401 });
     }

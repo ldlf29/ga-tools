@@ -9,7 +9,7 @@ const RECIPIENT = process.env.PAYMENT_RECIPIENT!.toLowerCase();
 const USDC_CONTRACT = process.env.USDC_CONTRACT_RONIN!.toLowerCase();
 const RONIN_RPC = process.env.RONIN_RPC_URL || 'https://api.roninchain.com/rpc';
 const JWT_SECRET = new TextEncoder().encode(process.env.PREDICTIONS_JWT_SECRET!);
-const TRANSFER_TOPIC = ethers.utils.id('Transfer(address,address,uint256)');
+const TRANSFER_TOPIC = ethers.id('Transfer(address,address,uint256)');
 
 const PLAN_USD: Record<string, number> = { DAILY: 1, WEEKLY: 5, SEASON: 20 };
 const PLAN_DURATIONS_MS: Record<string, number> = {

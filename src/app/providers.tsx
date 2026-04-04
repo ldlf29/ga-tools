@@ -8,6 +8,21 @@ import { LazyMotion, domAnimation } from 'framer-motion';
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_WAYPOINT_CLIENT_ID || '';
 
+// Hack: Tanto Widget's internal dependencies (like WalletConnect) blindly access
+// indexedDB during configuration. Since this file is evaluated in Node during Next.js build,
+// we mock indexedDB globally so the build doesn't crash with "ReferenceError: indexedDB is not defined".
+if (typeof window === 'undefined') {
+  (globalThis as any).indexedDB = {
+    open: () => ({
+      onupgradeneeded: null,
+      onsuccess: null,
+      onerror: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }),
+  };
+}
+
 const config = getDefaultConfig({
   appMetadata: {
     appName: 'Grand Arena Tools',
