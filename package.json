@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@sky-mavis/tanto-widget": "^0.0.5",
-    "@sky-mavis/waypoint": "^4.2.2",
     "@supabase/supabase-js": "^2.93.2",
     "@tanstack/react-query": "^5.96.2",
     "@upstash/ratelimit": "^2.0.8",
@@ -20,7 +19,7 @@
     "@vercel/analytics": "^1.6.1",
     "@vercel/functions": "^3.4.3",
     "csv-parse": "^6.2.1",
-    "ethers": "^5.8.0",
+    "ethers": "^6.16.0",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.27.3",
     "html2canvas": "^1.4.1",
@@ -51,5 +50,10 @@
     "tsx": "^4.21.0",
     "typescript": "^5",
     "undici": "^7.24.0"
+  },
+  "overrides": {
+    "elliptic": "^6.6.1",
+    "lodash": "^4.17.21",
+    "@stablelib/ed25519": "^2.0.3"
   }
 }
