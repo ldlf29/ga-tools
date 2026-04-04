@@ -11,7 +11,8 @@ export async function GET() {
     // 1. Fetch all Moki stats
     const { data: globalData, error: globalError } = await supabaseAdmin
       .from('moki_stats')
-      .select('*');
+      .select('*')
+      .limit(500); // Cap at 500 rows; the moki roster never exceeds this
 
     if (globalError) {
       console.error('[API Stats] Moki stats fetch error:', globalError);

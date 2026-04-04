@@ -60,6 +60,7 @@ const PredictionsTab = dynamic(() => import('@/components/PredictionsTab'), {
   ),
   ssr: false,
 });
+const PredictionsGate = dynamic(() => import('@/components/PredictionsGate'), { ssr: false });
 import ChangelogModal from '@/components/ChangelogModal';
 
 // Custom Hooks
@@ -1615,7 +1616,7 @@ export default function Home() {
           </div>
         )}
 
-        {isAdmin && activeTab === 'predictions' && (
+        {activeTab === 'predictions' && (
           <div
             style={{
               display: 'flex',
@@ -1624,7 +1625,9 @@ export default function Home() {
               minHeight: 0,
             }}
           >
-            <PredictionsTab allCards={allCards} userCards={userCards} cardMode={cardMode} />
+            <PredictionsGate>
+              <PredictionsTab allCards={allCards} userCards={userCards} cardMode={cardMode} />
+            </PredictionsGate>
           </div>
         )}
 

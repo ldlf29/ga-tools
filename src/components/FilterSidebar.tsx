@@ -4,7 +4,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import styles from './FilterSidebar.module.css';
 import StarRangeSlider from './StarRangeSlider';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { FilterState, TRAIT_GROUPS } from '@/types';
 
 interface FilterSidebarProps {

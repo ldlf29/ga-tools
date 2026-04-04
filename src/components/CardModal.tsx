@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { EnhancedCard } from '@/types';
 import styles from './CardModal.module.css';
 import NextImage from 'next/image';

@@ -1,0 +1,113 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextResponse } from 'next/server';
+import { SignJWT } from 'jose';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { ethers } from 'ethers';
+import { SiweMessage } from 'siwe';
+import { consumeNonce } from '@/app/api/auth/nonce/route';
+
+const JWT_SECRET = new TextEncoder().encode(process.env.PREDICTIONS_JWT_SECRET!);
+
+export const dynamic = 'force-dynamic';
+
+export async function POST(req: Request) {
+  try {
+    const { message, signature, walletAddress, requestTestMode } = await req.json();
+
+    if (!message || !signature || !walletAddress) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // 1. Parse and validate SIWE message
+    let siweMessage: SiweMessage;
+    try {
+      siweMessage = new SiweMessage(message);
+    } catch {
+      return NextResponse.json({ error: 'Invalid SIWE message format' }, { status: 400 });
+    }
+
+    // 2. Validate nonce (one-time use, prevents replay)
+    if (!consumeNonce(siweMessage.nonce)) {
+      return NextResponse.json({ error: 'Invalid or expired nonce' }, { status: 401 });
+    }
+
+    // 3. Verify expiration
+    if (siweMessage.expirationTime) {
+      const exp = new Date(siweMessage.expirationTime);
+      if (exp < new Date()) {
+        return NextResponse.json({ error: 'SIWE message expired' }, { status: 401 });
+      }
+    }
+
+    // 4. Recover signer from signature and verify it matches the claimed address
+    let recoveredAddress: string;
+    try {
+      const messageString = siweMessage.prepareMessage();
+      recoveredAddress = ethers.utils.verifyMessage(messageString, signature).toLowerCase();
+    } catch {
+      return NextResponse.json({ error: 'Signature verification failed' }, { status: 401 });
+    }
+
+    const normalizedWallet = walletAddress.toLowerCase();
+    if (recoveredAddress !== normalizedWallet) {
+      return NextResponse.json({ error: 'Address mismatch: signer does not match claimed wallet' }, { status: 403 });
+    }
+
+    // 5. Upsert user — use wallet as both PK and waypoint_sub (no JWKS sub for SIWE)
+    await supabaseAdmin.from('predictions_users').upsert(
+      { wallet_address: normalizedWallet, waypoint_sub: `siwe-${normalizedWallet}`, last_login_at: new Date().toISOString() },
+      { onConflict: 'wallet_address' }
+    );
+
+    // 6. Check active subscription
+    const { data: activeSub } = await supabaseAdmin
+      .from('predictions_subscriptions')
+      .select('plan_type, expires_at, is_test_mode')
+      .eq('wallet_address', normalizedWallet)
+      .gt('expires_at', new Date().toISOString())
+      .order('expires_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let hasAccess = !!activeSub;
+    let isTestMode = activeSub?.is_test_mode ?? false;
+    let expiresAt: string | null = activeSub?.expires_at ?? null;
+
+    // 7. Grant TEST MODE if requested and no active paid subscription
+    if (requestTestMode && !hasAccess) {
+      const testExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      await supabaseAdmin.from('predictions_subscriptions').insert({
+        wallet_address: normalizedWallet,
+        plan_type: 'TEST',
+        token_used: 'FREE',
+        expires_at: testExpiresAt,
+        is_test_mode: true,
+        notes: 'Self-serve test mode',
+      });
+      hasAccess = true;
+      isTestMode = true;
+      expiresAt = testExpiresAt;
+    }
+
+    // 8. Issue our 24h session JWT (httpOnly cookie)
+    const sessionToken = await new SignJWT({ wallet: normalizedWallet })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('24h')
+      .sign(JWT_SECRET);
+
+    const response = NextResponse.json({ hasAccess, isTestMode, expiresAt, walletAddress: normalizedWallet });
+    response.cookies.set('ga_predictions_session', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60,
+      path: '/',
+    });
+
+    return response;
+  } catch (err) {
+    console.error('[AuthWallet] Unexpected error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

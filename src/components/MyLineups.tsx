@@ -9,7 +9,7 @@ import styles from './MyLineups.module.css';
 import NextImage from 'next/image';
 import RatingSlider from './RatingSlider';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 
 import CardModal from './CardModal';

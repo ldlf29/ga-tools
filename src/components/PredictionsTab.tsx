@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import styles from './PredictionsTab.module.css';
 import { Contest, ContestsResponse } from '@/types/contest';
@@ -20,9 +20,10 @@ interface PredictionsTabProps {
   allCards?: EnhancedCard[];
   userCards?: EnhancedCard[];
   cardMode?: 'ALL' | 'USER';
+  isTestMode?: boolean;
 }
 
-export default function PredictionsTab({ allCards = [], userCards = [], cardMode = 'ALL' }: PredictionsTabProps) {
+export default function PredictionsTab({ allCards = [], userCards = [], cardMode = 'ALL', isTestMode = false }: PredictionsTabProps) {
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -77,6 +78,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [rankingLoading, setRankingLoading] = useState(false);
   const [rankingPage, setRankingPage] = useState(0);
   const RANKING_PAGE_SIZE = 10;
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   // Build lookup: moki name (uppercase) -> metadata entry
   const metadataByName = React.useMemo(() => {
@@ -200,46 +202,48 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   };
 
   useEffect(() => {
-    const fetchContests = async () => {
+    const fetchAll = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const response = await fetch('/api/contests');
-        if (!response.ok) throw new Error('Failed to fetch contests');
-        const json: ContestsResponse = await response.json();
-        const now = new Date();
-        const upcoming = (json.data || []).filter(contest => {
-          const startDate = new Date(contest.startDate);
-          return startDate > now;
-        });
-        setContests(upcoming);
-      } catch (err) {
-        console.error('Error fetching contests:', err);
-        setError('Error loading active contests. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
+        // Run both fetches in parallel — cuts total wait from sum to max of the two
+        const [contestsRes, rankingRes] = await Promise.all([
+          fetch('/api/contests'),
+          fetch(`/api/predictions/ranking${isTestMode ? '?mode=test' : ''}`),
+        ]);
 
-    fetchContests();
+        // Handle contests
+        if (contestsRes.ok) {
+          const json: ContestsResponse = await contestsRes.json();
+          const now = new Date();
+          const upcoming = (json.data || []).filter(contest => {
+            const startDate = new Date(contest.startDate);
+            return startDate > now;
+          });
+          setContests(upcoming);
+        } else {
+          setError('Error loading active contests. Please try again later.');
+        }
 
-    const fetchRanking = async () => {
-      try {
-        setRankingLoading(true);
-        const res = await fetch('/api/predictions/ranking');
-        const json = await res.json();
-        if (json.success) {
-          setRankingData(json.data);
-          if (json.effectiveDate) {
-            setRankingEffectiveDate(json.effectiveDate);
+        // Handle ranking
+        if (rankingRes.ok) {
+          const json = await rankingRes.json();
+          if (json.success) {
+            setRankingData(json.data);
+            if (json.effectiveDate) {
+              setRankingEffectiveDate(json.effectiveDate);
+            }
           }
         }
       } catch (err) {
-        console.error('Error fetching ranking:', err);
+        console.error('Error fetching predictions data:', err);
+        setError('Error loading data. Please try again later.');
       } finally {
+        setLoading(false);
         setRankingLoading(false);
       }
     };
-    fetchRanking();
+
+    fetchAll();
   }, []);
 
   // Ensure maxRepeated is within valid bounds [2, lineupCount] if lineupCount >= 2
@@ -1294,7 +1298,11 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                                     const mokiEffective = moki.baseScore * getRarityMultiplier(moki.rarity);
                                     return (
                                       <div key={`${lineup.id}-${moki.name}`} className={styles.mokiSlotCard}>
-                                        <div className={styles.mokiCardImgWrapper}>
+                                        <div
+                                          className={styles.mokiCardImgWrapper}
+                                          onClick={() => moki.cardImage && setZoomedImage(moki.cardImage)}
+                                          style={{ cursor: moki.cardImage ? 'zoom-in' : 'default' }}
+                                        >
                                           {moki.cardImage ? (
                                             <img src={moki.cardImage} alt={moki.name} className={styles.mokiCardImg} loading="lazy" />
                                           ) : (
@@ -1318,7 +1326,11 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
 
                                     return (
                                       <div className={`${styles.mokiSlotCard} ${styles.schemeSlotCard}`}>
-                                        <div className={`${styles.mokiCardImgWrapper} ${!isOwned ? styles.nonOwnedSchemeCard : ''}`}>
+                                        <div
+                                          className={`${styles.mokiCardImgWrapper} ${!isOwned ? styles.nonOwnedSchemeCard : ''}`}
+                                          onClick={() => schemeImage && setZoomedImage(schemeImage)}
+                                          style={{ cursor: schemeImage ? 'zoom-in' : 'default' }}
+                                        >
                                           <img src={schemeImage} alt="Scheme" className={styles.mokiCardImg} />
                                         </div>
                                         <div className={styles.mokiCardScoreBadge}>
@@ -1337,6 +1349,59 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
           </motion.div>
         )}
       </AnimatePresence>,
+      document.body
+    )}
+
+    {/* ─── IMAGE ZOOM LIGHTBOX ─────────────────────────────────────────── */}
+    {mounted && zoomedImage && createPortal(
+      <div
+        onClick={() => setZoomedImage(null)}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.92)',
+          backdropFilter: 'blur(12px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          cursor: 'zoom-out',
+          padding: '16px',
+        }}
+      >
+        <img
+          src={zoomedImage}
+          alt="Card zoom"
+          style={{
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            objectFit: 'contain',
+            borderRadius: '12px',
+            boxShadow: '0 0 60px rgba(0,0,0,0.8)',
+            border: '3px solid #333',
+          }}
+        />
+        <button
+          onClick={() => setZoomedImage(null)}
+          style={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            background: '#ff66cc',
+            border: '3px solid #333',
+            color: 'white',
+            fontSize: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            lineHeight: 1,
+          }}
+        >×</button>
+      </div>,
       document.body
     )}
     </>
