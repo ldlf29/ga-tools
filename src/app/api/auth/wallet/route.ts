@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { SignJWT } from 'jose';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ethers } from 'ethers';
 import { SiweMessage } from 'siwe';
 import { consumeNonce } from '@/app/api/auth/nonce/route';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.PREDICTIONS_JWT_SECRET!);
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
+
+export async function POST(req: NextRequest) {
+  const JWT_SECRET = new TextEncoder().encode(process.env.PREDICTIONS_JWT_SECRET!);
+  console.log('[AuthWallet] Request received');
   try {
     const { message, signature, walletAddress, requestTestMode } = await req.json();
+    console.log('[AuthWallet] Payload parsed, wallet:', walletAddress?.slice(0, 8));
 
     if (!message || !signature || !walletAddress) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -27,7 +31,10 @@ export async function POST(req: Request) {
     }
 
     // 2. Validate nonce (one-time use, prevents replay)
-    if (!consumeNonce(siweMessage.nonce)) {
+    console.log('[AuthWallet] Consuming nonce:', siweMessage.nonce);
+    const cookieNonce = consumeNonce(req);
+    if (!cookieNonce || cookieNonce !== siweMessage.nonce) {
+      console.warn('[AuthWallet] Nonce invalid or already used. cookie:', cookieNonce, 'message:', siweMessage.nonce);
       return NextResponse.json({ error: 'Invalid or expired nonce' }, { status: 401 });
     }
 
@@ -43,8 +50,11 @@ export async function POST(req: Request) {
     let recoveredAddress: string;
     try {
       const messageString = siweMessage.prepareMessage();
+      console.log('[AuthWallet] Verifying signature...');
       recoveredAddress = ethers.verifyMessage(messageString, signature).toLowerCase();
-    } catch {
+      console.log('[AuthWallet] Recovered:', recoveredAddress, 'Claimed:', walletAddress?.toLowerCase());
+    } catch (sigErr) {
+      console.error('[AuthWallet] verifyMessage failed:', sigErr);
       return NextResponse.json({ error: 'Signature verification failed' }, { status: 401 });
     }
 
@@ -104,7 +114,8 @@ export async function POST(req: Request) {
       maxAge: 24 * 60 * 60,
       path: '/',
     });
-
+    // Clear the one-time nonce cookie
+    response.cookies.delete('ga_siwe_nonce');
     return response;
   } catch (err) {
     console.error('[AuthWallet] Unexpected error:', err);
