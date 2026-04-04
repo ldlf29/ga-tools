@@ -687,7 +687,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                     </svg>
                   </button>
                   {openFilter === 'type' && (
-                    <ul className={styles.orderByMenu}>
+                    <ul className={`${styles.orderByMenu} ${styles.rightMenu}`}>
                       {['All', 'Open', 'Only Legendary', 'Only Epic', 'Only Rare', 'Only Basic', 'One-Of-Each', 'Up To Epic', 'Up To Rare', 'Mix'].map(opt => (
                         <li key={opt} onClick={() => handleFilterChange('type', opt)} className={filters.type === opt ? styles.activeSort : ''}>
                           {opt}
@@ -696,7 +696,6 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                     </ul>
                   )}
                 </div>
-
                 <div style={{ flex: 1 }} />
 
                 <button 
@@ -707,9 +706,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                 </button>
 
                 <button 
-                  className={`${styles.hideFullBtn} ${useLocalTime ? styles.activeLocal : ''}`}
+                  className={`${styles.hideFullBtn} ${styles.utcBtn} ${useLocalTime ? styles.activeLocal : ''}`}
                   onClick={() => setUseLocalTime(!useLocalTime)}
-                  style={{ minWidth: '100px' }}
                 >
                   {useLocalTime ? 'LOCAL TIME' : 'UTC TIME'}
                 </button>
