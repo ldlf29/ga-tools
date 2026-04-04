@@ -24,16 +24,10 @@ import Toast, { ToastMessage } from '@/components/Toast';
 import { fetchUserCards } from '@/utils/cardService';
 import { sortCardsByFilters, getRarityValue } from '@/utils/sortingUtils';
 import { matchesFilter } from '@/utils/filterUtils';
-import AutoLineupsModal, { AutoLineup } from '@/components/AutoLineupsModal';
-import ContestTypeModal, {
-  ContestType,
-  ExactCounts,
-} from '@/components/ContestTypeModal';
 import { ModeToggle } from '@/components/ModeToggle';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { HeaderControls } from '@/components/HeaderControls';
 import { checkAdminAction } from '@/app/actions/auth';
-import AdminLoginModal from '@/components/AdminLoginModal';
 
 // Lazy Loaded Components
 const MyLineups = dynamic(() => import('@/components/MyLineups'), {
@@ -87,20 +81,11 @@ export default function Home() {
   const [showWalletInput, setShowWalletInput] = useState(false);
   const [showWalletManagerModal, setShowWalletManagerModal] = useState(false);
 
-  /* Auto Lineups State */
-  const [autoLineupsModalOpen, setAutoLineupsModalOpen] = useState(false);
-  const [currentAutoLineups, setCurrentAutoLineups] = useState<AutoLineup[]>(
-    []
-  );
-  const [contestModalOpen, setContestModalOpen] = useState(false);
-  const [pendingAutoFilters, setPendingAutoFilters] =
-    useState<Partial<FilterState> | null>(null);
+
   const [isSuggestionActive, setIsSuggestionActive] = useState(false);
 
   /* Admin Access State */
   const [isAdmin, setIsAdmin] = useState(false);
-  const [logoClicks, setLogoClicks] = useState(0);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   useEffect(() => {
     // Initial check for persisted admin session
@@ -109,14 +94,7 @@ export default function Home() {
     });
   }, []);
 
-  const handleLogoClick = () => {
-    const nextCount = logoClicks + 1;
-    setLogoClicks(nextCount);
-    if (nextCount >= 5) {
-      setShowAdminLogin(true);
-      setLogoClicks(0);
-    }
-  };
+
 
   /* Custom Hooks Integration */
   const { allCards, isLoading, handleRefresh: refreshCards } = useCards();
@@ -728,364 +706,6 @@ export default function Home() {
     addToast('Suggestion Applied!', 'success');
   };
 
-  const handleAutoLineups = (suggestionFilters: Partial<FilterState>) => {
-    // 1. Get current scheme card if any
-    const schemeCard = lineup.find((c) => c.cardType === 'SCHEME');
-    if (!schemeCard) {
-      addToast('A Scheme is required for Auto Lineups.', 'error');
-      return;
-    }
-
-    // 2. Special fast-path for "Collect 'Em All": skip the contest modal
-    if (schemeCard.name === "Collect 'Em All") {
-      setPendingAutoFilters(suggestionFilters);
-      // Directly generate with 1 of each rarity, best by score
-      generateCollectEmAllLineups(suggestionFilters, schemeCard);
-      return;
-    }
-
-    // 3. All other Schemes: open contest type modal
-    setPendingAutoFilters(suggestionFilters);
-    setContestModalOpen(true);
-  };
-
-  const generateCollectEmAllLineups = (
-    suggestionFilters: Partial<FilterState>,
-    schemeCard: EnhancedCard
-  ) => {
-    const sourceCards = cardMode === 'USER' ? userCards : allCards;
-
-    // Sort all MOKI cards by score (best first), then remove duplicate names
-    const baseFilters: FilterState = {
-      rarity: [],
-      cardType: 'MOKI',
-      schemeName: [],
-      fur: [],
-      stars: [],
-      customClass: [],
-      specialization: ['Score'],
-      traits: [],
-      insertionOrder: ['specialization:Score'],
-      matchLimit: filters.matchLimit ?? 'ALL', // Respect active match performance filter
-    };
-
-    const allMokis = sourceCards.filter((c) => c.cardType === 'MOKI');
-
-    // Merge active Context specs from sidebar (Winner/Loser/Good Streak/Bad Streak)
-    // These override the Scheme's default Context.
-    const CONTEXT_SPECS = ['Winner', 'Loser', 'Good Streak', 'Bad Streak'];
-    const ROLE_SPECS_SET = ['Gacha', 'Killer', 'Wart Rider'];
-
-    // 1. Roles come from suggestionFilters (passed by AUTO button)
-    const passedRoleSpecs = (suggestionFilters.specialization || []).filter(
-      (s) => ROLE_SPECS_SET.includes(s)
-    );
-    if (passedRoleSpecs.length > 0) {
-      baseFilters.specialization = [
-        ...baseFilters.specialization,
-        ...passedRoleSpecs,
-      ];
-    }
-
-    // 2. Roles from sidebar (Gacha/Killer/Wart Rider)
-    const sidebarRoleSpecs = (filters.specialization || []).filter((s) =>
-      ROLE_SPECS_SET.includes(s)
-    );
-    if (sidebarRoleSpecs.length > 0) {
-      sidebarRoleSpecs.forEach((role) => {
-        if (!baseFilters.specialization.includes(role)) {
-          baseFilters.specialization.push(role);
-        }
-      });
-    }
-
-    // 3. Context specs come from sidebar
-    const sidebarContextSpecs = (filters.specialization || []).filter((s) =>
-      CONTEXT_SPECS.includes(s)
-    );
-    if (sidebarContextSpecs.length > 0) {
-      baseFilters.specialization = baseFilters.specialization.filter(
-        (s) => !CONTEXT_SPECS.includes(s)
-      );
-      baseFilters.specialization.push(...sidebarContextSpecs);
-    }
-
-    // 1. Filter by role/context specs if any are active (STRICT FILTER)
-    const hasActiveSpecs = baseFilters.specialization.some(
-      (s) => s !== 'Score'
-    );
-    const filteredMokis = hasActiveSpecs
-      ? allMokis.filter((c) =>
-          matchesFilter(c, { ...baseFilters, rarity: [] }, '')
-        )
-      : allMokis;
-
-    // 2. Sort the filtered pool
-    const sortedMokis = sortCardsByFilters(
-      filteredMokis,
-      baseFilters,
-      'default'
-    );
-
-    // 3. Separate into rarity groups (they remain sorted by selection criteria)
-    const lPool = sortedMokis.filter(
-      (c) => c.rarity.toLowerCase() === 'legendary'
-    );
-    const ePool = sortedMokis.filter((c) => c.rarity.toLowerCase() === 'epic');
-    const rPool = sortedMokis.filter((c) => c.rarity.toLowerCase() === 'rare');
-    const bPool = sortedMokis.filter((c) =>
-      ['basic', 'common'].includes(c.rarity.toLowerCase())
-    );
-
-    const generatedLineups: AutoLineup[] = [];
-    const usedIds = new Set<string>();
-
-    for (let count = 1; count <= 5; count++) {
-      // For each lineup, we need 4 different names
-      const lineupNames = new Set<string>();
-
-      const findBestUnused = (pool: EnhancedCard[]) => {
-        for (let i = 0; i < pool.length; i++) {
-          const card = pool[i];
-          if (!usedIds.has(card.id) && !lineupNames.has(card.name)) {
-            pool.splice(i, 1); // Remove from pool so it's not reused in next lineup
-            usedIds.add(card.id);
-            lineupNames.add(card.name);
-            return card;
-          }
-        }
-        return null;
-      };
-
-      const legendary = findBestUnused(lPool);
-      const epic = findBestUnused(ePool);
-      const rare = findBestUnused(rPool);
-      const basic = findBestUnused(bPool);
-
-      if (!legendary || !epic || !rare || !basic) break;
-
-      generatedLineups.push({
-        id: `auto-${Date.now()}-${count}`,
-        name: `${schemeCard.name} Auto ${count}`,
-        cards: [legendary, epic, rare, basic, schemeCard],
-      });
-    }
-
-    if (generatedLineups.length === 0) {
-      addToast("Not enough cards of each rarity for Collect 'Em All.", 'error');
-    } else {
-      setCurrentAutoLineups(generatedLineups);
-      setAutoLineupsModalOpen(true);
-    }
-  };
-
-  const generateAutoLineups = (
-    contestType: ContestType,
-    exactCounts?: ExactCounts
-  ) => {
-    setContestModalOpen(false);
-    const suggestionFilters = pendingAutoFilters;
-    if (!suggestionFilters) return;
-
-    const schemeCard = lineup.find((c) => c.cardType === 'SCHEME');
-    if (!schemeCard) return;
-
-    // We start with a base filter setting for Moki search
-    const baseFilters: FilterState = {
-      rarity: [],
-      cardType: 'MOKI',
-      schemeName: [],
-      fur: [],
-      stars: [],
-      customClass: [],
-      specialization: ['Score'], // Forcibly inject Score
-      traits: [],
-      insertionOrder: ['specialization:Score'],
-      matchLimit: filters.matchLimit ?? 'ALL', // Respect active match performance filter
-    };
-
-    // Apply Contest Rules
-    switch (contestType) {
-      case 'ONLY_LEGENDARY':
-        baseFilters.rarity = ['Legendary'];
-        break;
-      case 'ONLY_EPIC':
-        baseFilters.rarity = ['Epic'];
-        break;
-      case 'ONLY_RARE':
-        baseFilters.rarity = ['Rare'];
-        break;
-      case 'ONLY_BASIC':
-        baseFilters.rarity = ['Basic', 'Common'];
-        break;
-      case 'UP_TO_EPIC':
-        baseFilters.rarity = ['Epic', 'Rare', 'Basic', 'Common'];
-        break;
-      case 'UP_TO_RARE':
-        baseFilters.rarity = ['Rare', 'Basic', 'Common'];
-        break;
-      case 'OPEN':
-      case 'OTHER':
-        break; // No absolute preliminary restrictions, exact rarity counting handles 'OTHER' below.
-    }
-
-    // Merge the suggestion filters into the base
-    Object.entries(suggestionFilters).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        // If specialization, we already added Score, so append
-        if (key === 'specialization') {
-          baseFilters.specialization = ['Score', ...(value as string[])];
-          (value as string[]).forEach((v) =>
-            baseFilters.insertionOrder?.push(`specialization:${v}`)
-          );
-        } else {
-          (baseFilters as any)[key] = value;
-          (value as string[]).forEach((v) =>
-            baseFilters.insertionOrder?.push(`${key}:${v}`)
-          );
-        }
-      } else if (key === 'matchLimit') {
-        baseFilters.matchLimit = value as 'ALL' | 10 | 20 | 30;
-      }
-    });
-
-    // Merge active Context specs from sidebar (Winner/Loser/Good Streak/Bad Streak)
-    // These override any Context the Scheme's suggestion may already have.
-    const CONTEXT_SPECS = ['Winner', 'Loser', 'Good Streak', 'Bad Streak'];
-    const sidebarContextSpecs = (filters.specialization || []).filter((s) =>
-      CONTEXT_SPECS.includes(s)
-    );
-    if (sidebarContextSpecs.length > 0) {
-      baseFilters.specialization = baseFilters.specialization.filter(
-        (s) => !CONTEXT_SPECS.includes(s)
-      );
-      baseFilters.specialization.push(...sidebarContextSpecs);
-    }
-
-    // Role specs from sidebar (Gacha/Killer/Wart Rider) are ignored by default
-    // UNLESS the scheme is one of the 7 whitelisted "flexible" schemes.
-    const ROLE_WHITELIST = [
-      'Divine Intervention',
-      'Golden Shower',
-      'Midnight Strike',
-      'Rainbow Riot',
-      'Taking a Dive',
-      'Victory Lap',
-      'Whale Watching',
-    ];
-    if (ROLE_WHITELIST.includes(schemeCard.name)) {
-      const ROLE_SPECS_SET = ['Gacha', 'Killer', 'Wart Rider'];
-      const sidebarRoleSpecs = (filters.specialization || []).filter((s) =>
-        ROLE_SPECS_SET.includes(s)
-      );
-      if (sidebarRoleSpecs.length > 0) {
-        // Add roles from sidebar without removing existing roles from the scheme itself
-        sidebarRoleSpecs.forEach((role) => {
-          if (!baseFilters.specialization.includes(role)) {
-            baseFilters.specialization.push(role);
-          }
-        });
-      }
-    }
-
-    const sourceCards = cardMode === 'USER' ? userCards : allCards;
-
-    // Filter them
-    const validMokis = sourceCards.filter(
-      (c) => c.cardType === 'MOKI' && matchesFilter(c, baseFilters, '')
-    );
-
-    // Sort them (score & specialization happens here)
-    const sortedMokis = sortCardsByFilters(validMokis, baseFilters, 'default');
-
-    // Force Rarity to have the absolute highest priority on top of score
-    sortedMokis.sort(
-      (a, b) => getRarityValue(b.rarity) - getRarityValue(a.rarity)
-    );
-
-    // Remove duplicates
-    const uniqueMokis: EnhancedCard[] = [];
-    const seenNames = new Set<string>();
-
-    for (const moki of sortedMokis) {
-      if (!seenNames.has(moki.name)) {
-        uniqueMokis.push(moki);
-        seenNames.add(moki.name);
-      }
-    }
-
-    // Partition into Teams of 4
-    const generatedLineups: AutoLineup[] = [];
-
-    if (contestType === 'OTHER' && exactCounts) {
-      // Exact count distribution logic
-      const legendaryList = uniqueMokis.filter(
-        (c) => c.rarity.toLowerCase() === 'legendary'
-      );
-      const epicList = uniqueMokis.filter(
-        (c) => c.rarity.toLowerCase() === 'epic'
-      );
-      const rareList = uniqueMokis.filter(
-        (c) => c.rarity.toLowerCase() === 'rare'
-      );
-      const basicList = uniqueMokis.filter((c) =>
-        ['basic', 'common'].includes(c.rarity.toLowerCase())
-      );
-
-      for (let count = 1; count <= 5; count++) {
-        if (
-          legendaryList.length >= exactCounts.legendary &&
-          epicList.length >= exactCounts.epic &&
-          rareList.length >= exactCounts.rare &&
-          basicList.length >= exactCounts.basic
-        ) {
-          const chunk: EnhancedCard[] = [
-            ...legendaryList.splice(0, exactCounts.legendary),
-            ...epicList.splice(0, exactCounts.epic),
-            ...rareList.splice(0, exactCounts.rare),
-            ...basicList.splice(0, exactCounts.basic),
-          ];
-
-          generatedLineups.push({
-            id: `auto-${Date.now()}-${count}`,
-            name: `${schemeCard.name} Auto ${count}`,
-            cards: [...chunk, schemeCard],
-          });
-        } else {
-          break; // Insufficient cards to fill the exact rarity combo for the next lineup
-        }
-      }
-    } else {
-      // Standard full greedy grouping
-      let count = 1;
-      for (
-        let i = 0;
-        i < uniqueMokis.length && generatedLineups.length < 5;
-        i += 4
-      ) {
-        const chunk = uniqueMokis.slice(i, i + 4);
-        if (chunk.length === 4) {
-          generatedLineups.push({
-            id: `auto-${Date.now()}-${count}`,
-            name: `${schemeCard.name} Auto ${count}`,
-            cards: [...chunk, schemeCard],
-          });
-          count++;
-        }
-      }
-    }
-
-    // Results
-    if (generatedLineups.length === 0) {
-      addToast(
-        'Not enough matching Mokis found for these restrictions.',
-        'error'
-      );
-    } else {
-      setCurrentAutoLineups(generatedLineups);
-      setAutoLineupsModalOpen(true);
-    }
-  };
 
   /* UI Helpers */
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -1163,7 +783,6 @@ export default function Home() {
             src="/icons/logo-ga-tools-2.png"
             alt="Grand Arena"
             className={styles.drawerLogo}
-            onClick={handleLogoClick}
           />
           <button
             className={styles.closeMenuButton}
@@ -1307,9 +926,7 @@ export default function Home() {
           onSave={handleSaveLineup}
           onUpdate={setLineup}
           onSuggestFilters={handleSuggestFilters}
-          onAutoLineups={handleAutoLineups}
           onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
-          activeSpecializations={filters.specialization ?? []}
         />
       </div>
 
@@ -1320,8 +937,6 @@ export default function Home() {
               src="/icons/logo-ga-tools-2.png"
               alt="Grand Arena Builder"
               className={styles.logo}
-              onClick={handleLogoClick}
-              style={{ cursor: 'pointer' }}
             />
 
             <div className={styles.infoWrapper} ref={infoWrapperRef}>
@@ -1530,9 +1145,7 @@ export default function Home() {
                   onSave={handleSaveLineup}
                   onUpdate={setLineup}
                   onSuggestFilters={handleSuggestFilters}
-                  onAutoLineups={handleAutoLineups}
                   onShowMessage={(msg) => addToast(msg, 'suggestion', true)}
-                  activeSpecializations={filters.specialization ?? []}
                 />
               </div>
             </div>
@@ -1730,24 +1343,7 @@ export default function Home() {
         <LoadingOverlay message="Loading cards..." />
       )}
 
-      {/* Request Contest Type Modal */}
-      <ContestTypeModal
-        isOpen={contestModalOpen}
-        onClose={() => setContestModalOpen(false)}
-        onGenerate={generateAutoLineups}
-      />
 
-      {/* Auto Lineups Modal */}
-      <AutoLineupsModal
-        isOpen={autoLineupsModalOpen}
-        onClose={() => setAutoLineupsModalOpen(false)}
-        autoLineups={currentAutoLineups}
-        onError={(msg) => addToast(msg, 'error')}
-        onSaveLineup={(name, cards) => {
-          saveLineupToStorage(name, cards);
-          addToast(`Lineup "${name}" Saved!`, 'success');
-        }}
-      />
 
       {/* Wallet Manager Modal */}
       {showWalletManagerModal && (
@@ -1781,12 +1377,6 @@ export default function Home() {
       {isLoadingUser && !showWalletInput && (
         <LoadingOverlay message="Loading cards..." />
       )}
-
-      <AdminLoginModal
-        isOpen={showAdminLogin}
-        onClose={() => setShowAdminLogin(false)}
-        onSuccess={() => setIsAdmin(true)}
-      />
 
       <Toast messages={toasts} onClose={removeToast} />
     </main>
