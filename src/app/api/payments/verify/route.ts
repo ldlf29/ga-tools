@@ -5,8 +5,8 @@ import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { ethers } from 'ethers';
 
-const RECIPIENT = process.env.PAYMENT_RECIPIENT!.toLowerCase();
-const USDC_CONTRACT = process.env.USDC_CONTRACT_RONIN!.toLowerCase();
+const RECIPIENT = (process.env.PAYMENT_RECIPIENT || '').toLowerCase();
+const USDC_CONTRACT = (process.env.USDC_CONTRACT_RONIN || '').toLowerCase();
 const RONIN_RPC = process.env.RONIN_RPC_URL || 'https://api.roninchain.com/rpc';
 const JWT_SECRET = new TextEncoder().encode(process.env.PREDICTIONS_JWT_SECRET!);
 const TRANSFER_TOPIC = ethers.id('Transfer(address,address,uint256)');
