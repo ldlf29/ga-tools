@@ -11,11 +11,11 @@ const RONIN_RPC = process.env.RONIN_RPC_URL || 'https://api.roninchain.com/rpc';
 const JWT_SECRET = new TextEncoder().encode(process.env.PREDICTIONS_JWT_SECRET!);
 const TRANSFER_TOPIC = ethers.id('Transfer(address,address,uint256)');
 
-const PLAN_USD: Record<string, number> = { DAILY: 1, WEEKLY: 5, SEASON: 20 };
+const PLAN_USD: Record<string, number> = { DAILY: 3, WEEKLY: 5, SEASON: 25 };
 const PLAN_DURATIONS_MS: Record<string, number> = {
-  DAILY: 24 * 3600 * 1000,
+  DAILY: 72 * 3600 * 1000,
   WEEKLY: 7 * 24 * 3600 * 1000,
-  SEASON: 90 * 24 * 3600 * 1000,
+  SEASON: 70 * 24 * 3600 * 1000,
 };
 
 /** Direct JSON-RPC call — more reliable than ethers with Ronin's public endpoint */
@@ -162,8 +162,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Amount validation failed', detail: err?.message }, { status: 400 });
   }
 
-  // 7. Grant subscription
-  const expiresAt = new Date(Date.now() + PLAN_DURATIONS_MS[plan]).toISOString();
+  // 7. Grant subscription – stack duration on top of existing active subscription
+  // If the user has an active plan, start counting from where it ends (not from now)
+  const { data: currentSub } = await supabaseAdmin
+    .from('predictions_subscriptions')
+    .select('expires_at')
+    .eq('wallet_address', walletAddress)
+    .eq('is_test_mode', false)
+    .gt('expires_at', new Date().toISOString())
+    .order('expires_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const baseTime = currentSub?.expires_at
+    ? Math.max(Date.now(), new Date(currentSub.expires_at).getTime())
+    : Date.now();
+  const expiresAt = new Date(baseTime + PLAN_DURATIONS_MS[plan]).toISOString();
+
   const { error: dbError } = await supabaseAdmin.from('predictions_subscriptions').insert({
     wallet_address: walletAddress,
     plan_type: plan,

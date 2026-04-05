@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAccount, useDisconnect, useSignMessage, useSendTransaction, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useDisconnect, useSignMessage, useSendTransaction, useWriteContract, useWaitForTransactionReceipt, useConnect } from 'wagmi';
+
 import { parseEther, parseUnits, type Address } from 'viem';
 import { TantoConnectButton } from '@sky-mavis/tanto-widget';
 import { SiweMessage } from 'siwe';
@@ -18,20 +19,34 @@ interface PlanInfo { usd: number; ronDisplay: string; ronWei: string; usdcDispla
 interface PriceData { ronUsdRate: number; plans: Record<Plan, PlanInfo>; }
 
 const PLAN_LABELS: Record<Plan, { title: string; duration: string; badge?: string }> = {
-  DAILY:  { title: 'DAILY',  duration: '24 hours' },
+  DAILY: { title: '3-DAYS', duration: '72 hours' },
   WEEKLY: { title: 'WEEKLY', duration: '7 days', badge: 'POPULAR' },
-  SEASON: { title: 'SEASON', duration: '90 days', badge: 'BEST VALUE' },
+  SEASON: { title: 'SEASON', duration: '6 WEEKS', badge: 'BEST VALUE' },
 };
-const PLAN_USD: Record<Plan, number> = { DAILY: 1, WEEKLY: 5, SEASON: 20 };
+const PLAN_USD: Record<Plan, number> = { DAILY: 3, WEEKLY: 5, SEASON: 25 };
 
-interface Props { children: React.ReactNode; }
+interface Props { 
+  children: React.ReactNode; 
+  hasUserCards?: boolean;
+  onLoadCards?: () => void;
+  onManageWallets?: () => void;
+}
 
-export default function PredictionsGate({ children }: Props) {
-  const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
+export default function PredictionsGate({ children, hasUserCards, onLoadCards, onManageWallets }: Props) {
+  const { address, isConnected, status: accountStatus } = useAccount();
+  // Suppress 'Connector not connected' wagmi error globally — our logout doesn't require
+  // the connector to be in a connected state; session clearing is server-side
+  const { disconnect } = useDisconnect({ mutation: { onError: () => {} } });
   const { signMessageAsync } = useSignMessage();
   const { sendTransactionAsync } = useSendTransaction();
   const { writeContractAsync } = useWriteContract();
+  const { connect, connectors } = useConnect();
+  // Prevent concurrent SIWE auth attempts
+  const authInProgress = React.useRef(false);
+  // Track if the wallet actively connected (went through 'connecting') vs was already connected on load
+  // We use this to avoid auto-triggering SIWE on page refresh without user action
+  const walletActivelyConnected = React.useRef(false);
+
 
   const [gateState, setGateState] = useState<GateState>('loading');
   const [isTestMode, setIsTestMode] = useState(false);
@@ -42,6 +57,14 @@ export default function PredictionsGate({ children }: Props) {
   const [statusMsg, setStatusMsg] = useState('');
   const [error, setError] = useState('');
   const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | undefined>();
+  // Track if SIWE was already completed in this session (wallet connected + signed)
+  const [siweCompleted, setSiweCompleted] = useState(false);
+  // Wallet address from server session (persists even if wagmi wallet disconnects)
+  const [sessionWallet, setSessionWallet] = useState<string | null>(null);
+  // Active plan type (used to disable EXTEND for SEASON)
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+  // Track if we came to the payment screen via the EXTEND button
+  const [isExtending, setIsExtending] = useState(false);
 
   const { isSuccess: txConfirmed } = useWaitForTransactionReceipt({ hash: pendingTxHash });
 
@@ -51,9 +74,18 @@ export default function PredictionsGate({ children }: Props) {
       .then(r => r.json())
       .then(d => {
         if (d.hasAccess) {
+          // Active subscription → show content directly
           setIsTestMode(d.isTestMode);
           setExpiresAt(d.expiresAt);
+          if (d.walletAddress) setSessionWallet(d.walletAddress);
+          if (d.planType) setCurrentPlan(d.planType);
           setGateState('active');
+        } else if (d.isSigned && d.walletAddress) {
+          // Valid JWT but no subscription → already signed, go to payment
+          // No need to request SIWE again
+          setSiweCompleted(true);
+          setSessionWallet(d.walletAddress);
+          setGateState('no-access');
         } else {
           setGateState('unauthenticated');
         }
@@ -61,13 +93,82 @@ export default function PredictionsGate({ children }: Props) {
       .catch(() => setGateState('unauthenticated'));
   }, []);
 
-  // When wallet connects and we're at login screen → auto trigger SIWE
+  // Track when user actively initiated a wallet connection (went through 'connecting' state)
   useEffect(() => {
-    if (isConnected && address && gateState === 'unauthenticated') {
-      performSiweAuth(address);
+    if (accountStatus === 'connecting') {
+      walletActivelyConnected.current = true;
+    }
+  }, [accountStatus]);
+
+  // When wallet ADDRESS changes (user switched wallets) → reset auth state so the new wallet is checked fresh
+  const prevAddressRef = React.useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (address && prevAddressRef.current && address !== prevAddressRef.current) {
+      setSiweCompleted(false);
+      setSessionWallet(null);
+      setError('');
+      setGateState('unauthenticated');
+    }
+    prevAddressRef.current = address;
+  }, [address]);
+
+  // Try to reconnect a previously-verified wallet WITHOUT asking for a signature.
+  // Falls back to full SIWE only if the wallet has never signed before (first time).
+  const performWalletAuth = useCallback(async (walletAddress: string) => {
+    if (authInProgress.current) return;
+    authInProgress.current = true;
+    setError('');
+    setGateState('signing');
+    setStatusMsg('Checking wallet…');
+    try {
+      // Step 1: try reconnect (no signature needed for known wallets)
+      const reconnectRes = await fetch('/api/auth/wallet-reconnect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress }),
+      });
+      const reconnectData = await reconnectRes.json();
+
+      if (reconnectData.known) {
+        // Wallet was previously verified — session issued, no signature needed
+        setIsTestMode(reconnectData.isTestMode);
+        setExpiresAt(reconnectData.expiresAt);
+        setSessionWallet(reconnectData.walletAddress);
+        if (reconnectData.planType) setCurrentPlan(reconnectData.planType);
+        setSiweCompleted(true);
+        setGateState(reconnectData.hasAccess ? 'active' : 'no-access');
+        setStatusMsg('');
+        authInProgress.current = false;
+        return;
+      }
+
+      // Step 2: Unknown wallet → require SIWE (first time proving ownership)
+      setStatusMsg('First time — please sign to verify wallet ownership…');
+      authInProgress.current = false; // release so performSiweAuth can acquire it
+      await performSiweAuth(walletAddress);
+    } catch {
+      setError('Connection failed. Please try again.');
+      setGateState('unauthenticated');
+      setStatusMsg('');
+      authInProgress.current = false;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-trigger wallet auth when user actively connects a wallet in this session
+  useEffect(() => {
+    if (
+      walletActivelyConnected.current &&
+      accountStatus === 'connected' &&
+      address &&
+      gateState === 'unauthenticated' &&
+      !siweCompleted &&
+      !authInProgress.current
+    ) {
+      performWalletAuth(address);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address]);
+  }, [accountStatus, address, gateState]);
 
   // When on-chain tx confirms → verify server-side
   useEffect(() => {
@@ -80,7 +181,7 @@ export default function PredictionsGate({ children }: Props) {
   // Load prices when user needs to pay
   useEffect(() => {
     if (gateState === 'no-access') {
-      fetch('/api/payments/ron-price').then(r => r.json()).then(setPriceData).catch(() => {});
+      fetch('/api/payments/ron-price').then(r => r.json()).then(setPriceData).catch(() => { });
     }
   }, [gateState]);
 
@@ -92,6 +193,8 @@ export default function PredictionsGate({ children }: Props) {
 
   // ── SIWE sign-in flow (for paid plans) ────────────────────────────
   const performSiweAuth = useCallback(async (walletAddress: string) => {
+    if (authInProgress.current) return; // prevent concurrent calls
+    authInProgress.current = true;
     setError('');
     setGateState('signing');
     setStatusMsg('Generating sign-in message…');
@@ -119,13 +222,21 @@ export default function PredictionsGate({ children }: Props) {
       if (!res.ok) throw new Error(data.error || 'Auth failed');
       setIsTestMode(data.isTestMode);
       setExpiresAt(data.expiresAt);
+      if (data.walletAddress) setSessionWallet(data.walletAddress);
+      setSiweCompleted(true);
       setGateState(data.hasAccess ? 'active' : 'no-access');
       setStatusMsg('');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Sign-in failed');
-      setGateState('unauthenticated');
+      const message = err instanceof Error ? err.message : 'Sign-in failed';
+      setError(message);
       setStatusMsg('');
-      disconnect();
+      setGateState('unauthenticated');
+      // Only disconnect if this was a user-rejected or auth error, not a 'connector not connected' hydration issue
+      if (!message.toLowerCase().includes('connector not connected')) {
+        disconnect();
+      }
+    } finally {
+      authInProgress.current = false;
     }
   }, [signMessageAsync, disconnect]);
 
@@ -134,7 +245,12 @@ export default function PredictionsGate({ children }: Props) {
     await fetch('/api/auth/session', { method: 'DELETE' });
     setIsTestMode(false);
     setExpiresAt(null);
+    setSessionWallet(null);
+    setSiweCompleted(false);
+    // Reset so SIWE doesn't auto-trigger again after logout (would need user to actively reconnect)
+    walletActivelyConnected.current = false;
     setGateState('unauthenticated');
+    // Disconnect wagmi — error is silenced via mutation.onError: () => {} in useDisconnect
     disconnect();
   }, [disconnect]);
 
@@ -157,7 +273,10 @@ export default function PredictionsGate({ children }: Props) {
       setStatusMsg('Waiting for confirmation…');
       setPendingTxHash(txHash);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Payment failed');
+      const raw = err instanceof Error ? err.message : '';
+      // Detect user rejection (viem surfaces this as a verbose message)
+      const isRejected = raw.toLowerCase().includes('user rejected') || raw.toLowerCase().includes('rejected the request');
+      setError(isRejected ? 'Payment cancelled.' : 'Payment failed. Please try again.');
       setGateState('no-access');
       setStatusMsg('');
     }
@@ -174,12 +293,16 @@ export default function PredictionsGate({ children }: Props) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed');
       setExpiresAt(data.expiresAt);
+      if (data.plan) setCurrentPlan(data.plan);
       setIsTestMode(false);
+      setIsExtending(false);
       setGateState('active');
       setStatusMsg('');
       setPendingTxHash(undefined);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Verification failed');
+      const raw = err instanceof Error ? err.message : '';
+      const isRejected = raw.toLowerCase().includes('user rejected') || raw.toLowerCase().includes('rejected the request');
+      setError(isRejected ? 'Payment cancelled.' : (raw || 'Verification failed. Please try again.'));
       setGateState('no-access');
       setStatusMsg('');
       setPendingTxHash(undefined);
@@ -211,19 +334,53 @@ export default function PredictionsGate({ children }: Props) {
         {isTestMode && (
           <div className={styles.testBanner}>
             ⚠️ TEST MODE — Scores &amp; rankings are simulated &nbsp;
-            <button className={styles.upgradeBannerBtn} onClick={() => { setIsTestMode(false); setGateState('unauthenticated'); }}>
+            <button className={styles.upgradeBannerBtn} onClick={() => { setIsTestMode(false); setGateState(sessionWallet ? 'no-access' : 'unauthenticated'); }}>
               UPGRADE TO REAL DATA
             </button>
           </div>
         )}
-        {!isTestMode && address && (
+        {!isTestMode && sessionWallet && (
           <div className={styles.sessionBar}>
             <span className={styles.walletBadge}>
               <span className={styles.greenDot} />
-              {address.slice(0, 6)}…{address.slice(-4)}
+              {sessionWallet.slice(0, 6)}…{sessionWallet.slice(-4)}
             </span>
-            {expiresAt && <span className={styles.expiryLabel}>Access until {new Date(expiresAt).toLocaleDateString()}</span>}
-            <button className={styles.logoutBtn} onClick={handleLogout}>LOG OUT</button>
+            {expiresAt && (
+              <span className={styles.expiryLabel}>
+                Access until <strong>{
+                  new Date(expiresAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                }</strong>
+              </span>
+            )}
+            <button
+              className={styles.extendBtn}
+              disabled={currentPlan === 'SEASON'}
+              title={currentPlan === 'SEASON' ? 'Season plan cannot be extended further' : 'Extend your access'}
+              onClick={() => { 
+                if (currentPlan !== 'SEASON') {
+                  setIsExtending(true);
+                  setGateState('no-access');
+                }
+              }}
+              style={currentPlan === 'SEASON' ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+            >
+              EXTEND
+            </button>
+            <div className={styles.sessionButtonGroup}>
+              <button 
+                className={styles.actionBtn} 
+                onClick={() => {
+                  if (hasUserCards) {
+                    onManageWallets?.();
+                  } else {
+                    onLoadCards?.();
+                  }
+                }}
+              >
+                LOAD CARDS
+              </button>
+              <button className={styles.logoutBtn} onClick={handleLogout}>LOG OUT</button>
+            </div>
           </div>
         )}
         {childrenWithProps}
@@ -245,14 +402,23 @@ export default function PredictionsGate({ children }: Props) {
     const planInfo = priceData?.plans[selectedPlan];
     return (
       <div className={styles.gate}>
-        <div className={styles.gateCard}>
+        <div className={styles.gateCard} style={{ position: 'relative' }}>
+          <button className={styles.backBtn} onClick={() => { 
+            setError(''); 
+            if (isExtending) {
+              setIsExtending(false);
+              setGateState('active');
+            } else {
+              setGateState('unauthenticated'); 
+            }
+          }}>GO BACK</button>
           <div className={styles.walletConnectedRow}>
             <span className={styles.greenDot} />
             <span className={styles.walletSmall}>{address?.slice(0, 8)}…{address?.slice(-4)}</span>
             <button className={styles.logoutLink} onClick={handleLogout}>Log out</button>
           </div>
           <h2 className={styles.gateTitle}>CHOOSE YOUR PLAN</h2>
-          <p className={styles.gateSubtitle}>Unlock AI-powered lineup predictions</p>
+          <p className={styles.gateSubtitle}>Unlock AI-powered Score Prediction and Auto Meta-Lineup Builder for any Contest.</p>
           <div className={styles.planGrid}>
             {(Object.keys(PLAN_LABELS) as Plan[]).map(plan => (
               <button key={plan} className={`${styles.planCard} ${selectedPlan === plan ? styles.planCardActive : ''}`} onClick={() => setSelectedPlan(plan)}>
@@ -288,20 +454,59 @@ export default function PredictionsGate({ children }: Props) {
   return (
     <div className={styles.gate}>
       <div className={styles.gateCard}>
-        <div className={styles.lockIcon}>🔐</div>
+        <div className={styles.lockIcon}>
+          <img
+            src="/images/moki-praying.png"
+            alt="Moki Praying"
+            className={styles.mokiPrayingImg}
+          />
+        </div>
         <h2 className={styles.gateTitle}>PREDICTIONS</h2>
         <p className={styles.gateSubtitle}>
-          AI-powered lineup predictions &amp; ranking for Grand Arena competitive play.
+          AI-powered Moki Champion Score Prediction and Auto Meta-Lineup Builder for any Contest.
         </p>
         {error && <p className={styles.errorMsg}>⚠️ {error}</p>}
         <div className={styles.connectBtnWrapper}>
-          <TantoConnectButton />
+          {accountStatus === 'connected' && address ? (
+            // Wallet already connected: show clear action button instead of Ronin SVG
+            // This handles both: GO BACK state (siweCompleted=true) and F5 (wallet pre-connected)
+            <button
+              className={styles.continuePayBtn}
+              onClick={() => {
+                if (siweCompleted) {
+                  // Already signed this session → go straight to plan selection
+                  setGateState('no-access');
+                } else {
+                  // Try reconnect first (no sign for known wallets), SIWE only for new wallets
+                  performWalletAuth(address);
+                }
+              }}
+            >
+              CONTINUE TO PAYMENT
+            </button>
+          ) : (
+            // No wallet connected → show Ronin sign-in SVG button
+            <button
+              className={styles.roninSignInBtn}
+              onClick={() => {
+                const roninConnector = connectors.find(c => c.id === 'roninWallet' || c.name?.toLowerCase().includes('ronin'));
+                if (roninConnector) connect({ connector: roninConnector });
+                else connect({ connector: connectors[0] });
+              }}
+            >
+              <img
+                src="/icons/basic-button-light-e78eacb75cafb49bc7c5a9268252865d.svg"
+                alt="Sign in with Ronin"
+                className={styles.roninSignInImg}
+              />
+            </button>
+          )}
         </div>
         <div className={styles.divider}><span>or</span></div>
         <button className={styles.testModeBtn} onClick={handleTestMode}>
           Try TEST MODE <span className={styles.freeTag}>FREE</span>
         </button>
-        <p className={styles.testModeHint}>Simulated data — no payment or wallet required</p>
+        <p className={styles.testModeHint}>Simulated data for testing functions, no payment required.</p>
       </div>
     </div>
   );

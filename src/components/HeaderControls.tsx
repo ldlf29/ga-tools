@@ -19,35 +19,7 @@ export const HeaderControls: React.FC<HeaderControlsProps> = ({
 }) => {
   return (
     <div className={styles.headerControls}>
-      <div className={styles.mokiButtonContainer}>
-        <button
-          onClick={() => {
-            if (!mokiDropdownOpen) {
-              setMokiDropdownOpen(true);
-              setTimeout(() => setMokiDropdownOpen(false), 1500);
-            }
-          }}
-          className={styles.mokiButton}
-          title="Dorime"
-        >
-          <img
-            src="/images/moki-praying.png"
-            alt="Moki"
-            width={iconSize}
-            height={iconSize}
-          />
-        </button>
-        <div
-          className={`${styles.mokiDropdown} ${mokiDropdownOpen ? styles.mokiDropdownOpen : ''}`}
-        >
-          <img
-            src="/icons/count.png"
-            alt="Count"
-            width={iconSize === 56 ? 24 : 20}
-            height={iconSize === 56 ? 24 : 20}
-          />
-        </div>
-      </div>
+
 
       <button
         onClick={() => setNotificationsEnabled(!notificationsEnabled)}

@@ -67,7 +67,7 @@ export default function Home() {
   /* Global UI State */
   const [activeTab, setActiveTab] = useState<
     'builder' | 'lineups' | 'predictions' | 'champions' | 'changelog'
-  >('builder');
+  >('predictions');
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const lastToastTimeRef = useRef<{ [key: string]: number }>({});
@@ -807,6 +807,15 @@ export default function Home() {
 
         <nav className={styles.navTabs}>
           <button
+            className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
+            onClick={() => {
+              handleMainTabChange('predictions');
+              closeDrawers();
+            }}
+          >
+            Predictions
+          </button>
+          <button
             className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
             onClick={() => {
               handleMainTabChange('builder');
@@ -824,17 +833,7 @@ export default function Home() {
           >
             My Lineups
           </button>
-          {isAdmin && (
-            <button
-              className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
-              onClick={() => {
-                handleMainTabChange('predictions');
-                closeDrawers();
-              }}
-            >
-              Predictions
-            </button>
-          )}
+
           <button
             className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
             onClick={() => {
@@ -978,6 +977,12 @@ export default function Home() {
             <nav className={`${styles.navContainer} ${styles.desktopOnly}`}>
               <div className={styles.navTabs}>
                 <button
+                  className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
+                  onClick={() => handleMainTabChange('predictions')}
+                >
+                  Predictions
+                </button>
+                <button
                   className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
                   onClick={() => handleMainTabChange('builder')}
                 >
@@ -989,14 +994,6 @@ export default function Home() {
                 >
                   My Lineups
                 </button>
-                {isAdmin && (
-                  <button
-                    className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
-                    onClick={() => handleMainTabChange('predictions')}
-                  >
-                    Predictions
-                  </button>
-                )}
                 <button
                   className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
                   onClick={() => handleMainTabChange('champions')}
@@ -1238,7 +1235,11 @@ export default function Home() {
               minHeight: 0,
             }}
           >
-            <PredictionsGate>
+            <PredictionsGate
+              hasUserCards={userWallets.length > 0}
+              onLoadCards={() => setShowWalletInput(true)}
+              onManageWallets={() => setShowWalletManagerModal(true)}
+            >
               <PredictionsTab allCards={allCards} userCards={userCards} cardMode={cardMode} />
             </PredictionsGate>
           </div>

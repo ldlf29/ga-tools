@@ -99,11 +99,21 @@ export async function POST(req: NextRequest) {
       expiresAt = testExpiresAt;
     }
 
-    // 8. Issue our 24h session JWT (httpOnly cookie)
+    // 8. Issue session JWT — valid until subscription expires (max 30 days)
+    // This avoids asking the user to re-sign daily when they have an active multi-day subscription
+    const now = Date.now();
+    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+    const subExpiryMs = expiresAt ? new Date(expiresAt).getTime() - now : 0;
+    const sessionDurationMs = hasAccess
+      ? Math.min(Math.max(subExpiryMs, 0) + 60 * 60 * 1000, thirtyDaysMs) // sub duration + 1h buffer, max 30d
+      : 60 * 60 * 1000; // 1h for no-access: wallet is known, quick re-auth if they pay
+    const sessionDurationSec = Math.ceil(sessionDurationMs / 1000);
+    const sessionExpiry = `${Math.ceil(sessionDurationMs / (1000 * 60 * 60))}h`;
+
     const sessionToken = await new SignJWT({ wallet: normalizedWallet })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('24h')
+      .setExpirationTime(sessionExpiry)
       .sign(JWT_SECRET);
 
     const response = NextResponse.json({ hasAccess, isTestMode, expiresAt, walletAddress: normalizedWallet });
@@ -111,7 +121,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60,
+      maxAge: sessionDurationSec,
       path: '/',
     });
     // Clear the one-time nonce cookie
