@@ -276,8 +276,7 @@
 
 .toggleButton svg {
   stroke-width: 4px;
-  filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000)
-    drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
+  filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000) drop-shadow(0 1px 0 #000) drop-shadow(0 -1px 0 #000);
 }
 
 .toggleButton:hover {
@@ -803,8 +802,7 @@
   height: 24px;
   stroke: currentColor;
   stroke-width: 3px;
-  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333)
-    drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }
 
 .modalSaveButton {
@@ -847,8 +845,7 @@
   height: 20px;
   stroke: currentColor;
   stroke-width: 3px;
-  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333)
-    drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }
 
 .editInput {
@@ -907,8 +904,7 @@
   color: #ffffff;
   cursor: pointer;
   transition: transform 0.2s;
-  filter: drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000)
-    drop-shadow(0 2px 0 #000) drop-shadow(0 -2px 0 #000);
+  filter: drop-shadow(2px 0 0 #000) drop-shadow(-2px 0 0 #000) drop-shadow(0 2px 0 #000) drop-shadow(0 -2px 0 #000);
   display: flex;
   align-items: center;
 }
@@ -1311,8 +1307,7 @@
   height: 20px;
   stroke-width: 3px;
   stroke: #ffd753;
-  filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black)
-    drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
+  filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
 }
 
 .orderByButton:hover {
@@ -1615,8 +1610,7 @@
   width: 28px;
   height: 28px;
   stroke-width: 3px;
-  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333)
-    drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }
 
 .exportButton {
@@ -1753,6 +1747,7 @@
 }
 
 @media (max-width: 1180px) {
+
   /* Modal Responsive Styles */
   .modalOverlay {
     z-index: 3000;
@@ -1870,7 +1865,7 @@
     margin-top: auto;
   }
 
-  .modalFooter > div:first-child {
+  .modalFooter>div:first-child {
     display: flex;
     justify-content: center;
     width: 100%;
@@ -1995,6 +1990,7 @@
 }
 
 @media (max-width: 1180px) {
+
   .placeholderCard:hover,
   .placeholderCard:active {
     transform: none !important;
@@ -2282,8 +2278,7 @@
     height: 20px;
     stroke-width: 4px;
     transform: translateX(-1.5px);
-    filter: drop-shadow(1px 0 0 rgba(0, 0, 0, 0.1))
-      drop-shadow(-1px 0 0 rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(1px 0 0 rgba(0, 0, 0, 0.1)) drop-shadow(-1px 0 0 rgba(0, 0, 0, 0.1));
   }
 
   .selectorMobileDrawerOpen .selectorDrawerCloseButton {
@@ -2384,8 +2379,7 @@
   height: 16px;
   stroke: currentColor;
   stroke-width: 3px;
-  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333)
-    drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
+  filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }
 
 /* Tablet Specific Adjustments (601px - 1180px) */

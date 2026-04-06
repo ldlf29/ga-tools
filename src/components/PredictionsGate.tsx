@@ -25,8 +25,8 @@ const PLAN_LABELS: Record<Plan, { title: string; duration: string; badge?: strin
 };
 const PLAN_USD: Record<Plan, number> = { DAILY: 3, WEEKLY: 5, SEASON: 25 };
 
-interface Props { 
-  children: React.ReactNode; 
+interface Props {
+  children: React.ReactNode;
   hasUserCards?: boolean;
   onLoadCards?: () => void;
   onManageWallets?: () => void;
@@ -36,7 +36,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
   const { address, isConnected, status: accountStatus } = useAccount();
   // Suppress 'Connector not connected' wagmi error globally — our logout doesn't require
   // the connector to be in a connected state; session clearing is server-side
-  const { disconnect } = useDisconnect({ mutation: { onError: () => {} } });
+  const { disconnect } = useDisconnect({ mutation: { onError: () => { } } });
   const { signMessageAsync } = useSignMessage();
   const { sendTransactionAsync } = useSendTransaction();
   const { writeContractAsync } = useWriteContract();
@@ -152,7 +152,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       setStatusMsg('');
       authInProgress.current = false;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-trigger wallet auth when user actively connects a wallet in this session
@@ -356,7 +356,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
               className={styles.extendBtn}
               disabled={currentPlan === 'SEASON'}
               title={currentPlan === 'SEASON' ? 'Season plan cannot be extended further' : 'Extend your access'}
-              onClick={() => { 
+              onClick={() => {
                 if (currentPlan !== 'SEASON') {
                   setIsExtending(true);
                   setGateState('no-access');
@@ -367,8 +367,8 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
               EXTEND
             </button>
             <div className={styles.sessionButtonGroup}>
-              <button 
-                className={styles.actionBtn} 
+              <button
+                className={styles.actionBtn}
                 onClick={() => {
                   if (hasUserCards) {
                     onManageWallets?.();
@@ -403,13 +403,13 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
     return (
       <div className={styles.gate}>
         <div className={styles.gateCard} style={{ position: 'relative' }}>
-          <button className={styles.backBtn} onClick={() => { 
-            setError(''); 
+          <button className={styles.backBtn} onClick={() => {
+            setError('');
             if (isExtending) {
               setIsExtending(false);
               setGateState('active');
             } else {
-              setGateState('unauthenticated'); 
+              setGateState('unauthenticated');
             }
           }}>GO BACK</button>
           <div className={styles.walletConnectedRow}>
@@ -482,7 +482,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
                 }
               }}
             >
-              CONTINUE TO PAYMENT
+              CONTINUE
             </button>
           ) : (
             // No wallet connected → show Ronin sign-in SVG button
