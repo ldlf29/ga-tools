@@ -101,61 +101,65 @@ async function run() {
   }
   console.log(`[Cron Upcoming] Loaded ${mokiStatsMap.size} moki stats for class override.`);
 
-  // 2. Extraer Partidos
-  // Usamos 15 páginas en lugar de 12 para compensar los Byes y partidos
-  // sin players que se filtran. Cada página tiene ~100 entradas brutas,
-  // pero solo ~75-80 son partidos reales insertables.
-  console.log('[Cron Upcoming] Extrayendo partidos (hasta 15 paginas de 100)...');
+  // 2. Extraer Partidos en Paralelo (batches de 5 páginas simultáneas)
+  console.log('[Cron Upcoming] Extrayendo partidos (15 páginas en batches paralelos de 5)...');
   const upcomingInserts: any[] = [];
   const TOTAL_PAGES = 15;
+  const BATCH_SIZE = 5;
 
-  for (let page = 1; page <= TOTAL_PAGES; page++) {
+  const fetchPage = async (page: number): Promise<any[]> => {
     const url = `${API_BASE_URL}/contests/${contestId}/matches?page=${page}&limit=100&state=scheduled`;
     try {
       const response = await fetch(url, { headers });
       if (!response.ok) {
         console.error(`[Cron Upcoming] API Error page ${page}: ${response.status}`);
-        continue;
+        return [];
       }
-
       const json = (await response.json()) as any;
       const matches = json.data || [];
-      // No cortamos el loop si una página sale vacía; la API puede tener
-      // huecos de paginación. Solo continuamos.
       if (matches.length === 0) {
-        console.warn(`[Cron Upcoming] Página ${page} vino vacía, continuando...`);
-        continue;
+        console.warn(`[Cron Upcoming] Página ${page} vino vacía.`);
       }
-
-      for (const match of matches) {
-        if (!match || !match.id) continue;
-        if (match.isBye) continue; // Ignoramos byes (faltas)
-        if (!match.players || match.players.length === 0) continue;
-
-        const overrideClass = (p: any) => {
-          if (p.name) {
-            const key = p.name.trim().toLowerCase();
-            const statsClass = mokiStatsMap.get(key);
-            if (statsClass) {
-              p.class = statsClass;
-            }
-          }
-          return p;
-        };
-
-        const teamRed = match.players.filter((p: any) => p.team === 'red').map(overrideClass);
-        const teamBlue = match.players.filter((p: any) => p.team === 'blue').map(overrideClass);
-
-        upcomingInserts.push({
-          id: match.id,
-          contest_id: contestId,
-          match_date: contest.startDate ? new Date(contest.startDate).toISOString() : new Date().toISOString(),
-          team_red: teamRed,
-          team_blue: teamBlue,
-        });
-      }
+      return matches;
     } catch (err) {
       console.error(`[Cron Upcoming] Error fetching page ${page}:`, err);
+      return [];
+    }
+  };
+
+  for (let batchStart = 1; batchStart <= TOTAL_PAGES; batchStart += BATCH_SIZE) {
+    const pages = Array.from(
+      { length: Math.min(BATCH_SIZE, TOTAL_PAGES - batchStart + 1) },
+      (_, i) => batchStart + i
+    );
+    console.log(`[Cron Upcoming] Batch: páginas ${pages[0]}–${pages[pages.length - 1]}...`);
+    const batchResults = await Promise.all(pages.map(fetchPage));
+    const allMatches = batchResults.flat();
+
+    for (const match of allMatches) {
+      if (!match || !match.id) continue;
+      if (match.isBye) continue;
+      if (!match.players || match.players.length === 0) continue;
+
+      const overrideClass = (p: any) => {
+        if (p.name) {
+          const key = p.name.trim().toLowerCase();
+          const statsClass = mokiStatsMap.get(key);
+          if (statsClass) p.class = statsClass;
+        }
+        return p;
+      };
+
+      const teamRed  = match.players.filter((p: any) => p.team === 'red').map(overrideClass);
+      const teamBlue = match.players.filter((p: any) => p.team === 'blue').map(overrideClass);
+
+      upcomingInserts.push({
+        id: match.id,
+        contest_id: contestId,
+        match_date: contest.startDate ? new Date(contest.startDate).toISOString() : new Date().toISOString(),
+        team_red:  teamRed,
+        team_blue: teamBlue,
+      });
     }
   }
 
@@ -245,7 +249,7 @@ async function run() {
       // 4a. Feedback Loop: Retrain with latest historical matches from Supabase
       console.log('[Cron Upcoming] Ejecutando Retraining (Feedback Loop)...');
       try {
-        const retrainOutput = execSync(`${pythonCommand} 10_retrain_from_supabase.py`, { 
+        const retrainOutput = execSync(`${pythonCommand} 7_retrain_from_supabase.py`, { 
           cwd: mlDir,
           env: { ...process.env }
         });
@@ -256,7 +260,7 @@ async function run() {
 
       // 4b. Ranking Generation
       console.log('[Cron Upcoming] Ejecutando Generación de Ranking (Cascade IA)...');
-      const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, { 
+      const mlOutput = execSync(`${pythonCommand} 5_generate_rank.py`, { 
         cwd: mlDir,
         env: { ...process.env }
       });
