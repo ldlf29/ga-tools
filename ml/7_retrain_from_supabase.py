@@ -72,51 +72,64 @@ def download_recent_matches():
 
 def extract_raw_row_v2(perf_json, moki_token_id):
     """Adaptación de Script 1 para procesar el JSON guardado en Supabase."""
-    # En Supabase guardamos match_data que es el objeto 'match' de la API
-    # Pero Script 1 esperaba el objeto 'performance' que contiene 'match' y 'results'
-    
-    # RE-CONSTRUIR estructura de performance si es posible
-    # Si Supabase guardó el match completo, buscamos los resultados de este moki específico
-    match = perf_json
+    match        = perf_json
     match_result = match.get("result", {})
-    players = match.get("players", [])
-    rp_list = match_result.get("players", [])
-    
-    # Encontrar stats de este moki
-    target_moki_stats = next((rp for rp in rp_list if rp.get("mokiTokenId") == moki_token_id or rp.get("token_id") == moki_token_id), None)
+    players      = match.get("players", [])     # Tiene mokiTokenId + mokiId + class
+    rp_list      = match_result.get("players", [])  # Tiene mokiId + stats (sin mokiTokenId)
+
+    # Paso 1: encontrar al moki por mokiTokenId en match_data.players
+    target_player = next(
+        (p for p in players if p.get("mokiTokenId") == moki_token_id),
+        None
+    )
+    if not target_player:
+        return None
+
+    # Paso 2: obtener su mokiId para buscar en result.players
+    target_moki_id = target_player.get("mokiId")
+
+    # Paso 3: buscar estadísticas en result.players usando mokiId
+    target_moki_stats = next(
+        (rp for rp in rp_list if rp.get("mokiId") == target_moki_id),
+        None
+    )
     if not target_moki_stats:
-        # Fallback: intentar por index si el orden coincide (riesgoso)
         return None
 
     row = {
         "moki_token_id": moki_token_id,
-        "perf_id": f"{match.get('id')}_{moki_token_id}", # ID sintético
-        "match_id": match.get("id"),
-        "match_date": match.get("matchDate", datetime.now().isoformat()),
-        "is_bye": False,
-        "res_won": target_moki_stats.get("won", False),
-        "res_win_type": match_result.get("winType", ""),
+        "perf_id":       f"{match.get('id')}_{moki_token_id}",
+        "match_id":      match.get("id"),
+        "match_date":    match.get("matchDate", datetime.now().isoformat()),
+        "is_bye":        False,
+        "res_won":          target_player.get("won", target_moki_stats.get("won", False)),
+        "res_win_type":     match_result.get("winType", ""),
         "res_eliminations": int(target_moki_stats.get("eliminations", 0)),
-        "res_deposits": int(target_moki_stats.get("deposits", 0)),
-        "res_wart_distance": float(target_moki_stats.get("wartDistance", 0.0)),
-        "res_deaths": int(target_moki_stats.get("deaths", 0)),
-        "res_ended_game": target_moki_stats.get("endedGame", False),
+        "res_deposits":     int(target_moki_stats.get("deposits", 0)),
+        "res_wart_distance":     float(target_moki_stats.get("wartDistance", 0.0)),
+        "res_deaths":            int(target_moki_stats.get("deaths", 0)),
+        "res_ended_game":        target_moki_stats.get("endedGame", False),
         "res_wart_ride_seconds": float(target_moki_stats.get("wartRideTimeSeconds", 0.0)),
         "res_buff_time_seconds": float(target_moki_stats.get("buffTimeSeconds", 0.0)),
-        "res_wart_closer": target_moki_stats.get("wartCloser", False),
-        "res_eaten_by_wart": int(target_moki_stats.get("eatenByWart", 0)),
-        "res_loose_ball_pickups": int(target_moki_stats.get("looseBallPickups", 0)),
-        "res_eating_while_riding": int(target_moki_stats.get("eatingWhileRiding", 0)),
-        "match_game_type": match.get("gameType", ""),
-        "match_team_won": str(match_result.get("teamWon", "")),
-        "match_win_type": match_result.get("winType", ""),
-        "match_duration": float(match_result.get("duration", 0.0)),
-        "match_ended_by": match_result.get("gameEndedBy", ""),
+        "res_wart_closer":       target_moki_stats.get("wartCloser", False),
+        "res_eaten_by_wart":     int(target_moki_stats.get("eatenByWart", 0)),
+        "res_loose_ball_pickups":    int(target_moki_stats.get("looseBallPickups", 0)),
+        "res_eating_while_riding":   int(target_moki_stats.get("eatingWhileRiding", 0)),
+        "match_game_type":  match.get("gameType", ""),
+        "match_team_won":   str(match_result.get("teamWon", "")),
+        "match_win_type":   match_result.get("winType", ""),
+        "match_duration":   float(match_result.get("duration", 0.0)),
+        "match_ended_by":   match_result.get("gameEndedBy", ""),
     }
+
+    # Determinar si ganó: el teamWon coincide con el team del jugador
+    team_won = str(match_result.get("teamWon", "")).lower()
+    player_team = str(target_player.get("team", "")).lower()
+    row["res_won"] = (team_won == player_team) if team_won and player_team else False
 
     for i, p in enumerate(players[:6], 1):
         row[f"p{i}_moki_id"]  = p.get("mokiId", "")
-        row[f"p{i}_token_id"] = p.get("mokiTokenId") or p.get("tokenId")
+        row[f"p{i}_token_id"] = p.get("mokiTokenId")
         row[f"p{i}_name"]     = p.get("name", "")
         row[f"p{i}_team"]     = str(p.get("team", ""))
         row[f"p{i}_class"]    = p.get("class", "")
@@ -134,6 +147,7 @@ def extract_raw_row_v2(perf_json, moki_token_id):
         row[f"rp{i}_eaten_by_wart"]     = int(rp.get("eatenByWart", 0))
 
     return row
+
 
 # ─── Main Process ─────────────────────────────────────────────────────────────
 
@@ -159,10 +173,22 @@ def main():
     df_new = pd.DataFrame(new_rows)
     print(f"[INFO] Se extrajeron {len(df_new)} filas de performance de Supabase.")
 
+    if df_new.empty:
+        print("[WARNING] No se pudieron extraer filas válidas de los datos de Supabase.")
+        print("[WARNING] Skipping retrain — se usará el modelo previo.")
+        return
+
     # 2. Merge with local
     if RAW_PATH.exists():
-        df_old = pd.read_csv(RAW_PATH)
-        df_combined = pd.concat([df_old, df_new], ignore_index=True)
+        try:
+            df_old = pd.read_csv(RAW_PATH)
+            if df_old.empty:
+                df_combined = df_new
+            else:
+                df_combined = pd.concat([df_old, df_new], ignore_index=True)
+        except Exception:
+            print("[WARN] No se pudo leer raw_matches.csv existente, usando solo data de Supabase.")
+            df_combined = df_new
     else:
         df_combined = df_new
 
