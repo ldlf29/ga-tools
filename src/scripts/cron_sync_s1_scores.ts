@@ -25,7 +25,7 @@ async function run() {
   }
 
   const results: any[] = [];
-  const TOTAL_PAGES = 2; // Assuming limit=100 will cover 180 mokis in 2 pages
+  const TOTAL_PAGES = 3; // Covers 240+ mokis in 3 pages (limit=100)
 
   for (let page = 1; page <= TOTAL_PAGES; page++) {
     const url = `${API_URL_BASE}?page=${page}&limit=100&sort=score&order=desc`;

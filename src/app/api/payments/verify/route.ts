@@ -71,7 +71,12 @@ export async function POST(req: Request) {
 
   // 2. Parse body
   const body = await req.json().catch(() => ({}));
-  const { txHash, plan, token } = body as { txHash: string; plan: string; token: 'RON' | 'USDC' };
+  const { txHash, plan, token, referralCode } = body as { txHash: string; plan: string; token: 'RON' | 'USDC'; referralCode?: string };
+
+  const VALID_REFERRALS = ['LUNA', 'WIL', 'ZEKI', 'KENSHI', 'ANTOO'];
+  const finalizedReferral = (referralCode && VALID_REFERRALS.includes(referralCode.toUpperCase())) 
+    ? referralCode.toUpperCase() 
+    : null;
 
   if (!txHash || !plan || !token) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   if (!PLAN_USD[plan]) return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
@@ -188,11 +193,25 @@ export async function POST(req: Request) {
     usd_value: usdValue,
     expires_at: expiresAt,
     is_test_mode: false,
+    used_referral_code: finalizedReferral,
   });
 
   if (dbError) {
     console.error('[PaymentVerify] DB error:', dbError.message);
     return NextResponse.json({ error: 'Failed to record subscription' }, { status: 500 });
+  }
+
+  // 8. Record Referral Commission if applicable
+  if (finalizedReferral) {
+    const commission = usdValue * 0.10;
+    const { error: refError } = await supabaseAdmin.from('referral_commissions').insert({
+      referral_code: finalizedReferral,
+      owed_usd: commission,
+      source_tx: txHash
+    });
+    if (refError) {
+      console.error('[PaymentVerify] Referral DB error (non-fatal):', refError.message);
+    }
   }
 
   return NextResponse.json({ success: true, expiresAt, plan });

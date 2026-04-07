@@ -102,9 +102,12 @@ async function run() {
   console.log(`[Cron Upcoming] Loaded ${mokiStatsMap.size} moki stats for class override.`);
 
   // 2. Extraer Partidos
-  console.log('[Cron Upcoming] Extrayendo 900 partidos (9 páginas)...');
+  // Usamos 15 páginas en lugar de 12 para compensar los Byes y partidos
+  // sin players que se filtran. Cada página tiene ~100 entradas brutas,
+  // pero solo ~75-80 son partidos reales insertables.
+  console.log('[Cron Upcoming] Extrayendo partidos (hasta 15 paginas de 100)...');
   const upcomingInserts: any[] = [];
-  const TOTAL_PAGES = 9;
+  const TOTAL_PAGES = 15;
 
   for (let page = 1; page <= TOTAL_PAGES; page++) {
     const url = `${API_BASE_URL}/contests/${contestId}/matches?page=${page}&limit=100&state=scheduled`;
@@ -117,7 +120,12 @@ async function run() {
 
       const json = (await response.json()) as any;
       const matches = json.data || [];
-      if (matches.length === 0) break;
+      // No cortamos el loop si una página sale vacía; la API puede tener
+      // huecos de paginación. Solo continuamos.
+      if (matches.length === 0) {
+        console.warn(`[Cron Upcoming] Página ${page} vino vacía, continuando...`);
+        continue;
+      }
 
       for (const match of matches) {
         if (!match || !match.id) continue;
@@ -279,6 +287,7 @@ async function run() {
           losses: parseFloat(r['Losses']),
           gacha_pts: parseFloat(r['Gacha Pts']),
           deaths: parseFloat(r['Deaths']),
+          kills: parseFloat(r['Kills'] || '0'),
           win_by_combat: parseFloat(r['Win By Combat']),
           fur: r['Fur'],
           traits: r['Traits'],
@@ -310,6 +319,7 @@ async function run() {
         } else {
           console.log('[Cron Upcoming] Successfully synced ranking records to Supabase.');
         }
+
       } else {
         console.warn('[Cron Upcoming] Ranking CSV not found at', csvPath);
       }

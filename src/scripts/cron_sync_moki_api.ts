@@ -2,6 +2,9 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
+import { execSync } from 'child_process';
+import { parse } from 'csv-parse/sync';
 import mokiMetadataRaw from '../data/mokiMetadata.json';
 
 // Carga de variables de entorno
@@ -145,9 +148,10 @@ async function run() {
       .from('class_changes')
       .insert(classChanges);
 
-    if (logErr)
+    if (logErr) {
       console.error('[Cron Sync Moki] Error logging class changes:', logErr);
-    else {
+    } else {
+      // Discord notification
       try {
         const { DiscordService } = await import('../services/DiscordService');
         await DiscordService.notifyClassChanges(classChanges);
@@ -156,6 +160,61 @@ async function run() {
           '[Cron Sync Moki] Discord notification failed:',
           discordErr
         );
+      }
+
+      // Trigger ML Re-Ranking (solo regenerar predicciones con las clases actualizadas)
+      console.log(`[Cron Sync Moki] Class change detected (${classChanges.length} changes). Triggering ML re-ranking...`);
+      try {
+        const projectRoot = path.resolve(__dirname, '../../');
+        let mlDir = path.join(projectRoot, 'ml');
+        if (!fs.existsSync(mlDir)) mlDir = path.join(projectRoot, 'ML');
+
+        let pythonCommand = process.platform === 'win32'
+          ? '.\\venv\\Scripts\\python.exe'
+          : './venv/bin/python';
+        if (process.env.GITHUB_ACTIONS === 'true') pythonCommand = 'python3';
+
+        const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, {
+          cwd: mlDir,
+          env: { ...process.env },
+        });
+        console.log(`[Cron Sync Moki] Ranking regenerated:\n${mlOutput.toString()}`);
+
+        // Sync Global Ranking CSV
+        const csvPath = path.join(mlDir, 'data', 'upcoming_180_ranking.csv');
+        if (fs.existsSync(csvPath)) {
+          const records = parse(fs.readFileSync(csvPath, 'utf8'), {
+            columns: true, skip_empty_lines: true, trim: true, bom: true,
+          });
+
+          const rankingUpserts = records.map((r: any) => ({
+            moki_id: parseInt(r['Moki ID']),
+            name: r['Name'],
+            class: r['Class'],
+            score: parseFloat(r['Score']),
+            win_rate: parseFloat(r['WinRate']),
+            wart_closer: parseFloat(r['Wart Closer']),
+            losses: parseFloat(r['Losses']),
+            gacha_pts: parseFloat(r['Gacha Pts']),
+            deaths: parseFloat(r['Deaths']),
+            kills: parseFloat(r['Kills'] || '0'),
+            win_by_combat: parseFloat(r['Win By Combat']),
+            fur: r['Fur'],
+            traits: r['Traits'],
+            eliminations_pct: parseFloat(r['Win Cond: Eliminations (%)']),
+            wart_pct: parseFloat(r['Win Cond: Wart (%)']),
+            gacha_pct: parseFloat(r['Win Cond: Gacha (%)']),
+            updated_at: new Date().toISOString(),
+          }));
+
+          await supabaseAdmin.from('moki_predictions_ranking').delete().neq('id', 0);
+          await supabaseAdmin.from('moki_predictions_ranking').insert(rankingUpserts);
+          console.log(`[Cron Sync Moki] Global ranking refreshed: ${rankingUpserts.length} records.`);
+        }
+      } catch (reRankErr: any) {
+        console.error('[Cron Sync Moki] Re-ranking failed (non-fatal):', reRankErr.message);
+        if (reRankErr.stdout) console.log(reRankErr.stdout.toString());
+        if (reRankErr.stderr) console.error(reRankErr.stderr.toString());
       }
     }
   }

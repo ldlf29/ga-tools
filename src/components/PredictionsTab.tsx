@@ -48,6 +48,41 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [selectedMetaScheme, setSelectedMetaScheme] = useState<string | null>(null);
   const [activeSort, setActiveSort] = useState<'SCORE' | 'WINRATE' | 'META'>('SCORE');
   const [mobileRankingOpen, setMobileRankingOpen] = useState(false);
+  const [isExpandedRankingOpen, setIsExpandedRankingOpen] = useState(false);
+  const [modalSortKey, setModalSortKey] = useState<string | null>(null);
+  const [modalSortDirection, setModalSortDirection] = useState<'asc' | 'desc'>('desc');
+  const handleModalSort = (key: string) => {
+    if (modalSortKey === key) {
+      setModalSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
+    } else {
+      setModalSortKey(key);
+      setModalSortDirection('desc');
+    }
+  };
+
+  useEffect(() => {
+    if (isExpandedRankingOpen) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsExpandedRankingOpen(false);
+        }
+      };
+      window.addEventListener('keydown', handleEscape);
+      return () => {
+        document.body.style.overflow = 'unset';
+        document.documentElement.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+    }
+  }, [isExpandedRankingOpen]);
+
+  const [modalFilters, setModalFilters] = useState({ class: 'ALL', fur: 'ALL', trait: 'ALL' });
+  const [openModalDropdown, setOpenModalDropdown] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     distribution: 'All',
     price: 'All',
@@ -65,6 +100,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     Losses: number;
     'Gacha Pts': number;
     Deaths: number;
+    Kills: number;
     'Win By Combat': number;
     Fur: string;
     Traits: string;
@@ -187,7 +223,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   };
 
   const getSortedTimeOptions = () => {
-    const rawOptions = ['01:00', '09:00', '17:00'];
+    const rawOptions = ['00:00', '14:00'];
     if (!useLocalTime) return ['All', ...rawOptions];
     
     return ['All', ...[...rawOptions].sort((a, b) => {
@@ -404,8 +440,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         metric = displayScore + (wartCloser * 175);
         displayScore = Math.round(metric);
       } else if (selectedMetaScheme === 'Collective Specialization') {
-        // Formula: (Gacha Pts + ((WinRate / 10) * 300)) + (Gacha Pts * 0.5)
-        const calculatedScore = (gachaPts + (winRateRaw / 10) * 300) + (gachaPts * 0.5);
+        // Formula: (Gacha Pts + ((WinRate / 10) * 200)) + (Gacha Pts * 0.5)
+        const calculatedScore = (gachaPts + (winRateRaw / 10) * 200) + (gachaPts * 0.5);
         displayScore = Math.round(calculatedScore);
         metric = displayScore;
       }
@@ -433,9 +469,74 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     return sorted;
   };
 
-  const allSortedRanking = getSortedRanking();
+  const allSortedRanking = getSortedRanking().map((m, i) => ({ ...m, _originalRank: i + 1 }));
   const currentRanking = allSortedRanking.slice(rankingPage * RANKING_PAGE_SIZE, (rankingPage + 1) * RANKING_PAGE_SIZE);
   const totalRankingPages = Math.ceil(allSortedRanking.length / RANKING_PAGE_SIZE);
+
+  // Derive unique options for modal filters
+  const availClasses = React.useMemo(() => [
+    "ALL", "DEFENDER", "STRIKER", "SPRINTER", "BRUISER", "GRINDER"
+  ], []);
+  const availFurs = React.useMemo(() => [
+    "ALL", "COMMON", "RAINBOW", "GOLD", "SHADOW", "SPIRIT", "1 OF 1"
+  ], []);
+  const availTraits = React.useMemo(() => [
+    "ALL", "Shapeshifting", "Tear jerking", "Costume party", "Dress To Impress", "Call To Arms", "Malicious Intent", "Housekeeping", "Dungaree Duel"
+  ], []);
+
+  const modalSortedRanking = React.useMemo(() => {
+    let filtered = allSortedRanking;
+
+    // Apply modal filters
+    if (modalFilters.class !== 'ALL') {
+      const classFilter = modalFilters.class.toLowerCase().trim();
+      filtered = filtered.filter(m => (m.Class || '').toLowerCase().trim() === classFilter);
+    }
+    if (modalFilters.fur !== 'ALL') {
+      const furFilter = modalFilters.fur.toLowerCase().trim();
+      filtered = filtered.filter(m => {
+        const dataFur = (m.Fur || '').toLowerCase().trim();
+        if (furFilter === '1 of 1') return dataFur === '1 of 1' || dataFur === '1-of-1';
+        return dataFur === furFilter;
+      });
+    }
+    if (modalFilters.trait !== 'ALL') {
+      filtered = filtered.filter(m => {
+        if (!m.Traits) return false;
+        if (modalFilters.trait === 'Shapeshifting') return hasTrait(m.Traits, ['Tongue Out', 'Tanuki', 'Kitsune', 'Cat Mask']);
+        if (modalFilters.trait === 'Tear jerking') return hasTrait(m.Traits, ['Crying Eye']);
+        if (modalFilters.trait === 'Costume party') return hasTrait(m.Traits, ['Onesie', 'Lemon', 'Kappa', 'Tomato', 'Blob Head']);
+        if (modalFilters.trait === 'Dress To Impress') return hasTrait(m.Traits, ['Kimono']);
+        if (modalFilters.trait === 'Call To Arms') return hasTrait(m.Traits, ['Ronin', 'Samurai']);
+        if (modalFilters.trait === 'Malicious Intent') return hasTrait(m.Traits, ['Devious Mouth', 'Oni', 'Tengu', 'Skull Mask']);
+        if (modalFilters.trait === 'Housekeeping') return hasTrait(m.Traits, ['Apron', 'Garbage Can', 'Gold Can', 'Toilet Paper']);
+        if (modalFilters.trait === 'Dungaree Duel') return hasTrait(m.Traits, ['Pink Overalls', 'Blue Overalls', 'Green Overalls']);
+        return false;
+      });
+    }
+
+    if (!modalSortKey) return filtered;
+    
+    return [...filtered].sort((a: any, b: any) => {
+      let valA = a[modalSortKey];
+      let valB = b[modalSortKey];
+
+      // Handle WinRate % if it's a string
+      if (modalSortKey === 'WinRate') {
+        valA = parseFloat(String(valA).replace('%', ''));
+        valB = parseFloat(String(valB).replace('%', ''));
+      }
+      
+      // Handle Score if sorted manually in modal
+      if (modalSortKey === 'Score') {
+        valA = a._displayScore || a.Score;
+        valB = b._displayScore || b.Score;
+      }
+
+      const diff = Number(valB || 0) - Number(valA || 0);
+      return modalSortDirection === 'desc' ? diff : -diff;
+    });
+  }, [allSortedRanking, modalSortKey, modalSortDirection, modalFilters]);
 
   const handleCardClick = (contest: Contest) => {
     setSelectedContest(contest);
@@ -792,7 +893,15 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         </button>
 
         <div className={styles.rankingBox}>
-            <h2 className={styles.rankingTitle}>PREDICTION RANKING</h2>
+            <div className={styles.rankingTitleRow}>
+              <h2 className={styles.rankingTitle}>PREDICTION RANKING</h2>
+              <button 
+                className={styles.expandRankingBtn}
+                onClick={() => setIsExpandedRankingOpen(true)}
+              >
+                EXPAND
+              </button>
+            </div>
             
             {rankingEffectiveDate && (
               <p className={styles.rankingDateLabel}>
@@ -1402,6 +1511,227 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
           }}
         >×</button>
       </div>,
+      document.body
+    )}
+
+    {mounted && createPortal(
+      <AnimatePresence>
+        {isExpandedRankingOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={styles.expandedRankingOverlay}
+            onClick={() => setIsExpandedRankingOpen(false)}
+          >
+            <motion.div
+              initial={{ y: 20, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.95 }}
+              className={styles.expandedRankingModal}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button className={styles.modalCloseButton} onClick={() => setIsExpandedRankingOpen(false)} style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 100 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+              <div className={styles.expandedHeader}>
+                <h2 className={styles.resultsTitle}>FULL RANKING DATA</h2>
+              </div>
+              
+              <div className={styles.expandedTableWrapper}>
+                <table className={styles.expandedTable}>
+                  <thead>
+                    <tr>
+                      <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '65px' }}>Rank</th>
+                      <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '80px' }}>Moki ID</th>
+                      <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '150px' }}>Name</th>
+                      <th className={styles.filterHeaderCell} style={{ width: '120px' }}>
+                        <div className={styles.modalFilterDropdown}>
+                          <button 
+                            className={`${styles.modalFilterBtn} ${modalFilters.class !== 'ALL' ? styles.activeFilter : ''}`}
+                            onClick={() => setOpenModalDropdown(openModalDropdown === 'class' ? null : 'class')}
+                          >
+                            CLASS
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'class' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </button>
+                          {openModalDropdown === 'class' && (
+                            <ul className={styles.modalFilterMenu}>
+                              {availClasses.map(c => (
+                                <li key={c} onClick={() => { setModalFilters(p => ({...p, class: c})); setOpenModalDropdown(null); }}>{c}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </th>
+                      <th 
+                        className={styles.sortableHeader} 
+                        onClick={() => handleModalSort('Score')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          Score 
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Score' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Score' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+                      <th 
+                        className={styles.sortableHeader} 
+                        onClick={() => handleModalSort('WinRate')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          WinRate
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'WinRate' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'WinRate' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+                      <th 
+                        className={styles.sortableHeader} 
+                        onClick={() => handleModalSort('Wart Closer')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          Wart Closer
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Wart Closer' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Wart Closer' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+                      <th 
+                        className={styles.sortableHeader} 
+                        onClick={() => handleModalSort('Losses')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          Losses
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Losses' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Losses' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+                      <th 
+                        className={styles.sortableHeader} 
+                        onClick={() => handleModalSort('Gacha Pts')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          Gacha Pts
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Gacha Pts' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Gacha Pts' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+                      <th 
+                        className={styles.sortableHeader} 
+                        onClick={() => handleModalSort('Deaths')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          Deaths
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Deaths' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Deaths' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+                      <th
+                        className={styles.sortableHeader}
+                        onClick={() => handleModalSort('Kills')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          Kills
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Kills' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Kills' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+
+                      <th 
+                        className={styles.sortableHeader} 
+                        onClick={() => handleModalSort('Win By Combat')}
+                        style={{ width: '100px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                          Win combat
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Win By Combat' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Win By Combat' ? 1 : 0.3 }}>
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                      </th>
+                      <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                        <div className={styles.modalFilterDropdown}>
+                          <button 
+                            className={`${styles.modalFilterBtn} ${modalFilters.fur !== 'ALL' ? styles.activeFilter : ''}`}
+                            onClick={() => setOpenModalDropdown(openModalDropdown === 'fur' ? null : 'fur')}
+                          >
+                            FUR
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'fur' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </button>
+                          {openModalDropdown === 'fur' && (
+                            <ul className={styles.modalFilterMenu}>
+                              {availFurs.map(f => (
+                                <li key={f} onClick={() => { setModalFilters(p => ({...p, fur: f})); setOpenModalDropdown(null); }}>{f}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </th>
+                      <th className={styles.filterHeaderCell} style={{ width: '250px' }}>
+                        <div className={styles.modalFilterDropdown}>
+                          <button 
+                            className={`${styles.modalFilterBtn} ${modalFilters.trait !== 'ALL' ? styles.activeFilter : ''}`}
+                            onClick={() => setOpenModalDropdown(openModalDropdown === 'trait' ? null : 'trait')}
+                          >
+                            TRAITS (SCHEME)
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'trait' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                              <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                          </button>
+                          {openModalDropdown === 'trait' && (
+                            <ul className={`${styles.modalFilterMenu} ${styles.rightMenu}`}>
+                              {availTraits.map(t => (
+                                <li key={t} onClick={() => { setModalFilters(p => ({...p, trait: t})); setOpenModalDropdown(null); }}>{t}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {modalSortedRanking.map((moki: any) => (
+                      <tr key={moki['Moki ID']}>
+                        <td><strong>#{moki._originalRank}</strong></td>
+                        <td><strong>{moki['Moki ID']}</strong></td>
+                        <td>{moki.Name}</td>
+                        <td style={{textTransform: 'uppercase'}}><strong>{moki.Class}</strong></td>
+                        <td style={{ color: '#ffd753', fontWeight: 'bold' }}>{moki._displayScore}</td>
+                        <td style={{ color: '#1abf9e', fontWeight: 'bold' }}>{moki.WinRate}%</td>
+                        <td>{moki['Wart Closer'] ? Number(moki['Wart Closer']).toFixed(2) : '0'}</td>
+                        <td style={{ color: '#ff6b6b' }}>{moki.Losses}</td>
+                        <td>{moki['Gacha Pts']}</td>
+                        <td>{moki.Deaths ? Number(moki.Deaths).toFixed(2) : '0'}</td>
+                        <td>{moki.Kills ? Number(moki.Kills).toFixed(2) : '0'}</td>
+                        <td>{moki['Win By Combat'] ? Number(moki['Win By Combat']).toFixed(2) : '0'}</td>
+                        <td>{moki.Fur}</td>
+                        <td className={styles.traitsCell}>{moki.Traits}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>,
       document.body
     )}
     </>

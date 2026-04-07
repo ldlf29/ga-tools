@@ -1654,5 +1654,539 @@
       "Ronin"
     ],
     "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8887"
+  },
+  "BOBA_FITT": {
+    "id": "1361",
+    "name": "Boba Fitt",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b5bf7f6537a0c7a4154dc138c6ac9d685d222b9b56fbdabbfccbc3bb22f28e30.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1361"
+  },
+  "CAVIAR": {
+    "id": "3607",
+    "name": "Caviar",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0f499304246912bcaee80e7717e46b023d9db5f03aaeeb1118e7c6d53d31402f.png",
+    "fur": "Rainbow",
+    "traits": [
+      "Tongue out"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3607"
+  },
+  "I_AM_KENOUGH": {
+    "id": "2767",
+    "name": "I AM KENOUGH",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/fa34d4dea919ed0868b89a4c257b802cedc44b775eadec36cb7bfb95cc41e8ad.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2767"
+  },
+  "ANGRY_BUNNY": {
+    "id": "2420",
+    "name": "Angry Bunny",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/33d7e48766a40fed6d6b02a35ae7bfd45d2fdf25693803668b9343f0a1e19768.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2420"
+  },
+  "FESTA": {
+    "id": "134",
+    "name": "Festa",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/bf6aaf2e5d42fe1dbe4deaa1b3e99ba7ef9b42e15875061610d7723056a1c27e.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/134"
+  },
+  "PINA_COLADA": {
+    "id": "8524",
+    "name": "Pina Colada",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0cf53963a7a879ae403fa7ef64deace19b5061a9f6ff1cce3ee4ae1b2b474628.png",
+    "fur": "Rainbow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8524"
+  },
+  "FUBAR": {
+    "id": "7662",
+    "name": "FUBAR",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/f71951d62f5a0faf87d57181a60bca385ac77d548a9bcc79cb73084756325492.png",
+    "fur": "Common",
+    "traits": [
+      "Tongue out",
+      "Straw Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7662"
+  },
+  "DONGKE_KEROT": {
+    "id": "548",
+    "name": "Dongke Kerot",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/c864c13fba9ba53cfce90d79a972f3779c17881921485ae6e846d8b8fc9dd895.png",
+    "fur": "Gold",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/548"
+  },
+  "THE_CLOGFATHER": {
+    "id": "5257",
+    "name": "The Clogfather",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/9342e82f5aa87c0b74027bcd2057a500318cbac59737398c5275a95beed289b4.png",
+    "fur": "Shadow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5257"
+  },
+  "OVER": {
+    "id": "1175",
+    "name": "Over",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/1a20d5426700a0f66f252ea01b6d718579ccfee7468336b08aeb8acb27e91695.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1175"
+  },
+  "ROMEO": {
+    "id": "5681",
+    "name": "Romeo",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/ef54b14d78a3c6c665de22a2dbcf3f9c079668747669e1b1206d286eb29db6d8.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5681"
+  },
+  "GATCHA": {
+    "id": "6753",
+    "name": "Gatcha",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/843d6467a1794e98be94ff4ba9e734cd1a2be0988f8f45de36ea5a9ce8111f00.png",
+    "fur": "Shadow",
+    "traits": [
+      "Rainbow Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6753"
+  },
+  "BANDIT": {
+    "id": "2202",
+    "name": "Bandit",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/f92bc781828e2a121ec2f3eb6546d3d13863a413c7bed4e239ea10f1d047fbc2.png",
+    "fur": "Rainbow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2202"
+  },
+  "BATTERED_CORN": {
+    "id": "6154",
+    "name": "Battered Corn",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b1fccbf7c171cbdbdadab9b3e35520d6ee1e74a8391778a1138992c315589c3b.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6154"
+  },
+  "ONIGIRI": {
+    "id": "6249",
+    "name": "Onigiri",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b4c217a8d610c58c1420f3650e4efe4f57def54ced2babaf6c7ce86ad6d9ba0c.png",
+    "fur": "Common",
+    "traits": [
+      "Horns"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6249"
+  },
+  "XUANYE": {
+    "id": "7795",
+    "name": "XuanYe",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/fc423ab284eaffc15decc2d2868a5869a3851563eb133fa7ce10fcb570bc93fc.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7795"
+  },
+  "HAM_SOLO": {
+    "id": "1599",
+    "name": "Ham Solo",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/5a01d3e9c7bbee21590bc11191e0edcf16b98a7e8d6d2608ce2c7e4eaa01c856.png",
+    "fur": "Common",
+    "traits": [
+      "Pig Onesie"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1599"
+  },
+  "CHILL_GUY": {
+    "id": "6942",
+    "name": "Chill Guy",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/6bd05f8720188ae192fb4fc2f90815817b9af40c5d44e7da616934bc09e232eb.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6942"
+  },
+  "HOSHINEKO": {
+    "id": "5044",
+    "name": "Hoshineko",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/e65e1d3dc2c2ca8ec589ed7794491a6d512a229d271dad4bbc7c2237896c7d2d.png",
+    "fur": "Spirit",
+    "traits": [
+      "Casual Kimono",
+      "Tanuki Mask"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5044"
+  },
+  "VERGIL": {
+    "id": "200",
+    "name": "VERGIL",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/5fd5188538f5219a616e289cdbf8d891eb11505afae67f4da6d55d66f59d297c.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/200"
+  },
+  "BIG_AND_TINY": {
+    "id": "2051",
+    "name": "Big And Tiny",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/aa5720ea19ec887d4bb4851742677d533771c9bd8441429bbd2566fcf316a0f5.png",
+    "fur": "Spirit",
+    "traits": [
+      "Spirit Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2051"
+  },
+  "MAIZE_WINDU": {
+    "id": "5085",
+    "name": "Maize Windu",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/618a0d58248018681c410e783e3e26fd972eeee1b3e61875ffea15eb43f2406b.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5085"
+  },
+  "FENGYE": {
+    "id": "8223",
+    "name": "FengYe",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/80b0190679cb9e78d58b842d5ae30935cb27e2b565a1881a0d27f0985c5e7be8.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8223"
+  },
+  "MINGYE": {
+    "id": "7149",
+    "name": "MingYe",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/3238986be8f01985cb3bd89fa9e2b04990c763769b2cc16f0e5711fe5fe18777.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7149"
+  },
+  "ANAKIN": {
+    "id": "7605",
+    "name": "Anakin",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/6e33b68be9c899d33a5ae21f74b0f98481eab73e25885bca282066e893bd039b.png",
+    "fur": "Spirit",
+    "traits": [
+      "Spirit Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7605"
+  },
+  "EGGXAVIER": {
+    "id": "3849",
+    "name": "EGGXAVIER",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/a35eebfda9d1f5f94978141999a9bc9c89f4a2887cac53c2423031254c0a308c.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3849"
+  },
+  "PUSHIME": {
+    "id": "3969",
+    "name": "Pushime",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/fde959d6fdfb3828307ec5d0382cc37a41ef56bd8170808915b4c01fb78d3dec.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3969"
+  },
+  "UNFAIRBANKS": {
+    "id": "5052",
+    "name": "Unfairbanks",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/4038f3b0386aeb33d21922c10dc9c8de9413d839bce8e5a6eddd147dec399f66.png",
+    "fur": "Rainbow",
+    "traits": [
+      "Blue Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5052"
+  },
+  "TEDDY": {
+    "id": "1861",
+    "name": "Teddy",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/20c451f4faf33d862a14920df4500d5d41594060cf294fc5f7e768bd68633221.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1861"
+  },
+  "DOVOLENA": {
+    "id": "5449",
+    "name": "Dovolena",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/863f6aeb94efc90908b61fcfb9d799cead3fe8e9a66afe23b4464d1f4034591e.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5449"
+  },
+  "JINJIN": {
+    "id": "2991",
+    "name": "Jinjin",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/40fdddabce956d68faf143f800c17d409756ef9c86c8067d2d2632c8786f2928.png",
+    "fur": "Shadow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2991"
+  },
+  "DWEEB": {
+    "id": "2568",
+    "name": "Dweeb",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/2f1d620e426f3d5100865fd23e41a7ffbe2f6d4721e50512ce9f8244c8ae788f.png",
+    "fur": "Common",
+    "traits": [
+      "Green Overalls"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2568"
+  },
+  "PIP_THE_MERMAID": {
+    "id": "8339",
+    "name": "Pip the Mermaid",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/4108bf177b7043f459d03826f316da40b141b1f970bedf8dfe4867eb8ce9050e.png",
+    "fur": "Gold",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8339"
+  },
+  "BONESY": {
+    "id": "2856",
+    "name": "Bonesy",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/d4aafce455b1f2449d54765ecdbffd6048bb69f435b8a161e5cc4ab8f6b5fdf2.png",
+    "fur": "Rainbow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2856"
+  },
+  "MATECITO": {
+    "id": "7555",
+    "name": "Matecito",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0c7920d23bf45b96f60ad8cfba6f77f0d17a9e20be8ab0c82546c64867f542f8.png",
+    "fur": "Rainbow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7555"
+  },
+  "JAZZY_JOSIE": {
+    "id": "2965",
+    "name": "Jazzy Josie",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/d92a0dddd584050c9c25bd73514ec553d1437fa6f747802b9487bb186ab1effb.png",
+    "fur": "Common",
+    "traits": [
+      "Blue Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2965"
+  },
+  "SAKURA": {
+    "id": "1440",
+    "name": "Sakura",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/04f9e842238f0cfb663db6bdd3b9af23f2dc69906924d7f352514fa2263acf52.png",
+    "fur": "Spirit",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1440"
+  },
+  "MCYOLO": {
+    "id": "209",
+    "name": "McYolo",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0c84e96710fe01870bbdc2faba552bb11b39902257db8c970574c12409098b98.png",
+    "fur": "Shadow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/209"
+  },
+  "OXYGN": {
+    "id": "7027",
+    "name": "Oxygn",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/62dbd7ef56d7d65be857bd91503462c65ccdb4e592bfc3d41ddccc285d835f17.png",
+    "fur": "Common",
+    "traits": [
+      "Ronin Moon",
+      "Blue Artist Apron"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7027"
+  },
+  "GRUMPY_MAID": {
+    "id": "7143",
+    "name": "Grumpy Maid",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/70dc6001fb7043f8a7bc9f722c627346477d2418d2df40837e3fdf93edc9ab44.png",
+    "fur": "Common",
+    "traits": [
+      "Maid Apron"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7143"
+  },
+  "PERK": {
+    "id": "3484",
+    "name": "Perk",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/65de308313d1797f66907b93215981e90f57157105deeae3a503e6eae24daa89.png",
+    "fur": "Rainbow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3484"
+  },
+  "RAMBO": {
+    "id": "7333",
+    "name": "Rambo",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/2d5edd5e015bb2bb455dfb87f1cea2a82c8ac09634fe87e98694171227e3c81e.png",
+    "fur": "Shadow",
+    "traits": [
+      "Tongue out"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7333"
+  },
+  "SAKUREI": {
+    "id": "7039",
+    "name": "Sakurei",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/73aa03843e4ff1b47ae26045bcc252986b9c0d21e6623d3c7ab1ff6eff2b8d00.png",
+    "fur": "Spirit",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7039"
+  },
+  "CAG": {
+    "id": "3156",
+    "name": "CAG",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/11a1cd8642ad3fae4de09daf3d63f81dcae79cbce1834491a22b9e5b9a267924.png",
+    "fur": "Rainbow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3156"
+  },
+  "YASHANUKI": {
+    "id": "4702",
+    "name": "Yashanuki",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/857b8db31cc93b26e8c57a48f0a01bedef607c4d9d255521644c6bd78d907347.png",
+    "fur": "Spirit",
+    "traits": [
+      "Tongue out",
+      "Casual Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4702"
+  },
+  "GOLDEN_BONES": {
+    "id": "4315",
+    "name": "Golden Bones",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/01949b94f45aaaab8bb0a2a482effe40c9ba99c8532370da832455a1e5cab751.png",
+    "fur": "Gold",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4315"
+  },
+  "SKULLY": {
+    "id": "5374",
+    "name": "Skully",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/647e6165f5f7372a956aa48604c0763b3d57faf48e7f2342b4949f5d637cea3b.png",
+    "fur": "Common",
+    "traits": [
+      "TMA Noble Skull"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5374"
+  },
+  "BRUTALIZER": {
+    "id": "3616",
+    "name": "Brutalizer",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/6615e1c2d55d485b99277ce75354753fe56dc172b3059f4ec6274044120e10d5.png",
+    "fur": "Gold",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3616"
+  },
+  "CORNPERNICUS": {
+    "id": "1628",
+    "name": "Cornpernicus",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/d622a364530d8d3aa44003bb3916eda6071ff8952210832793e891e7745f6ffe.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1628"
+  },
+  "THE_KILL3R": {
+    "id": "8388",
+    "name": "The Kill3r",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/a066335bbcbc92f5684ebcdb035437c449419b0edcb7131ccebd78325dfcb6e1.png",
+    "fur": "Rainbow",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8388"
+  },
+  "PRISMATIC": {
+    "id": "7637",
+    "name": "Prismatic",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b8b4866520a5e726feba1177891dfdfb15cfbed1c0a849d128b93e41c58fb10b.png",
+    "fur": "Common",
+    "traits": [
+      "Rainbow Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7637"
+  },
+  "POGGERS": {
+    "id": "888",
+    "name": "Poggers",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/875a989e18e0f92b2b9def911f12d4cf3628400ff3c74fba415a8cc1656bd30c.png",
+    "fur": "Common",
+    "traits": [
+      "Tongue out",
+      "Kappa Onesie"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/888"
+  },
+  "MAID_OF_HONOUR": {
+    "id": "3032",
+    "name": "Maid of Honour",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/2129e2a730b567322ebc3b1d8150b8cd3f55f3ee986d96c3fb55f9d2662768b4.png",
+    "fur": "Spirit",
+    "traits": [
+      "Tongue out",
+      "Maid Apron"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3032"
+  },
+  "HATSUNE_MOKI": {
+    "id": "4081",
+    "name": "Hatsune Moki",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/9b4b5fd83350b796d106220550cc0d7e0b2115a2d8f496fbd45ed6f5bc0aec73.png",
+    "fur": "Common",
+    "traits": [
+      "Casual Kimono"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4081"
+  },
+  "KABOOMARU": {
+    "id": "8124",
+    "name": "Kaboomaru",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/c82cc2438857e6a4b680c81a62bf96ae4622c204b7fd053bf099cd806d4f3212.png",
+    "fur": "Spirit",
+    "traits": [
+      "Tongue out"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8124"
+  },
+  "CRYBABY": {
+    "id": "798",
+    "name": "Crybaby",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/15005867ed43abd592f563a4532b011721db265b31074c94a1d9e3332dbde96e.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/798"
+  },
+  "TSURUGI": {
+    "id": "2766",
+    "name": "Tsurugi",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/c89d39cc42d13d6c644a9b41f39c415848c697abffee33d94601572f98dac9ed.png",
+    "fur": "Gold",
+    "traits": [
+      "White Sheep Onesie"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2766"
+  },
+  "RORONOA_TORA": {
+    "id": "4037",
+    "name": "Roronoa Tora",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0e81c5cb0ad30f1b0ff813201541069bd5f3b742370c02fa286f44e52d019045.png",
+    "fur": "Common",
+    "traits": [
+      "Tiger Onesie"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4037"
+  },
+  "VAEEKER": {
+    "id": "8483",
+    "name": "Vaeeker",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/e3f6f1ae91605207335da4594437ed9e709f5cc7d06cb14f4f7f8bc3f32d57a9.png",
+    "fur": "Common",
+    "traits": [],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8483"
+  },
+  "POOTEA": {
+    "id": "5690",
+    "name": "PooTEA",
+    "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/ed761f863b1b9b5759ac2fae2512313b979cbbe9d8036e7be339cbccada8e6ec.png",
+    "fur": "Shadow",
+    "traits": [
+      "Ronin"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5690"
   }
 }

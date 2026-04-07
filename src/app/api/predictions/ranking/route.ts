@@ -66,6 +66,7 @@ export async function GET(req: NextRequest) {
       'Losses': r.losses,
       'Gacha Pts': r.gacha_pts,
       'Deaths': r.deaths,
+      'Kills': r.kills,
       'Win By Combat': r.win_by_combat,
       'Fur': r.fur,
       'Traits': r.traits,

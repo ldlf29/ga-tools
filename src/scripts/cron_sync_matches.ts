@@ -171,7 +171,7 @@ async function run() {
   try {
     const { data: deletedData, error: cleanupErr } = await supabaseAdmin.rpc(
       'cleanup_old_matches',
-      { keep_count: 40 }
+      { keep_count: 30 }  // 30 matches por Moki × 240 Mokis = ~7200 filas máx en la tabla
     );
 
     if (cleanupErr) {

@@ -95,12 +95,12 @@ const TRAIT_FUR_SCHEMES: SchemeDef[] = [
   { name: 'Midnight Strike', image: '/scheme/midnight strike.png', type: 'fur', values: ['Shadow'] },
   { name: 'Golden Shower', image: '/scheme/golden shower.png', type: 'fur', values: ['Gold'] },
   { name: 'Rainbow Riot', image: '/scheme/rainbow riot.png', type: 'fur', values: ['Rainbow'] },
-  { name: 'Shapeshifting', image: '/scheme/shapeshifting.png', type: 'trait', values: ['Tongue Out', 'Tanuki', 'Kitsune', 'Cat Mask'] },
+  { name: 'Shapeshifting', image: '/scheme/shapeshifting.png', type: 'trait', values: ['Tongue Out', 'Tanuki Mask', 'Kitsune Mask', 'Cat Mask'] },
   { name: 'Tear jerking', image: '/scheme/tear jerking.png', type: 'trait', values: ['Crying Eye'] },
-  { name: 'Costume party', image: '/scheme/costume party.png', type: 'trait', values: ['Onesie', 'Lemon', 'Kappa', 'Tomato', 'Blob Head'] },
+  { name: 'Costume party', image: '/scheme/costume party.png', type: 'trait', values: ['Onesie', 'Lemon Head', 'Kappa Head', 'Tomato Head', 'Blob Head'] },
   { name: 'Dress To Impress', image: '/scheme/dress to impress.png', type: 'trait', values: ['Kimono'] },
   { name: 'Call To Arms', image: '/scheme/call to arms.png', type: 'trait', values: ['Ronin', 'Samurai', 'Ronin Aurora', 'Ronin Moon'] },
-  { name: 'Malicious Intent', image: '/scheme/malicious intent.png', type: 'trait', values: ['Devious Mouth', 'Oni', 'Tengu', 'Skull Mask'] },
+  { name: 'Malicious Intent', image: '/scheme/malicious intent.png', type: 'trait', values: ['Devious Mouth', 'Oni Mask', 'Tengu Mask', 'Skull Mask', 'Horns', 'TMA Noble Skull'] },
   { name: 'Housekeeping', image: '/scheme/housekeeping.png', type: 'trait', values: ['Apron', 'Garbage Can', 'Gold Can', 'Toilet Paper'] },
   { name: 'Dungaree Duel', image: '/scheme/dungaree duel.png', type: 'trait', values: ['Pink Overalls', 'Blue Overalls', 'Green Overalls'] },
 ];
@@ -258,7 +258,7 @@ function getSchemeBonus(moki: MokiCandidate, scoreType: ScoreType): number {
 function calcValidationScore(moki: MokiCandidate, scoreType: ScoreType): number {
   // Validation Score: (Base Score) + Bonuses (NO Rarity Multiplier)
   if (scoreType === 'gacha') {
-    return (moki.gachaPts + (moki.winRate / 10) * 300) + (moki.gachaPts * 0.5);
+    return (moki.gachaPts + (moki.winRate / 10) * 200) + (moki.gachaPts * 0.5);
   }
   return moki.baseScore + getSchemeBonus(moki, scoreType);
 }
@@ -267,7 +267,7 @@ function calcRankingScore(moki: MokiCandidate, scoreType: ScoreType): number {
   // Ranking Score (Effective): (Base Score * Multiplier) + Bonuses
   const multiplier = getRarityMultiplier(moki.rarity);
   if (scoreType === 'gacha') {
-    return (moki.gachaPts + (moki.winRate / 10) * 300) * multiplier + (moki.gachaPts * 0.5);
+    return (moki.gachaPts + (moki.winRate / 10) * 200) * multiplier + (moki.gachaPts * 0.5);
   }
   return (moki.baseScore * multiplier) + getSchemeBonus(moki, scoreType);
 }
@@ -298,6 +298,9 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup): MokiCa
 
     const name = row.Name;
     if (!name) continue;
+
+    // Filtro de seguridad: ignorar los 60 Mokis nuevos que no están en el catálogo de cartas
+    if (!catalogLookup.has(String(name).toUpperCase())) continue;
 
     const baseMoki = {
       name,
@@ -410,10 +413,12 @@ function buildLineup(
 
   if (schemeType === 'trait-fur') {
     const rawSum = mokis.reduce((s, m) => s + m.baseScore, 0);
-    if (rawSum < 14000) return null;
+    // Ajustado al nuevo meta (Promedios de 2600-2700 pts * 4 = 10400)
+    if (rawSum < 10000) return null;
   } else if (schemeType === 'relegated') {
     const valScore = lineupTotalValidation(mokis, scoreType);
-    if (valScore < 18000) return null;
+    // Ajustado al nuevo meta (Base 10400 + 4000 en bonos)
+    if (valScore < 13000) return null;
   }
 
   const totalEffectiveScore = lineupTotalEffective(mokis, scoreType);
@@ -519,7 +524,7 @@ function generateOneOfEach(
 
     if (selected.length === 4) {
       const valScore = lineupTotalValidation(selected, 'one-of-each');
-      if (valScore >= 18000) {
+      if (valScore >= 13000) {
         const fingerprint = getLineupFingerprint(selected);
         if (!seenFingerprints.has(fingerprint)) {
           const totalEffectiveScore = lineupTotalEffective(selected, 'one-of-each');
@@ -692,7 +697,7 @@ function generateStandard(
       let currentPool = getAvailablePool();
       
       if (schemeDef.scoreType === 'wart') {
-        currentPool = currentPool.filter(m => m.wartCloser > 5 && (m.class.toLowerCase() !== 'striker' && m.class.toLowerCase() !== 'sprinter'));
+        currentPool = currentPool.filter(m => m.wartCloser > 5 && (m.class.toLowerCase() !== 'striker'));
       } else if (schemeDef.scoreType === 'dive') {
         currentPool = currentPool.filter(m => m.losses > 5);
       } else if (schemeDef.scoreType === 'gacha') {

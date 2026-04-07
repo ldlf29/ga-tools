@@ -57,6 +57,9 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
   const [statusMsg, setStatusMsg] = useState('');
   const [error, setError] = useState('');
   const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | undefined>();
+  const [referralInputText, setReferralInputText] = useState('');
+  const [appliedReferral, setAppliedReferral] = useState('');
+  const [referralError, setReferralError] = useState(false);
   // Track if SIWE was already completed in this session (wallet connected + signed)
   const [siweCompleted, setSiweCompleted] = useState(false);
   // Wallet address from server session (persists even if wagmi wallet disconnects)
@@ -288,7 +291,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       const res = await fetch('/api/payments/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ txHash, plan: selectedPlan, token: selectedToken }),
+        body: JSON.stringify({ txHash, plan: selectedPlan, token: selectedToken, referralCode: appliedReferral }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed');
@@ -307,7 +310,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       setStatusMsg('');
       setPendingTxHash(undefined);
     }
-  }, [selectedPlan, selectedToken]);
+  }, [selectedPlan, selectedToken, appliedReferral]);
 
   // Inject isTestMode into children (→ PredictionsTab) via cloneElement
   const childrenWithProps = React.Children.map(children, child =>
@@ -432,6 +435,63 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
           <div className={styles.tokenToggle}>
             <button className={`${styles.tokenBtn} ${selectedToken === 'USDC' ? styles.tokenActive : ''}`} onClick={() => setSelectedToken('USDC')}>USDC</button>
             <button className={`${styles.tokenBtn} ${selectedToken === 'RON' ? styles.tokenActive : ''}`} onClick={() => setSelectedToken('RON')}>RON</button>
+          </div>
+          <div className={styles.referralContainer}>
+            {appliedReferral ? (
+              <div className={styles.referralBadge}>
+                Code applied: <strong>{appliedReferral}</strong>
+                <button
+                  className={styles.referralRemoveBtn}
+                  onClick={() => {
+                    setAppliedReferral('');
+                    setReferralError(false);
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className={styles.referralInputGroup}>
+                  <input
+                    type="text"
+                    placeholder="Referral Code (Optional)"
+                    className={`${styles.referralInput} ${referralError ? styles.referralInputError : ''}`}
+                    value={referralInputText}
+                    onChange={(e) => {
+                      const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+                      setReferralInputText(val);
+                      setReferralError(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const VALID_REFERRALS = ['LUNA', 'WIL', 'ZEKI', 'KENSHI', 'ANTOO'];
+                        if (VALID_REFERRALS.includes(referralInputText)) setAppliedReferral(referralInputText);
+                        else setReferralError(true);
+                      }
+                    }}
+                  />
+                  <button
+                    className={styles.referralAddBtn}
+                    onClick={() => {
+                      if (!referralInputText) return;
+                      const VALID_REFERRALS = ['LUNA', 'WIL', 'ZEKI', 'KENSHI', 'ANTOO'];
+                      if (VALID_REFERRALS.includes(referralInputText)) {
+                        setAppliedReferral(referralInputText);
+                        setReferralInputText('');
+                        setReferralError(false);
+                      } else {
+                        setReferralError(true);
+                      }
+                    }}
+                  >
+                    ADD
+                  </button>
+                </div>
+                {referralError && <span className={styles.referralErrorMsg}>Invalid code</span>}
+              </>
+            )}
           </div>
           {planInfo && (
             <div className={styles.priceDisplay}>
