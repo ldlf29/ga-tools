@@ -15,6 +15,7 @@ import {
   getRarityMultiplier,
 } from '@/utils/lineupGenerator';
 import { EnhancedCard } from '@/types';
+import { isSchemeTrait } from '@/data/traitMapping';
 
 interface PredictionsTabProps {
   allCards?: EnhancedCard[];
@@ -1731,7 +1732,12 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                         <td>{moki.Kills ? Number(moki.Kills).toFixed(2) : '0'}</td>
                         <td>{moki['Win By Combat'] ? Number(moki['Win By Combat']).toFixed(2) : '0'}</td>
                         <td>{moki.Fur}</td>
-                        <td className={styles.traitsCell}>{moki.Traits}</td>
+                        <td className={styles.traitsCell}>
+                          {moki.Traits.split(',')
+                            .map((t: string) => t.trim())
+                            .filter((t: string) => isSchemeTrait(t))
+                            .join(', ')}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

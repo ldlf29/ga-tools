@@ -7,8 +7,8 @@ import styles from './CardModal.module.css';
 import NextImage from 'next/image';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { isSchemeTrait } from '@/data/traitMapping';
 import { getStatValueByLimit } from '@/utils/specializationUtils';
-import { SCHEME_RELEVANT_TRAITS } from '@/utils/constants';
 
 interface CardModalProps {
   card: EnhancedCard | null;
@@ -275,7 +275,7 @@ export default function CardModal({
 
                   {(() => {
                     const schemeTraits = (card.custom.traits ?? []).filter((t) =>
-                      SCHEME_RELEVANT_TRAITS.has(t)
+                      isSchemeTrait(t)
                     );
                     if (schemeTraits.length === 0) return null;
                     return (

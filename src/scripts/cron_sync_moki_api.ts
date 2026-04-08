@@ -128,18 +128,10 @@ async function run() {
     const totalSum = str + spd + def + dex + fort;
 
     // Lookup by moki_id (stable) instead of name (fragile)
-    const existingDbRow = dbMap.get(tokenIdNum) || {
-      name: canonicalName,
-      moki_id: tokenIdNum,
-      eliminations: 0,
-      deposits: 0,
-      wart_distance: 0,
-      score: 0,
-      win_rate: 0,
-      stars: 0,
-    };
-
-    const oldClass = existingDbRow.class || '';
+    const existingDbRow = dbMap.get(tokenIdNum);
+    
+    // Si la fila ya existe, conservamos sus estrellas y otros campos calculados
+    const oldClass = existingDbRow?.class || '';
     if (oldClass && oldClass !== apiClass && apiClass !== '') {
       classChanges.push({
         moki_id: tokenIdNum,
@@ -149,10 +141,9 @@ async function run() {
       });
     }
 
-    updatesToSupabase.push({
-      ...existingDbRow,
-      moki_id: tokenIdNum,      // Stable join key
-      name: canonicalName,       // From mokiMetadata, NOT from API
+    const mokiUpdate: any = {
+      moki_id: tokenIdNum,
+      name: canonicalName,
       class: apiClass || oldClass,
       defense: def,
       dexterity: dex,
@@ -162,7 +153,15 @@ async function run() {
       total_stats: totalSum,
       train: totalTrain,
       last_updated: new Date().toISOString(),
-    });
+    };
+
+    // Solo preservamos la columna 'stars' si ya existe en la DB, 
+    // tal como se solicitó para evitar que el cron la sobreescriba.
+    if (existingDbRow && existingDbRow.stars !== undefined) {
+      mokiUpdate.stars = existingDbRow.stars;
+    }
+
+    updatesToSupabase.push(mokiUpdate);
   }
 
   // A. Class Changes
@@ -250,12 +249,10 @@ async function run() {
     console.log(
       `[Cron Sync Moki] Upserting ${updatesToSupabase.length} Moki stats...`
     );
-    // PHASE 1: upsert on 'name' (current PK) to populate moki_id on existing rows.
-    // Once all rows have moki_id set and the DB PK is migrated to moki_id,
-    // change this back to onConflict: 'moki_id'.
+    // Usamos moki_id como clave de conflicto ya que el usuario confirmó que name ya no es el PK.
     const { error: upsertErr } = await supabaseAdmin
       .from('moki_stats')
-      .upsert(updatesToSupabase, { onConflict: 'name' });
+      .upsert(updatesToSupabase, { onConflict: 'moki_id' });
 
     if (upsertErr) console.error('[Cron Sync Moki] Upsert Error:', upsertErr);
   }
