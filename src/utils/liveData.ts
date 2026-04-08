@@ -7,6 +7,7 @@ interface MokiMetadata {
   portraitUrl?: string;
   fur?: string;
   traits?: string[];
+  schemes?: string[];
   marketLink?: string;
 }
 
@@ -39,12 +40,7 @@ export interface MokiData {
   avgScore20?: number;
   avgWinRate20?: number;
 
-  // Last 30 Averages
-  avgEliminations30?: number;
-  avgDeposits30?: number;
-  avgWartDistance30?: number;
-  avgScore30?: number;
-  avgWinRate30?: number;
+
   avgEndedGame10?: number;
   avgDeaths10?: number;
   avgEatingWhileRiding10?: number;
@@ -61,14 +57,6 @@ export interface MokiData {
   avgLooseBallPickups20?: number;
   avgEatenByWart20?: number;
   avgWartCloser20?: number;
-  avgEndedGame30?: number;
-  avgDeaths30?: number;
-  avgEatingWhileRiding30?: number;
-  avgBuffTime30?: number;
-  avgWartTime30?: number;
-  avgLooseBallPickups30?: number;
-  avgEatenByWart30?: number;
-  avgWartCloser30?: number;
 
   // Backwards compatibility
   avgEliminations?: number;
@@ -85,6 +73,7 @@ export interface MokiData {
   totalStats?: number;
   train?: number;
   marketLink?: string;
+  traitSchemes?: string[];
 }
 
 export type LiveDataMap = Record<string, MokiData>;
@@ -126,33 +115,43 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
       // Merge with our Local Source of Truth (mokiMetadata)
       const statsWithIdentity: LiveDataMap = { ...data };
 
-      // Ensure every Moki in our identity map is present and has its correct visual data
-      Object.keys(mokiMetadata).forEach((name) => {
-        const identity = mokiMetadata[name];
-        if (statsWithIdentity[name]) {
+      // Ensure every Moki in our identity map is present and has its correct visual data.
+      // Keys in mokiMetadata may use underscores (e.g. "GOLDEN_BONES") while the stats
+      // API uses spaces (e.g. "GOLDEN BONES"). Normalize to spaces for consistent lookup.
+      Object.keys(mokiMetadata).forEach((key) => {
+        const identity = mokiMetadata[key];
+        // Normalize: underscore → space, so "GOLDEN_BONES" becomes "GOLDEN BONES"
+        const normalizedKey = key.replace(/_/g, ' ');
+
+        if (statsWithIdentity[normalizedKey]) {
           // Overwrite with local identity data for consistency
-          statsWithIdentity[name].imageUrl =
-            identity.portraitUrl || statsWithIdentity[name].imageUrl;
-          statsWithIdentity[name].fur =
-            identity.fur || statsWithIdentity[name].fur || '';
-          statsWithIdentity[name].traits =
+          statsWithIdentity[normalizedKey].imageUrl =
+            identity.portraitUrl || statsWithIdentity[normalizedKey].imageUrl;
+          statsWithIdentity[normalizedKey].fur =
+            identity.fur || statsWithIdentity[normalizedKey].fur || '';
+          statsWithIdentity[normalizedKey].traits =
             identity.traits && identity.traits.length > 0
               ? identity.traits
-              : statsWithIdentity[name].traits || [];
-          statsWithIdentity[name].marketLink =
-            identity.marketLink || statsWithIdentity[name].marketLink;
-          statsWithIdentity[name].tokenId = identity.id
+              : statsWithIdentity[normalizedKey].traits || [];
+          statsWithIdentity[normalizedKey].marketLink =
+            identity.marketLink || statsWithIdentity[normalizedKey].marketLink;
+          statsWithIdentity[normalizedKey].traitSchemes =
+            identity.schemes && identity.schemes.length > 0
+              ? identity.schemes
+              : statsWithIdentity[normalizedKey].traitSchemes || [];
+          statsWithIdentity[normalizedKey].tokenId = identity.id
             ? parseInt(identity.id, 10)
             : undefined;
         } else {
-          // If a Moki exists in our identity database but isn't in the stats sheet yet
-          statsWithIdentity[name] = {
+          // Moki exists in identity database but not in stats yet — create stub entry
+          statsWithIdentity[normalizedKey] = {
             name: identity.name,
             imageUrl: identity.portraitUrl || '',
             class: '',
             stars: 0,
             fur: identity.fur || '',
             traits: identity.traits || [],
+            traitSchemes: identity.schemes || [],
             marketLink: identity.marketLink || '',
             tokenId: identity.id ? parseInt(identity.id, 10) : undefined,
           };
@@ -168,15 +167,18 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
       );
       // Fallback Mode: return at least the names and identity from our local source
       const fallbackData: LiveDataMap = {};
-      Object.keys(mokiMetadata).forEach((name) => {
-        const identity = mokiMetadata[name];
-        fallbackData[name] = {
+      Object.keys(mokiMetadata).forEach((key) => {
+        const identity = mokiMetadata[key];
+        // Same normalization: underscore → space
+        const normalizedKey = key.replace(/_/g, ' ');
+        fallbackData[normalizedKey] = {
           name: identity.name,
           imageUrl: identity.portraitUrl || '',
           class: '',
           stars: 0,
           fur: identity.fur || '',
           traits: identity.traits || [],
+          traitSchemes: identity.schemes || [],
           marketLink: identity.marketLink || '',
           tokenId: identity.id ? parseInt(identity.id, 10) : undefined,
         };

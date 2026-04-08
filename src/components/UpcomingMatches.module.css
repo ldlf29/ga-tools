@@ -64,6 +64,21 @@
   min-height: 44px;
 }
 
+.headerTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.matchCount {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #333333;
+  opacity: 0.65;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.3px;
+}
+
 .pageTitle {
   font-size: 1.7rem;
   font-family: var(--font-display);
@@ -391,12 +406,23 @@
   color: #333333;
   overflow-y: auto;
   animation: slideUp 0.3s ease-out;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: thin;
+  scrollbar-color: #5097ff #b8d8ff;
 }
 
 .modalContent::-webkit-scrollbar {
-  display: none; /* Chrome/Safari/Webkit */
+  width: 6px;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: #b8d8ff;
+  border-radius: 0 1.5rem 1.5rem 0;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: #5097ff;
+  border-radius: 3px;
+  border: 1px solid #333;
 }
 
 .modalClose {

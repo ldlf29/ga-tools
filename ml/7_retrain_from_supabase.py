@@ -52,21 +52,41 @@ GENERIC_NAME_RE = re.compile(r"^Moki\s*#\d+$", re.IGNORECASE)
 # ─── Supabase Download ────────────────────────────────────────────────────────
 
 def download_recent_matches():
-    print("[INFO] Fetching recent matches from Supabase (moki_match_history)...")
+    print("[INFO] Fetching matches from Supabase (moki_match_history) with pagination...")
     
-    # Traemos los matches de los últimos 7 días o los últimos 2000 registros
-    url = f"{SUPABASE_URL}/rest/v1/moki_match_history?select=match_data,token_id&limit=2000&order=match_date.desc"
+    url = f"{SUPABASE_URL}/rest/v1/moki_match_history?select=match_data,token_id&order=match_date.desc"
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}"
     }
     
-    r = requests.get(url, headers=headers)
-    if r.status_code != 200:
-        print(f"[ERROR] Supabase API error: {r.status_code}")
-        return []
+    all_data = []
+    from_idx = 0
+    to_idx = 999
+    has_more = True
+    
+    while has_more:
+        headers_page = {**headers, "Range": f"{from_idx}-{to_idx}", "Prefer": "count=exact"}
+        r = requests.get(url, headers=headers_page)
+        if r.status_code not in [200, 206]:
+            print(f"[ERROR] API error fetching matches: {r.status_code}")
+            break
+            
+        batch = r.json()
+        if not batch:
+            has_more = False
+            break
+            
+        all_data.extend(batch)
+        print(f"[Supabase Pagination] Descargadas filas {from_idx}-{to_idx}. Total acumulado: {len(all_data)}")
         
-    return r.json()
+        if len(batch) < 1000:
+            has_more = False
+        else:
+            from_idx += 1000
+            to_idx += 1000
+            
+    return all_data
 
 # ─── Extract Raw Logic (from Script 1) ────────────────────────────────────────
 

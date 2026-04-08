@@ -94,5 +94,11 @@ export const matchesFilter = (
     if (!hasTrait) return false;
   }
 
+  // TRAIT SCHEMES (Call to Arms, Dungaree Duel, etc.)
+  if (filters.traitScheme && filters.traitScheme.length > 0) {
+    const cardSchemes = card.custom?.traitSchemes ?? [];
+    if (!filters.traitScheme.some((s) => cardSchemes.includes(s))) return false;
+  }
+
   return true;
 };

@@ -5,18 +5,33 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_20ad4ad20b0a3cc521373cc4501f2fc07609f459e25308aaf9983759ed086dc4_300x300.png",
     "fur": "Gold",
     "traits": [
+      "Yellow Sparkles",
+      "Passive",
+      "Azure Crying",
       "Banana Onesie",
-      "Crying Eye"
+      "Anime Zoom"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2284"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2284",
+    "schemes": [
+      "Tear Jerking",
+      "Costume Party"
+    ]
   },
   "69": {
     "id": "3527",
     "name": "69",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_305ff2894ee91b96482221a9e0f908cce7c0b4e8b568bf80add478aa3c4c3197_300x300.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3527"
+    "traits": [
+      "Spirit Blue",
+      "Smile",
+      "Happy",
+      "Ninja",
+      "Bananagasm",
+      "Light Snow"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3527",
+    "schemes": []
   },
   "TWO": {
     "id": "2",
@@ -24,15 +39,23 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8cd5e73bcd162502f607de85271aa994c94c8f4493ae141305bd394acef671f8_300x300.png",
     "fur": "Common",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2",
+    "schemes": []
   },
   "TRIPPY": {
     "id": "73",
     "name": "Trippy",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_99b45c6a6ce5734f1afe0c0c0ac6eed00b346267bf54c183147c251482b61327_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/73"
+    "traits": [
+      "Shadow Purple",
+      "Sad",
+      "Rainbow Round",
+      "Halo",
+      "Mushroom"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/73",
+    "schemes": []
   },
   "THE GOLDEN BOY": {
     "id": "227",
@@ -40,9 +63,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_23a46c4dd53bbc18ef0beeefeb80fcf5ae59688336b8c69db2e4c8552521a535_300x300.png",
     "fur": "Gold",
     "traits": [
-      "Tongue Out"
+      "Dark Grey",
+      "Tongue out",
+      "Brown Tired",
+      "Sparkle Cap",
+      "Gacha Ballz"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/227"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/227",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SUPERMAGUS": {
     "id": "235",
@@ -50,9 +80,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_bc9f5d635d63accf8397e9cb8084618e1bfe394eae181cfe518b636b555c7ce6_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Tongue Out"
+      "Shadow Purple",
+      "Tongue out",
+      "Purple Determined",
+      "Jiangshi"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/235"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/235",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "DEFRANKONG": {
     "id": "298",
@@ -60,9 +96,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_23f59d9e8a8b7819e7876e27233a8d8d79a31e69a5c29ad77201465e2b18cf68_300x300.png",
     "fur": "Common",
     "traits": [
+      "Dark Green",
+      "Eye Bags",
+      "Red Tired",
       "CyberKongz Onesie"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/298"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/298",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "MAID OF COINS": {
     "id": "316",
@@ -70,9 +112,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9b3ba6d0e8c4a1ecc80bb94327006791a567bea28b5c55194ea8c2e8b13cfbf7_300x300.png",
     "fur": "Common",
     "traits": [
-      "Maid Apron"
+      "Dark Grey",
+      "Hmph",
+      "Brown Round",
+      "Maid Apron",
+      "Maid Headband",
+      "Gold Coin"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/316"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/316",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "DUNG SHOGUN": {
     "id": "368",
@@ -80,9 +130,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0556cf47cb22844c987e7d6be4c841d1e5bc873fc464859e87dda551e7988257_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Ronin"
+      "Shadow Purple",
+      "Scared",
+      "Rainbow Determined",
+      "Ronin",
+      "Ronin",
+      "Gold Chocolate",
+      "Talisman"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/368"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/368",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "TEARDROP": {
     "id": "392",
@@ -90,15 +149,21 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Teardrop_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/392"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/392",
+    "schemes": []
   },
   "SIR BREW": {
     "id": "446",
     "name": "Sir Brew",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_20bf31817f33165e2c488598f28e0b8b8fabb08da2b0c9cc8b9f237f6bddb2ae_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/446"
+    "traits": [
+      "Teeth Smile",
+      "Relaxed",
+      "Red Sleeveless"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/446",
+    "schemes": []
   },
   "SALVADOR DALI": {
     "id": "467",
@@ -106,17 +171,32 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_c2f1e10d2d7de5059f8739e1bf27a02fcb86768bfceec05a7d423234272743a8_300x300.png",
     "fur": "Common",
     "traits": [
-      "Blue Artist Apron"
+      "Light Green",
+      "Hmph",
+      "Rainbow Determined",
+      "Blue Artist Apron",
+      "White Wine"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/467"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/467",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "GOLDILOCKS": {
     "id": "523",
     "name": "Goldilocks",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_37ed6cf852a79b9de2450085015da8bcdac73bc287753effbd959261f1462ef9_300x300.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/523"
+    "traits": [
+      "Open Smile",
+      "Blush",
+      "Red Bored",
+      "Yellow Bandana",
+      "Blue Kanzashi",
+      "Onigiri"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/523",
+    "schemes": []
   },
   "BLOODMOON": {
     "id": "539",
@@ -124,9 +204,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_bbf5912ceb529d74ad5297fd8eeff2fdf02940e5cb8083de0b10f1aacf5ac408_300x300.png",
     "fur": "Common",
     "traits": [
-      "Kappa Onesie"
+      "Scared",
+      "Villian Sunglasses",
+      "Kappa Onesie",
+      "Emerald Hands Plushie"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/539"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/539",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "EGGSY": {
     "id": "561",
@@ -134,17 +220,33 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0f5f59ae52efcc5198dd40cdad3eeb7843dc6194d47e2d12b323d243db243573_300x300.png",
     "fur": "Common",
     "traits": [
-      "Tongue Out"
+      "Tongue out",
+      "Azure Round",
+      "Brown Egg",
+      "Brown Egg",
+      "Chef Knife"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/561"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/561",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "TEA BONE": {
     "id": "670",
     "name": "Tea Bone",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_c598115170e62e11ca5b52d9f732a2ec1769e558d78488512f821a8e398307dc_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/670"
+    "traits": [
+      "Purple Sparkles",
+      "Scared",
+      "Red Round",
+      "Teal Hoodie",
+      "Fish Bone",
+      "Pink Teacup",
+      "Sakura"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/670",
+    "schemes": []
   },
   "BANANA MOGGER": {
     "id": "807",
@@ -152,10 +254,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_921564b2ac23d177f500c7f55fc2c4fcead0a7d36cb2167bb73b96e169ea8f82_300x300.png",
     "fur": "Common",
     "traits": [
+      "Ronin Aurora",
+      "Sad",
+      "Red Round",
+      "Rainbow Shades",
       "Banana Onesie",
-      "Ronin Aurora"
+      "Heavy Snow"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/807"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/807",
+    "schemes": [
+      "Call to Arms",
+      "Costume Party"
+    ]
   },
   "POOTATURD": {
     "id": "818",
@@ -163,9 +273,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_b3501f0b213ca439a1ffa1ecf0b4d7934501f502efdf2062a027fb9a750c564c_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Tongue Out"
+      "Spirit Aqua",
+      "Tongue out",
+      "Red Frown",
+      "Jiangshi",
+      "Jiangshi",
+      "Bowl of Eggs",
+      "Heavy Snow"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/818"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/818",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SHINE": {
     "id": "857",
@@ -173,10 +292,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ccc6992a86fcf6cd3ece8bcf400bd50694f66125ba3655512ed5780bf11bd560_300x300.png",
     "fur": "Common",
     "traits": [
+      "Scared",
+      "Blush",
+      "Silver Crying",
       "Gold Kimono",
-      "Crying Eye"
+      "Smiley Mask",
+      "Capirinha"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/857"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/857",
+    "schemes": [
+      "Tear Jerking",
+      "Dress to Impress"
+    ]
   },
   "PENGU": {
     "id": "939",
@@ -184,9 +311,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ef613b726aa09ac4b0d76819cf66109ee0649b5bbe18c320b418eb6859dc3029_300x300.png",
     "fur": "Common",
     "traits": [
-      "Penguin Onesie"
+      "Sad",
+      "Penguin Onesie",
+      "Doodle Book",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/939"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/939",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "MOKIWITCH": {
     "id": "962",
@@ -194,7 +327,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Mokiwitch_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/962"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/962",
+    "schemes": []
   },
   "SHADY": {
     "id": "964",
@@ -202,17 +336,32 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_f861748ab2bc1b3348708790641d10b00f0d8cc13f4179483f18757f8e5375ba_300x300.png",
     "fur": "Common",
     "traits": [
-      "Daimyo Kimono"
+      "Light Yellow",
+      "Green Bored",
+      "Villian Sunglasses",
+      "Daimyo Kimono With Katanas",
+      "Steamed Bun",
+      "Rain"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/964"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/964",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "MR CARROT": {
     "id": "984",
     "name": "Mr Carrot",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_59c1f6bb6507b6fb3663db8d9ee2fe16392e61e884be0fce88a0d8c10bf30ca9_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/984"
+    "traits": [
+      "Light Green",
+      "Hmph",
+      "Green Bored",
+      "Sunglasses",
+      "Carrot"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/984",
+    "schemes": []
   },
   "SWEET90S": {
     "id": "987",
@@ -220,7 +369,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_sweet90s_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/987"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/987",
+    "schemes": []
   },
   "BURNS WENIPEE": {
     "id": "1001",
@@ -228,9 +378,14 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_f0a4e96834ec84aaaf07ea15992ccbf4f6667c228e60a7b003a6ad09de000858_300x300.png",
     "fur": "Rainbow",
     "traits": [
+      "Passive",
+      "Eye Bags",
       "Blue Overalls"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1001"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1001",
+    "schemes": [
+      "Dungaree Duel"
+    ]
   },
   "MIDNIGHT": {
     "id": "1029",
@@ -238,9 +393,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_de6952f75957cd252af280981b605681b3aa3b63365235331a0ef4b8b0d137ed_300x300.png",
     "fur": "Common",
     "traits": [
-      "Tengu Mask"
+      "Light Grey",
+      "Chubby",
+      "Azure Determined",
+      "Tengu Mask",
+      "Banana Milk",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1029"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1029",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "THANK U 4 PLAYIN": {
     "id": "1055",
@@ -248,33 +411,57 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_2eb550b90059e71cbe70974992dcf01007d8e3f687f64276a6d1d46c74ca3e8e_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Tongue Out"
+      "Shadow Purple",
+      "Tongue out",
+      "Azure Round",
+      "Sake Bottle",
+      "Talisman"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1055"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1055",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "LIL TOMATO": {
     "id": "1071",
     "name": "Lil Tomato",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_877dd4b238d6376f3f62f69eca0770a7cb6d9305e2a152f152a9520a6942357c_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1071"
+    "traits": [
+      "Excited",
+      "Annoyed",
+      "Tomato"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1071",
+    "schemes": []
   },
   "NAKIMUSHI": {
     "id": "1095",
     "name": "Nakimushi",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_6d1b88463312f725a171b45d7e79e6a661271c27cb7c1123a82aca842d0edd76_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1095"
+    "traits": [
+      "Yell",
+      "Relaxed",
+      "Purple Hoodie",
+      "Pink Bunny Headband"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1095",
+    "schemes": []
   },
   "GOLDEN PURPS": {
     "id": "1105",
     "name": "Golden Purps",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_a749c2848939962fbbe248d86b6802886869b061db8b7bd1f6a9a4ad27b2e87a_300x300.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1105"
+    "traits": [
+      "Sad",
+      "Purple Frown",
+      "Purple Sleeveless",
+      "Banana Milk"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1105",
+    "schemes": []
   },
   "BEARISH": {
     "id": "1133",
@@ -282,17 +469,31 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_91c30e974bfa8c573c380c10174ae2f92804fdfcfbc67c9c23d4a53fc8fa7af1_300x300.png",
     "fur": "Common",
     "traits": [
-      "Bear Head"
+      "Light Green",
+      "Gasp",
+      "Green Round",
+      "Bear Head",
+      "Talisman"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1133"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1133",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "BADASS": {
     "id": "1173",
     "name": "BadAss",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_c48761e38cad3ae82571c885cb4fd4b9c8376e61dcd67b6cc21686cbefa9363f_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1173"
+    "traits": [
+      "Shadow Purple",
+      "Sad",
+      "Green Determined",
+      "Jingu Bang",
+      "Talisman"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1173",
+    "schemes": []
   },
   "FORTUNE GOBBLER": {
     "id": "1176",
@@ -300,9 +501,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_e8e80db5e14e478dd49e1fae3ed5a3c1647a2351cf00ad56efb93440eecbf95d_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Crying Eye"
+      "Shadow Purple",
+      "Passive",
+      "Rainbow Crying",
+      "Gold Raffle"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1176"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1176",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "BIO PHANTOM": {
     "id": "1235",
@@ -310,17 +517,31 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_5ccd239c22d168a74efc7a770815ccd121a18db3193c7c3280e02ed3dca18b86_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Tongue Out"
+      "Spirit Blue",
+      "Tongue out",
+      "Green Frown",
+      "Spirit Flame",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1235"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1235",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "LOW TIER PHENOM": {
     "id": "1270",
     "name": "Low Tier Phenom",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ff56b48d598944cae793b4dd81932e39a45237133dcfbed9b4cdebc7effb9c97_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1270"
+    "traits": [
+      "Open Smile",
+      "Red Round",
+      "Jiangshi",
+      "Vanilla M9",
+      "Particles"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1270",
+    "schemes": []
   },
   "PNLS": {
     "id": "1418",
@@ -328,9 +549,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8f1c9f71d6143ee1580973f7d77abb3b0f657b3c9cb5d75fa24854b8d03a820e_300x300.png",
     "fur": "Gold",
     "traits": [
-      "Tongue Out"
+      "Tongue out",
+      "Blush",
+      "Purple Determined",
+      "Teal Hoodie",
+      "Pink Bunny Headband"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1418"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1418",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "ZOMBINA": {
     "id": "1444",
@@ -338,9 +566,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_4f6027d6e3d117f5637b77d9b3d8ede8a12f7d6e9024110234de7526f872a501_300x300.png",
     "fur": "Common",
     "traits": [
-      "Pink Overalls"
+      "Teeth Smile",
+      "Rainbow Frown",
+      "Pink Overalls",
+      "Big Bow",
+      "Shepherds Crank"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1444"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1444",
+    "schemes": [
+      "Dungaree Duel"
+    ]
   },
   "PEELBERT GRUMPS": {
     "id": "1454",
@@ -348,9 +583,14 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_eb9d2573fac33b8b466c895484b2248f3104945c3606ecad51e3a524b08d8a24_300x300.png",
     "fur": "Common",
     "traits": [
-      "Banana Onesie"
+      "Red Tired",
+      "Banana Onesie",
+      "Heavy Snow"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1454"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1454",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "SPARTACUS": {
     "id": "1494",
@@ -358,9 +598,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_5907fb9ffed8d4bb343f1b66bdef86c339149c551c45917b44d206891b634021_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Devious Mouth"
+      "Devious",
+      "Red Frown",
+      "Bandaid",
+      "Towel",
+      "Towel",
+      "Big Stick"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1494"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1494",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "ULQUIORRA": {
     "id": "1521",
@@ -368,9 +616,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_89c9303e64213a57ef4ce58a62249a11228d79a70280857c7528bf3e7b17e309_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Tongue Out"
+      "Spirit Aqua",
+      "Tongue out",
+      "Green Bored",
+      "Gold Headband",
+      "Calligraphy Brush"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1521"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1521",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SIR CARROTSTEIN": {
     "id": "1569",
@@ -378,9 +633,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_79c8c3135de5acd17fde932a5ce75bfdbef5e87acd244935069b199ca964d51a_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Blue Overalls"
+      "Smile",
+      "Green Bored",
+      "Purple Round Glasses",
+      "Blue Overalls",
+      "Carrot"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1569"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1569",
+    "schemes": [
+      "Dungaree Duel"
+    ]
   },
   "NOT NISHEEP": {
     "id": "1600",
@@ -388,26 +650,48 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_a1b2ae93f8c8f10fe27285df77427399306a5d1b78522cc111664b160fc69a40_300x300.png",
     "fur": "Common",
     "traits": [
+      "Light Pink",
+      "Sad",
+      "Red Crying",
       "White Sheep Onesie",
-      "Crying Eye"
+      "Buff Moki",
+      "Rain"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1600"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1600",
+    "schemes": [
+      "Tear Jerking",
+      "Costume Party"
+    ]
   },
   "STONE OF DAVID": {
     "id": "1749",
     "name": "Stone of David",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_96f82d51af19b26c9b29ef07f4a8c1ef632a29dbc5f1094942f1d4d0192c373e_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1749"
+    "traits": [
+      "Light Green",
+      "Silver Frown",
+      "Red Thin Scarf",
+      "Blue Pacifier",
+      "White Chef Wrap"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1749",
+    "schemes": []
   },
   "KOHI": {
     "id": "1787",
     "name": "KOHI",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_a53de0a9e30d3525c45347e99dd63f665b6b4b9e56d6e8105f8b844c540eeb44_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1787"
+    "traits": [
+      "Light Grey",
+      "Passive",
+      "Azure Bored",
+      "White Chef Wrap",
+      "Coffee"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1787",
+    "schemes": []
   },
   "MOKINGTON": {
     "id": "1826",
@@ -415,7 +699,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Mokington_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1826"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1826",
+    "schemes": []
   },
   "MR TEABAG": {
     "id": "1863",
@@ -423,17 +708,32 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_47add106ee19c3beedd1d76ca8723a983397e8bb3d3d458cd9a06c3462e70b25_300x300.png",
     "fur": "Common",
     "traits": [
-      "Samurai"
+      "Light Yellow",
+      "Scared",
+      "Silver Determined",
+      "Bubblegum Round Glasses",
+      "Samurai",
+      "Blue Teacup"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1863"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1863",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "ANGRYBREAD": {
     "id": "1868",
     "name": "Angrybread",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_3b187e98a9988c0deb72422a03418bfbeaec720b6ac7bd2cd7450655d71d3ae8_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1868"
+    "traits": [
+      "Teal",
+      "Sad",
+      "Purple Round",
+      "Green Sleeveless",
+      "Baguette"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1868",
+    "schemes": []
   },
   "MOSE": {
     "id": "2188",
@@ -441,9 +741,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_db46f970d2273efccb0f4a6ffc3e7525992d3c68994b147e5f6b66e2374d134a_300x300.png",
     "fur": "Common",
     "traits": [
-      "Straw Kimono"
+      "Light Green",
+      "Open Smile",
+      "Gold Determined",
+      "Straw Kimono",
+      "Large Straw Hat"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2188"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2188",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "MOKIPACK": {
     "id": "2288",
@@ -451,7 +758,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_MOKIPACK_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2288"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2288",
+    "schemes": []
   },
   "SINTANK": {
     "id": "2485",
@@ -459,9 +767,14 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_d8cb0a32e41ce68f8e6fbccb7ddf32e8732f6a70f9ae35a755b662d39cfcb2cc_300x300.png",
     "fur": "Common",
     "traits": [
+      "Passive",
+      "Rainbow Determined",
       "Garbage Can"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2485"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2485",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "PEELTERGEIST": {
     "id": "2575",
@@ -469,9 +782,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_89771dd451935c5da0fb885f8599567399d21c574b908c16fdc57e2111fc3670_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Tongue Out"
+      "Spirit Blue",
+      "Tongue out",
+      "Azure Bored",
+      "Mom Tattoo",
+      "White Chef Wrap",
+      "Bananagasm"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2575"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2575",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SAMURAI BOI": {
     "id": "2660",
@@ -479,9 +800,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_400ed368893cda4578fa034e62c1671ccd92167697bc273894940ed4ed73e9af_300x300.png",
     "fur": "Common",
     "traits": [
-      "Straw Kimono"
+      "Light Pink",
+      "Teeth Smile",
+      "Blush",
+      "Purple Determined",
+      "Straw Kimono",
+      "Large Straw Hat"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2660"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2660",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "MOKUHADELY": {
     "id": "2661",
@@ -489,15 +818,24 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Mokuhadely_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2661"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2661",
+    "schemes": []
   },
   "VALKYRIE": {
     "id": "2730",
     "name": "Valkyrie",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_155687a723c11968a227e0956ccdaa123d4ab999c7d211efb2a037f77b2ebcf6_300x300.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2730"
+    "traits": [
+      "Spirit Aqua",
+      "Teeth Smile",
+      "Brown Determined",
+      "Goddess Shall",
+      "Halo",
+      "Gord"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2730",
+    "schemes": []
   },
   "DRACUMOKI": {
     "id": "2755",
@@ -505,15 +843,21 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Dracumoki_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2755"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2755",
+    "schemes": []
   },
   "JOY BOY": {
     "id": "2828",
     "name": "Joy Boy",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9ed3c60bb35e2a3eeea1aee566a637c2a9ae4b86213b48bdeb7c074408d9f9e9_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2828"
+    "traits": [
+      "Passive",
+      "Green Frown",
+      "Rain"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2828",
+    "schemes": []
   },
   "SODA": {
     "id": "2906",
@@ -521,7 +865,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_soda_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2906"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2906",
+    "schemes": []
   },
   "GAMBIT": {
     "id": "3015",
@@ -529,9 +874,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_e7c84f7f05adeef4e2869a6a41737adb620ec1c1467ea75edc98befe477f7057_300x300.png",
     "fur": "Common",
     "traits": [
-      "Kappa Onesie"
+      "Grey Sparkles",
+      "Teeth Smile",
+      "Purple Round",
+      "Kappa Onesie",
+      "Moki Cards"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3015"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3015",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "SHADREL KAGEKIN": {
     "id": "3080",
@@ -539,10 +891,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_1f80961af9f6836130be42ede87d97ff0112f945402f30d6d89e40ffd9cf1fd3_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Tongue Out",
-      "Kimono Gold"
+      "Shadow Blue",
+      "Tongue out",
+      "Green Determined",
+      "Gold Kimono",
+      "Lit Lattern"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3080"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3080",
+    "schemes": [
+      "Shapeshifting",
+      "Dress to Impress"
+    ]
   },
   "FIZZYTWINTAILS": {
     "id": "3145",
@@ -550,25 +909,42 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_6468f01bc83e56cdfbb83fe9c0db677fc27d4247d66ba5177d510f3f420389cf_300x300.png",
     "fur": "Common",
     "traits": [
-      "Crying Eye"
+      "Hmph",
+      "Red Crying",
+      "Fernet"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3145"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3145",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "LUCID": {
     "id": "3185",
     "name": "Lucid",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_985d7e7dfeb0003d5381ec9880d83b848a4f037dde9f7eef8c54922b35da2d59_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3185"
+    "traits": [
+      "Smile",
+      "Rainbow Tired",
+      "Gold Headband",
+      "Black Controller",
+      "Particles"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3185",
+    "schemes": []
   },
   "THE LAST SAMURAI": {
     "id": "3186",
     "name": "The Last Samurai",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_bd6446218817cd17333b71a96e52ce899c718bfc54e361e0c54dfc7a8ff31f32_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3186"
+    "traits": [
+      "Shadow Blue",
+      "Brown Frown",
+      "Gold Katana"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3186",
+    "schemes": []
   },
   "KRONI": {
     "id": "3246",
@@ -576,9 +952,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_cdd555ccac094f0c1b3d737dbaf711db2987ca18d5da7d339e9b108d467debe9_300x300.png",
     "fur": "Common",
     "traits": [
-      "Ronin Aurora"
+      "Ronin Aurora",
+      "Teeth",
+      "Smile",
+      "Red Frown",
+      "White Bunny Bag",
+      "Gold Headband",
+      "Buff Moki"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3246"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3246",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "CAMMYYY": {
     "id": "3284",
@@ -586,9 +971,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_235c9a314918a6603cf62512c232d2d8f0484ffc46b57b78f11a498afc51f3e5_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Tongue Out"
+      "Shadow Blue",
+      "Tongue out",
+      "Purple Determined",
+      "Ratz Ballz"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3284"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3284",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SPECTER": {
     "id": "3320",
@@ -596,9 +987,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_eecb22c7011b3be47e97194374d14fa6dddbadc30b624e0caad1ff40f70cfc33_300x300.png",
     "fur": "Spirit",
     "traits": [
+      "Spirit Blue",
+      "Smile",
+      "Silver Tired",
       "Spirit Kimono"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3320"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3320",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "SWEETPOTATO": {
     "id": "3340",
@@ -606,19 +1003,34 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_b4da6a0137c43260393884abf82021f687423a1aacf639d772e9f038c6d7702c_300x300.png",
     "fur": "Rainbow",
     "traits": [
+      "Tongue out",
+      "Blush",
+      "Red Crying",
       "Ronin",
-      "Tongue Out",
-      "Crying Eye"
+      "Ronin"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3340"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3340",
+    "schemes": [
+      "Call to Arms",
+      "Shapeshifting",
+      "Tear Jerking"
+    ]
   },
   "LONG DINGER": {
     "id": "3432",
     "name": "Long Dinger",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8624efbb95ac650514e754d5a02c094fec8f6a7af0f562178b4c9cfa572cecea_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3432"
+    "traits": [
+      "Teal Sparkles",
+      "Sad",
+      "Green Round",
+      "Purple Hoodie",
+      "Jiangshi",
+      "FL Bat"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3432",
+    "schemes": []
   },
   "CRY BUNNY": {
     "id": "3563",
@@ -626,9 +1038,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_edc0fb0fad533c6a95fa84570ee20ac098e1f03ed1b0ea03af5ebe7ed49f332f_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Crying Eye"
+      "Spirit Aqua",
+      "Chubby",
+      "Silver Crying",
+      "Blue Bunny Bag",
+      "Blue Chef Wrap"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3563"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3563",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "MUSHI": {
     "id": "3582",
@@ -636,9 +1055,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_232a49aafdcac73b680b66fd342556b3c9eff0ef8091d0b0c698dcb95dab12d7_300x300.png",
     "fur": "Common",
     "traits": [
-      "Devious Mouth"
+      "Dark Fog",
+      "Devious",
+      "Azure Round",
+      "Green Beetle"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3582"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3582",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "ANIMO": {
     "id": "3624",
@@ -646,17 +1071,30 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_288ef5241f7530f414eee0bee28b180fe90210bb82715ad2e121b66d39cde20b_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Gold Kimono"
+      "Shadow Purple",
+      "Passive",
+      "Gold Tired",
+      "Gold Kimono",
+      "Talisman"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3624"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3624",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "YISHU": {
     "id": "3672",
     "name": "Yishu",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_a5f9016bbee96c63845cb19a7af3ab45d3370ca55c174c9809ee771b22278680_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3672"
+    "traits": [
+      "Disgust",
+      "Brown Bored",
+      "Denim Vest",
+      "Purple Brush"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3672",
+    "schemes": []
   },
   "SCABBERS": {
     "id": "3715",
@@ -664,9 +1102,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_2c2f8bd32fe4eb2e0c4ae1582cb111702ea01a109a2052cc035fa0742e9c1b06_300x300.png",
     "fur": "Common",
     "traits": [
-      "Ratz Onesie"
+      "Gasp",
+      "Scar",
+      "Happy",
+      "Ratz Onesie",
+      "Jingu Bang"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3715"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3715",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "ARTIST MOKI": {
     "id": "3717",
@@ -674,15 +1119,22 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ArtistMoki_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3717"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3717",
+    "schemes": []
   },
   "MOKI FANATIC": {
     "id": "3722",
     "name": "Moki Fanatic",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_2831435a95b44a3ca6e772de41581658551e8eeb13cb7c0abbf5243112a1f763_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3722"
+    "traits": [
+      "Gasp",
+      "Blush",
+      "Teal Hoodie",
+      "Blue Sensu"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3722",
+    "schemes": []
   },
   "AMBER": {
     "id": "3836",
@@ -690,49 +1142,92 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ec13342d2b9a2ed978b63b2704be77fd9dc9fd1c9b6a12f4926a9785618a9ab0_300x300.png",
     "fur": "Gold",
     "traits": [
-      "Casual Kimono"
+      "Teal",
+      "Open Smile",
+      "Gold Determined",
+      "Casual Kimono",
+      "Pink Kanzashi"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3836"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3836",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "SMG LOVES YOU": {
     "id": "3841",
     "name": "SMG Loves You",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_d56d26ec644956177eb555e755c40b8f83c8d3458c6fdf83ff348d7b4b03abfc_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3841"
+    "traits": [
+      "Shadow Blue",
+      "Azure Round",
+      "Mom Tattoo",
+      "Shadow Flame"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3841",
+    "schemes": []
   },
   "STARK": {
     "id": "3847",
     "name": "Stark",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0f2807f950992e7efd95a2dfa103a7271449cb28ab5127da567c5a2233f904cb_300x300.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3847"
+    "traits": [
+      "Dark Grey",
+      "Smile",
+      "Red Round",
+      "TMA Noble Skull",
+      "Shepherds Crank",
+      "Particles"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3847",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "CITRUS": {
     "id": "3932",
     "name": "Citrus",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_50b2e18da3e237cc755adaaf77670d755eb0697cef51fb749689d747a6fc833c_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3932"
+    "traits": [
+      "Scared",
+      "Happy",
+      "Sparkle Cap"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3932",
+    "schemes": []
   },
   "SHADOWSTORM": {
     "id": "4011",
     "name": "Shadowstorm",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_618f941fd2963ec8052bc2ede71e3373e76953bc2ce2a0db4a8f910a04546012_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4011"
+    "traits": [
+      "Shadow Purple",
+      "Scared",
+      "Scar",
+      "Relaxed",
+      "Blue Bunny Bag"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4011",
+    "schemes": []
   },
   "CLUTCH": {
     "id": "4137",
     "name": "Clutch",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_20b626c489dcac4ad34a42089be737f0cda4d40fbc37dd498583a9b66ab867ab_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4137"
+    "traits": [
+      "Teeth Smile",
+      "Blush",
+      "Purple Bored",
+      "Pirate Bandana",
+      "Mochi",
+      "Particles"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4137",
+    "schemes": []
   },
   "RONIN SPIRIT": {
     "id": "4177",
@@ -740,9 +1235,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_e400845b3c4d8420cbbbf357d5ce8ba6ef2c992e08f0124543c8f5d5b369c7aa_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Ronin"
+      "Spirit Aqua",
+      "Teeth Smile",
+      "Gold Frown",
+      "Ronin",
+      "Ronin",
+      "Golden Ramen"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4177"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4177",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "MAHOSHOJO": {
     "id": "4193",
@@ -750,15 +1253,24 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_MahoShojo_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4193"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4193",
+    "schemes": []
   },
   "DEADLYKITTEN": {
     "id": "4246",
     "name": "deadlykitten",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_e011e379bd81dd0866eebd9d8686794f5ead4bfaec14292d91c4de8396690d0d_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4246"
+    "traits": [
+      "Shadow Purple",
+      "Hmph",
+      "Scar",
+      "Spaced out",
+      "Halo",
+      "Bananagasm"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4246",
+    "schemes": []
   },
   "STARFLUFF": {
     "id": "4258",
@@ -766,7 +1278,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Starfluff_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4258"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4258",
+    "schemes": []
   },
   "MUSHROOM GLASSES": {
     "id": "4341",
@@ -774,9 +1287,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_affaa2541cd458195e49ba7424c98d0288857105a7959b6bea7c20e9cc7bbd00_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Crying Eye"
+      "Smile",
+      "Purple Crying",
+      "Sunglasses",
+      "Mushroom"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4341"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4341",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "BENDAN": {
     "id": "4407",
@@ -784,25 +1303,48 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_c5bc68da245c3e01bffcecfa2d43fd6a82229841c36b3b07ba24d1b98c1d075d_300x300.png",
     "fur": "Common",
     "traits": [
-      "Tongue Out"
+      "Teal",
+      "Tongue out",
+      "Silver Bored",
+      "Red Thin Scarf",
+      "Pink Kanzashi",
+      "Doodle Book"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4407"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4407",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SWEATIN SIMMONS": {
     "id": "4434",
     "name": "Sweatin Simmons",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_2d65a6af655710b3f1a242ad54c35c424f742a5ca7847ad1d76f5dd81fc15d38_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4434"
+    "traits": [
+      "Smile",
+      "Purple Frown",
+      "Moustache",
+      "Pink Top",
+      "Pink Headband",
+      "Toilet Paper"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4434",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "NUMBSKULL": {
     "id": "4437",
     "name": "Numbskull",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_99aea1e9e67c186394e0c220f825e4da6d2344aa2e43cd09f6900a9d54045abe_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4437"
+    "traits": [
+      "Shadow Purple",
+      "Brown Frown",
+      "Ice Pack"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4437",
+    "schemes": []
   },
   "KINGOFRATZ": {
     "id": "4509",
@@ -810,7 +1352,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_KingOfRatz_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4509"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4509",
+    "schemes": []
   },
   "DR SHROOM": {
     "id": "4597",
@@ -818,9 +1361,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_b0aedb3551368aa68dcfae8fb4e5bbd9e3e7ffbd6a524955c0f67cc8c2b6b9cf_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Devious Mouth"
+      "Shadow Purple",
+      "Devious",
+      "Red Frown",
+      "Jiangshi",
+      "Mushroom"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4597"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4597",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "WIZARD BOI": {
     "id": "4602",
@@ -828,9 +1378,14 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_824f3780df160f275f0c71f8a1015767cb0d923369c18b9ade176dc5976c5bb5_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Crying Eye"
+      "Shadow Blue",
+      "Purple Crying",
+      "Witch Hat"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4602"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4602",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "NEUTY": {
     "id": "4642",
@@ -838,10 +1393,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_6b31ae120274eb17e256e7801b0263225d1498261e65e4dd06ce8008728b9738_300x300.png",
     "fur": "Common",
     "traits": [
-      "Tongue Out",
-      "Ronin Moon"
+      "Ronin Moon",
+      "Tongue out",
+      "Green Tired",
+      "Black Aviator"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4642"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4642",
+    "schemes": [
+      "Call to Arms",
+      "Shapeshifting"
+    ]
   },
   "MILKY": {
     "id": "4772",
@@ -849,17 +1410,30 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_68bcb0589d8eece13f67b31baf5b29dcb7b80f9f94a626c5e0f1d559088dd5f2_300x300.png",
     "fur": "Common",
     "traits": [
-      "Cow Onesie"
+      "Gallery Grey",
+      "Teeth Smile",
+      "Purple Frown",
+      "Cow Onesie",
+      "Light Snow"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4772"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4772",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "POOP DIGGER": {
     "id": "4784",
     "name": "Poop Digger",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_94045902fdf656f9c5a8a95fb60fb4376b1344cd1efc857cc36d56e963dfa7fb_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4784"
+    "traits": [
+      "Teal Sparkles",
+      "Smile",
+      "Spaced out",
+      "Shovel"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4784",
+    "schemes": []
   },
   "MILO THATCH": {
     "id": "4813",
@@ -867,9 +1441,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_c88c13e5fc130467fa7f7bd14e6ea9ce7de53575e8ddb8562d3a5525d618b01f_300x300.png",
     "fur": "Common",
     "traits": [
-      "Devious Mouth"
+      "Gallery Grey",
+      "Devious",
+      "Scar",
+      "Purple Round",
+      "Red Bowtie",
+      "Shiny Blue Glasses"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4813"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4813",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "VAGABOND": {
     "id": "4816",
@@ -877,7 +1459,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Vagabond_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4816"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4816",
+    "schemes": []
   },
   "AKUMA": {
     "id": "4819",
@@ -885,7 +1468,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_akuma_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4819"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4819",
+    "schemes": []
   },
   "MOKI POCHI MOKI": {
     "id": "4919",
@@ -893,7 +1477,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Mokipochi_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4919"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4919",
+    "schemes": []
   },
   "BADSPEED": {
     "id": "5031",
@@ -901,33 +1486,60 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_b7838bb921f5e51ae52bd42c3622037cdf835c72a7dc749d9d30a068700201db_300x300.png",
     "fur": "Gold",
     "traits": [
-      "Tongue Out"
+      "Tongue out",
+      "Red Round",
+      "Ninja Shirt",
+      "White Origami"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5031"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5031",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SLEEPY GARY": {
     "id": "5050",
     "name": "Sleepy Gary",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_2cec94121edbc5384009f93f3f56dccee9766a513510bc7efee773a57fed0eac_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5050"
+    "traits": [
+      "Yell",
+      "Brown Determined",
+      "Blue Nightcap",
+      "Ratz Ballz",
+      "Particles"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5050",
+    "schemes": []
   },
   "CAPOEIRA": {
     "id": "5078",
     "name": "CAPOEIRA",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8ef3c2fd3340830f150f487f49ff13a461b54a221bebdab168df737b23a7d18d_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5078"
+    "traits": [
+      "Teal Sparkles",
+      "Gasp",
+      "Scar",
+      "Teal Hoodie",
+      "Black Head Band",
+      "Pink Phone"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5078",
+    "schemes": []
   },
   "MUGSY": {
     "id": "5110",
     "name": "Mugsy",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_610b13742358c44e937cda3cfa946f53abfb23d82e4b65f71cf99df8b88600e1_300x300.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5110"
+    "traits": [
+      "Scared",
+      "Green Round",
+      "WF Glider Gear",
+      "Rootbeer"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5110",
+    "schemes": []
   },
   "FIRE MOKI": {
     "id": "5125",
@@ -935,7 +1547,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_FireMoki_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5125"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5125",
+    "schemes": []
   },
   "NISHEEP": {
     "id": "5168",
@@ -943,10 +1556,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_dfc7729238f0f2820297c1cad0ad1ec3855f5e2108c8f757d6e00dd01d410554_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Tongue Out",
-      "Black Sheep Onesie"
+      "Light Pink",
+      "Tongue out",
+      "Red Round",
+      "Black Sheep Onesie",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5168"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5168",
+    "schemes": [
+      "Shapeshifting",
+      "Costume Party"
+    ]
   },
   "RED WHINE": {
     "id": "5193",
@@ -954,17 +1574,30 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9a1bf547f3eabc0245bb91505ea822711ae130e66a7a48ade7629cbf3cfaec4c_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Skull Mask"
+      "Shadow Blue",
+      "Scared",
+      "Brown Round",
+      "Skull Mask",
+      "Red Wine"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5193"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5193",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "THE DESTROYER": {
     "id": "5232",
     "name": "The Destroyer",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_db39eb849e2dd91f23a4e7a96cf5ea3dce05bfbaece1975c3585fece735da69f_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5232"
+    "traits": [
+      "Light Yellow",
+      "Hmph",
+      "Azure Round",
+      "Grimbone"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5232",
+    "schemes": []
   },
   "ONE": {
     "id": "5249",
@@ -972,9 +1605,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_6296775a7ab72b2f4c2bb62a6592b4fa265651ce6126388a63229413480e0b8f_300x300.png",
     "fur": "Gold",
     "traits": [
-      "Straw Kimono"
+      "Teal",
+      "Rainbow Frown",
+      "Eye Patch",
+      "Straw Kimono",
+      "Large Straw Hat"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5249"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5249",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "GOLDEN NUGGET": {
     "id": "5256",
@@ -982,10 +1622,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_c568fd280e7e7e6f2265383e8a468ebc3514037ab644e4aaa910d47e09b065c6_300x300.png",
     "fur": "Shadow",
     "traits": [
+      "Shadow Purple",
+      "Passive",
+      "Green Crying",
       "Gold Kimono",
-      "Crying Eye"
+      "Jingu Bang"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5256"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5256",
+    "schemes": [
+      "Tear Jerking",
+      "Dress to Impress"
+    ]
   },
   "JOEHNINGUS": {
     "id": "5504",
@@ -993,10 +1640,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_66528043dc66364346780a38b81635832f0149fdfa4169295fc206dad616f6cf_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Crying Eye",
-      "Pink Overalls"
+      "Scared",
+      "Brown Crying",
+      "Pink Overalls",
+      "Pink Headband",
+      "Butter Knife"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5504"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5504",
+    "schemes": [
+      "Dungaree Duel",
+      "Tear Jerking"
+    ]
   },
   "MOZY": {
     "id": "5534",
@@ -1004,7 +1658,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Mozy_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5534"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5534",
+    "schemes": []
   },
   "FENRIR": {
     "id": "5705",
@@ -1012,9 +1667,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_3452a8c68c84b31451493b4db5a85839b1442c5d0058494a228dcb78c1918e71_300x300.png",
     "fur": "Common",
     "traits": [
-      "Wolf Onesie"
+      "Light Yellow",
+      "Chubby",
+      "Silver Determined",
+      "Wolf Onesie",
+      "Pink Sensu"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5705"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5705",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "FERNECITO": {
     "id": "5710",
@@ -1022,10 +1684,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_f38d9c0123af3e24e42b3692de373a8cea9f5b602f42b7a59a40191c59fc1943_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Devious Mouth",
-      "Blue Overalls"
+      "Devious",
+      "Green Bored",
+      "Blue Overalls",
+      "Blue Snapback",
+      "Fernet"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5710"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5710",
+    "schemes": [
+      "Dungaree Duel",
+      "Malicious Intent"
+    ]
   },
   "KEANU": {
     "id": "5755",
@@ -1033,17 +1702,31 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_5a7fa04b83f7764fd75a1d6eb5c18d054f5d7876b4919080285e202e0bc905f6_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Straw Kimono"
+      "Spirit Blue",
+      "Teeth Smile",
+      "Red Determined",
+      "Straw Kimono",
+      "Large Straw Hat"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5755"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5755",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "THE CHAMP MOTZ": {
     "id": "5809",
     "name": "The Champ MoTZ",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_3e684ca6e8ecd6b7404b29b303d2990a34dac7a6726729c38d203c494ca60d38_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5809"
+    "traits": [
+      "Light Grey",
+      "Teeth Smile",
+      "Green Bored",
+      "School Uniform",
+      "Doodle Book"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5809",
+    "schemes": []
   },
   "SMILEY": {
     "id": "5885",
@@ -1051,9 +1734,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_d869aaff34185859dbcd9fd6e7d7b1ac8f09ed7fbf84a39dfee9354e93c2cb5e_300x300.png",
     "fur": "Common",
     "traits": [
-      "Samurai"
+      "Light Grey",
+      "Passive",
+      "Red Determined",
+      "Samurai",
+      "Smiley Mask",
+      "Purple Brush",
+      "Particles"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5885"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5885",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "UNI": {
     "id": "5890",
@@ -1061,26 +1753,43 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_a5236f40033aa83450cfb124ef44cca3dfd07d1b08872862dacea18bffbf6c64_300x300.png",
     "fur": "Common",
     "traits": [
+      "Nature",
+      "Sad",
+      "Brown Bored",
       "Green Overalls",
-      "Oni Mask"
+      "Oni Mask",
+      "Fish"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5890"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5890",
+    "schemes": [
+      "Dungaree Duel",
+      "Malicious Intent"
+    ]
   },
   "RAE": {
     "id": "5925",
     "name": "Rae",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_6e40e00506bd948ef0d686b78abefc1194fa566426f7e84698dbe69ebda62dab_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5925"
+    "traits": [
+      "Teeth Smile",
+      "Azure Bored",
+      "Star Glasses",
+      "Blue Wagasa"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5925",
+    "schemes": []
   },
   "ITS MADAM": {
     "id": "5960",
     "name": "Its Madam",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_66416af712d63df5ad96dbef1929ea83c78eb37b7e6d13c9503ef5eac7b3662f_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5960"
+    "traits": [
+      "Azure Determined"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5960",
+    "schemes": []
   },
   "FILTHY": {
     "id": "6009",
@@ -1088,10 +1797,19 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_f0b548f765006fcce90660c30b027b6a3042ee1906be395067b1824046a4f288_300x300.png",
     "fur": "Spirit",
     "traits": [
+      "Spirit Aqua",
+      "Tongue out",
+      "Brown Round",
       "Maid Apron",
-      "Tongue Out"
+      "Maid Headband",
+      "Lattern",
+      "Rain"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6009"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6009",
+    "schemes": [
+      "Shapeshifting",
+      "Housekeeping"
+    ]
   },
   "YP THE FEARLESS": {
     "id": "6014",
@@ -1099,9 +1817,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_20eb9dbe0358cfba4f4661499fe3ddb4a8ec05d623db9d3daee0094e89af3875_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Ronin"
+      "Spirit Blue",
+      "Smile",
+      "Red Frown",
+      "Ronin",
+      "Ronin",
+      "Gold Coin",
+      "Particles"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6014"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6014",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "KUROSHI": {
     "id": "6025",
@@ -1109,9 +1836,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8a95f752b77cff1531e8597673958557c799485a9e645371a77e3a123fcacade_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Ronin"
+      "Shadow Purple",
+      "Hmph",
+      "Azure Round",
+      "Bite",
+      "Ronin",
+      "Ronin",
+      "Vanilla M9"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6025"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6025",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "ZARIS": {
     "id": "6066",
@@ -1119,17 +1855,30 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_739f9f9feb1822edcf39c6040619dd011a86ca79b3117e74569f94aecf776707_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Crying Eye"
+      "Teal",
+      "Scared",
+      "Green Crying",
+      "Teal Hoodie",
+      "White Origami"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6066"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6066",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "SIR POCHINGTON": {
     "id": "6100",
     "name": "Sir Pochington",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9c8b63f2655168f91a1ea47c1ab2a8f36ce25e22237c1d89c8e0d394c746d00c_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6100"
+    "traits": [
+      "Brown Tired",
+      "Bandaid",
+      "Blue Bowtie",
+      "Taiyaki"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6100",
+    "schemes": []
   },
   "GARRISON": {
     "id": "6142",
@@ -1137,11 +1886,19 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_a75a4829aacec512d7d2c3ed1816bb49e280681d502a433bfafd1f52f45df932_300x300.png",
     "fur": "Shadow",
     "traits": [
+      "Shadow Blue",
+      "Devious",
+      "Red Crying",
       "Casual Kimono",
-      "Crying Eye",
-      "Devious Mouth"
+      "Witch Hat",
+      "Shadow Flame"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6142"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6142",
+    "schemes": [
+      "Malicious Intent",
+      "Tear Jerking",
+      "Dress to Impress"
+    ]
   },
   "ANTITHEI": {
     "id": "6191",
@@ -1149,9 +1906,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_f30bb2687e46904b45586f97228391c3cc43ce62e2203359c2bc13131b89be3f_300x300.png",
     "fur": "Shadow",
     "traits": [
+      "Shadow Blue",
+      "Smile",
+      "Azure Bored",
       "Rainbow Kimono"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6191"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6191",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "UNDERDOGBYDESIGN": {
     "id": "6221",
@@ -1159,33 +1922,62 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_3dbdcc51e49d82b92701fd69c9013f05efeaf6684d146c1b93d0389337f625e6_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Devious Mouth"
+      "Yellow Sparkles",
+      "Devious",
+      "Green Frown",
+      "Clown Paint",
+      "Red Hat",
+      "Silver Coin",
+      "Rain"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6221"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6221",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "BLAZIN ACE": {
     "id": "6259",
     "name": "BLAZIN ACE",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8208df9984fda265b25c4dae5a6e8ac07d2f7e9d7f5e9ce734b239b9ad87379a_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6259"
+    "traits": [
+      "Smile",
+      "Silver Bored",
+      "Teal Hoodie",
+      "Tie Dye Headband",
+      "Silver Coin"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6259",
+    "schemes": []
   },
   "KARPATHY": {
     "id": "6293",
     "name": "Karpathy",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_17131971a5991966f0125eca542ca3e663ea7d6bccfed5a97bc57ed05f91cc86_300x300.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6293"
+    "traits": [
+      "Yell",
+      "Gold Bored",
+      "Purple Hoodie",
+      "Strawberry Milk"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6293",
+    "schemes": []
   },
   "DANGO": {
     "id": "6300",
     "name": "Dango",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9f638a289702bde28f962c34282538aad267b2d6a1151352b37b3c0a53784f41_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6300"
+    "traits": [
+      "Passive",
+      "Green Tired",
+      "Red Thin Scarf",
+      "Red Headband",
+      "Blue Cyberpunk Katana"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6300",
+    "schemes": []
   },
   "APPLE": {
     "id": "6414",
@@ -1193,9 +1985,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_36f34cd4f42f222902f670187992193e3426df2f586a764c2e0f1eaea50792e0_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Tongue Out"
+      "Light Yellow",
+      "Tongue out",
+      "Azure Determined",
+      "WF Glider Gear",
+      "Particles"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6414"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6414",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "RAINBOW QUEEN": {
     "id": "6536",
@@ -1203,18 +2002,34 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9d7170fc7c91aded72e50355ae98e845b597b37f5be94d48ad4d1aa83b44386b_300x300.png",
     "fur": "Rainbow",
     "traits": [
+      "Tongue out",
+      "Gold Bored",
       "Green Overalls",
-      "Tongue Out"
+      "Pink Kanzashi",
+      "Coxinha"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6536"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6536",
+    "schemes": [
+      "Dungaree Duel",
+      "Shapeshifting"
+    ]
   },
   "MIYAMOTO MUSASHI": {
     "id": "6602",
     "name": "Miyamoto Musashi",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0c256e07c263f8f354fe8cc2c62c3c021465c81ea345b3416f10c11fdf63b0a8_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6602"
+    "traits": [
+      "Sad",
+      "Eye Bags",
+      "Brown Round",
+      "Yellow Bandana",
+      "Red Headband",
+      "Blue Cyberpunk Katana",
+      "Rain"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6602",
+    "schemes": []
   },
   "DARK LORD MOKI": {
     "id": "6606",
@@ -1222,7 +2037,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_CultMoki_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6606"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6606",
+    "schemes": []
   },
   "NOT A RACCOON": {
     "id": "6769",
@@ -1230,9 +2046,13 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_06189f822ac0fcb1d311a3a33d7bd55659b4c8d82594cfc4b28f8ce190df29f0_300x300.png",
     "fur": "Common",
     "traits": [
+      "Purple Frown",
       "Garbage Can"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6769"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6769",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "RONINKU": {
     "id": "6777",
@@ -1240,23 +2060,36 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Roninku_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6777"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6777",
+    "schemes": []
   },
   "MONONOKU": {
     "id": "6820",
     "name": "Mononoku",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9f92a5e17d85902c3c1cde6afe1495bac44a3214f514b25bfb31046065c8b30c_300x300.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6820"
+    "traits": [
+      "Spirit Aqua",
+      "Scared",
+      "Gold Determined",
+      "Spirit Flame"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6820",
+    "schemes": []
   },
   "24K": {
     "id": "6821",
     "name": "24K",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_3adb82204c485cb46e5b46141720378203da79046a69bbb76d7f74ad6c879a75_300x300.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6821"
+    "traits": [
+      "Yellow Sparkles",
+      "Sad",
+      "Gold Determined",
+      "Rain"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6821",
+    "schemes": []
   },
   "RYU GANKEN": {
     "id": "6824",
@@ -1264,10 +2097,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_b26a231cc164ddc7bab80dd9236d14aadd3d8a3f08522a127eb1533052624a0b_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Straw Kimono",
-      "Ronin Aurora"
+      "Ronin Aurora",
+      "Smile",
+      "Azure Tired",
+      "Straw Kimono"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6824"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6824",
+    "schemes": [
+      "Call to Arms",
+      "Dress to Impress"
+    ]
   },
   "FUOCO FATUO": {
     "id": "6882",
@@ -1275,10 +2114,18 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_f620392b8cb98feb002531ac076c78a226fe858f3bc430d45bfc85e8f52e7734_300x300.png",
     "fur": "Spirit",
     "traits": [
+      "Spirit Blue",
+      "Passive",
+      "Brown Tired",
       "Gold Kimono",
-      "Kitsune Mask"
+      "Kitsune Mask",
+      "Spirit Flame"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6882"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6882",
+    "schemes": [
+      "Shapeshifting",
+      "Dress to Impress"
+    ]
   },
   "BUTTHOLE MOKI": {
     "id": "6913",
@@ -1286,15 +2133,25 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ButtholeLord_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6913"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6913",
+    "schemes": []
   },
   "CHEF MAKI": {
     "id": "7008",
     "name": "Chef Maki",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_5a03dfce261a3a235a92ba93f7e6e58d766f7eca0c1f65094b007161eacb5ebe_300x300.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7008"
+    "traits": [
+      "Spirit Blue",
+      "Chubby",
+      "Brown Frown",
+      "White Chef Wrap",
+      "Toilet Paper"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7008",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "POO LICKER": {
     "id": "7021",
@@ -1302,9 +2159,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_efd8ac7ffad48f087d98e77ea193e8719950c00605f1f42f6e07720d209e4aff_300x300.png",
     "fur": "Common",
     "traits": [
-      "Tongue Out"
+      "Dark Green",
+      "Tongue out",
+      "Brown Bored",
+      "Gold Chocolate",
+      "Rain"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7021"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7021",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "GRUYERE": {
     "id": "7181",
@@ -1312,7 +2176,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Gruyere_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7181"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7181",
+    "schemes": []
   },
   "KRAMPY": {
     "id": "7215",
@@ -1320,9 +2185,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_eec649dd217bafce632f71d5985f726357983cfcfea44646bb399d0c35e73299_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Black Sheep Onesie"
+      "Smile",
+      "Blush",
+      "Brown Bored",
+      "Black Sheep Onesie",
+      "Pizza"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7215"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7215",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "SAM NIELBYYY": {
     "id": "7247",
@@ -1330,9 +2202,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_d82ab06ebd9710bea84e8eacf3af371d25771dbb591f9400994836ea3550cfaa_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Rainbow Kimono"
+      "Spirit Aqua",
+      "Teeth Smile",
+      "Rainbow Bored",
+      "Rainbow Kimono",
+      "Gold Rose"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7247"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7247",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "NOMAD": {
     "id": "7254",
@@ -1340,7 +2219,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Nomad_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7254"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7254",
+    "schemes": []
   },
   "MK ULTRA 8888": {
     "id": "7302",
@@ -1348,9 +2228,14 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0a4808d3d76d1f68e8d61b75b8272ebb23ffe8449465def72e7a6bdd0f6f816e_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Crying Eye"
+      "Azure Crying",
+      "Teal Hoodie",
+      "Jiangshi"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7302"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7302",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "STRAW BARRY": {
     "id": "7303",
@@ -1358,17 +2243,30 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8242b5f72e01caa3dfbf87b50495295a3ee25a67bde3e42214afa776c6b9f574_300x300.png",
     "fur": "Common",
     "traits": [
-      "Straw Kimono"
+      "Scared",
+      "Purple Frown",
+      "Straw Kimono",
+      "Large Straw Hat"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7303"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7303",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "MOKUNA": {
     "id": "7338",
     "name": "Mokuna",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_228e2054601e4b3d4404755314e0cb0bc45fdc94f73085a7738791274e33f0cd_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7338"
+    "traits": [
+      "Light Pink",
+      "Smile",
+      "Purple Determined",
+      "Teal Hoodie",
+      "Decorators Brush"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7338",
+    "schemes": []
   },
   "KINTAMA": {
     "id": "7360",
@@ -1376,15 +2274,25 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Kintama_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7360"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7360",
+    "schemes": []
   },
   "HOPPI": {
     "id": "7370",
     "name": "Hoppi",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_d0cdd9e1716c785d94d7af8e6f7c004338f9ed1e4bd1bb61914e9af6e62aea30_300x300.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7370"
+    "traits": [
+      "Spirit Blue",
+      "Teeth Smile",
+      "Silver Determined",
+      "Jiangshi",
+      "Blue Pacifier",
+      "Jiangshi",
+      "Sakura"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7370",
+    "schemes": []
   },
   "SOMBER": {
     "id": "7405",
@@ -1392,17 +2300,30 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_da99b84105a4706929237d00de5c048b90e339c8f053ae4bcf9f90687be1553d_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Blue Artist Apron"
+      "Light Yellow",
+      "Hmph",
+      "Red Bored",
+      "Blue Artist Apron",
+      "Pirate Bandana",
+      "Water"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7405"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7405",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "SYDNEY": {
     "id": "7608",
     "name": "Sydney",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_8aa14f2aff6615cfdd93cd1cee592ab389dd979cbb22b6ddda41ee0996e2ddb3_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7608"
+    "traits": [
+      "Purple Sparkles",
+      "Azure Frown",
+      "Yakitori"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7608",
+    "schemes": []
   },
   "RUDDY": {
     "id": "7691",
@@ -1410,9 +2331,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_3f1af978756e2c08d2540ac2cfaa774692c606488a7e1e0eba79de7dcba25195_300x300.png",
     "fur": "Rainbow",
     "traits": [
-      "Yellow Artist Apron"
+      "Sad",
+      "Brown Determined",
+      "Yellow Artist Apron",
+      "Black Beret",
+      "Leek"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7691"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7691",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "ONIKI": {
     "id": "7804",
@@ -1420,7 +2348,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Oniki_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7804"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7804",
+    "schemes": []
   },
   "MAOMAO": {
     "id": "7858",
@@ -1428,9 +2357,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_240a4fd6ffe669bf53dbd887ae61d11f8b051ba982ec90378ff49a113849bfbc_300x300.png",
     "fur": "Common",
     "traits": [
-      "Wolf Onesie"
+      "Sad",
+      "Purple Determined",
+      "Wolf Onesie",
+      "Balloons"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7858"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7858",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "EXTRA ONIONS": {
     "id": "7942",
@@ -1438,9 +2373,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_260ab20ed00596d83459fd1b8047351ccd4a24e8f2da7c8537fd3f94d4496c10_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Tongue Out"
+      "Spirit Blue",
+      "Tongue out",
+      "Green Tired",
+      "Halo",
+      "Leek",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7942"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7942",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "CITRAVALE": {
     "id": "7947",
@@ -1448,9 +2391,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_55e0cc1502554636347b20362d902298dcf8cb2131899ca22367375c0c6c3200_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Crying Eye"
+      "Shadow Purple",
+      "Scared",
+      "Gold Crying",
+      "Lemon Bag"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7947"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7947",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "BOREALIS": {
     "id": "7958",
@@ -1458,15 +2407,22 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Borealis_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7958"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7958",
+    "schemes": []
   },
   "LIL MC MOKI": {
     "id": "8016",
     "name": "Lil MC Moki",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0cabea8fb4246344665ec4e9cd7984e6ad9e198ea7b94bc975db24ec367dc1ea_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8016"
+    "traits": [
+      "Passive",
+      "Azure Bored",
+      "White Bunny Bag",
+      "Pink Snapback"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8016",
+    "schemes": []
   },
   "MAD SCIENTIST": {
     "id": "8044",
@@ -1474,7 +2430,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Memecontest_neoarts_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8044"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8044",
+    "schemes": []
   },
   "MAID OF SHADOWS": {
     "id": "8086",
@@ -1482,18 +2439,33 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0fdb0f4d3be27cff1befb905d2b20e77b1c1e35df099bf7ef49a99c966708a49_300x300.png",
     "fur": "Shadow",
     "traits": [
+      "Shadow Purple",
+      "Sad",
+      "Rainbow Crying",
       "Maid Apron",
-      "Crying Eye"
+      "Maid Headband"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8086"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8086",
+    "schemes": [
+      "Housekeeping",
+      "Tear Jerking"
+    ]
   },
   "GUPPY93ALLAN": {
     "id": "8097",
     "name": "Guppy93Allan",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_082d7f805b81cdb3965e55c27bc6233345649d5b95556730f06082c0aeaa4907_300x300.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8097"
+    "traits": [
+      "Shadow Purple",
+      "Smile",
+      "Red Round",
+      "Pink Bag",
+      "Gold Pipe",
+      "Talisman"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8097",
+    "schemes": []
   },
   "DHEU": {
     "id": "8180",
@@ -1501,9 +2473,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_64366db47bc52f9842983168e7af5885c0852e82efad87bc629418a1a5f6700a_300x300.png",
     "fur": "Common",
     "traits": [
-      "Green Overalls"
+      "Drool",
+      "Green Frown",
+      "Green Overalls",
+      "Jiangshi",
+      "Rain"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8180"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8180",
+    "schemes": [
+      "Dungaree Duel"
+    ]
   },
   "BIN DIESEL": {
     "id": "8260",
@@ -1511,9 +2490,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_9c9739877ce8af280b88434b28ae104b4654913de2dabc329d6b3c028c7e0001_300x300.png",
     "fur": "Common",
     "traits": [
-      "Garbage Can"
+      "Scared",
+      "Scar",
+      "Green Bored",
+      "Garbage Can",
+      "Particles"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8260"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8260",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "PALMER": {
     "id": "8277",
@@ -1521,9 +2507,17 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_806ca9c12e26c069f3af76e276c592aa085b71bf04f7f01a45bd7dcca3946fb2_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Samurai"
+      "Shadow Purple",
+      "Green Round",
+      "Bite",
+      "Samurai",
+      "Horns"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8277"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8277",
+    "schemes": [
+      "Call to Arms",
+      "Malicious Intent"
+    ]
   },
   "FISHOO": {
     "id": "8316",
@@ -1531,33 +2525,59 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ca354668d6f60c07bd6f57a736213f77bde1362fdcac38406b7fa05f182af9f1_300x300.png",
     "fur": "Common",
     "traits": [
-      "Crying Eye"
+      "Dark Green",
+      "Hmph",
+      "Brown Crying",
+      "Purple Hoodie",
+      "Fish"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8316"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8316",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "I WILL FARM U": {
     "id": "8401",
     "name": "I WILL FARM U",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_54248d1af2446036cd4fbe6913037611bd32470dbeae49120c3d52fa50399189_300x300.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8401"
+    "traits": [
+      "Spirit Blue",
+      "Passive",
+      "Red Bored",
+      "Bronze coin",
+      "Rain"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8401",
+    "schemes": []
   },
   "BUN BUN": {
     "id": "8411",
     "name": "Bun Bun",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_68df83bdc8cd2d8079926b16480845c95a81b5d600da98cce6f726b9f52abfa6_300x300.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8411"
+    "traits": [
+      "Teeth Smile",
+      "Red Tired",
+      "Blue Bunny Bag",
+      "Lit Lattern"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8411",
+    "schemes": []
   },
   "GOLDEN DELICIOUS": {
     "id": "8415",
     "name": "Golden Delicious",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_4dad9b14cc447d66ad16659413541be3269754cc552a3d61f7135b13c2d71495_300x300.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8415"
+    "traits": [
+      "Sad",
+      "Rainbow Bored",
+      "Apple Beret",
+      "Sakura"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8415",
+    "schemes": []
   },
   "RYNNIE": {
     "id": "8509",
@@ -1565,9 +2585,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_0a97c1ed94a81da87745d85bf24d4eb53bee94464502198f097ba889b3877af2_300x300.png",
     "fur": "Gold",
     "traits": [
-      "Blue Artist Apron"
+      "Light Green",
+      "Chubby",
+      "Silver Round",
+      "Blue Artist Apron",
+      "Sparkle Cap"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8509"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8509",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "TOAST": {
     "id": "8530",
@@ -1575,9 +2602,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_f9f8fe4678fe96be9caabfa25be0ffb8da1ef66886f73c61ba71863c7e933c1f_300x300.png",
     "fur": "Common",
     "traits": [
-      "Avocado Onesie"
+      "Sad",
+      "Brown Bored",
+      "Bandaid",
+      "Avocado Onesie",
+      "Heavy Snow"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8530"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8530",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "MIGATTE SEISHIN": {
     "id": "8575",
@@ -1585,9 +2619,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_d1ca705b639efcfd20bdb090b56fbe1e40bba3c4641897e8cb2d3636251bf3c2_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Straw Kimono"
+      "Spirit Blue",
+      "Hmph",
+      "Green Determined",
+      "Straw Kimono",
+      "Particles"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8575"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8575",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "TAMANUKI": {
     "id": "8579",
@@ -1595,7 +2636,8 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_Tamanuki_300x300.png",
     "fur": "1 of 1",
     "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8579"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8579",
+    "schemes": []
   },
   "THE PEELOMANCER": {
     "id": "8587",
@@ -1603,9 +2645,15 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_b445cec77cef10d26ee5347d66cb253be250f859f341055a31fba3840e11dd3c_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Crying Eye"
+      "Shadow Purple",
+      "Purple Crying",
+      "Witch Hat",
+      "Bananagasm"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8587"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8587",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "MAKE": {
     "id": "8642",
@@ -1613,17 +2661,33 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_67029db009cb1919b3310c75c07f898e42c7899454b63750b4c35e2bebcb9d0e_300x300.png",
     "fur": "Common",
     "traits": [
-      "Blue Kimono"
+      "Smile",
+      "Blush",
+      "Purple Round",
+      "Blue Kimono",
+      "Sake Bottle"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8642"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8642",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "CAIPIRINHA TIME": {
     "id": "8717",
     "name": "Caipirinha Time",
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_d88e0138e8d76192095181cc2809d3d2808044a2022e269ffa1b912a55c26fad_300x300.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8717"
+    "traits": [
+      "Teal Sparkles",
+      "Passive",
+      "Eye Bags",
+      "Green Tired",
+      "Kappa Bag",
+      "Yellow Nightcap",
+      "Capirinha"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8717",
+    "schemes": []
   },
   "WILLOFD": {
     "id": "8759",
@@ -1631,9 +2695,19 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_ca21ba8c866bc341ade3d5b1b5ace9063e939aeeb627befd1b44e8b599c7e6fa_300x300.png",
     "fur": "Common",
     "traits": [
-      "Blue Overalls"
+      "Grey Sparkles",
+      "Disgust",
+      "Eye Bags",
+      "Brown Tired",
+      "Blue Overalls",
+      "Pink Snapback",
+      "Pirate Hook",
+      "Rain"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8759"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8759",
+    "schemes": [
+      "Dungaree Duel"
+    ]
   },
   "MINOZ": {
     "id": "8833",
@@ -1641,9 +2715,16 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_a8ff6ec0ffb6fb885c8d58b96f0a2d8403de9673013af0c81a579511e0be4999_300x300.png",
     "fur": "Spirit",
     "traits": [
-      "Gold Kimono"
+      "Spirit Aqua",
+      "Teeth Smile",
+      "Gold Round",
+      "Gold Kimono",
+      "Gold Teacup"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8833"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8833",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "SHADO": {
     "id": "8887",
@@ -1651,17 +2732,34 @@
     "portraitUrl": "https://5rH8sf3XHWbNEbyj.public.blob.vercel-storage.com/profile/moki_94491afd09f0c35157e95dee5606dc367806abaff210a8e3006b58557309a8ef_300x300.png",
     "fur": "Shadow",
     "traits": [
-      "Ronin"
+      "Shadow Blue",
+      "Chubby",
+      "Silver Frown",
+      "Ronin",
+      "Ronin",
+      "Gold Katana"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8887"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8887",
+    "schemes": [
+      "Call to Arms"
+    ]
   },
   "BOBA_FITT": {
     "id": "1361",
     "name": "Boba Fitt",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b5bf7f6537a0c7a4154dc138c6ac9d685d222b9b56fbdabbfccbc3bb22f28e30.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1361"
+    "traits": [
+      "Yell",
+      "Azure Round",
+      "Toilet Paper",
+      "Black Head Band",
+      "Bubble Tea"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1361",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "CAVIAR": {
     "id": "3607",
@@ -1669,41 +2767,79 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0f499304246912bcaee80e7717e46b023d9db5f03aaeeb1118e7c6d53d31402f.png",
     "fur": "Rainbow",
     "traits": [
-      "Tongue out"
+      "Tongue out",
+      "Spaced out",
+      "White Egg",
+      "White Egg",
+      "Fish"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3607"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3607",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "I_AM_KENOUGH": {
     "id": "2767",
     "name": "I AM KENOUGH",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/fa34d4dea919ed0868b89a4c257b802cedc44b775eadec36cb7bfb95cc41e8ad.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2767"
+    "traits": [
+      "Scared",
+      "Red Crying",
+      "Teal Hoodie",
+      "Pink Headband",
+      "Strawberry Parfait"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2767",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "ANGRY_BUNNY": {
     "id": "2420",
     "name": "Angry Bunny",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/33d7e48766a40fed6d6b02a35ae7bfd45d2fdf25693803668b9343f0a1e19768.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2420"
+    "traits": [
+      "Gallery Blue",
+      "Sad",
+      "Eye Bags",
+      "Green Round",
+      "Yellow Bandana",
+      "White Bunny Headband",
+      "Talisman"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2420",
+    "schemes": []
   },
   "FESTA": {
     "id": "134",
     "name": "Festa",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/bf6aaf2e5d42fe1dbe4deaa1b3e99ba7ef9b42e15875061610d7723056a1c27e.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/134"
+    "traits": [
+      "Gasp",
+      "Azure Determined",
+      "Yellow Blanket",
+      "Pastel Bucket Hat"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/134",
+    "schemes": []
   },
   "PINA_COLADA": {
     "id": "8524",
     "name": "Pina Colada",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0cf53963a7a879ae403fa7ef64deace19b5061a9f6ff1cce3ee4ae1b2b474628.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8524"
+    "traits": [
+      "Light Grey",
+      "Red Bored",
+      "Blue Bowtie",
+      "Red Headband",
+      "Coconut"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8524",
+    "schemes": []
   },
   "FUBAR": {
     "id": "7662",
@@ -1711,42 +2847,83 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/f71951d62f5a0faf87d57181a60bca385ac77d548a9bcc79cb73084756325492.png",
     "fur": "Common",
     "traits": [
+      "Dark Green",
       "Tongue out",
-      "Straw Kimono"
+      "Gold Crying",
+      "Straw Kimono",
+      "Large Straw Hat",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7662"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7662",
+    "schemes": [
+      "Shapeshifting",
+      "Tear Jerking",
+      "Dress to Impress"
+    ]
   },
   "DONGKE_KEROT": {
     "id": "548",
     "name": "Dongke Kerot",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/c864c13fba9ba53cfce90d79a972f3779c17881921485ae6e846d8b8fc9dd895.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/548"
+    "traits": [
+      "Light Yellow",
+      "Hmph",
+      "Blush",
+      "Green Round",
+      "Brown Egg",
+      "Brown Egg",
+      "Taiyaki"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/548",
+    "schemes": []
   },
   "THE_CLOGFATHER": {
     "id": "5257",
     "name": "The Clogfather",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/9342e82f5aa87c0b74027bcd2057a500318cbac59737398c5275a95beed289b4.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5257"
+    "traits": [
+      "Shadow Purple",
+      "Hmph",
+      "Azure Determined",
+      "White Bunny Bag",
+      "Toilet Plunger"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5257",
+    "schemes": []
   },
   "OVER": {
     "id": "1175",
     "name": "Over",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/1a20d5426700a0f66f252ea01b6d718579ccfee7468336b08aeb8acb27e91695.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1175"
+    "traits": [
+      "Purple Sparkles",
+      "Smile",
+      "Happy",
+      "Annoyed",
+      "White Shades",
+      "Coffee"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1175",
+    "schemes": []
   },
   "ROMEO": {
     "id": "5681",
     "name": "Romeo",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/ef54b14d78a3c6c665de22a2dbcf3f9c079668747669e1b1206d286eb29db6d8.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5681"
+    "traits": [
+      "Dark Green",
+      "Teeth Smile",
+      "Mavis",
+      "Teal Hoodie",
+      "Tie Dye Headband",
+      "Red Rose"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5681",
+    "schemes": []
   },
   "GATCHA": {
     "id": "6753",
@@ -1754,25 +2931,48 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/843d6467a1794e98be94ff4ba9e734cd1a2be0988f8f45de36ea5a9ce8111f00.png",
     "fur": "Shadow",
     "traits": [
-      "Rainbow Kimono"
+      "Shadow Blue",
+      "Gold Round",
+      "Rainbow Kimono",
+      "Tie Dye Headband",
+      "Daruma"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6753"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6753",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "BANDIT": {
     "id": "2202",
     "name": "Bandit",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/f92bc781828e2a121ec2f3eb6546d3d13863a413c7bed4e239ea10f1d047fbc2.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2202"
+    "traits": [
+      "Purple Sparkles",
+      "Hmph",
+      "Brown Tired",
+      "Red Bandana"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2202",
+    "schemes": []
   },
   "BATTERED_CORN": {
     "id": "6154",
     "name": "Battered Corn",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b1fccbf7c171cbdbdadab9b3e35520d6ee1e74a8391778a1138992c315589c3b.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6154"
+    "traits": [
+      "Excited",
+      "Battle Paint",
+      "Toilet Paper",
+      "Toilet Paper",
+      "Corn",
+      "Rain"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6154",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "ONIGIRI": {
     "id": "6249",
@@ -1780,17 +2980,31 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b4c217a8d610c58c1420f3650e4efe4f57def54ced2babaf6c7ce86ad6d9ba0c.png",
     "fur": "Common",
     "traits": [
+      "Teal Sparkles",
+      "Teeth Smile",
+      "Relaxed",
+      "Blue Bowtie",
       "Horns"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6249"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6249",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "XUANYE": {
     "id": "7795",
     "name": "XuanYe",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/fc423ab284eaffc15decc2d2868a5869a3851563eb133fa7ce10fcb570bc93fc.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7795"
+    "traits": [
+      "Light Yellow",
+      "Passive",
+      "Brown Round",
+      "Blue Kanzashi",
+      "Balloons"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7795",
+    "schemes": []
   },
   "HAM_SOLO": {
     "id": "1599",
@@ -1798,17 +3012,31 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/5a01d3e9c7bbee21590bc11191e0edcf16b98a7e8d6d2608ce2c7e4eaa01c856.png",
     "fur": "Common",
     "traits": [
+      "Scared",
+      "Rainbow Tired",
       "Pig Onesie"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1599"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1599",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "CHILL_GUY": {
     "id": "6942",
     "name": "Chill Guy",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/6bd05f8720188ae192fb4fc2f90815817b9af40c5d44e7da616934bc09e232eb.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6942"
+    "traits": [
+      "Dark Green",
+      "Devious",
+      "Purple Round",
+      "Teal Hoodie",
+      "Pastel Bucket Hat"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/6942",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "HOSHINEKO": {
     "id": "5044",
@@ -1816,18 +3044,32 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/e65e1d3dc2c2ca8ec589ed7794491a6d512a229d271dad4bbc7c2237896c7d2d.png",
     "fur": "Spirit",
     "traits": [
+      "Spirit Aqua",
+      "Smile",
+      "Silver Round",
       "Casual Kimono",
       "Tanuki Mask"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5044"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5044",
+    "schemes": [
+      "Shapeshifting",
+      "Dress to Impress"
+    ]
   },
   "VERGIL": {
     "id": "200",
     "name": "VERGIL",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/5fd5188538f5219a616e289cdbf8d891eb11505afae67f4da6d55d66f59d297c.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/200"
+    "traits": [
+      "Purple Sparkles",
+      "Passive",
+      "Rainbow Tired",
+      "Monocle",
+      "Purple Sleeveless"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/200",
+    "schemes": []
   },
   "BIG_AND_TINY": {
     "id": "2051",
@@ -1835,33 +3077,68 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/aa5720ea19ec887d4bb4851742677d533771c9bd8441429bbd2566fcf316a0f5.png",
     "fur": "Spirit",
     "traits": [
-      "Spirit Kimono"
+      "Spirit Blue",
+      "Hmph",
+      "Red Frown",
+      "Spirit Kimono",
+      "Buff Moki",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2051"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2051",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "MAIZE_WINDU": {
     "id": "5085",
     "name": "Maize Windu",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/618a0d58248018681c410e783e3e26fd972eeee1b3e61875ffea15eb43f2406b.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5085"
+    "traits": [
+      "Dark Green",
+      "Teeth Smile",
+      "Silver Crying",
+      "Yellow Blanket",
+      "Pink Snapback",
+      "Rain"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5085",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "FENGYE": {
     "id": "8223",
     "name": "FengYe",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/80b0190679cb9e78d58b842d5ae30935cb27e2b565a1881a0d27f0985c5e7be8.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8223"
+    "traits": [
+      "Gallery Grey",
+      "Smile",
+      "Rainbow Crying",
+      "White Bunny Bag",
+      "Heart Glasses",
+      "White Origami"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8223",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "MINGYE": {
     "id": "7149",
     "name": "MingYe",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/3238986be8f01985cb3bd89fa9e2b04990c763769b2cc16f0e5711fe5fe18777.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7149"
+    "traits": [
+      "Light Yellow",
+      "Hmph",
+      "Relaxed",
+      "Villian Sunglasses",
+      "Regular Milk"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7149",
+    "schemes": []
   },
   "ANAKIN": {
     "id": "7605",
@@ -1869,25 +3146,44 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/6e33b68be9c899d33a5ae21f74b0f98481eab73e25885bca282066e893bd039b.png",
     "fur": "Spirit",
     "traits": [
+      "Spirit Aqua",
+      "Teeth Smile",
+      "Green Crying",
       "Spirit Kimono"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7605"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7605",
+    "schemes": [
+      "Tear Jerking",
+      "Dress to Impress"
+    ]
   },
   "EGGXAVIER": {
     "id": "3849",
     "name": "EGGXAVIER",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/a35eebfda9d1f5f94978141999a9bc9c89f4a2887cac53c2423031254c0a308c.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3849"
+    "traits": [
+      "Hmph",
+      "Purple Bored",
+      "Teal Hoodie",
+      "Fish Bone",
+      "Bowl of Eggs",
+      "Rain"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3849",
+    "schemes": []
   },
   "PUSHIME": {
     "id": "3969",
     "name": "Pushime",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/fde959d6fdfb3828307ec5d0382cc37a41ef56bd8170808915b4c01fb78d3dec.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3969"
+    "traits": [
+      "Yell",
+      "Ice Coffee"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3969",
+    "schemes": []
   },
   "UNFAIRBANKS": {
     "id": "5052",
@@ -1895,33 +3191,62 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/4038f3b0386aeb33d21922c10dc9c8de9413d839bce8e5a6eddd147dec399f66.png",
     "fur": "Rainbow",
     "traits": [
-      "Blue Kimono"
+      "Teal Sparkles",
+      "Hmph",
+      "Red Tired",
+      "Blue Kimono",
+      "Red Kunai"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5052"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5052",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "TEDDY": {
     "id": "1861",
     "name": "Teddy",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/20c451f4faf33d862a14920df4500d5d41594060cf294fc5f7e768bd68633221.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1861"
+    "traits": [
+      "Dark Fog",
+      "Disgust",
+      "Excited",
+      "Bear Head",
+      "Onigiri",
+      "Fog"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1861",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "DOVOLENA": {
     "id": "5449",
     "name": "Dovolena",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/863f6aeb94efc90908b61fcfb9d799cead3fe8e9a66afe23b4464d1f4034591e.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5449"
+    "traits": [
+      "Teal Sparkles",
+      "Passive",
+      "Red Determined"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5449",
+    "schemes": []
   },
   "JINJIN": {
     "id": "2991",
     "name": "Jinjin",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/40fdddabce956d68faf143f800c17d409756ef9c86c8067d2d2632c8786f2928.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2991"
+    "traits": [
+      "Shadow Purple",
+      "Smile",
+      "Brown Determined",
+      "Witch Hat",
+      "Golden Ramen"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2991",
+    "schemes": []
   },
   "DWEEB": {
     "id": "2568",
@@ -1929,33 +3254,61 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/2f1d620e426f3d5100865fd23e41a7ffbe2f6d4721e50512ce9f8244c8ae788f.png",
     "fur": "Common",
     "traits": [
+      "Passive",
+      "Brown Round",
+      "Bubblegum Round Glasses",
       "Green Overalls"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2568"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2568",
+    "schemes": [
+      "Dungaree Duel"
+    ]
   },
   "PIP_THE_MERMAID": {
     "id": "8339",
     "name": "Pip the Mermaid",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/4108bf177b7043f459d03826f316da40b141b1f970bedf8dfe4867eb8ce9050e.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8339"
+    "traits": [
+      "Light Pink",
+      "Sad",
+      "Azure Crying",
+      "Fish"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8339",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "BONESY": {
     "id": "2856",
     "name": "Bonesy",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/d4aafce455b1f2449d54765ecdbffd6048bb69f435b8a161e5cc4ab8f6b5fdf2.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2856"
+    "traits": [
+      "Scared",
+      "Red Bored",
+      "Black Aviator",
+      "Bia Hoi"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2856",
+    "schemes": []
   },
   "MATECITO": {
     "id": "7555",
     "name": "Matecito",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0c7920d23bf45b96f60ad8cfba6f77f0d17a9e20be8ab0c82546c64867f542f8.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7555"
+    "traits": [
+      "Scared",
+      "Green Bored",
+      "Purple Hoodie",
+      "Pink Pacifier",
+      "Blue Headband",
+      "Mate"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7555",
+    "schemes": []
   },
   "JAZZY_JOSIE": {
     "id": "2965",
@@ -1963,25 +3316,48 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/d92a0dddd584050c9c25bd73514ec553d1437fa6f747802b9487bb186ab1effb.png",
     "fur": "Common",
     "traits": [
-      "Blue Kimono"
+      "Purple Sparkles",
+      "Devious",
+      "Mavis",
+      "Blue Kimono",
+      "Blue Kanzashi",
+      "Red Wine",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2965"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2965",
+    "schemes": [
+      "Malicious Intent",
+      "Dress to Impress"
+    ]
   },
   "SAKURA": {
     "id": "1440",
     "name": "Sakura",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/04f9e842238f0cfb663db6bdd3b9af23f2dc69906924d7f352514fa2263acf52.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1440"
+    "traits": [
+      "Spirit Blue",
+      "Sad",
+      "Azure Frown",
+      "Sakura"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1440",
+    "schemes": []
   },
   "MCYOLO": {
     "id": "209",
     "name": "McYolo",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0c84e96710fe01870bbdc2faba552bb11b39902257db8c970574c12409098b98.png",
     "fur": "Shadow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/209"
+    "traits": [
+      "Shadow Purple",
+      "Passive",
+      "Azure Frown",
+      "Red Bowtie",
+      "Golden Ramen"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/209",
+    "schemes": []
   },
   "OXYGN": {
     "id": "7027",
@@ -1990,9 +3366,16 @@
     "fur": "Common",
     "traits": [
       "Ronin Moon",
-      "Blue Artist Apron"
+      "Open Smile",
+      "Silver Round",
+      "Blue Artist Apron",
+      "Tie Dye Headband"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7027"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7027",
+    "schemes": [
+      "Call to Arms",
+      "Housekeeping"
+    ]
   },
   "GRUMPY_MAID": {
     "id": "7143",
@@ -2000,17 +3383,33 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/70dc6001fb7043f8a7bc9f722c627346477d2418d2df40837e3fdf93edc9ab44.png",
     "fur": "Common",
     "traits": [
-      "Maid Apron"
+      "Scared",
+      "Red Frown",
+      "Maid Apron",
+      "Maid Headband",
+      "Sake Bottle"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7143"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7143",
+    "schemes": [
+      "Housekeeping"
+    ]
   },
   "PERK": {
     "id": "3484",
     "name": "Perk",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/65de308313d1797f66907b93215981e90f57157105deeae3a503e6eae24daa89.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3484"
+    "traits": [
+      "Scared",
+      "Green Crying",
+      "Red Thin Scarf",
+      "Pink Snapback",
+      "Gacha Ballz"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3484",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "RAMBO": {
     "id": "7333",
@@ -2018,25 +3417,47 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/2d5edd5e015bb2bb455dfb87f1cea2a82c8ac09634fe87e98694171227e3c81e.png",
     "fur": "Shadow",
     "traits": [
-      "Tongue out"
+      "Shadow Purple",
+      "Tongue out",
+      "Excited",
+      "Pink Bag",
+      "Red Headband",
+      "Sake Cup"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7333"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7333",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "SAKUREI": {
     "id": "7039",
     "name": "Sakurei",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/73aa03843e4ff1b47ae26045bcc252986b9c0d21e6623d3c7ab1ff6eff2b8d00.png",
     "fur": "Spirit",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7039"
+    "traits": [
+      "Spirit Blue",
+      "Hmph",
+      "Red Determined",
+      "Jiangshi",
+      "Sakura"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7039",
+    "schemes": []
   },
   "CAG": {
     "id": "3156",
     "name": "CAG",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/11a1cd8642ad3fae4de09daf3d63f81dcae79cbce1834491a22b9e5b9a267924.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3156"
+    "traits": [
+      "Dark Green",
+      "Sad",
+      "Happy",
+      "Bite",
+      "White Bunny Headband"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3156",
+    "schemes": []
   },
   "YASHANUKI": {
     "id": "4702",
@@ -2044,18 +3465,34 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/857b8db31cc93b26e8c57a48f0a01bedef607c4d9d255521644c6bd78d907347.png",
     "fur": "Spirit",
     "traits": [
+      "Spirit Aqua",
       "Tongue out",
-      "Casual Kimono"
+      "Rainbow Crying",
+      "Casual Kimono",
+      "Blue Wagasa",
+      "Sakura"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4702"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4702",
+    "schemes": [
+      "Shapeshifting",
+      "Tear Jerking",
+      "Dress to Impress"
+    ]
   },
   "GOLDEN_BONES": {
     "id": "4315",
     "name": "Golden Bones",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/01949b94f45aaaab8bb0a2a482effe40c9ba99c8532370da832455a1e5cab751.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4315"
+    "traits": [
+      "Grey Sparkles",
+      "Smile",
+      "Green Crying"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4315",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "SKULLY": {
     "id": "5374",
@@ -2063,33 +3500,71 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/647e6165f5f7372a956aa48604c0763b3d57faf48e7f2342b4949f5d637cea3b.png",
     "fur": "Common",
     "traits": [
-      "TMA Noble Skull"
+      "Light Yellow",
+      "Hmph",
+      "Scar",
+      "Purple Frown",
+      "Blue Bowtie",
+      "TMA Noble Skull",
+      "Gold Beetle"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5374"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5374",
+    "schemes": [
+      "Malicious Intent"
+    ]
   },
   "BRUTALIZER": {
     "id": "3616",
     "name": "Brutalizer",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/6615e1c2d55d485b99277ce75354753fe56dc172b3059f4ec6274044120e10d5.png",
     "fur": "Gold",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3616"
+    "traits": [
+      "Gallery Blue",
+      "Scared",
+      "Blush",
+      "Azure Crying",
+      "Teal Hoodie",
+      "Tan Explorer Hat",
+      "Calligraphy Brush"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3616",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "CORNPERNICUS": {
     "id": "1628",
     "name": "Cornpernicus",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/d622a364530d8d3aa44003bb3916eda6071ff8952210832793e891e7745f6ffe.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1628"
+    "traits": [
+      "Light Yellow",
+      "Sad",
+      "Silver Frown",
+      "Purple Sleeveless",
+      "Corn"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/1628",
+    "schemes": []
   },
   "THE_KILL3R": {
     "id": "8388",
     "name": "The Kill3r",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/a066335bbcbc92f5684ebcdb035437c449419b0edcb7131ccebd78325dfcb6e1.png",
     "fur": "Rainbow",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8388"
+    "traits": [
+      "Light Grey",
+      "Sad",
+      "Silver Crying",
+      "Denim Vest",
+      "Red Hat",
+      "Chef Knife",
+      "Light Streaks"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8388",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "PRISMATIC": {
     "id": "7637",
@@ -2097,9 +3572,17 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/b8b4866520a5e726feba1177891dfdfb15cfbed1c0a849d128b93e41c58fb10b.png",
     "fur": "Common",
     "traits": [
-      "Rainbow Kimono"
+      "Dark Grey",
+      "Hmph",
+      "Happy",
+      "Rainbow Kimono",
+      "White Shades",
+      "Jingu Bang"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7637"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/7637",
+    "schemes": [
+      "Dress to Impress"
+    ]
   },
   "POGGERS": {
     "id": "888",
@@ -2108,9 +3591,15 @@
     "fur": "Common",
     "traits": [
       "Tongue out",
-      "Kappa Onesie"
+      "Rainbow Shades",
+      "Kappa Onesie",
+      "Teal Phone"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/888"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/888",
+    "schemes": [
+      "Shapeshifting",
+      "Costume Party"
+    ]
   },
   "MAID_OF_HONOUR": {
     "id": "3032",
@@ -2118,10 +3607,17 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/2129e2a730b567322ebc3b1d8150b8cd3f55f3ee986d96c3fb55f9d2662768b4.png",
     "fur": "Spirit",
     "traits": [
+      "Spirit Blue",
       "Tongue out",
-      "Maid Apron"
+      "Green Determined",
+      "Maid Apron",
+      "Maid Headband"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3032"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/3032",
+    "schemes": [
+      "Shapeshifting",
+      "Housekeeping"
+    ]
   },
   "HATSUNE_MOKI": {
     "id": "4081",
@@ -2129,9 +3625,12 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/9b4b5fd83350b796d106220550cc0d7e0b2115a2d8f496fbd45ed6f5bc0aec73.png",
     "fur": "Common",
     "traits": [
-      "Casual Kimono"
+      "Teal Sparkles",
+      "Azure Round",
+      "School Uniform"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4081"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4081",
+    "schemes": []
   },
   "KABOOMARU": {
     "id": "8124",
@@ -2139,17 +3638,32 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/c82cc2438857e6a4b680c81a62bf96ae4622c204b7fd053bf099cd806d4f3212.png",
     "fur": "Spirit",
     "traits": [
-      "Tongue out"
+      "Spirit Aqua",
+      "Tongue out",
+      "Brown Determined",
+      "Ninja",
+      "Sake Cup"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8124"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8124",
+    "schemes": [
+      "Shapeshifting"
+    ]
   },
   "CRYBABY": {
     "id": "798",
     "name": "Crybaby",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/15005867ed43abd592f563a4532b011721db265b31074c94a1d9e3332dbde96e.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/798"
+    "traits": [
+      "Hmph",
+      "Red Crying",
+      "Purple Hoodie",
+      "Pink Snapback"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/798",
+    "schemes": [
+      "Tear Jerking"
+    ]
   },
   "TSURUGI": {
     "id": "2766",
@@ -2157,9 +3671,16 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/c89d39cc42d13d6c644a9b41f39c415848c697abffee33d94601572f98dac9ed.png",
     "fur": "Gold",
     "traits": [
-      "White Sheep Onesie"
+      "Light Grey",
+      "Passive",
+      "Brown Tired",
+      "White Sheep Onesie",
+      "Chef Knife"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2766"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/2766",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "RORONOA_TORA": {
     "id": "4037",
@@ -2167,17 +3688,30 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/0e81c5cb0ad30f1b0ff813201541069bd5f3b742370c02fa286f44e52d019045.png",
     "fur": "Common",
     "traits": [
-      "Tiger Onesie"
+      "Hmph",
+      "Rainbow Round",
+      "Bandaid",
+      "Tiger Onesie",
+      "Blue Katana"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4037"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/4037",
+    "schemes": [
+      "Costume Party"
+    ]
   },
   "VAEEKER": {
     "id": "8483",
     "name": "Vaeeker",
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/e3f6f1ae91605207335da4594437ed9e709f5cc7d06cb14f4f7f8bc3f32d57a9.png",
     "fur": "Common",
-    "traits": [],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8483"
+    "traits": [
+      "Gasp",
+      "Red Bored",
+      "Yellow Bandana",
+      "White Explorer Hat"
+    ],
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/8483",
+    "schemes": []
   },
   "POOTEA": {
     "id": "5690",
@@ -2185,8 +3719,17 @@
     "portraitUrl": "https://moku-nft-nextjs-s3.s3.us-east-2.amazonaws.com/mokis/ed761f863b1b9b5759ac2fae2512313b979cbbe9d8036e7be339cbccada8e6ec.png",
     "fur": "Shadow",
     "traits": [
-      "Ronin"
+      "Shadow Blue",
+      "Scar",
+      "Azure Frown",
+      "Ronin",
+      "Ronin",
+      "Gold Teacup",
+      "Talisman"
     ],
-    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5690"
+    "marketLink": "https://marketplace.roninchain.com/collections/moki-genesis/5690",
+    "schemes": [
+      "Call to Arms"
+    ]
   }
 }

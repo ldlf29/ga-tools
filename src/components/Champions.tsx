@@ -11,15 +11,8 @@ import { matchesFilter } from '@/utils/filterUtils';
 import mokiMetadata from '@/data/mokiMetadata.json';
 import { getSpecializationCoefficient, getStatValueByLimit } from '@/utils/specializationUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from 'recharts';
+import { isSchemeTrait } from '@/data/traitMapping';
+
 
 // ─── Cache ────────────────────────────────────────────────────────────────────
 let cachedMatchesData: UpcomingMatchData[] = [];
@@ -42,7 +35,7 @@ interface ChampionsProps {
   onSearchChange: (query: string) => void;
 }
 
-type ModalTab = 'stats' | 'history' | 'upcoming' | 'daily';
+type ModalTab = 'stats' | 'history' | 'upcoming';
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function Champions({
@@ -64,13 +57,10 @@ export default function Champions({
   // Match History state
   const [matchHistory, setMatchHistory] = useState<any[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
-  const [historyLimit, setHistoryLimit] = useState<10 | 20 | 30>(10);
+  const [historyLimit, setHistoryLimit] = useState<10 | 20>(10);
   const [selectedMatchDetails, setSelectedMatchDetails] = useState<any | null>(null);
 
-  // Live Leaderboard state
-  const [leaderboard, setLeaderboard] = useState<{ date: string; daily_rank: number; daily_score: number }[]>([]);
-  const [liveLoading, setLiveLoading] = useState(false);
-  const [liveView, setLiveView] = useState<'7' | '14' | 'all'>('14');
+
 
   // Filters state
   // Filters state managed via props
@@ -106,7 +96,7 @@ export default function Champions({
     }
   };
 
-  // ─── Load upcoming matches ─────────────────────────────────────────────────
+  // ─── Load matches ──────────────────────────────────────────────────────────
   useEffect(() => {
     async function loadMatches() {
       if (cachedMatchesData.length > 0) {
@@ -115,14 +105,38 @@ export default function Champions({
         return;
       }
       setIsLoading(true);
-      const { data, error } = await supabase
-        .from('upcoming_matches_ga')
-        .select('*')
-        .order('match_date', { ascending: true });
+      
+      let allData: any[] = [];
+      let from = 0;
+      let to = 999;
+      let hasMore = true;
 
-      if (!error && data) {
-        setMatches(data);
-        cachedMatchesData = data;
+      while (hasMore && allData.length < 3000) {
+        const { data, error, count } = await supabase
+          .from('upcoming_matches_ga')
+          .select('*', { count: 'exact' })
+          .order('match_date', { ascending: true })
+          .range(from, to);
+
+        if (error || !data) {
+          console.error("[Supabase Pagination] Error:", error);
+          hasMore = false;
+          break;
+        }
+
+        allData = [...allData, ...data];
+
+        if (data.length < 1000 || allData.length >= (count || 0)) {
+          hasMore = false;
+        } else {
+          from += 1000;
+          to += 1000;
+        }
+      }
+
+      if (allData.length > 0) {
+        setMatches(allData);
+        cachedMatchesData = allData;
       }
       setIsLoading(false);
     }
@@ -149,25 +163,7 @@ export default function Champions({
     fetchHistory();
   }, [selectedChampion, activeTab, historyLimit]);
 
-  // ─── Load live leaderboard when tab is active ─────────────────────────────
-  useEffect(() => {
-    if (!selectedChampion || activeTab !== 'daily') return;
-    // moki_id in daily_leaderboard corresponds to the metadata .id field (string)
-    const mokiId = selectedChampion.id ?? null;
-    if (!mokiId) return;
 
-    const fetchLive = async () => {
-      setLiveLoading(true);
-      const { data, error } = await supabase
-        .from('daily_leaderboard')
-        .select('date, daily_rank, daily_score')
-        .eq('moki_id', mokiId)
-        .order('date', { ascending: false });
-      if (!error && data) setLeaderboard([...data].reverse());
-      setLiveLoading(false);
-    };
-    fetchLive();
-  }, [selectedChampion, activeTab]);
 
   // Prevent background scroll when modal is open
   useEffect(() => {
@@ -360,7 +356,7 @@ export default function Champions({
         return b.score - a.score;
       });
     }
-    else if (lastSortKey?.startsWith('extraSort:') && filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+    else if (lastSortKey?.startsWith('extraSort:') && filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20)) {
       sorted.sort((a, b) => {
         const valA = getStatValueByLimit(a.fullCard, filters.extraSort as string, filters.matchLimit as any);
         const valB = getStatValueByLimit(b.fullCard, filters.extraSort as string, filters.matchLimit as any);
@@ -375,7 +371,7 @@ export default function Champions({
       });
     }
     // Fallbacks if insertionOrder is missing but filters are present
-    else if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+    else if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20)) {
       sorted.sort((a, b) => {
         const valA = getStatValueByLimit(a.fullCard, filters.extraSort as string, filters.matchLimit as any);
         const valB = getStatValueByLimit(b.fullCard, filters.extraSort as string, filters.matchLimit as any);
@@ -430,17 +426,14 @@ export default function Champions({
   // ─── Upcoming matches for selected champion ───────────────────────────────
   const championUpcomingMatches = useMemo(() => {
     if (!selectedChampion) return [];
-    return matches
-      .filter((match) => {
-        const redChamp = match.team_red[0];
-        const blueChamp = match.team_blue[0];
-        return (
-          (redChamp && redChamp.name === selectedChampion.name) ||
-          (blueChamp && blueChamp.name === selectedChampion.name)
-        );
-      })
-      .slice(0, 10)
-      .reverse();
+    const targetName = selectedChampion.name.trim().toUpperCase();
+    
+    const found = matches.filter((match) => {
+      return (match.team_red.some((m: any) => m?.name?.trim().toUpperCase() === targetName) ||
+              match.team_blue.some((m: any) => m?.name?.trim().toUpperCase() === targetName));
+    });
+    
+    return found.slice(0, 10).reverse();
   }, [selectedChampion, matches]);
 
   const formattedDate = useMemo(() => {
@@ -461,7 +454,7 @@ export default function Champions({
     setShowModal(true);
     setActiveTab('stats');
     setMatchHistory([]);
-    setLeaderboard([]);
+
     setSelectedMatchDetails(null);
   };
 
@@ -767,7 +760,7 @@ export default function Champions({
 
               {/* Tab Switcher */}
               <div className={styles.tabBar}>
-                {(['stats', 'history', 'upcoming', 'daily'] as ModalTab[]).map((tab) => (
+                {(['stats', 'history', 'upcoming'] as ModalTab[]).map((tab) => (
                   <button
                     key={tab}
                     className={`${styles.tabBtn} ${activeTab === tab ? styles.tabBtnActive : ''}`}
@@ -776,7 +769,6 @@ export default function Champions({
                     {tab === 'stats' && 'INFO'}
                     {tab === 'history' && 'HISTORY'}
                     {tab === 'upcoming' && 'UPCOMING'}
-                    {tab === 'daily' && 'DAILY'}
                   </button>
                 ))}
               </div>
@@ -799,7 +791,9 @@ export default function Champions({
                             { label: 'Fur', value: fc?.custom?.fur || '-' },
                             { label: 'Stars', value: fc?.custom?.stars ? `${fc.custom.stars} ★` : '-' },
                             ...(fc?.custom?.traits && fc.custom.traits.length > 0
-                              ? fc.custom.traits.map((t: string) => ({ label: 'Trait', value: t }))
+                              ? fc.custom.traits
+                                  .filter((t: string) => isSchemeTrait(t))
+                                  .map((t: string) => ({ label: 'Trait', value: t }))
                               : []
                             ),
                           ].map((s, idx) => (
@@ -853,7 +847,7 @@ export default function Champions({
                         </div>
                       </div>
 
-                      {(filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30) && (
+                      {(filters.matchLimit === 10 || filters.matchLimit === 20) && (
                         <div className={styles.statsSection}>
                           <h3 className={styles.statsSectionTitle}>EXTRA (LAST {filters.matchLimit})</h3>
                           <div className={styles.statsRow} style={{ gap: '0.4rem' }}>
@@ -929,7 +923,7 @@ export default function Champions({
 
                       {/* RIGHT Column: Limit Toggle Buttons */}
                       <div className={styles.mhLimitToggle} style={{ alignSelf: 'flex-start' }}>
-                        {([10, 20, 30] as const).map((limit) => (
+                        {([10, 20] as const).map((limit) => (
                           <button
                             key={limit}
                             className={`${styles.mhLimitBtn} ${historyLimit === limit ? styles.mhLimitBtnActive : ''}`}
@@ -1187,104 +1181,7 @@ export default function Champions({
                   </div>
                 )}
 
-                {/* ── TAB: LIVE LEADERBOARD (Ahora DAILY) ─────────────── */}
-                {activeTab === 'daily' && (
-                  <div className={styles.liveContainer}>
-                    <div className={styles.mhLimitToggle} style={{ marginBottom: '1rem', marginLeft: 'auto', width: 'fit-content' }}>
-                      {(['7', '14', 'all'] as const).map((type) => (
-                        <button
-                          key={type}
-                          className={`${styles.mhLimitBtn} ${liveView === type ? styles.mhLimitBtnActive : ''}`}
-                          onClick={() => setLiveView(type)}
-                        >
-                          {type === 'all' ? 'ALL' : `${type}D`}
-                        </button>
-                      ))}
-                    </div>
 
-                    {liveLoading ? (
-                      <div className={styles.loading}>Loading live data...</div>
-                    ) : leaderboard.length === 0 ? (
-                      <div className={styles.empty}>No live data available yet.</div>
-                    ) : (() => {
-                      const data = (liveView === 'all' ? leaderboard : leaderboard.slice(-Number(liveView))).map((d) => ({
-                        ...d,
-                        formatted_date: new Date(d.date.replace(/-/g, '/')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-                      }));
-
-                      const ticks: string[] = [];
-                      if (data.length > 0) {
-                        const n = data.length;
-                        const interval = liveView === 'all' ? 7 : (liveView === '14' ? 3 : 1);
-
-                        if (interval > 0) {
-                          const tickIndexes: number[] = [];
-                          // Start from most recent (index n-1) and go backwards
-                          for (let i = n - 1; i >= 0; i -= interval) {
-                            tickIndexes.push(i);
-                          }
-
-                          // Also try to include the oldest (index 0) if it's at least half an interval away
-                          const oldestIdx = 0;
-                          const lastGap = tickIndexes[tickIndexes.length - 1] - oldestIdx;
-                          if (lastGap > interval / 2 && !tickIndexes.includes(oldestIdx)) {
-                            tickIndexes.push(oldestIdx);
-                          } else if (!tickIndexes.includes(oldestIdx) && tickIndexes.length > 1) {
-                            // If too close, replace the oldest tick we have with index 0
-                            // actually better to just keep it as is, or just ensure index 0 is used instead of the very close one
-                            tickIndexes[tickIndexes.length - 1] = oldestIdx;
-                          } else if (!tickIndexes.includes(oldestIdx)) {
-                            tickIndexes.push(oldestIdx);
-                          }
-
-                          // Sort indexes chronologically and get the labels
-                          tickIndexes.sort((a, b) => a - b).forEach(idx => {
-                            ticks.push(data[idx].formatted_date);
-                          });
-                        }
-                      }
-
-                      return (
-                        <div className={styles.chartWrapper}>
-                          <h3 className={styles.chartTitle}>Leaderboard Position</h3>
-                          <div style={{ height: '240px', width: '100%' }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                              <AreaChart data={data} margin={{ top: 10, right: 25, left: -20, bottom: 0 }}>
-                                <defs>
-                                  <linearGradient id="colorRankChamp" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#FFD753" stopOpacity={0.8} />
-                                    <stop offset="95%" stopColor="#FFD753" stopOpacity={0.0} />
-                                  </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                                <XAxis
-                                  dataKey="formatted_date"
-                                  stroke="#555"
-                                  fontSize={9}
-                                  fontWeight={600}
-                                  tickLine={false}
-                                  interval={ticks.length > 0 ? 0 : 'preserveStartEnd'}
-                                  ticks={ticks.length > 0 ? ticks : undefined}
-                                />
-                                <YAxis stroke="#555" fontSize={10} fontWeight={600} tickLine={false} allowDecimals={false} />
-                                <Tooltip
-                                  contentStyle={{ backgroundColor: '#1C1C1E', border: '2px solid #333', borderRadius: '0.5rem', color: '#fff', fontSize: '0.85rem' }}
-                                  formatter={((value: any, name: any) => {
-                                    const label = String(name || '');
-                                    if (label === 'daily_rank') return [`Rank #${value}`, 'Position'];
-                                    if (label === 'daily_score') return [`${value} pts`, 'Score'];
-                                    return [value, label];
-                                  }) as any}
-                                />
-                                <Area type="monotone" dataKey="daily_rank" stroke="#FFD753" strokeWidth={3} fillOpacity={1} fill="url(#colorRankChamp)" animationDuration={1500} />
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                )}
 
               </div>
             </div>

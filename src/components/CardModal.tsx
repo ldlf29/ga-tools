@@ -8,11 +8,12 @@ import NextImage from 'next/image';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getStatValueByLimit } from '@/utils/specializationUtils';
+import { SCHEME_RELEVANT_TRAITS } from '@/utils/constants';
 
 interface CardModalProps {
   card: EnhancedCard | null;
   onClose: () => void;
-  matchLimit?: 'ALL' | 10 | 20 | 30;
+  matchLimit?: 'ALL' | 10 | 20;
 }
 
 export default function CardModal({
@@ -272,18 +273,24 @@ export default function CardModal({
                     </div>
                   )}
 
-                  {card.custom.traits && card.custom.traits.length > 0 && (
-                    <div className={styles.traitsSection}>
-                      <span className={styles.statLabel}>Traits</span>
-                      <div className={styles.traitsWrapper}>
-                        {card.custom.traits.map((trait) => (
-                          <span key={trait} className={styles.traitTag}>
-                            {trait}
-                          </span>
-                        ))}
+                  {(() => {
+                    const schemeTraits = (card.custom.traits ?? []).filter((t) =>
+                      SCHEME_RELEVANT_TRAITS.has(t)
+                    );
+                    if (schemeTraits.length === 0) return null;
+                    return (
+                      <div className={styles.traitsSection}>
+                        <span className={styles.statLabel}>Traits</span>
+                        <div className={styles.traitsWrapper}>
+                          {schemeTraits.map((trait) => (
+                            <span key={trait} className={styles.traitTag}>
+                              {trait}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
               </div>
             )}

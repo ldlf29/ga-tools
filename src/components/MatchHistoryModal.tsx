@@ -32,7 +32,7 @@ export default function MatchHistoryModal({
   const [selectedMatchForDetails, setSelectedMatchForDetails] = useState<
     any | null
   >(null);
-  const [historyLimit, setHistoryLimit] = useState<10 | 20 | 30>(10);
+  const [historyLimit, setHistoryLimit] = useState<10 | 20>(10);
 
   useEffect(() => {
     setMounted(true);
@@ -302,11 +302,11 @@ export default function MatchHistoryModal({
               <div className={styles.titleRow}>
                 <h2 className={styles.title}>MATCH HISTORY</h2>
                 <div className={styles.limitToggle}>
-                  {[10, 20, 30].map((val) => (
+                  {[10, 20].map((val) => (
                     <button
                       key={val}
                       className={`${styles.limitBtn} ${historyLimit === val ? styles.limitBtnActive : ''}`}
-                      onClick={() => setHistoryLimit(val as 10 | 20 | 30)}
+                      onClick={() => setHistoryLimit(val as 10 | 20)}
                       disabled={loading}
                     >
                       LAST {val}

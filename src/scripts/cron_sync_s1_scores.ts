@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import mokiMetadataRaw from '../data/mokiMetadata.json';
 
 // Carga de variables de entorno
 dotenv.config({ path: path.join(__dirname, '../../.env.local') });
@@ -10,6 +11,19 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+const mokiMetadata = mokiMetadataRaw as Record<string, any>;
+
+// Build lookup maps from mokiMetadata (source of truth)
+const tokenIdToMeta = new Map<number, { name: string; key: string }>();
+const nameToTokenId = new Map<string, number>();
+Object.entries(mokiMetadata).forEach(([key, meta]) => {
+  if (meta.id) {
+    const id = parseInt(meta.id, 10);
+    tokenIdToMeta.set(id, { name: meta.name, key });
+    nameToTokenId.set(meta.name.trim().toUpperCase(), id);
+  }
+});
 
 const LEADERBOARD_ID = '6997a23dfe65385c3bd784e5';
 const API_URL_BASE = `https://api.grandarena.gg/api/v1/leaderboards/${LEADERBOARD_ID}/scores`;
@@ -56,10 +70,15 @@ async function run() {
   console.log(`[Cron S1 Scores] Fetched ${results.length} records. Syncing to DB...`);
 
   // Merge with existing DB data
+  // Use moki_id as the lookup key (stable, not name)
   const { data: dbStats } = await supabaseAdmin.from('moki_stats').select('*');
-  const dbMap = new Map<string, any>();
+  const dbMap = new Map<number, any>();
   if (dbStats) {
-    dbStats.forEach((row) => dbMap.set(row.name.trim().toUpperCase(), row));
+    dbStats.forEach((row) => {
+      if (row.moki_id) {
+        dbMap.set(row.moki_id, row);
+      }
+    });
   }
 
   const statsUpdates: any[] = [];
@@ -70,18 +89,28 @@ async function run() {
     const mokiName = record.name?.trim();
     if (!mokiName) return;
 
+    // Resolve moki_id from the leaderboard name
     const upperName = mokiName.toUpperCase();
-    const existing = dbMap.get(upperName) || { name: mokiName };
+    const mokiId = nameToTokenId.get(upperName);
+    if (!mokiId) {
+      console.warn(`[Cron S1 Scores] Unknown moki name from leaderboard: "${mokiName}" — skipping`);
+      return;
+    }
+
+    const metaEntry = tokenIdToMeta.get(mokiId);
+    const canonicalName = metaEntry?.name || mokiName;
+    const existing = dbMap.get(mokiId) || { name: canonicalName, moki_id: mokiId };
 
     statsUpdates.push({
       ...existing,
+      moki_id: mokiId,              // Stable join key
+      name: canonicalName,           // From mokiMetadata, NOT from leaderboard
       eliminations: mm.avgEliminations || 0,
       deposits: mm.avgDeposits || 0,
       wart_distance: mm.avgWartDistance || 0,
       score: mm.avgScore || 0,
       win_rate: mm.winPct || 0,
       last_updated: new Date().toISOString(),
-      // Ensure 'class' is maintained. Only overwrite if it was missing and we got it from API.
       class: existing.class || record.class || '',
     });
   });
@@ -94,7 +123,7 @@ async function run() {
     const chunk = statsUpdates.slice(i, i + DB_CHUNK_SIZE);
     const { error } = await supabaseAdmin
       .from('moki_stats')
-      .upsert(chunk, { onConflict: 'name' });
+      .upsert(chunk, { onConflict: 'moki_id' });
 
     if (error) {
        console.error('[Cron S1 Scores] Error upserting chunk:', error);

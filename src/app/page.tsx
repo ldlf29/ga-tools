@@ -387,8 +387,9 @@ export default function Home() {
     customClass: [] as string[],
     specialization: [] as string[],
     traits: [] as string[],
+    traitScheme: [] as string[],
     insertionOrder: [] as string[],
-    matchLimit: 'ALL' as 'ALL' | 10 | 20 | 30,
+    matchLimit: 'ALL' as 'ALL' | 10 | 20,
   };
 
   const [filters, setFilters] = useState<FilterState>({
@@ -683,6 +684,7 @@ export default function Home() {
       customClass: [],
       specialization: [],
       traits: [],
+      traitScheme: [],
       insertionOrder: [],
       matchLimit: 'ALL',
     };

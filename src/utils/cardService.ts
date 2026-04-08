@@ -68,7 +68,15 @@ const buildEnhancedCard = (
   // Look up stats from existing live data
   const stats = cachedLiveData ? cachedLiveData[normalizedName] : null;
 
-  const cardImage = baseImage || stats?.imageUrl || '';
+  // Card art = the actual NFT card image (from catalog or API).
+  // Portrait = the in-game character image (from mokiMetadata via liveData merge).
+  const cardImage = baseImage || '';
+  const portraitUrl = stats?.imageUrl || ''; // mokiMetadata.portraitUrl, resolved by liveData merge
+
+  // characterImage: for Schemes use scheme asset; for Mokis prefer the portrait over the card art.
+  const characterImage = isScheme
+    ? localSchemeImages[normalizedName] || cardImage
+    : portraitUrl || cardImage;
 
   // Determine market link
   let catalogMarketLink = '#';
@@ -92,9 +100,6 @@ const buildEnhancedCard = (
   } else {
     catalogMarketLink = catalogMarket || '#';
   }
-
-  const characterImage =
-    localSchemeImages[normalizedName] || stats?.imageUrl || cardImage;
 
   return {
     id: id,
@@ -139,11 +144,6 @@ const buildEnhancedCard = (
       avgWartDistance20: stats?.avgWartDistance20,
       avgScore20: stats?.avgScore20,
       avgWinRate20: stats?.avgWinRate20,
-      avgEliminations30: stats?.avgEliminations30,
-      avgDeposits30: stats?.avgDeposits30,
-      avgWartDistance30: stats?.avgWartDistance30,
-      avgScore30: stats?.avgScore30,
-      avgWinRate30: stats?.avgWinRate30,
       avgEndedGame10: stats?.avgEndedGame10,
       avgDeaths10: stats?.avgDeaths10,
       avgEatingWhileRiding10: stats?.avgEatingWhileRiding10,
@@ -160,15 +160,7 @@ const buildEnhancedCard = (
       avgLooseBallPickups20: stats?.avgLooseBallPickups20,
       avgEatenByWart20: stats?.avgEatenByWart20,
       avgWartCloser20: stats?.avgWartCloser20,
-      avgEndedGame30: stats?.avgEndedGame30,
-      avgDeaths30: stats?.avgDeaths30,
-      avgEatingWhileRiding30: stats?.avgEatingWhileRiding30,
-      avgBuffTime30: stats?.avgBuffTime30,
-      avgWartTime30: stats?.avgWartTime30,
-      avgLooseBallPickups30: stats?.avgLooseBallPickups30,
-      avgEatenByWart30: stats?.avgEatenByWart30,
-      avgWartCloser30: stats?.avgWartCloser30,
-      imageUrl: cardImage,
+      imageUrl: portraitUrl || cardImage,
       characterImage,
       defense: stats?.defense,
       dexterity: stats?.dexterity,
@@ -180,6 +172,7 @@ const buildEnhancedCard = (
       marketLink: stats?.marketLink,
       series: seriesInfo?.series,
       catalogMarketLink: catalogMarketLink,
+      traitSchemes: stats?.traitSchemes || [],
     },
     category: seriesInfo?.category,
   };

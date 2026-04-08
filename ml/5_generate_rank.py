@@ -136,13 +136,37 @@ def get_metadata(champ_name):
 
 def main():
     # ── Cargar upcoming matches desde Supabase ────────────────────────────────
+    # ── Cargar upcoming matches desde Supabase (PAGINADO) ─────────────────────
+    print("[INFO] Fetching ALL upcoming matches from Supabase...")
     url = f"{SUPABASE_URL}/rest/v1/upcoming_matches_ga?select=*"
     headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        print(f"[ERROR] No se pudo conectar a Supabase: {response.status_code}")
-        return
-    data = response.json()
+    
+    data = []
+    from_idx = 0
+    to_idx = 999
+    has_more = True
+    
+    while has_more:
+        headers_page = {**headers, "Range": f"{from_idx}-{to_idx}", "Prefer": "count=exact"}
+        response = requests.get(url, headers=headers_page)
+        if response.status_code not in [200, 206]: # 200 (OK) or 206 (Partial Content)
+            print(f"[ERROR] Error al conectar a Supabase: {response.status_code}")
+            break
+            
+        batch = response.json()
+        if not batch:
+            has_more = False
+            break
+            
+        data.extend(batch)
+        print(f"[Supabase Pagination] Recuperadas filas {from_idx}-{to_idx}. Total: {len(data)}")
+        
+        if len(batch) < 1000:
+            has_more = False
+        else:
+            from_idx += 1000
+            to_idx += 1000
+
     if not data:
         print("[WARN] No hay upcoming matches en Supabase.")
         return

@@ -5,7 +5,7 @@ import { useState, useEffect, Fragment } from 'react';
 import styles from './FilterSidebar.module.css';
 import StarRangeSlider from './StarRangeSlider';
 import { m as motion, AnimatePresence } from 'framer-motion';
-import { FilterState, TRAIT_GROUPS } from '@/types';
+import { FilterState } from '@/types';
 
 interface FilterSidebarProps {
   filters: FilterState;
@@ -35,6 +35,18 @@ const SPECIALIZATION_CONFIG: { key: string; label: string }[] = [
   { key: 'Good Streak', label: 'Good Streak' },
   { key: 'Bad Streak', label: 'Bad Streak' },
   { key: 'Score', label: 'Score' },
+];
+
+// Trait-based scheme options (NFT attributes → scheme categories)
+const TRAIT_SCHEME_OPTIONS = [
+  'Call to Arms',
+  'Costume Party',
+  'Dress to Impress',
+  'Dungaree Duel',
+  'Housekeeping',
+  'Malicious Intent',
+  'Shapeshifting',
+  'Tear Jerking',
 ];
 
 export default function FilterSidebar({
@@ -180,6 +192,9 @@ export default function FilterSidebar({
     });
   };
 
+  const handleTraitSchemeChange = (scheme: string) =>
+    updateFilter('traitScheme', scheme);
+
   const handleClearFilters = () => {
     onFilterChange({
       ...filters,
@@ -190,6 +205,7 @@ export default function FilterSidebar({
       customClass: [],
       specialization: [],
       traits: [],
+      traitScheme: [],
       insertionOrder: [],
       matchLimit: 'ALL',
     });
@@ -201,7 +217,8 @@ export default function FilterSidebar({
     filters.fur.length > 0 ||
     filters.customClass.length > 0 ||
     filters.specialization.length > 0 ||
-    filters.traits.length > 0 ||
+
+    (filters.traitScheme?.length ?? 0) > 0 ||
     filters.stars.length > 0 ||
     (filters.matchLimit && filters.matchLimit !== 'ALL');
 
@@ -213,10 +230,9 @@ export default function FilterSidebar({
   const specMatches = hasMatches(specLabels);
   const starsMatches = starsHasMatch();
   const furMatches = hasMatches(FUR_OPTIONS);
-  const traitLabels = TRAIT_GROUPS.map((g) => g.label);
-  const traitsMatches = hasMatches(traitLabels);
+  const traitSchemeMatches = hasMatches(TRAIT_SCHEME_OPTIONS);
   const schemeMatches = hasMatches(SCHEME_NAMES);
-  const perfLabels = ['Last 10 Matches', 'Last 20 Matches', 'Last 30 Matches'];
+  const perfLabels = ['Last 10 Matches', 'Last 20 Matches'];
   const performanceMatches = hasMatches(perfLabels);
 
   return (
@@ -341,32 +357,25 @@ export default function FilterSidebar({
               </FilterAccordion>
             )}
 
-            {/* Traits (Grouped) */}
-            {(!filterSearch.trim() || traitsMatches) && (
+
+            {/* Trait Schemes */}
+            {(!filterSearch.trim() || traitSchemeMatches) && (
               <FilterAccordion
                 storagePrefix={storagePrefix}
-                title="Traits"
+                title="Trait Schemes"
                 isOpenDefault={false}
-                forceOpen={traitsMatches}
+                forceOpen={traitSchemeMatches}
               >
-                {TRAIT_GROUPS.filter((group) => {
-                  if (!filterSearch.trim()) return true;
-                  return group.label
-                    .toLowerCase()
-                    .includes(filterSearch.toLowerCase());
-                }).map((group) => {
-                  const isChecked = filters.traits.includes(group.label);
-                  return (
-                    <label key={group.label} className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox" // Keep as checkbox visually so they can toggle it off, but logic handles it exclusively
-                        checked={isChecked}
-                        onChange={() => handleTraitGroupChange(group)}
-                      />
-                      <span className={styles.labelText}>{group.label}</span>
-                    </label>
-                  );
-                })}
+                {filterOptions(TRAIT_SCHEME_OPTIONS).map((scheme) => (
+                  <label key={scheme} className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={(filters.traitScheme ?? []).includes(scheme)}
+                      onChange={() => handleTraitSchemeChange(scheme)}
+                    />
+                    <span className={styles.labelText}>{scheme}</span>
+                  </label>
+                ))}
               </FilterAccordion>
             )}
 
@@ -413,7 +422,6 @@ export default function FilterSidebar({
                 {[
                   { label: 'Last 10 Matches', value: 10 },
                   { label: 'Last 20 Matches', value: 20 },
-                  { label: 'Last 30 Matches', value: 30 },
                 ]
                   .filter(
                     (opt) =>
@@ -433,7 +441,7 @@ export default function FilterSidebar({
                           const newLimit =
                             currentLimit === opt.value
                               ? 'ALL'
-                              : (opt.value as 10 | 20 | 30);
+                              : (opt.value as 10 | 20);
 
                           // Handle insertion order logic so the chip appears/disappears
                           let updatedOrder = filters.insertionOrder
@@ -442,8 +450,7 @@ export default function FilterSidebar({
                           updatedOrder = updatedOrder.filter(
                             (k) =>
                               k !== 'matchLimit:10' &&
-                              k !== 'matchLimit:20' &&
-                              k !== 'matchLimit:30'
+                              k !== 'matchLimit:20'
                           );
                           if (newLimit !== 'ALL') {
                             updatedOrder.push(`matchLimit:${newLimit}`);
@@ -470,7 +477,7 @@ export default function FilterSidebar({
             )}
 
             {/* Extra Sorting - Only if matchLimit is active */}
-            {(filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30) && (
+            {(filters.matchLimit === 10 || filters.matchLimit === 20) && (
               <FilterAccordion
                 storagePrefix={storagePrefix}
                 title="Extra"

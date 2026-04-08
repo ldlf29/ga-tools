@@ -133,6 +133,7 @@ export default function MyLineups({
     customClass: [],
     specialization: [],
     traits: [],
+    traitScheme: [],
     insertionOrder: [],
   });
   const [selectorMobileFiltersOpen, setSelectorMobileFiltersOpen] =
@@ -250,6 +251,7 @@ export default function MyLineups({
       customClass: [],
       specialization: [],
       traits: [],
+      traitScheme: [],
       insertionOrder: [],
     });
   };

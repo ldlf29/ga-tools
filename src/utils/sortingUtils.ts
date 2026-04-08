@@ -80,7 +80,7 @@ export const sortCardsByFilters = (
           if (diff !== 0) return diff;
         }
       }
-      else if (lastSortKey?.startsWith('extraSort:') && filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+      else if (lastSortKey?.startsWith('extraSort:') && filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20)) {
         const valA = getStatValueByLimit(a, filters.extraSort, filters.matchLimit);
         const valB = getStatValueByLimit(b, filters.extraSort, filters.matchLimit);
         if (valB !== valA) return valB - valA;
@@ -97,7 +97,7 @@ export const sortCardsByFilters = (
         }
       }
       // Fallbacks if insertionOrder is missing but filters are present
-      else if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20 || filters.matchLimit === 30)) {
+      else if (filters.extraSort && (filters.matchLimit === 10 || filters.matchLimit === 20)) {
         const valA = getStatValueByLimit(a, filters.extraSort, filters.matchLimit);
         const valB = getStatValueByLimit(b, filters.extraSort, filters.matchLimit);
         if (valB !== valA) return valB - valA;

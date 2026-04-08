@@ -69,11 +69,11 @@ export default function ChampionsList() {
   >(null);
   const [showChangelog, setShowChangelog] = useState(false);
   const [confirmExport, setConfirmExport] = useState(false);
-  const [matchLimit, setMatchLimit] = useState<'ALL' | 10 | 20 | 30>(() => {
+  const [matchLimit, setMatchLimit] = useState<'ALL' | 10 | 20>(() => {
     if (typeof sessionStorage !== 'undefined') {
       const saved = sessionStorage.getItem('champions_matchLimit');
       if (saved !== null && saved !== 'ALL')
-        return Number(saved) as 10 | 20 | 30;
+        return Number(saved) as 10 | 20;
     }
     return 'ALL';
   });
@@ -552,11 +552,11 @@ export default function ChampionsList() {
           </div>
           <div className={styles.headerRight}>
             <div className={styles.limitToggle}>
-              {['ALL', 10, 20, 30].map((val) => (
+              {['ALL', 10, 20].map((val) => (
                 <button
                   key={val}
                   className={`${styles.limitBtn} ${matchLimit === val ? styles.limitBtnActive : ''}`}
-                  onClick={() => setMatchLimit(val as 'ALL' | 10 | 20 | 30)}
+                  onClick={() => setMatchLimit(val as 'ALL' | 10 | 20)}
                   title={`View ${val === 'ALL' ? 'Season 1' : 'Last ' + val} Match Performance`}
                 >
                   {val === 'ALL' ? 'S1' : `LAST ${val}`}
@@ -668,11 +668,11 @@ export default function ChampionsList() {
         {/* Mobile Action Row (hidden on desktop) */}
         <div className={styles.actionRow}>
           <div className={styles.limitToggle}>
-            {['ALL', 10, 20, 30].map((val) => (
+            {['ALL', 10, 20].map((val) => (
               <button
                 key={val}
                 className={`${styles.limitBtn} ${matchLimit === val ? styles.limitBtnActive : ''}`}
-                onClick={() => setMatchLimit(val as 'ALL' | 10 | 20 | 30)}
+                onClick={() => setMatchLimit(val as 'ALL' | 10 | 20)}
                 title={`View ${val === 'ALL' ? 'Season 1' : 'Last ' + val} Match Performance`}
               >
                 {val === 'ALL' ? 'S1' : val}
@@ -990,17 +990,13 @@ export default function ChampionsList() {
                               />
                             </div>
                           )}
-                          <Link
-                            href={`/moki/${encodeURIComponent(moki.name)}`}
+                          <span
                             style={{
-                              textDecoration: 'none',
                               color: 'inherit',
-                              borderBottom: '1px solid currentColor',
                             }}
-                            onClick={(e) => e.stopPropagation()}
                           >
                             {moki.name}
-                          </Link>
+                          </span>
                           {moki.tokenId && (
                             <button
                               className={styles.linkButton}
@@ -1118,17 +1114,14 @@ export default function ChampionsList() {
                       <span className={styles.mobileRank}>
                         #{rankMap.get(moki.id || moki.name) || '-'}
                       </span>
-                      <Link
-                        href={`/moki/${encodeURIComponent(moki.name)}`}
+                      <span
                         style={{
-                          textDecoration: 'none',
                           color: 'inherit',
-                          borderBottom: '1px solid currentColor',
                         }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         {moki.name}
-                      </Link>
+                      </span>
                     </div>
                     <div className={styles.expandIcon}>
                       <svg

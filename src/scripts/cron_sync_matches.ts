@@ -13,6 +13,15 @@ const supabaseAdmin = createClient(
 );
 
 const mokiMetadata = mokiMetadataRaw as Record<string, any>;
+
+// Build tokenId → canonical name lookup from mokiMetadata
+const tokenIdToMeta = new Map<number, { name: string; key: string }>();
+Object.entries(mokiMetadata).forEach(([key, meta]) => {
+  if (meta.id) {
+    tokenIdToMeta.set(parseInt(meta.id, 10), { name: meta.name, key });
+  }
+});
+
 const CONCURRENCY_LIMIT = 20;
 const DELAY_BETWEEN_BATCHES = 2000;
 
@@ -55,7 +64,7 @@ async function run() {
     );
 
     const fetchPromises = chunkTokenIds.map(async (tokenId) => {
-      const apiUrl = `https://api.grandarena.gg/api/v1/mokis/${tokenId}/performances?page=1&limit=30`;
+      const apiUrl = `https://api.grandarena.gg/api/v1/mokis/${tokenId}/performances?page=1&limit=20`;
       try {
         const response = await fetch(apiUrl, {
           headers: {
@@ -96,11 +105,14 @@ async function run() {
             );
             const perfResults = perf.results || {};
 
+            // Use canonical name from mokiMetadata, NOT from API
+            const metaEntry = tokenIdToMeta.get(parseInt(tokenId, 10));
+
             records.push({
               match_id: match.id,
               moki_id: targetMokiHash,
               token_id: parseInt(tokenId, 10),
-              moki_name: playerInfo?.name || 'Unknown',
+              moki_name: metaEntry?.name || playerInfo?.name || 'Unknown',
               moki_class: playerInfo?.class || '',
               moki_image_url: playerInfo?.imageUrl || '',
               moki_team: playerInfo?.team || 0,
@@ -171,7 +183,7 @@ async function run() {
   try {
     const { data: deletedData, error: cleanupErr } = await supabaseAdmin.rpc(
       'cleanup_old_matches',
-      { keep_count: 30 }  // 30 matches por Moki × 240 Mokis = ~7200 filas máx en la tabla
+      { keep_count: 20 }  // 20 matches por Moki × 240 Mokis = ~4800 filas máx en la tabla
     );
 
     if (cleanupErr) {
@@ -186,16 +198,7 @@ async function run() {
     console.error(`[Cron Matches] Housekeeping failed:`, err);
   }
 
-  // Leaderboard
-  try {
-    const { error: rpcErr } = await supabaseAdmin.rpc(
-      'update_daily_leaderboard'
-    );
-    if (rpcErr) console.error('[Cron Matches] Leaderboard RPC error:', rpcErr);
-    else console.log('[Cron Matches] Daily leaderboard updated successfully.');
-  } catch (err) {
-    console.error('[Cron Matches] Leaderboard RPC failed:', err);
-  }
+
 
   console.log(
     `[Cron Matches] Sync Complete. Upserted ${recordsUpserted}. Duration: ${Date.now() - startTime}ms`

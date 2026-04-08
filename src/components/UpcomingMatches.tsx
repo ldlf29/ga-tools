@@ -11,6 +11,8 @@ import { getSpecializationCoefficient } from '@/utils/specializationUtils';
 import { getActiveFiltersDisplay } from '@/utils/filterDisplay';
 
 let cachedMatchesData: UpcomingMatchData[] = [];
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 interface UpcomingMatchData {
   id: string;
@@ -44,6 +46,7 @@ export default function UpcomingMatches({ allCards }: UpcomingMatchesProps) {
     customClass: [],
     specialization: [],
     traits: [],
+    traitScheme: [],
     matchLimit: 'ALL',
   });
   
@@ -52,7 +55,9 @@ export default function UpcomingMatches({ allCards }: UpcomingMatchesProps) {
 
   useEffect(() => {
     async function loadMatches() {
-      if (cachedMatchesData.length > 0) {
+      const now = Date.now();
+      const cacheValid = cachedMatchesData.length > 0 && (now - cacheTimestamp) < CACHE_TTL_MS;
+      if (cacheValid) {
         setMatches(cachedMatchesData);
         setIsLoading(false);
         return;
@@ -61,11 +66,15 @@ export default function UpcomingMatches({ allCards }: UpcomingMatchesProps) {
       const { data, error } = await supabase
         .from('upcoming_matches_ga')
         .select('*')
-        .order('match_date', { ascending: true });
+        .order('match_date', { ascending: true })
+        .limit(2000);
 
       if (!error && data) {
         setMatches(data);
         cachedMatchesData = data;
+        cacheTimestamp = Date.now();
+      } else if (error) {
+        console.error('[UpcomingMatches] Supabase error:', error);
       }
       setIsLoading(false);
     }
@@ -104,6 +113,7 @@ const hasSidebarFilters =
     filters.traits!.length > 0 || 
     filters.specialization!.length > 0 || 
     filters.customClass!.length > 0 ||
+    (filters.traitScheme?.length ?? 0) > 0 ||
     (filters.stars && filters.stars.length > 0);
 // Aggregate Unique Champions from matches and calculate Rank
 const uniqueChampions = useMemo(() => {
@@ -192,12 +202,12 @@ const uniqueChampions = useMemo(() => {
 
   const championMatches = useMemo(() => {
     if (!selectedChampion) return [];
-    return matches.filter(match => {
-      const redChamp = match.team_red[0];
-      const blueChamp = match.team_blue[0];
-      return (redChamp && redChamp.name === selectedChampion.name) || 
-             (blueChamp && blueChamp.name === selectedChampion.name);
-    }).slice(0, 10).reverse();
+    const champName = selectedChampion.name;
+    const found = matches.filter(match => (
+      match.team_red.some((m: any) => m?.name === champName) ||
+      match.team_blue.some((m: any) => m?.name === champName)
+    ));
+    return found.slice(0, 10).reverse();
   }, [selectedChampion, matches]);
 
   const formattedDate = useMemo(() => {
@@ -249,9 +259,16 @@ const uniqueChampions = useMemo(() => {
         <div className={styles.matchesView}>
            <div className={styles.topControls}>
               <div className={styles.headerTopRow}>
-                 <h1 className={styles.pageTitle}>UPCOMING MATCHES</h1>
-                 <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search Champion by Name..." className={styles.searchInput} />
-              </div>
+                  <div className={styles.headerTitleGroup}>
+                     <h1 className={styles.pageTitle}>UPCOMING MATCHES</h1>
+                     {!isLoading && (
+                       <span className={styles.matchCount}>
+                         {uniqueChampions.length} champions · {matches.length} matches
+                       </span>
+                     )}
+                  </div>
+                  <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search Champion by Name..." className={styles.searchInput} />
+               </div>
               {activeFilters.length > 0 && (
                 <div className={styles.activeFilters}>
                   {activeFilters.map((f, i) => (
@@ -302,7 +319,7 @@ const uniqueChampions = useMemo(() => {
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
              <div className={styles.modalHeader}>
                 <div className={styles.modalHeaderInfo}>
-                   <h2 className={styles.modalName}>UPCOMING MATCHES (NEXT 10)</h2>
+                   <h2 className={styles.modalName}>UPCOMING MATCHES</h2>
                    {formattedDate && <p className={styles.modalHeaderDate}>{formattedDate}</p>}
                    <p className={styles.updateFreq}>The data is updated at the end of each block of games.</p>
                    <h3 className={styles.mokiSubtitle}>{selectedChampion.name}</h3>

@@ -381,24 +381,27 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         sorted = sorted.filter(m => m.Fur === 'Gold');
       } else if (selectedMetaScheme === 'Rainbow Riot') {
         sorted = sorted.filter(m => m.Fur === 'Rainbow');
-      }
-      // Trait-based schemes using TRAIT_GROUPS logic
-      else if (selectedMetaScheme === 'Shapeshifting') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Tongue Out', 'Tanuki', 'Kitsune', 'Cat Mask']));
-      } else if (selectedMetaScheme === 'Tear jerking') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Crying Eye']));
-      } else if (selectedMetaScheme === 'Costume party') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Onesie', 'Lemon', 'Kappa', 'Tomato', 'Blob Head']));
-      } else if (selectedMetaScheme === 'Dress To Impress') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Kimono']));
-      } else if (selectedMetaScheme === 'Call To Arms') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Ronin', 'Samurai']));
-      } else if (selectedMetaScheme === 'Malicious Intent') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Devious Mouth', 'Oni', 'Tengu', 'Skull Mask']));
-      } else if (selectedMetaScheme === 'Housekeeping') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Apron', 'Garbage Can', 'Gold Can', 'Toilet Paper']));
-      } else if (selectedMetaScheme === 'Dungaree Duel') {
-        sorted = sorted.filter(m => hasTrait(m.Traits, ['Pink Overalls', 'Blue Overalls', 'Green Overalls']));
+      } else {
+        // Trait-based schemes: use mokiMetadata.schemes (same source as FilterSidebar)
+        // Map PredictionsTab scheme name -> mokiMetadata scheme name (handles case differences)
+        const SCHEME_NAME_MAP: Record<string, string> = {
+          'Shapeshifting':    'Shapeshifting',
+          'Tear jerking':     'Tear Jerking',
+          'Costume party':    'Costume Party',
+          'Dress To Impress': 'Dress to Impress',
+          'Call To Arms':     'Call to Arms',
+          'Malicious Intent': 'Malicious Intent',
+          'Housekeeping':     'Housekeeping',
+          'Dungaree Duel':    'Dungaree Duel',
+        };
+        const metaKey = selectedMetaScheme ? SCHEME_NAME_MAP[selectedMetaScheme] : null;
+        if (metaKey) {
+          sorted = sorted.filter(m => {
+            const meta = metadataByName[(m.Name || '').toUpperCase()];
+            const schemes: string[] = (meta as any)?.schemes ?? [];
+            return schemes.includes(metaKey);
+          });
+        }
       }
     }
 
@@ -501,18 +504,24 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       });
     }
     if (modalFilters.trait !== 'ALL') {
-      filtered = filtered.filter(m => {
-        if (!m.Traits) return false;
-        if (modalFilters.trait === 'Shapeshifting') return hasTrait(m.Traits, ['Tongue Out', 'Tanuki', 'Kitsune', 'Cat Mask']);
-        if (modalFilters.trait === 'Tear jerking') return hasTrait(m.Traits, ['Crying Eye']);
-        if (modalFilters.trait === 'Costume party') return hasTrait(m.Traits, ['Onesie', 'Lemon', 'Kappa', 'Tomato', 'Blob Head']);
-        if (modalFilters.trait === 'Dress To Impress') return hasTrait(m.Traits, ['Kimono']);
-        if (modalFilters.trait === 'Call To Arms') return hasTrait(m.Traits, ['Ronin', 'Samurai']);
-        if (modalFilters.trait === 'Malicious Intent') return hasTrait(m.Traits, ['Devious Mouth', 'Oni', 'Tengu', 'Skull Mask']);
-        if (modalFilters.trait === 'Housekeeping') return hasTrait(m.Traits, ['Apron', 'Garbage Can', 'Gold Can', 'Toilet Paper']);
-        if (modalFilters.trait === 'Dungaree Duel') return hasTrait(m.Traits, ['Pink Overalls', 'Blue Overalls', 'Green Overalls']);
-        return false;
-      });
+      const MODAL_SCHEME_MAP: Record<string, string> = {
+        'Shapeshifting':    'Shapeshifting',
+        'Tear jerking':     'Tear Jerking',
+        'Costume party':    'Costume Party',
+        'Dress To Impress': 'Dress to Impress',
+        'Call To Arms':     'Call to Arms',
+        'Malicious Intent': 'Malicious Intent',
+        'Housekeeping':     'Housekeeping',
+        'Dungaree Duel':    'Dungaree Duel',
+      };
+      const metaKey = MODAL_SCHEME_MAP[modalFilters.trait];
+      if (metaKey) {
+        filtered = filtered.filter(m => {
+          const meta = metadataByName[(m.Name || '').toUpperCase()];
+          const schemes: string[] = (meta as any)?.schemes ?? [];
+          return schemes.includes(metaKey);
+        });
+      }
     }
 
     if (!modalSortKey) return filtered;
@@ -556,7 +565,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     let matches = upcomingMatchesCache;
     if (matches.length === 0) {
       try {
-        const { data } = await supabase.from('upcoming_matches_ga').select('*');
+        const { data } = await supabase.from('upcoming_matches_ga').select('*').limit(2000);
         if (data) {
           setUpcomingMatchesCache(data as UpcomingMatchData[]);
           matches = data as UpcomingMatchData[];

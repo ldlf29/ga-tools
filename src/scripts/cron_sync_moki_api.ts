@@ -16,6 +16,15 @@ const supabaseAdmin = createClient(
 );
 
 const mokiMetadata = mokiMetadataRaw as Record<string, any>;
+
+// Build tokenId → canonical name lookup from mokiMetadata
+const tokenIdToMeta = new Map<number, { name: string; key: string }>();
+Object.entries(mokiMetadata).forEach(([key, meta]) => {
+  if (meta.id) {
+    tokenIdToMeta.set(parseInt(meta.id, 10), { name: meta.name, key });
+  }
+});
+
 const BATCH_SIZE = 90;
 
 async function run() {
@@ -38,9 +47,14 @@ async function run() {
     process.exit(1);
   }
 
-  const dbMap = new Map<string, any>();
+  // Use moki_id as the lookup key (stable, not name)
+  const dbMap = new Map<number, any>();
   if (dbStats) {
-    dbStats.forEach((row) => dbMap.set(row.name.trim().toUpperCase(), row));
+    dbStats.forEach((row) => {
+      if (row.moki_id) {
+        dbMap.set(row.moki_id, row);
+      }
+    });
   }
 
   const allIds = Object.values(mokiMetadata)
@@ -82,10 +96,18 @@ async function run() {
   const classChanges: any[] = [];
 
   for (const apiMoki of apiResults) {
-    const mokiName = apiMoki.name;
-    if (!mokiName) continue;
+    // Use mokiTokenId as the stable identifier
+    const mokiTokenId = apiMoki.mokiTokenId || apiMoki.tokenId;
+    if (!mokiTokenId) {
+      console.warn(`[Cron Sync Moki] Skipping moki without mokiTokenId: ${apiMoki.name}`);
+      continue;
+    }
 
-    const upperName = mokiName.trim().toUpperCase();
+    const tokenIdNum = typeof mokiTokenId === 'number' ? mokiTokenId : parseInt(mokiTokenId, 10);
+    // Get canonical name from mokiMetadata (source of truth)
+    const metaEntry = tokenIdToMeta.get(tokenIdNum);
+    const canonicalName = metaEntry?.name || apiMoki.name;
+
     const gameStats = apiMoki.gameStats || {};
     const stats = gameStats.stats || {};
     const apiClass = gameStats.class || '';
@@ -105,8 +127,10 @@ async function run() {
 
     const totalSum = str + spd + def + dex + fort;
 
-    const existingDbRow = dbMap.get(upperName) || {
-      name: mokiName,
+    // Lookup by moki_id (stable) instead of name (fragile)
+    const existingDbRow = dbMap.get(tokenIdNum) || {
+      name: canonicalName,
+      moki_id: tokenIdNum,
       eliminations: 0,
       deposits: 0,
       wart_distance: 0,
@@ -118,7 +142,8 @@ async function run() {
     const oldClass = existingDbRow.class || '';
     if (oldClass && oldClass !== apiClass && apiClass !== '') {
       classChanges.push({
-        moki_name: mokiName,
+        moki_id: tokenIdNum,
+        moki_name: canonicalName,
         old_class: oldClass,
         new_class: apiClass,
       });
@@ -126,7 +151,8 @@ async function run() {
 
     updatesToSupabase.push({
       ...existingDbRow,
-      name: mokiName,
+      moki_id: tokenIdNum,      // Stable join key
+      name: canonicalName,       // From mokiMetadata, NOT from API
       class: apiClass || oldClass,
       defense: def,
       dexterity: dex,
@@ -224,6 +250,9 @@ async function run() {
     console.log(
       `[Cron Sync Moki] Upserting ${updatesToSupabase.length} Moki stats...`
     );
+    // PHASE 1: upsert on 'name' (current PK) to populate moki_id on existing rows.
+    // Once all rows have moki_id set and the DB PK is migrated to moki_id,
+    // change this back to onConflict: 'moki_id'.
     const { error: upsertErr } = await supabaseAdmin
       .from('moki_stats')
       .upsert(updatesToSupabase, { onConflict: 'name' });

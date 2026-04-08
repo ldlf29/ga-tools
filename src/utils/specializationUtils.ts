@@ -82,12 +82,10 @@ const getStreakRatio = (card: EnhancedCard, limit?: string | number): number => 
 
   if (limit == 10) actual = card.custom?.avgWinRate10 || 0;
   else if (limit == 20) actual = card.custom?.avgWinRate20 || 0;
-  else if (limit == 30) actual = card.custom?.avgWinRate30 || 0;
   else {
     const avg10 = card.custom?.avgWinRate10 || 0;
     const avg20 = card.custom?.avgWinRate20 || 0;
-    const avg30 = card.custom?.avgWinRate30 || 0;
-    actual = (avg10 + avg20 + avg30) / 3;
+    actual = (avg10 + avg20) / 2;
   }
 
   return (global + 0.05) / (actual + 0.05);

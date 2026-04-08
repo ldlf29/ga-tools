@@ -57,6 +57,11 @@ export function getActiveFiltersDisplay(filters: FilterState): DisplayFilter[] {
         label: 'TRAIT',
         value: v,
       })),
+      ...(filters.traitScheme ?? []).map((v) => ({
+        key: 'traitScheme' as keyof FilterState,
+        label: 'SCHEME',
+        value: v,
+      })),
     ];
     return list;
   }
@@ -90,6 +95,7 @@ export function getActiveFiltersDisplay(filters: FilterState): DisplayFilter[] {
       if (key === 'customClass') label = 'CLASS';
       if (key === 'specialization') label = 'SPEC';
       if (key === 'traits') label = 'TRAIT';
+      if (key === 'traitScheme') label = 'SCHEME';
       if (key === 'matchLimit') label = 'MATCHES';
       if (key === 'extraSort') label = 'EXTRA';
 

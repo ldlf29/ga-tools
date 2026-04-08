@@ -48,6 +48,7 @@ export interface EnhancedCard extends GrandArenaCard {
     train?: number;
     marketLink?: string;
     catalogMarketLink?: string;
+    traitSchemes?: string[];  // e.g. ['Call to Arms', 'Dungaree Duel']
     avgEliminations?: number;
     avgDeposits?: number;
     avgWartDistance?: number;
@@ -63,11 +64,7 @@ export interface EnhancedCard extends GrandArenaCard {
     avgWartDistance20?: number;
     avgScore20?: number;
     avgWinRate20?: number;
-    avgEliminations30?: number;
-    avgDeposits30?: number;
-    avgWartDistance30?: number;
-    avgScore30?: number;
-    avgWinRate30?: number;
+
     avgEndedGame10?: number;
     avgDeaths10?: number;
     avgEatingWhileRiding10?: number;
@@ -84,14 +81,7 @@ export interface EnhancedCard extends GrandArenaCard {
     avgLooseBallPickups20?: number;
     avgEatenByWart20?: number;
     avgWartCloser20?: number;
-    avgEndedGame30?: number;
-    avgDeaths30?: number;
-    avgEatingWhileRiding30?: number;
-    avgBuffTime30?: number;
-    avgWartTime30?: number;
-    avgLooseBallPickups30?: number;
-    avgEatenByWart30?: number;
-    avgWartCloser30?: number;
+
   };
 }
 
@@ -110,8 +100,9 @@ export interface FilterState {
   customClass: string[];
   specialization: string[];
   traits: string[];
+  traitScheme: string[];
   insertionOrder?: string[];
-  matchLimit?: 10 | 20 | 30 | 'ALL';
+  matchLimit?: 10 | 20 | 'ALL';
   extraSort?: string;
 }
 

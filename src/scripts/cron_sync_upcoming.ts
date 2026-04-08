@@ -45,38 +45,32 @@ async function run() {
     return;
   }
 
-  console.log('[Cron Upcoming] Buscando el contest principal (Moki Mayhem o 10-Round)...');
+  console.log('[Cron Upcoming] Buscando el contest principal (SOLO 10-round)...');
   const now = Date.now();
   
-  let selectedContest = null;
-  
-  // 1. Prioridad Absoluta: 10 Rondas (los de 900+ partidos)
-  selectedContest = activeContests.find((c: any) => c.name?.toLowerCase().includes('10-round'));
+  // 1. Filtrar solo por contests que tengan '10-round' en su nombre
+  const relevantContests = activeContests.filter((c: any) => 
+    c.name?.toLowerCase().includes('10-round')
+  );
 
-  // 2. Fallback: Moki Mayhem (si no hay de 10 rondas, pero priorizando el nombre)
-  if (!selectedContest) {
-    selectedContest = activeContests.find((c: any) => c.name?.toLowerCase().includes('moki mayhem'));
+  if (relevantContests.length === 0) {
+    console.warn('[Cron Upcoming] No se encontró ningún contest "10-round" en la lista de activos.');
+    return;
   }
 
-  // 3. Tercera Prioridad: El más cercano en el futuro (mínimo 3-round)
-  if (!selectedContest) {
-    let minDiff = Infinity;
-    for (const c of activeContests) {
-      if (c.startDate) {
-        const contestTime = new Date(c.startDate).getTime();
-        const diff = contestTime - now;
-        if (diff > 0 && diff < minDiff) {
-          minDiff = diff;
-          selectedContest = c;
-        }
-      }
-    }
-  }
+  // 2. Encontrar el contest que empieza en el futuro más cercano
+  const futureContests = relevantContests
+    .map((c: any) => ({
+      ...c,
+      diff: c.startDate ? new Date(c.startDate).getTime() - now : -Infinity
+    }))
+    .filter((c: any) => c.diff > 0) // Solo hacia adelante (futuro)
+    .sort((a: any, b: any) => a.diff - b.diff); // El más cercano primero
 
-  const contest = selectedContest || activeContests[0];
+  const contest = futureContests[0];
 
   if (!contest) {
-    console.log('[Cron Upcoming] No se encontró ningún contest válido.');
+    console.log('[Cron Upcoming] No se encontró ningún contest "10-round" futuro. Probablemente ya empezaron todos.');
     return;
   }
 
@@ -93,65 +87,87 @@ async function run() {
     throw mokiStatsErr;
   }
 
-  const mokiStatsMap = new Map<string, string>();
+  // Build moki_id → class map from moki_stats (stable ID-based lookup)
+  const mokiStatsIdMap = new Map<number, string>();
   for (const row of mokiStatsData || []) {
-    if (row.name) {
-      mokiStatsMap.set(row.name.trim().toLowerCase(), row.class);
+    if (row.moki_id && row.class) {
+      mokiStatsIdMap.set(row.moki_id, row.class);
     }
   }
-  console.log(`[Cron Upcoming] Loaded ${mokiStatsMap.size} moki stats for class override.`);
+  console.log(`[Cron Upcoming] Loaded ${mokiStatsIdMap.size} moki stats for class override.`);
 
-  // 2. Extraer Partidos en Paralelo (batches de 5 páginas simultáneas)
-  console.log('[Cron Upcoming] Extrayendo partidos (15 páginas en batches paralelos de 5)...');
-  const upcomingInserts: any[] = [];
-  const TOTAL_PAGES = 15;
-  const BATCH_SIZE = 5;
-
-  const fetchPage = async (page: number): Promise<any[]> => {
+  // 2. Extraer Partidos Secuencialmente con Reintentos (Evita 524 timeouts)
+  console.log('[Cron Upcoming] Extrayendo partidos (Paginado dinámico con reintentos)...');
+  
+  const fetchPageWithRetry = async (page: number, retries = 3): Promise<any[]> => {
     const url = `${API_BASE_URL}/contests/${contestId}/matches?page=${page}&limit=100&state=scheduled`;
-    try {
-      const response = await fetch(url, { headers });
-      if (!response.ok) {
-        console.error(`[Cron Upcoming] API Error page ${page}: ${response.status}`);
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(url, { 
+          headers,
+          // Signal para timeout local de 60s
+          signal: AbortSignal.timeout(60000) 
+        });
+        
+        if (response.ok) {
+          const json = (await response.json()) as any;
+          return json.data || [];
+        }
+
+        if (response.status === 524 || response.status >= 500) {
+          console.warn(`[Cron Upcoming] Página ${page} intento ${attempt} falló (${response.status}). Reintentando en 3s...`);
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          continue;
+        }
+
+        console.error(`[Cron Upcoming] Página ${page} error fatal: ${response.status}`);
         return [];
+      } catch (err: any) {
+        console.warn(`[Cron Upcoming] Página ${page} intento ${attempt} error de red: ${err.message}. Reintentando...`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
-      const json = (await response.json()) as any;
-      const matches = json.data || [];
-      if (matches.length === 0) {
-        console.warn(`[Cron Upcoming] Página ${page} vino vacía.`);
-      }
-      return matches;
-    } catch (err) {
-      console.error(`[Cron Upcoming] Error fetching page ${page}:`, err);
-      return [];
     }
+    return [];
   };
 
-  for (let batchStart = 1; batchStart <= TOTAL_PAGES; batchStart += BATCH_SIZE) {
-    const pages = Array.from(
-      { length: Math.min(BATCH_SIZE, TOTAL_PAGES - batchStart + 1) },
-      (_, i) => batchStart + i
-    );
-    console.log(`[Cron Upcoming] Batch: páginas ${pages[0]}–${pages[pages.length - 1]}...`);
-    const batchResults = await Promise.all(pages.map(fetchPage));
-    const allMatches = batchResults.flat();
+  const upcomingInserts: any[] = [];
+  let page = 1;
+  let hasMore = true;
 
-    for (const match of allMatches) {
+  while (hasMore && page <= 25) { // Safety cap en 25 páginas
+    const matches = await fetchPageWithRetry(page);
+    
+    if (matches.length === 0) {
+      console.log(`[Cron Upcoming] Página ${page} vacía. Fin de la extracción.`);
+      hasMore = false;
+      break;
+    }
+
+    console.log(`[Cron Upcoming] Página ${page}: Procesando ${matches.length} partidos.`);
+    
+    for (const match of matches) {
       if (!match || !match.id) continue;
       if (match.isBye) continue;
       if (!match.players || match.players.length === 0) continue;
 
       const overrideClass = (p: any) => {
-        if (p.name) {
-          const key = p.name.trim().toLowerCase();
-          const statsClass = mokiStatsMap.get(key);
+        const tokenId = p.mokiTokenId;
+        if (tokenId) {
+          const statsClass = mokiStatsIdMap.get(tokenId);
           if (statsClass) p.class = statsClass;
         }
         return p;
       };
 
-      const teamRed  = match.players.filter((p: any) => p.team === 'red').map(overrideClass);
-      const teamBlue = match.players.filter((p: any) => p.team === 'blue').map(overrideClass);
+      const sortChampFirst = (players: any[]) =>
+        [...players].sort((a: any, b: any) => {
+          const aIsChamp = mokiStatsIdMap.has(a.mokiTokenId) ? 0 : 1;
+          const bIsChamp = mokiStatsIdMap.has(b.mokiTokenId) ? 0 : 1;
+          return aIsChamp - bIsChamp;
+        });
+
+      const teamRed  = sortChampFirst(match.players.filter((p: any) => p.team === 'red').map(overrideClass));
+      const teamBlue = sortChampFirst(match.players.filter((p: any) => p.team === 'blue').map(overrideClass));
 
       upcomingInserts.push({
         id: match.id,
@@ -160,6 +176,13 @@ async function run() {
         team_red:  teamRed,
         team_blue: teamBlue,
       });
+    }
+
+    if (matches.length < 100) {
+      console.log(`[Cron Upcoming] Página ${page} tiene menos de 100 resultados (${matches.length}). Asumiendo última página.`);
+      hasMore = false;
+    } else {
+      page++;
     }
   }
 
