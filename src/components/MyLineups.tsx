@@ -165,77 +165,6 @@ export default function MyLineups({
     setTimeout(() => setCopiedSlot(null), 1500);
   };
 
-  const handleExportExcel = async () => {
-    const favorites = favoriteLineups;
-    if (favorites.length === 0) {
-      onError('No lineups in favorite!');
-      return;
-    }
-
-    const ExcelJS = await import('exceljs');
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Favorite Lineups');
-
-    // Define columns
-    worksheet.columns = [
-      { header: 'Team Name', key: 'name', width: 20 },
-      { header: 'Moki 1', key: 'moki1', width: 15 },
-      { header: 'Class 1', key: 'class1', width: 12 },
-      { header: 'Rarity 1', key: 'rarity1', width: 12 },
-      { header: 'Moki 2', key: 'moki2', width: 15 },
-      { header: 'Class 2', key: 'class2', width: 12 },
-      { header: 'Rarity 2', key: 'rarity2', width: 12 },
-      { header: 'Moki 3', key: 'moki3', width: 15 },
-      { header: 'Class 3', key: 'class3', width: 12 },
-      { header: 'Rarity 3', key: 'rarity3', width: 12 },
-      { header: 'Moki 4', key: 'moki4', width: 15 },
-      { header: 'Class 4', key: 'class4', width: 12 },
-      { header: 'Rarity 4', key: 'rarity4', width: 12 },
-      { header: 'Scheme', key: 'scheme', width: 15 },
-      { header: 'Rating', key: 'rating', width: 10 },
-    ];
-
-    // Add rows
-    favorites.forEach((l: SavedLineup) => {
-      const mokis = l.cards.filter((c) => c.cardType !== 'SCHEME');
-      const scheme = l.cards.find((c) => c.cardType === 'SCHEME');
-
-      worksheet.addRow({
-        name: l.name,
-        moki1: mokis[0]?.name || '',
-        class1: mokis[0]?.custom?.class || '',
-        rarity1: mokis[0]?.rarity || '',
-        moki2: mokis[1]?.name || '',
-        class2: mokis[1]?.custom?.class || '',
-        rarity2: mokis[1]?.rarity || '',
-        moki3: mokis[2]?.name || '',
-        class3: mokis[2]?.custom?.class || '',
-        rarity3: mokis[2]?.rarity || '',
-        moki4: mokis[3]?.name || '',
-        class4: mokis[3]?.custom?.class || '',
-        rarity4: mokis[3]?.rarity || '',
-        scheme: scheme?.name || '',
-        rating: l.rating || 0,
-      });
-    });
-
-    // Generate buffer
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    // Trigger download
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
-    const url = window.URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = 'Favorite_Lineups.xlsx';
-    anchor.click();
-    window.URL.revokeObjectURL(url);
-  };
-
-  // --- Editing Handlers ---
-
   const handleSelectSlot = (index: number) => {
     setSelectorSlot(index);
     // Initialize filters based on slot type (0-3 = MOKI, 4 = SCHEME)
@@ -342,7 +271,6 @@ export default function MyLineups({
   const [deleteConfirmSection, setDeleteConfirmSection] = useState<
     'favorites' | 'others' | null
   >(null);
-  const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
   const [imageDownloadConfirmOpen, setImageDownloadConfirmOpen] =
     useState(false);
 
@@ -402,12 +330,6 @@ export default function MyLineups({
         setDeleteConfirmId(null);
       }
       if (
-        exportConfirmOpen &&
-        !target.closest(`.${styles.confirmationContainer}`)
-      ) {
-        setExportConfirmOpen(false);
-      }
-      if (
         imageDownloadConfirmOpen &&
         !target.closest(`.${styles.confirmationContainer}`)
       ) {
@@ -420,7 +342,6 @@ export default function MyLineups({
     activeDropdown,
     deleteConfirmSection,
     deleteConfirmId,
-    exportConfirmOpen,
     imageDownloadConfirmOpen,
   ]);
 
@@ -1043,58 +964,6 @@ export default function MyLineups({
         <div className={styles.headerTopRow}>
           <div className={styles.titleGroup}>
             <h2 className={styles.title}>My Lineups</h2>
-            <div className={`${styles.confirmationContainer}`}>
-              <button
-                className={styles.exportButton}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (favoriteLineups.length === 0) {
-                    onError('No lineups in favorite!');
-                    return;
-                  }
-                  setExportConfirmOpen(!exportConfirmOpen);
-                }}
-                title="Export to Excel"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 384 512"
-                  fill="currentColor"
-                >
-                  <path d="M64 48l112 0 0 88c0 39.8 32.2 72 72 72l88 0 0 240c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16L48 64c0-8.8 7.2-16 16-16zM224 67.9l92.1 92.1-68.1 0c-13.3 0-24-10.7-24-24l0-68.1zM64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-261.5c0-17-6.7-33.3-18.7-45.3L242.7 18.7C230.7 6.7 214.5 0 197.5 0L64 0zm99.2 265.6c-8-10.6-23-12.8-33.6-4.8s-12.8 23-4.8 33.6L162 344 124.8 393.6c-8 10.6-5.8 25.6 4.8 33.6s25.6 5.8 33.6-4.8L192 384 220.8 422.4c8 10.6 23 12.8 33.6 4.8s12.8-23 4.8-33.6L222 344 259.2 294.4c8-10.6 5.8-25.6-4.8-33.6s-25.6-5.8-33.6 4.8L192 304 163.2 265.6z" />
-                </svg>
-              </button>
-              {exportConfirmOpen && (
-                <div
-                  className={`${styles.deleteConfirmationMenu} ${styles.deleteConfirmationMenuBlue}`}
-                >
-                  <div className={styles.deleteConfirmationText}>
-                    Would you like to download your favorite lineups in Excel?
-                  </div>
-                  <div className={styles.deleteActions}>
-                    <button
-                      className={`${styles.deleteConfirmBtn} ${styles.btnSuccess}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleExportExcel();
-                        setExportConfirmOpen(false);
-                      }}
-                    >
-                      YES
-                    </button>
-                    <button
-                      className={`${styles.deleteConfirmBtn} ${styles.btnNo}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExportConfirmOpen(false);
-                      }}
-                    >
-                      NO
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
           <div className={`${styles.headerRight} ${styles.desktopSearch}`}>
             <div className={styles.infoWrapper} ref={infoWrapperRef}>

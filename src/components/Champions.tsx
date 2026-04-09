@@ -47,6 +47,7 @@ export default function Champions({
 }: ChampionsProps) {
   // Upcoming matches data
   const [matches, setMatches] = useState<UpcomingMatchData[]>([]);
+  const [mokiStats, setMokiStats] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Modal state
@@ -96,15 +97,22 @@ export default function Champions({
     }
   };
 
-  // ─── Load matches ──────────────────────────────────────────────────────────
+  // ─── Load matches & stats ──────────────────────────────────────────────────
   useEffect(() => {
-    async function loadMatches() {
+    async function loadInitialData() {
+      setIsLoading(true);
+      
+      // Load moki_stats for real-time class verification
+      const { data: statsData } = await supabase
+        .from('moki_stats')
+        .select('moki_id, name, class');
+      if (statsData) setMokiStats(statsData);
+
       if (cachedMatchesData.length > 0) {
         setMatches(cachedMatchesData);
         setIsLoading(false);
         return;
       }
-      setIsLoading(true);
       
       let allData: any[] = [];
       let from = 0;
@@ -140,7 +148,7 @@ export default function Champions({
       }
       setIsLoading(false);
     }
-    loadMatches();
+    loadInitialData();
   }, []);
 
   // ─── Load match history when champion is selected ─────────────────────────
@@ -245,11 +253,15 @@ export default function Champions({
         metadata = (mokiMetadata as any)[withUnderscores];
       }
 
+      // Real-time class override from moki_stats
+      const dbStat = mokiStats.find(s => s.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || s.name.toUpperCase() === normalizedName);
+      const currentClass = dbStat?.class || fullCard?.custom?.class || champ.class;
+
       return {
         ...champ,
         id: metadata?.id ?? fullCard?.id ?? champ.id,
         tokenId: metadata?.id ? parseInt(metadata.id, 10) : null,
-        class: fullCard?.custom?.class || champ.class,
+        class: currentClass,
         score: fullCard ? getStatValueByLimit(fullCard, 'score', filters.matchLimit) : 0,
         globalScore: fullCard ? getStatValueByLimit(fullCard, 'score', 'ALL') : 0,
         imageUrl: metadata?.portraitUrl || fullCard?.custom?.imageUrl || champ.imageUrl,
@@ -277,7 +289,7 @@ export default function Champions({
       ...champ,
       rank: rankMap.get(champ.name)
     }));
-  }, [matches, allCards, filters.extraSort, filters.matchLimit]);
+  }, [matches, allCards, filters.extraSort, filters.matchLimit, mokiStats]);
 
   // ─── Filtered champions ───────────────────────────────────────────────────
   const filteredChampions = useMemo(() => {

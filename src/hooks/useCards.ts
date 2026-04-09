@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { fetchLiteCollection } from '@/utils/cardService';
 import { EnhancedCard } from '@/types';
 
-export function useCards() {
+export function useCards(forceRefresh = false) {
   const {
     data: allCards = [],
     isLoading,
@@ -13,12 +13,17 @@ export function useCards() {
     revalidateOnFocus: false,
     revalidateIfStale: true,
     fallbackData: [],
+    // If forceRefresh is on, we ignore deduplication
+    dedupingInterval: forceRefresh ? 0 : 2000,
   });
 
   // Handle Hydration: Load cache only if SWR hasn't fetched yet
-  // AND validate cached data has required fields (like train)
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (forceRefresh) {
+      localStorage.removeItem('cachedCards_v3');
+      return;
+    }
     if (allCards.length > 0) return; // SWR already has data, don't overwrite
 
     const cached = localStorage.getItem('cachedCards_v3');
@@ -39,16 +44,17 @@ export function useCards() {
         console.error('Failed to load cached cards', e);
       }
     }
-  }, [mutate, allCards.length]);
+  }, [mutate, allCards.length, forceRefresh]);
 
   // Keep localStorage in sync for next load
   useEffect(() => {
-    if (allCards && allCards.length > 0) {
+    if (allCards && allCards.length > 0 && !forceRefresh) {
       localStorage.setItem('cachedCards_v3', JSON.stringify(allCards));
     }
-  }, [allCards]);
+  }, [allCards, forceRefresh]);
 
   const handleRefresh = async () => {
+    localStorage.removeItem('cachedCards_v3');
     await mutate();
   };
 

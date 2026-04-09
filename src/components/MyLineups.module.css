@@ -3,8 +3,6 @@
   position: relative;
 }
 
-/* ... existing styles ... */
-
 .title {
   font-size: 1.7rem;
   font-family: var(--font-display);
@@ -128,28 +126,6 @@
   min-height: 44px;
 }
 
-.exportButton {
-  background: #a855f7;
-  border: 2px solid #333333;
-  border-bottom-width: 4px;
-  border-radius: 12px;
-  color: white;
-  width: 37px;
-  height: 37px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.exportButton:hover {
-  transform: translateY(-2px);
-  background: #c084fc;
-}
-
 .headerRight {
   display: flex !important;
   gap: 1rem;
@@ -192,8 +168,6 @@
     height: 32px;
   }
 }
-
-/* ... existing intermediate styles ... */
 
 .activeFilters {
   display: flex;
@@ -327,7 +301,6 @@
   border-radius: 4px;
   transition: all 0.2s;
   opacity: 0;
-  /* Hidden by default until hover */
 }
 
 .lineupHeader:hover .editButton {
@@ -343,7 +316,6 @@
   background: none;
   border: none;
   color: #333333;
-  /* Black/Dark stroke */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -363,7 +335,6 @@
 .favoriteButton:hover {
   transform: scale(1.1);
   color: #333333;
-  /* Keep stroke black */
 }
 
 .favoriteButton:hover svg {
@@ -372,17 +343,13 @@
 
 .favoriteButton.isFavorite {
   color: #333333;
-  /* Keep stroke black */
 }
 
 .favoriteButton.isFavorite svg {
   fill: #ffd753;
 }
 
-/* ... existing grid ... */
-
 .deleteButton {
-  /* ... existing structure */
   position: absolute;
   top: -10px;
   right: -10px;
@@ -390,13 +357,8 @@
   height: 32px;
   background: #ef4444;
   color: white;
-  /* Ensure icon is white */
   border-radius: 50%;
-  border: 3px solid var(--color-bg-dark);
-  /* IMPORTANT: This needs to match the parent's actual background context if transparent, or use the card background if overlapping */
-  /* Since it overlaps the card corner, it should match the body background behind the card? No, usually the card background. */
-  border-color: var(--color-card-bg);
-  /* Match card background so it looks cut out from the card */
+  border: 3px solid var(--color-card-bg);
   font-size: 16px;
   display: flex;
   align-items: center;
@@ -404,7 +366,6 @@
   cursor: pointer;
   padding: 0;
   z-index: 20;
-  /* High z-index */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition:
     transform 0.2s,
@@ -416,7 +377,6 @@
   background-color: #ff4444;
 }
 
-/* Modal Title Wrapper to potentially add edit there too */
 .modalTitleWrapper {
   display: flex;
   justify-content: center;
@@ -435,7 +395,6 @@
   background: #5097ff;
   border: 3px solid #333333;
   border-bottom-width: 8px;
-  /* Thick bottom border */
   border-radius: 20px;
   padding: 1rem;
   transition:
@@ -446,17 +405,13 @@
   flex-direction: column;
   gap: 0.5rem;
   position: relative;
-  /* For absolute delete button */
   color: #333333;
-  /* Dark text for the whole card */
   cursor: pointer;
 }
 
 .lineupCard:hover {
   background: #84bcff;
 }
-
-/* ... existing styles ... */
 
 .lineupHeader {
   display: flex;
@@ -582,29 +537,6 @@
   background: #5097ff;
 }
 
-.deleteButton {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 26px;
-  height: 26px;
-  background: #ef4444;
-  color: white;
-  border-radius: 50%;
-  border: 2px solid #000;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s;
-}
-
-/* ... existing hover ... */
-
 .ratingBadge {
   position: absolute;
   bottom: -10px;
@@ -623,11 +555,6 @@
   z-index: 10;
   font-family: 'Inter', sans-serif;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-.deleteButton:hover {
-  transform: scale(1.1);
-  background-color: #ff4444;
 }
 
 .warningIcon {
@@ -666,7 +593,6 @@
   }
 }
 
-/* Modal Styles */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -725,7 +651,6 @@
   }
 }
 
-/* Background Switcher */
 .backgroundSwitcher {
   display: flex;
   justify-content: center;
@@ -756,7 +681,6 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Modal Header Row - Flex container for download | title */
 .modalHeaderRow {
   display: flex;
   justify-content: center;
@@ -783,7 +707,6 @@
     background 0.2s;
   z-index: 5;
   padding: 0;
-  /* Remove default padding */
 }
 
 .modalDownloadButton:hover {
@@ -1004,14 +927,12 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  /* Reduced to avoid clashing with rating bar in some resolutions */
 }
 
 .modalCardBottom {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  /* Gap between badge and info button */
   margin-top: 5px;
 }
 
@@ -1086,21 +1007,16 @@
   max-width: 300px;
 }
 
-/* Expandable Info Button Styles (PC) */
 .infoContainerDesktop {
   position: absolute;
   right: 100%;
-  /* Anchor to the left side of the slider */
   top: 50%;
   transform: translateY(-50%);
   padding-right: 35px;
-  /* Spacing from slider */
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  /* Ensure content expands to left */
   pointer-events: none;
-  /* Don't block clicks if transparent */
 }
 
 .infoButtonIcon {
@@ -1118,7 +1034,6 @@
   font-size: 0.8rem;
   font-weight: 700;
   pointer-events: auto;
-  /* Re-enable clicks for button */
   flex-shrink: 0;
 }
 
@@ -1151,10 +1066,6 @@
   pointer-events: auto;
 }
 
-.infoButtonMobile {
-  display: none;
-}
-
 .infoContainerMobile {
   display: none;
 }
@@ -1168,18 +1079,15 @@
     display: flex;
     position: absolute;
     left: 5%;
-    /* Align with rating slider start */
     top: 50%;
     transform: translateY(-50%);
     align-items: center;
     z-index: 100;
     pointer-events: none;
-    /* Allow clicks through container */
   }
 
   .infoContainerMobile .infoButtonIcon {
     pointer-events: auto;
-    /* Re-enable clicks */
   }
 
   .infoMessageMobile {
@@ -1191,7 +1099,6 @@
     border-radius: 20px;
     position: absolute;
     bottom: 30px;
-    /* Above the button */
     left: 0;
     white-space: nowrap;
     opacity: 0;
@@ -1209,73 +1116,14 @@
   }
 }
 
-.modalEditInput {
-  font-size: 1.25rem;
-  font-weight: 700;
-  width: 300px;
-  text-align: center;
-  background: #ffffff;
-  color: #333333;
-  border: 2px solid #333333;
-  border-radius: 4px;
-  padding: 0.25rem 0.5rem;
-  outline: none;
-  font-family: inherit;
-  height: 40px;
-  box-sizing: border-box;
-  transition: all 0.2s;
-}
-
-.modalEditInput:focus {
-  border-color: #ff66cc;
-  box-shadow: 0 0 10px rgba(255, 102, 204, 0.3);
-}
-
-/* Dropdown Styles */
 .orderByContainer {
   position: relative;
   z-index: 50;
-  /* Increased to ensure it's above cards */
 }
 
 .deleteAllContainer {
   position: relative;
   z-index: 50;
-}
-
-.orderByButton {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: color 0.2s;
-}
-
-.orderByButton:hover {
-  color: var(--color-text-main);
-}
-
-.deleteAllButton {
-  background: none;
-  border: none;
-  color: #ef6666;
-  font-size: 0.75rem;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  padding: 0;
-  transition: all 0.2s;
-}
-
-.deleteAllButton:hover {
-  color: #ef4444;
 }
 
 .orderByButton {
@@ -1310,10 +1158,6 @@
   filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
 }
 
-.orderByButton:hover {
-  color: #1abf9e;
-}
-
 .orderByMenu {
   position: absolute;
   top: 100%;
@@ -1328,6 +1172,24 @@
   margin: 8px 0 0 0;
   z-index: 100;
   overflow: hidden;
+}
+
+.deleteAllButton {
+  background: none;
+  border: none;
+  color: #ef6666;
+  font-size: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.deleteAllButton:hover {
+  color: #ef4444;
 }
 
 .deleteConfirmationMenu {
@@ -1411,7 +1273,6 @@
     left: 50% !important;
     right: auto !important;
     transform: translateX(-35%) !important;
-    /* Shifted to the right */
     width: 280px;
   }
 
@@ -1508,14 +1369,10 @@
   font-weight: 800;
 }
 
-/* Active Filters */
-/* Active Filters moved to topBar section */
-
 .filterChip {
   display: flex;
   align-items: center;
   background: #ffd753;
-  /* User Requested Yellow */
   border: 2px solid #000;
   border-radius: 0.75rem;
   padding: 0.3rem 0.6rem;
@@ -1567,13 +1424,6 @@
   transform: scale(1.1);
 }
 
-.modalDownloadButton:hover {
-  color: var(--color-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-2px);
-}
-
-/* Scroll To Top Button */
 .scrollTopButton {
   position: fixed;
   bottom: 2rem;
@@ -1613,46 +1463,10 @@
   filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }
 
-.exportButton {
-  background: #a855f7;
-  /* Purple background */
-  border: 2px solid #333333;
-  border-bottom-width: 4px;
-  border-radius: 12px;
-  color: white;
-  width: 37px;
-  height: 37px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.exportButton:hover {
-  transform: translateY(-2px);
-  background: #c084fc;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-.exportButton:active {
-  transform: translateY(1px);
-  border-bottom-width: 2px;
-}
-
-.exportButton svg {
-  width: 22px;
-  height: 22px;
-}
-
 @media (max-width: 1180px) {
   .topBar {
     padding: 0.75rem 1rem;
     gap: 0.75rem;
-    /* Increased from 0.5rem */
     margin-left: 0;
     margin-right: 0;
     border-radius: 0.75rem;
@@ -1677,13 +1491,11 @@
 
   .titleGroup {
     display: flex;
-    /* Force horizontal layout */
     align-items: center;
     gap: 0.5rem;
     flex-shrink: 0;
   }
 
-  /* Prevent the export button's container from collapsing in the top bar */
   .titleGroup .confirmationContainer {
     height: auto !important;
     position: relative !important;
@@ -1693,22 +1505,6 @@
     font-size: 0.85rem;
     white-space: nowrap;
     margin-right: 0;
-  }
-
-  .storageWarning {
-    display: none;
-  }
-
-  .exportButton {
-    width: 32px !important;
-    height: 32px !important;
-    border-width: 2px !important;
-    border-bottom-width: 3px !important;
-  }
-
-  .exportButton svg {
-    width: 18px !important;
-    height: 18px !important;
   }
 
   .desktopSearch {
@@ -1744,20 +1540,14 @@
     padding: 1rem 0.5rem;
     gap: 1rem;
   }
-}
 
-@media (max-width: 1180px) {
-
-  /* Modal Responsive Styles */
   .modalOverlay {
     z-index: 3000;
     align-items: flex-start;
-    /* Start from top to avoid header overlap */
     padding: 4rem 1rem 1rem 1rem;
     height: auto !important;
     bottom: 0 !important;
     backdrop-filter: none !important;
-    /* Disable blur on mobile to prevent jitter */
   }
 
   .modalContent {
@@ -1770,10 +1560,6 @@
     flex-direction: column;
   }
 
-  .modalContent::-webkit-scrollbar {
-    display: none;
-  }
-
   .modalTitleWrapper {
     width: 100%;
     display: flex;
@@ -1782,7 +1568,6 @@
     padding: 5px 15px;
     box-sizing: border-box;
     min-height: 50px;
-    /* Stabilize height for editing */
   }
 }
 
@@ -1814,7 +1599,6 @@
 
   .modalGridContainer {
     padding: 1.5rem 0;
-    /* Increased to lower the switcher from the cards */
   }
 
   .modalEditInput {
@@ -1849,18 +1633,11 @@
     transform: scale(1.03) !important;
   }
 
-  .modalCardClass {
-    font-size: 0.6rem;
-    padding: 0.15rem 0.4rem;
-  }
-
   .modalFooter {
     position: static;
     flex-direction: column-reverse;
     gap: 2rem;
-    /* Increased to separate switcher and slider significantly */
     padding: 1rem 0 0 0;
-    /* Added top padding to lower the entire group */
     width: 100%;
     margin-top: auto;
   }
@@ -1881,7 +1658,6 @@
     margin: 0;
     gap: 0.35rem;
     position: relative;
-    /* Context for info button */
     width: 100%;
     display: flex;
     justify-content: center;
@@ -1897,20 +1673,17 @@
     margin-bottom: 0.5rem;
     justify-content: center;
     position: relative;
-    /* Allow absolute positioning of children */
   }
 
   .modalDownloadButton {
     display: none !important;
   }
 
-  /* Reset container to allow absolute positioning relative to modalContent */
   .confirmationContainer {
     position: static !important;
     transform: none !important;
     width: auto !important;
     height: 0 !important;
-    /* Collapse height since children are absolute or hidden */
     margin: 0 !important;
   }
 
@@ -1920,7 +1693,6 @@
     top: 10px;
     left: 10px;
     width: 40px;
-    /* Match close button size */
     height: 40px;
     z-index: 2005;
     background: #22c55e;
@@ -1939,11 +1711,9 @@
 }
 
 .excludeFromCapture {
-  /* Marker class */
   pointer-events: auto;
 }
 
-/* Editing UI */
 .deleteOverlay {
   position: absolute;
   top: 0;
@@ -1976,7 +1746,6 @@
   justify-content: center;
   gap: 10px;
   border-radius: 12px;
-  /* Remove explicit height to respect aspect-ratio from .modalCard */
   transition: all 0.2s;
 }
 
@@ -1985,17 +1754,14 @@
   border-color: rgba(255, 255, 255, 0.6);
   transform: none;
   box-shadow: none;
-  box-shadow: none;
   z-index: auto;
 }
 
 @media (max-width: 1180px) {
-
   .placeholderCard:hover,
   .placeholderCard:active {
     transform: none !important;
     background: rgba(0, 0, 0, 0.1);
-    /* Reset background on mobile touch if needed */
   }
 }
 
@@ -2041,7 +1807,6 @@
   transform: scale(1.05);
 }
 
-/* Selector Overlay */
 .selectorBackdrop {
   position: fixed;
   top: 0;
@@ -2075,7 +1840,6 @@
   background-position: center;
   background-repeat: no-repeat;
   z-index: 4001;
-  /* Highest z-index */
   display: flex;
   flex-direction: column;
   border-radius: 1.5rem;
@@ -2153,22 +1917,18 @@
   position: relative;
 }
 
-/* Selector overrides for internal CardGrid header (the "MOKIS" header) */
 .selectorGridWrapper :global([class*='headerContainer']) {
   margin-left: 0 !important;
   margin-right: 0 !important;
   border-radius: 1.25rem !important;
 }
 
-/* Scoped Fix for Card Texts in Compact Mode (ONLY for selector) */
 .selectorGridWrapper :global([class*='compactImageWrapper']) {
   margin-right: 0.75rem !important;
-  /* Standard spacing from photo */
 }
 
 .selectorGridWrapper :global([class*='compactInfo']) {
   margin-left: 0.75rem !important;
-  /* Add extra spacing to shift the text block further right */
   gap: 0.2rem !important;
   justify-content: center !important;
 }
@@ -2214,7 +1974,6 @@
     padding-top: 0 !important;
   }
 
-  /* Target the internal 'MOKIS' header to pull it up in mobile */
   .selectorGridWrapper :global([class*='headerContainer']) {
     position: relative !important;
     top: 0 !important;
@@ -2238,7 +1997,6 @@
     height: 100%;
     background: #1e293b;
     z-index: 9000;
-    /* Above overlay */
     transition: left 0.3s ease-out;
     display: flex;
     flex-direction: column;
@@ -2250,7 +2008,6 @@
     position: absolute;
     top: 55%;
     right: -29px;
-    /* Positioned outside on the right edge */
     transform: translateY(-50%);
     width: 26px;
     height: 50px;
@@ -2304,7 +2061,6 @@
     position: fixed;
     left: 0;
     top: 55%;
-    /* Match Builder's fabContainer top 55% */
     transform: translateY(-50%);
     width: 38px;
     height: 54px;
@@ -2335,7 +2091,6 @@
 
   .selectorMobileDrawerBackdrop {
     display: block;
-    /* Ensure it's visible on mobile */
     position: fixed;
     top: 0;
     left: 0;
@@ -2345,10 +2100,6 @@
     z-index: 8500;
     backdrop-filter: blur(8px);
   }
-}
-
-.mobileOnly {
-  display: none !important;
 }
 
 .selectorCloseButton {
@@ -2382,13 +2133,7 @@
   filter: drop-shadow(1px 0 0 #333333) drop-shadow(-1px 0 0 #333333) drop-shadow(0 1px 0 #333333) drop-shadow(0 -1px 0 #333333);
 }
 
-/* Tablet Specific Adjustments (601px - 1180px) */
 @media (min-width: 601px) and (max-width: 1180px) {
-  .modalCardClass {
-    font-size: 0.75rem !important;
-    padding: 0.2rem 0.5rem !important;
-  }
-
   .modalGrid {
     row-gap: 1.25rem !important;
     column-gap: 1rem !important;
@@ -2403,7 +2148,6 @@
   }
 }
 
-/* Extracted Inline Styles from MyLineups.tsx */
 .previewImageContainer {
   position: relative;
   flex: 1;
@@ -2462,10 +2206,6 @@
   bottom: 100%;
   top: auto;
   margin-bottom: 10px;
-}
-
-.deleteConfirmationMenuBlue {
-  background: #5097ff;
 }
 
 .discardConfirmationModal {

@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { requirePredictionsAccess, AuthError } from '@/lib/auth-middleware';
 
-export const dynamic = 'force-dynamic';
+// Ranking data is cached for 5 mins as it only updates after periodic ML runs
+export const revalidate = 300;
 
 // Seeded shuffle for deterministic-but-fake test data
 function shuffleArray<T>(arr: T[], seed: number): T[] {

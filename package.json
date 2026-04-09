@@ -19,7 +19,6 @@
     "@vercel/functions": "^3.4.3",
     "csv-parse": "^6.2.1",
     "ethers": "^6.16.0",
-    "exceljs": "^4.4.0",
     "framer-motion": "^12.27.3",
     "html2canvas": "^1.4.1",
     "jose": "^6.2.2",

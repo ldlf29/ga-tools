@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-// Contest schedule is public game info — no auth needed
-export const dynamic = 'force-dynamic';
+// Contest schedule is public game info — cached for 60s to avoid Game API timeouts
+export const revalidate = 60;
 
 export async function GET() {
   const GA_API_KEY = process.env.GA_API_KEY;
@@ -12,7 +12,8 @@ export async function GET() {
   try {
     const response = await fetch('https://api.grandarena.gg/api/v1/contests/active?page=1&limit=100', {
       headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${GA_API_KEY}` },
-      next: { revalidate: 0 },
+      // Cache at the fetch level too
+      next: { revalidate: 60 },
     });
 
     if (!response.ok) {

@@ -2,13 +2,14 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
-// Revalidate every 10 minutes (600s) to sync smoothly with the new Cron endpoints
-export const revalidate = 600;
+// Revalidate every 1 minute (60s) to sync smoothly with the new Cron endpoints
+export const revalidate = 60;
 
 export async function GET() {
   console.log('[API Stats] Loading data...');
   try {
-    // 1. Fetch all Moki stats
+    // ... rest of the code
+
     const { data: globalData, error: globalError } = await supabaseAdmin
       .from('moki_stats')
       .select('*')
