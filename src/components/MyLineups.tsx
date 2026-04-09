@@ -316,25 +316,25 @@ export default function MyLineups({
       id: 'egg_field',
       label: 'Egg Field',
       color: '#7BCF5C',
-      image: '/backgrounds/Egg_field.jpg',
+      image: '/backgrounds/Egg_field.webp',
     },
     {
       id: 'eggu_island',
       label: 'Eggu Island',
       color: '#FF4D88',
-      image: '/backgrounds/Eggu_Island.jpg',
+      image: '/backgrounds/Eggu_Island.webp',
     },
     {
       id: 'colorful_stars',
       label: 'Colorful Stars',
       color: '#4BE3F5',
-      image: '/backgrounds/Colorful_Stars.png',
+      image: '/backgrounds/Colorful_Stars.webp',
     },
     {
       id: 'moki_universe',
       label: 'Moki Universe',
       color: '#6A3DE8',
-      image: '/backgrounds/Moki_Universe.jpg',
+      image: '/backgrounds/Moki_Universe.webp',
     },
   ];
 

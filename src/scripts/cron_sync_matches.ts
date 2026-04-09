@@ -205,6 +205,7 @@ async function run() {
   );
 
   await supabaseAdmin.from('sync_logs').insert({
+    job_type: 'MATCH_HISTORY',
     status: 'success',
     cards_updated: recordsUpserted,
     details: `GitHub Action Matches: Processed ${allTokenIds.length} mokis. Upserted ${recordsUpserted}.`,

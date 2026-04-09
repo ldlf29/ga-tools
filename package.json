@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "sync": "tsx src/scripts/sync-db.ts"
+    "sync-moki": "tsx src/scripts/cron_sync_moki_api.ts",
+    "sync-matches": "tsx src/scripts/cron_sync_matches.ts"
   },
   "dependencies": {
     "@sky-mavis/tanto-widget": "^0.0.5",

@@ -132,7 +132,7 @@ async function run() {
     
     // Si la fila ya existe, conservamos sus estrellas y otros campos calculados
     const oldClass = existingDbRow?.class || '';
-    if (oldClass && oldClass !== apiClass && apiClass !== '') {
+    if (oldClass && apiClass && oldClass !== apiClass) {
       classChanges.push({
         moki_id: tokenIdNum,
         moki_name: canonicalName,
@@ -199,7 +199,7 @@ async function run() {
           : './venv/bin/python';
         if (process.env.GITHUB_ACTIONS === 'true') pythonCommand = 'python3';
 
-        const mlOutput = execSync(`${pythonCommand} 8_generate_rank.py`, {
+        const mlOutput = execSync(`${pythonCommand} 5_generate_rank.py`, {
           cwd: mlDir,
           env: { ...process.env },
         });
@@ -235,11 +235,21 @@ async function run() {
           await supabaseAdmin.from('moki_predictions_ranking').delete().neq('id', 0);
           await supabaseAdmin.from('moki_predictions_ranking').insert(rankingUpserts);
           console.log(`[Cron Sync Moki] Global ranking refreshed: ${rankingUpserts.length} records.`);
+          
+          await supabaseAdmin.from('sync_logs').insert({
+            job_type: 'ML_RANKING_CLASS_CHANGE',
+            status: 'success',
+            cards_updated: rankingUpserts.length,
+            details: `Regenerated ranking due to ${classChanges.length} class changes.`,
+          });
         }
       } catch (reRankErr: any) {
         console.error('[Cron Sync Moki] Re-ranking failed (non-fatal):', reRankErr.message);
-        if (reRankErr.stdout) console.log(reRankErr.stdout.toString());
-        if (reRankErr.stderr) console.error(reRankErr.stderr.toString());
+        await supabaseAdmin.from('sync_logs').insert({
+          job_type: 'ML_RANKING_CLASS_CHANGE',
+          status: 'error',
+          details: `Re-ranking failed: ${reRankErr.message}`,
+        });
       }
     }
   }
@@ -262,6 +272,7 @@ async function run() {
   );
 
   await supabaseAdmin.from('sync_logs').insert({
+    job_type: 'MOKI_STATS',
     status: 'success',
     cards_updated: updatesToSupabase.length,
     details: `GitHub Action Moki API: Processed ${updatesToSupabase.length} Mokis.`,

@@ -238,7 +238,12 @@ export default function Champions({
     const list = Array.from(map.values()).map((champ) => {
       const fullCard = allCards.find((c) => c.name.trim().toUpperCase() === champ.name.trim().toUpperCase());
       const normalizedName = champ.name.trim().toUpperCase();
-      const metadata = (mokiMetadata as any)[normalizedName];
+      let metadata = (mokiMetadata as any)[normalizedName];
+
+      if (!metadata && normalizedName.includes(' ')) {
+        const withUnderscores = normalizedName.replace(/ /g, '_');
+        metadata = (mokiMetadata as any)[withUnderscores];
+      }
 
       return {
         ...champ,
@@ -791,7 +796,7 @@ export default function Champions({
                             { label: 'Fur', value: fc?.custom?.fur || '-' },
                             { label: 'Stars', value: fc?.custom?.stars ? `${fc.custom.stars} ★` : '-' },
                             ...(fc?.custom?.traits && fc.custom.traits.length > 0
-                              ? fc.custom.traits
+                              ? Array.from(new Set(fc.custom.traits as string[]))
                                   .filter((t: string) => isSchemeTrait(t))
                                   .map((t: string) => ({ label: 'Trait', value: t }))
                               : []
@@ -890,7 +895,7 @@ export default function Champions({
                             totalElims += m.eliminations || 0;
                             totalDeposits += m.deposits || 0;
                             totalWart += m.wart_distance || 0;
-                            totalScore += (isWinner ? 300 : 0) + (m.deposits || 0) * 50 + (m.eliminations || 0) * 80 + Math.floor((m.wart_distance || 0) / 80) * 45;
+                            totalScore += (isWinner ? 200 : 0) + (m.deposits || 0) * 50 + (m.eliminations || 0) * 80 + Math.floor((m.wart_distance || 0) / 80) * 40;
                           });
                           const n = matchHistory.length;
                           const winRate = Math.round((wins / n) * 100);
@@ -918,7 +923,7 @@ export default function Champions({
                             </div>
                           );
                         })()}
-                        <p className={styles.mhUpdateFreq} style={{ marginTop: '0.4rem', marginBottom: 0 }}>The data is updated every 5 minutes.</p>
+                        <p className={styles.mhUpdateFreq} style={{ marginTop: '0.4rem', marginBottom: 0 }}>The data is updated 1 hour after the contests end.</p>
                       </div>
 
                       {/* RIGHT Column: Limit Toggle Buttons */}
@@ -949,7 +954,7 @@ export default function Champions({
                       <div className={styles.mhMatchesList}>
                         {matchHistory.map((m: any) => {
                           const isWinner = m.team_won === m.moki_team;
-                          const score = (isWinner ? 300 : 0) + (m.deposits || 0) * 50 + (m.eliminations || 0) * 80 + Math.floor((m.wart_distance || 0) / 80) * 45;
+                          const score = (isWinner ? 200 : 0) + (m.deposits || 0) * 50 + (m.eliminations || 0) * 80 + Math.floor((m.wart_distance || 0) / 80) * 40;
                           const players: any[] = m.match_data?.players || [];
                           const targetMoki = players.filter((p: any) => p.mokiId === m.moki_id);
                           const teammates = players.filter((p: any) => p.team === m.moki_team && p.mokiId !== m.moki_id);
@@ -961,7 +966,7 @@ export default function Champions({
                             const elims = pr?.eliminations || 0;
                             const deps = pr?.deposits || 0;
                             const wart = pr?.wartDistance || 0;
-                            const sc = (team === m.team_won ? 300 : 0) + deps * 50 + elims * 80 + Math.floor(wart / 80) * 45;
+                            const sc = (team === m.team_won ? 200 : 0) + deps * 50 + elims * 80 + Math.floor(wart / 80) * 40;
                             return { elims, deps, wart: Math.round(wart), score: sc };
                           };
 
@@ -1064,7 +1069,7 @@ export default function Champions({
                         const elims = pr?.eliminations || 0;
                         const deps = pr?.deposits || 0;
                         const wart = pr?.wartDistance || 0;
-                        const sc = (team === m.team_won ? 300 : 0) + deps * 50 + elims * 80 + Math.floor(wart / 80) * 45;
+                        const sc = (team === m.team_won ? 200 : 0) + deps * 50 + elims * 80 + Math.floor(wart / 80) * 40;
                         return { elims, deps, wart: Math.round(wart), score: sc };
                       };
 
@@ -1127,7 +1132,7 @@ export default function Champions({
                     {formattedDate && (
                       <p className={styles.upcomingDate}>Next block: {formattedDate}</p>
                     )}
-                    <p className={styles.upcomingNote}>The data is updated at the end of each block of games.</p>
+                    <p className={styles.upcomingNote}>The data is updated 1 hour after the contests end.</p>
                     {championUpcomingMatches.length === 0 ? (
                       <div className={styles.empty}>No upcoming matches found for this champion.</div>
                     ) : (

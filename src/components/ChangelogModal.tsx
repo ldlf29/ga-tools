@@ -73,7 +73,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
       <div className={styles.modalContent}>
         <div className={styles.header}>
           <div className={styles.titleArea}>
-            <div className={styles.title}>Changelog</div>
+            <div className={styles.title}>CHANGELOG - SEASON 1</div>
           </div>
 
           <div className={styles.headerRight}>

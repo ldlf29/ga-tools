@@ -818,25 +818,6 @@ export default function Home() {
             Predictions
           </button>
           <button
-            className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
-            onClick={() => {
-              handleMainTabChange('builder');
-              closeDrawers();
-            }}
-          >
-            Builder
-          </button>
-          <button
-            className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
-            onClick={() => {
-              handleMainTabChange('lineups');
-              closeDrawers();
-            }}
-          >
-            My Lineups
-          </button>
-
-          <button
             className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
             onClick={() => {
               handleMainTabChange('champions');
@@ -853,6 +834,24 @@ export default function Home() {
             }}
           >
             Changelog
+          </button>
+          <button
+            className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
+            onClick={() => {
+              handleMainTabChange('builder');
+              closeDrawers();
+            }}
+          >
+            Builder
+          </button>
+          <button
+            className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
+            onClick={() => {
+              handleMainTabChange('lineups');
+              closeDrawers();
+            }}
+          >
+            My Lineups
           </button>
         </nav>
 
@@ -996,18 +995,6 @@ export default function Home() {
                   Predictions
                 </button>
                 <button
-                  className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
-                  onClick={() => handleMainTabChange('builder')}
-                >
-                  Builder
-                </button>
-                <button
-                  className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
-                  onClick={() => handleMainTabChange('lineups')}
-                >
-                  My Lineups
-                </button>
-                <button
                   className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
                   onClick={() => handleMainTabChange('champions')}
                 >
@@ -1018,6 +1005,18 @@ export default function Home() {
                   onClick={() => handleMainTabChange('changelog')}
                 >
                   Changelog
+                </button>
+                <button
+                  className={`${styles.navTab} ${activeTab === 'builder' ? styles.activeTab : ''}`}
+                  onClick={() => handleMainTabChange('builder')}
+                >
+                  Builder
+                </button>
+                <button
+                  className={`${styles.navTab} ${activeTab === 'lineups' ? styles.activeTab : ''}`}
+                  onClick={() => handleMainTabChange('lineups')}
+                >
+                  My Lineups
                 </button>
               </div>
             </nav>

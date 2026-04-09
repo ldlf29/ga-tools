@@ -90,28 +90,28 @@ interface SchemeDef {
 }
 
 const TRAIT_FUR_SCHEMES: SchemeDef[] = [
-  { name: 'Whale Watching', image: '/scheme/whale watching.png', type: 'fur', values: ['1 of 1', '1-of-1'] },
-  { name: 'Divine Intervention', image: '/scheme/divine intervention.png', type: 'fur', values: ['Spirit'] },
-  { name: 'Midnight Strike', image: '/scheme/midnight strike.png', type: 'fur', values: ['Shadow'] },
-  { name: 'Golden Shower', image: '/scheme/golden shower.png', type: 'fur', values: ['Gold'] },
-  { name: 'Rainbow Riot', image: '/scheme/rainbow riot.png', type: 'fur', values: ['Rainbow'] },
-  { name: 'Shapeshifting', image: '/scheme/shapeshifting.png', type: 'trait', values: ['Tongue Out', 'Tanuki Mask', 'Kitsune Mask', 'Cat Mask'] },
-  { name: 'Tear jerking', image: '/scheme/tear jerking.png', type: 'trait', values: ['Crying Eye'] },
-  { name: 'Costume party', image: '/scheme/costume party.png', type: 'trait', values: ['Onesie', 'Lemon Head', 'Kappa Head', 'Tomato Head', 'Blob Head'] },
-  { name: 'Dress To Impress', image: '/scheme/dress to impress.png', type: 'trait', values: ['Kimono'] },
-  { name: 'Call To Arms', image: '/scheme/call to arms.png', type: 'trait', values: ['Ronin', 'Samurai', 'Ronin Aurora', 'Ronin Moon'] },
-  { name: 'Malicious Intent', image: '/scheme/malicious intent.png', type: 'trait', values: ['Devious Mouth', 'Oni Mask', 'Tengu Mask', 'Skull Mask', 'Horns', 'TMA Noble Skull'] },
-  { name: 'Housekeeping', image: '/scheme/housekeeping.png', type: 'trait', values: ['Apron', 'Garbage Can', 'Gold Can', 'Toilet Paper'] },
-  { name: 'Dungaree Duel', image: '/scheme/dungaree duel.png', type: 'trait', values: ['Pink Overalls', 'Blue Overalls', 'Green Overalls'] },
+  { name: 'Whale Watching', image: '/scheme/whale watching.webp', type: 'fur', values: ['1 of 1', '1-of-1'] },
+  { name: 'Divine Intervention', image: '/scheme/divine intervention.webp', type: 'fur', values: ['Spirit'] },
+  { name: 'Midnight Strike', image: '/scheme/midnight strike.webp', type: 'fur', values: ['Shadow'] },
+  { name: 'Golden Shower', image: '/scheme/golden shower.webp', type: 'fur', values: ['Gold'] },
+  { name: 'Rainbow Riot', image: '/scheme/rainbow riot.webp', type: 'fur', values: ['Rainbow'] },
+  { name: 'Shapeshifting', image: '/scheme/shapeshifting.webp', type: 'trait', values: ['Tongue Out', 'Tanuki Mask', 'Kitsune Mask', 'Cat Mask'] },
+  { name: 'Tear jerking', image: '/scheme/tear jerking.webp', type: 'trait', values: ['Crying Eye'] },
+  { name: 'Costume party', image: '/scheme/costume party.webp', type: 'trait', values: ['Onesie', 'Lemon Head', 'Kappa Head', 'Tomato Head', 'Blob Head'] },
+  { name: 'Dress To Impress', image: '/scheme/dress to impress.webp', type: 'trait', values: ['Kimono'] },
+  { name: 'Call To Arms', image: '/scheme/call to arms.webp', type: 'trait', values: ['Ronin', 'Samurai', 'Ronin Aurora', 'Ronin Moon'] },
+  { name: 'Malicious Intent', image: '/scheme/malicious intent.webp', type: 'trait', values: ['Devious Mouth', 'Oni Mask', 'Tengu Mask', 'Skull Mask', 'Horns', 'TMA Noble Skull'] },
+  { name: 'Housekeeping', image: '/scheme/housekeeping.webp', type: 'trait', values: ['Apron', 'Garbage Can', 'Gold Can', 'Toilet Paper'] },
+  { name: 'Dungaree Duel', image: '/scheme/dungaree duel.webp', type: 'trait', values: ['Pink Overalls', 'Blue Overalls', 'Green Overalls'] },
 ];
 
 const RELEGATED_SCHEMES = [
-  { name: 'Touching The Wart', image: '/scheme/touching the wart.png', scoreType: 'wart' as const },
-  { name: 'Collective Specialization', image: '/scheme/collective specialization.png', scoreType: 'gacha' as const },
-  { name: 'Taking A Dive', image: '/scheme/taking a dive.png', scoreType: 'dive' as const },
+  { name: 'Touching The Wart', image: '/scheme/touching the wart.webp', scoreType: 'wart' as const },
+  { name: 'Collective Specialization', image: '/scheme/collective specialization.webp', scoreType: 'gacha' as const },
+  { name: 'Taking A Dive', image: '/scheme/taking a dive.webp', scoreType: 'dive' as const },
 ];
 
-const COLLECT_EM_ALL = { name: "Collect 'Em All", image: "/scheme/collect em all.png" };
+const COLLECT_EM_ALL = { name: "Collect 'Em All", image: "/scheme/collect em all.webp" };
 
 // ─── Rarity Utilities ────────────────────────────────────────────────────────
 

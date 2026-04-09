@@ -135,6 +135,7 @@ async function run() {
   console.log(`[Cron S1 Scores] Sync Complete. Updated ${successCount} Mokis in ${Date.now() - startTime}ms.`);
 
   await supabaseAdmin.from('sync_logs').insert({
+    job_type: 'S1_SCORES',
     status: 'success',
     cards_updated: successCount,
     details: `GitHub Action S1 Scores API: Synced ${successCount} Mokis.`,

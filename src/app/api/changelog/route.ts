@@ -7,7 +7,7 @@ export async function GET() {
       .from('class_changes')
       .select('id, moki_name, old_class, new_class, changed_at')
       .order('changed_at', { ascending: false })
-      .limit(100);
+      .limit(1000);
 
     if (error) {
       console.error('Error fetching changelog:', error);
