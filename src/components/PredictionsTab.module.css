@@ -1173,6 +1173,45 @@
   box-shadow: none;
 }
 
+.filterBtnSmall {
+  background: #333333;
+  color: white;
+  border: 2px solid #000;
+  border-bottom-width: 4px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.filterBtnSmall:hover {
+  transform: translateY(-2px);
+  background: #444;
+}
+
+.filterBtnSmall:active {
+  transform: translateY(0);
+  border-bottom-width: 2px;
+}
+
+.classGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 18px;
+  border-radius: 18px;
+  border: 2px solid #333333;
+  margin: 5px 0;
+}
+
 .modalActions {
   display: flex;
   gap: 12px;
@@ -1286,7 +1325,7 @@
   border: 2px solid #333333;
   border-radius: 6px;
   padding: 2px;
-  color: #ffd753;
+  color: #333333;
   width: 32px;
   font-size: 12px;
   font-weight: 900;
@@ -1294,7 +1333,6 @@
   outline: none;
   appearance: none;
   -moz-appearance: textfield;
-  text-shadow: 1px 1px 0 #000;
 }
 
 .nestedInput::-webkit-outer-spin-button,
@@ -1374,17 +1412,76 @@
 }
 
 .resultsModal .modalHeader {
-  padding: 1.5rem 2.5rem 1rem 1.5rem;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
   min-height: 70px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   position: relative;
   flex-shrink: 0;
+  gap: 1.5rem;
 }
 
-.resultsModal .modalTitle {
-  line-height: 1.2;
+.contestLinkBtn {
+  background: #ff66cc;
+  color: white;
+  border: 2px solid #333333;
+  border-bottom-width: 4px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 30px;
+}
+
+.contestLinkBtn:hover {
+  transform: translateY(-2px);
+  background: #ff85d5;
+}
+
+.contestLinkBtn:active {
+  transform: translateY(0);
+  border-bottom-width: 2px;
+}
+
+.rankingTitle {
+  font-family: var(--font-display, "Grand Arena", sans-serif);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffd753;
+  text-transform: uppercase;
   margin: 0;
+  letter-spacing: 0.05em;
+  text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000;
+}
+
+.rankingDateLabel {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #333333;
+  margin: 0;
+  margin-top: -4px;
+  margin-bottom: 2px;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.rankingUpdateInfo {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #333333;
+  opacity: 0.6;
+  margin: 0;
+  font-style: italic;
+  line-height: 1.2;
 }
 
 .lineupsList {
@@ -2412,6 +2509,12 @@
     gap: 6px !important;
   }
 
+  .classGrid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 8px;
+  }
+
   .checkboxLabel {
     font-size: 9px;
   }
@@ -2495,9 +2598,227 @@
 .expandedTableWrapper {
   flex: 1;
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
   padding: 0;
   background: #ffffff;
+}
+
+.pcOnlyRanking {
+  display: block;
+}
+
+.mobileOnlyRanking {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .pcOnlyRanking {
+    display: none;
+  }
+  
+  .mobileOnlyRanking {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .expandedTableWrapper {
+    background: #f0f2f5;
+  }
+
+  .mobileModalControls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #f0f2f5;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+  }
+
+  .mobileSortSelect {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 3px solid #333333;
+    background: #ffffff;
+    color: #333333;
+    font-weight: 900;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    cursor: pointer;
+  }
+
+  .mobileFilterRow {
+    display: flex;
+    gap: 8px;
+  }
+
+  .mobileFilterRow select {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #333333;
+    background: #ffffff;
+    color: #333333;
+    font-weight: 800;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+    cursor: pointer;
+  }
+}
+
+/* Mobile Card Styles */
+.mobileRankCard {
+  background: #ffffff;
+  border: 3px solid #333333;
+  border-bottom-width: 6px;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.mobileRankHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #f0f2f5;
+  padding-bottom: 8px;
+}
+
+.mobileRankId {
+  font-size: 0.7rem;
+  color: #888;
+  font-weight: 800;
+}
+
+.mobileRankName {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #333;
+  flex: 1;
+}
+
+.mobileRankClass {
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: #3a80ef;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.mobileMainStats {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.mobileStatBox {
+  flex: 1;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 10px 8px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.mobileStatLabel {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.mobileStatValue {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #333;
+}
+
+.mobileScoreValue {
+  color: #f1c40f;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+}
+
+.mobileWRValPos {
+  color: #1abf9e;
+}
+
+.mobileWRValNeg {
+  color: #ff6b6b;
+}
+
+.mobileStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.mobileGridItem {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 8px 4px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.mobileGridLabel {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.mobileGridValue {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #444;
+}
+
+.mobileRowFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 2px solid #f0f2f5;
+}
+
+.mobileFooterItem {
+  font-size: 0.75rem;
+  color: #555;
+  font-weight: 700;
+}
+
+.mobileFooterLabel {
+  font-weight: 800;
+  color: #333;
+  margin-right: 4px;
 }
 
 .expandedTable {
@@ -2557,8 +2878,8 @@
 }
 
 .sortableHeader:hover {
-  background: #3c3c3c !important;
-  color: #fff !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #3a80ef !important;
 }
 
 .filterHeaderCell {
@@ -2595,8 +2916,8 @@
 }
 
 .activeFilter {
-  background: rgba(255, 215, 83, 0.1) !important;
-  color: #fff !important;
+  background: rgba(58, 128, 239, 0.15) !important;
+  color: #333333 !important;
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -2605,32 +2926,37 @@
   position: absolute;
   top: 100%;
   left: 0;
-  min-width: 160px;
-  background: #2a2a2a;
-  border: 2px solid #444;
-  border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  min-width: 180px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   list-style: none;
-  padding: 0.5rem 0;
-  margin: 0;
-  z-index: 1000;
-  max-height: none;
-  overflow-y: visible;
+  padding: 0.75rem 0;
+  margin: 0.5rem 0 0 0;
+  z-index: 10000;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .modalFilterMenu li {
-  padding: 8px 16px;
-  color: #ccc;
-  font-size: 0.8rem;
+  padding: 10px 20px;
+  color: #333333;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
   text-transform: uppercase;
   font-weight: 700;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.modalFilterMenu li:last-child {
+  border-bottom: none;
 }
 
 .modalFilterMenu li:hover {
-  background: #ffd753;
-  color: #333;
+  background: rgba(58, 128, 239, 0.1);
+  color: #3a80ef;
 }
 
 .rightMenu {

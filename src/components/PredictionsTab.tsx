@@ -85,7 +85,10 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [lineupCount, setLineupCount] = useState<number>(1);
   const [allowRepeated, setAllowRepeated] = useState(false);
   const [maxRepeated, setMaxRepeated] = useState<number>(1);
-  const [excludeStrikers, setExcludeStrikers] = useState(false);
+  const [excludedClasses, setExcludedClasses] = useState<string[]>([]);
+  const [isExcludeClassesModalOpen, setIsExcludeClassesModalOpen] = useState(false);
+  const [selectedGenerateScheme, setSelectedGenerateScheme] = useState('ALL');
+  const [isSchemeSelectModalOpen, setIsSchemeSelectModalOpen] = useState(false);
   const [avoidMatchupConflicts, setAvoidMatchupConflicts] = useState(false);
   const [useOnlyMySchemes, setUseOnlyMySchemes] = useState(false);
   const [cardSource, setCardSource] = useState<'ALL' | 'MY'>('ALL');
@@ -160,6 +163,20 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [rankingPage, setRankingPage] = useState(0);
   const RANKING_PAGE_SIZE = 10;
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const [contestDate, setContestDate] = useState<string | null>(null);
+
+  // ─── 4. Load contest date for the ranking sidebar ──────────────────────────
+  useEffect(() => {
+    async function loadContestDate() {
+      const { data } = await supabase
+        .from('upcoming_matches_ga')
+        .select('match_date')
+        .limit(1)
+        .order('match_date', { ascending: true });
+      if (data && data[0]) setContestDate(data[0].match_date);
+    }
+    loadContestDate();
+  }, []);
 
   // Build lookup: moki name (uppercase) -> metadata entry
   const metadataByName = React.useMemo(() => {
@@ -545,21 +562,41 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     if (!selectedContest || rankingData.length === 0) return;
     setIsGenerating(true);
 
-    let matches = upcomingMatchesCache;
-    if (matches.length === 0) {
-      try {
-        const { data } = await supabase.from('upcoming_matches_ga').select('*').limit(2000);
-        if (data) {
-          setUpcomingMatchesCache(data as UpcomingMatchData[]);
-          matches = data as UpcomingMatchData[];
-        }
-      } catch (e) {
-        console.error('Failed to load upcoming matches:', e);
+    let matches: UpcomingMatchData[] = [];
+    try {
+      const { data } = await supabase.from('upcoming_matches_ga').select('*').limit(2000);
+      if (data) {
+        setUpcomingMatchesCache(data as UpcomingMatchData[]);
+        matches = data as UpcomingMatchData[];
       }
+    } catch (e) {
+      console.error('Failed to load upcoming matches:', e);
+      // Fallback to cache if request fails
+      matches = upcomingMatchesCache;
     }
 
+    let currentMokiStats = mokiStats;
+    try {
+      const { data } = await supabase.from('moki_stats').select('moki_id, name, class');
+      if (data) {
+        currentMokiStats = data;
+        setMokiStats(data); // update the state too for the ranking table
+      }
+    } catch (e) {
+      console.error('Failed to load fresh moki_stats:', e);
+    }
+
+    // Real-time class override from fresh moki_stats before generating
+    const rankingWithFreshClasses = (rankingData as unknown as MokiRankingRow[]).map(moki => {
+      const freshStat = currentMokiStats.find(s => s.moki_id === moki['Moki ID'] || s.name.toUpperCase() === moki.Name.toUpperCase());
+      return {
+        ...moki,
+        Class: freshStat?.class || moki.Class
+      };
+    });
+
     const results = generateLineups({
-      rankingData: rankingData as unknown as MokiRankingRow[],
+      rankingData: rankingWithFreshClasses,
       catalog: catalogJson as unknown as CatalogEntry[],
       userCards: userCards,
       cardMode: cardSource === 'MY' ? 'USER' : 'ALL',
@@ -568,10 +605,11 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       lineupCount: selectedContest.maxEntriesPerUser,
       allowRepeated,
       maxRepeated,
-      excludeStrikers,
+      excludedClasses,
       avoidMatchupConflicts,
-      useOnlyMySchemes,
-      cardSource,
+      useOnlyMySchemes: useOnlyMySchemes,
+      cardSource: cardSource,
+      selectedScheme: selectedGenerateScheme,
     });
 
     setGeneratedLineups(results);
@@ -615,6 +653,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     if (filters.type !== 'All') {
       const champions = contest.lineupConfig.slots.filter(s => s.cardType === 'champion');
       const type = filters.type.toLowerCase();
+      const contestName = contest.name.toLowerCase();
+
       if (type === 'open') {
         if (!champions.every(s => s.minRarity === 'basic' && s.maxRarity === 'legendary')) return false;
       } else if (type === 'only legendary') {
@@ -630,22 +670,27 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       } else if (type === 'up to rare') {
         if (!champions.every(s => s.minRarity === 'basic' && s.maxRarity === 'rare')) return false;
       } else if (type === 'one-of-each') {
+        // Must have "one of each" in name
+        if (!contestName.includes('one of each')) return false;
+        // Must have exactly 4 champions
         if (champions.length !== 4) return false;
-        const [c1, c2, c3, c4] = champions;
-        if (!(c1.minRarity === 'basic' && c1.maxRarity === 'basic' &&
-              c2.minRarity === 'rare' && c2.maxRarity === 'rare' &&
-              c3.minRarity === 'epic' && c3.maxRarity === 'epic' &&
-              c4.minRarity === 'legendary' && c4.maxRarity === 'legendary')) return false;
+        // Must have exactly one of each rarity
+        const has = (r: string) => champions.some(s => s.minRarity.toLowerCase() === r && s.maxRarity.toLowerCase() === r);
+        const isOneOfEach = has('basic') && has('rare') && has('epic') && has('legendary');
+        if (!isOneOfEach) return false;
+      } else if (type === 'sponsored') {
+        if (!contestName.includes('sponsored')) return false;
+      } else if (type === 'no win') {
+        if (!contestName.includes('no win')) return false;
       } else if (type === 'mix') {
         const championsConfigs = champions.map(s => `${s.minRarity}-${s.maxRarity}`);
         const uniqueConfigs = new Set(championsConfigs);
         if (uniqueConfigs.size < 2) return false;
-        const isOneOfEach = champions.length === 4 && 
-              champions[0].minRarity === 'basic' && champions[0].maxRarity === 'basic' &&
-              champions[1].minRarity === 'rare' && champions[1].maxRarity === 'rare' &&
-              champions[2].minRarity === 'epic' && champions[2].maxRarity === 'epic' &&
-              champions[3].minRarity === 'legendary' && champions[3].maxRarity === 'legendary';
-        if (isOneOfEach) return false;
+        
+        // Exclude One-Of-Each from Mix
+        const has = (r: string) => champions.some(s => s.minRarity.toLowerCase() === r && s.maxRarity.toLowerCase() === r);
+        const isOneOfEach = champions.length === 4 && has('basic') && has('rare') && has('epic') && has('legendary');
+        if (isOneOfEach && contestName.includes('one of each')) return false;
       }
     }
     return true;
@@ -725,7 +770,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                   </button>
                   {openFilter === 'type' && (
                     <ul className={`${styles.orderByMenu} ${styles.rightMenu}`}>
-                      {['All', 'Open', 'Only Legendary', 'Only Epic', 'Only Rare', 'Only Basic', 'One-Of-Each', 'Up To Epic', 'Up To Rare', 'Mix'].map(opt => (
+                      {['All', 'Open', 'Only Epic', 'Only Rare', 'Only Basic', 'One-Of-Each', 'Up To Epic', 'Up To Rare', 'Mix', 'Sponsored', 'No Win'].map(opt => (
                         <li key={opt} onClick={() => handleFilterChange('type', opt)} className={filters.type === opt ? styles.activeSort : ''}>{opt}</li>
                       ))}
                     </ul>
@@ -778,12 +823,10 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
               <h2 className={styles.rankingTitle}>PREDICTION RANKING</h2>
               <button className={styles.expandRankingBtn} onClick={() => setIsExpandedRankingOpen(true)}>EXPAND</button>
             </div>
-            {rankingEffectiveDate && (
-              <>
-                <p className={styles.rankingDateLabel}>FOR {formatContestDate(rankingEffectiveDate)} CONTEST</p>
-                <p className={styles.rankingUpdateInfo}>The ranking is updated 1 hour after the contests end</p>
-              </>
+            {contestDate && (
+              <p className={styles.rankingDateLabel}>FOR {formatContestDate(contestDate)} CONTEST</p>
             )}
+            <p className={styles.rankingUpdateInfo}>Ranking is updated 1 hour after the contest end</p>
             <div className={styles.filterByRow}>
               <span className={styles.filterLabel}>Filter by:</span>
               <div className={styles.sortControls}>
@@ -846,18 +889,26 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                       <button className={`${styles.toggleBtn} ${cardSource === 'MY' ? styles.active : ''}`} onClick={() => setCardSource('MY')}>MY CARDS</button>
                     </div>
                   </div>
+
+                  <div className={styles.modalRow} style={{ marginBottom: '4px' }}>
+                    <span className={styles.rowLabel}>EXCLUDE CLASSES</span>
+                    <button className={styles.filterBtnSmall} onClick={() => setIsExcludeClassesModalOpen(true)}>
+                      {excludedClasses.length > 0 ? `${excludedClasses.length} SELECTED` : 'NONE'}
+                    </button>
+                  </div>
+                  <div className={styles.modalRow} style={{ marginBottom: '8px' }}>
+                    <span className={styles.rowLabel}>SELECT SCHEME</span>
+                    <button className={styles.filterBtnSmall} onClick={() => setIsSchemeSelectModalOpen(true)}>
+                      {selectedGenerateScheme}
+                    </button>
+                  </div>
+
                   <div className={styles.checkboxGroup}>
                     <div className={styles.checkboxWrapper} onClick={() => setAvoidMatchupConflicts(!avoidMatchupConflicts)}>
                       <div className={`${styles.customCheckbox} ${avoidMatchupConflicts ? styles.checked : ''}`}>
                         {avoidMatchupConflicts && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                       </div>
                       <span className={styles.checkboxLabel}>Avoid match up conflicts</span>
-                    </div>
-                    <div className={styles.checkboxWrapper} onClick={() => setExcludeStrikers(!excludeStrikers)}>
-                      <div className={`${styles.customCheckbox} ${excludeStrikers ? styles.checked : ''}`}>
-                        {excludeStrikers && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                      </div>
-                      <span className={styles.checkboxLabel}>Exclude Strikers</span>
                     </div>
                     <div className={styles.checkboxWrapper} onClick={() => cardSource !== 'ALL' && setUseOnlyMySchemes(!useOnlyMySchemes)} style={{ opacity: cardSource === 'ALL' ? 0.5 : 1 }}>
                       <div className={`${styles.customCheckbox} ${useOnlyMySchemes ? styles.checked : ''}`}>
@@ -970,6 +1021,83 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
 
       {mounted && createPortal(
         <AnimatePresence>
+          {isExcludeClassesModalOpen && (
+            <div className={styles.modalOverlay} onClick={() => setIsExcludeClassesModalOpen(false)}>
+              <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className={styles.schemeMenuContent} style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                  <h2 className={styles.modalTitle}>EXCLUDE CLASSES</h2>
+                  <button className={styles.modalCloseButton} onClick={() => setIsExcludeClassesModalOpen(false)}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                <p className={styles.modalDesc} style={{ marginBottom: '10px' }}>Select the classes you want to <strong>exclude</strong> from the generation.</p>
+                <div className={styles.classGrid}>
+                  {['Anchor', 'Bruiser', 'Center', 'Defender', 'Flanker', 'Forward', 'Grinder', 'Sprinter', 'Striker', 'Support'].map((className) => {
+                    const isSelected = excludedClasses.includes(className.toUpperCase());
+                    return (
+                      <div key={className} className={styles.checkboxWrapper} onClick={() => {
+                        const upper = className.toUpperCase();
+                        if (isSelected) {
+                          setExcludedClasses(prev => prev.filter(c => c !== upper));
+                        } else {
+                          setExcludedClasses(prev => [...prev, upper]);
+                        }
+                      }}>
+                        <div className={`${styles.customCheckbox} ${isSelected ? styles.checked : ''}`}>
+                          {isSelected && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                        </div>
+                        <span className={styles.checkboxLabel}>{className}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className={styles.modalActions} style={{ marginTop: '20px' }}>
+                  <button className={styles.confirmButton} onClick={() => setIsExcludeClassesModalOpen(false)}>DONE</button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {mounted && createPortal(
+        <AnimatePresence>
+          {isSchemeSelectModalOpen && (
+            <div className={styles.modalOverlay} onClick={() => setIsSchemeSelectModalOpen(false)}>
+              <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className={styles.schemeMenuContent} style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                  <h2 className={styles.modalTitle}>SELECT SCHEME</h2>
+                  <button className={styles.modalCloseButton} onClick={() => setIsSchemeSelectModalOpen(false)}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                <p className={styles.modalDesc} style={{ marginBottom: '10px' }}>Select the main strategy for lineage generation.</p>
+                <div className={styles.classGrid} style={{ gridTemplateColumns: '1fr' }}>
+                  {['ALL', 'TRAIT', 'COLLECTIVE SPECIALIZATION', 'TOUCHING THE WART', 'TAKING A DIVE'].map((schemeOpt) => {
+                    const isSelected = selectedGenerateScheme === schemeOpt;
+                    return (
+                      <div key={schemeOpt} className={styles.checkboxWrapper} onClick={() => {
+                        setSelectedGenerateScheme(schemeOpt);
+                        setIsSchemeSelectModalOpen(false);
+                      }}>
+                        <div className={`${styles.customCheckbox} ${isSelected ? styles.checked : ''}`}>
+                          {isSelected && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                        </div>
+                        <span className={styles.checkboxLabel} style={{ fontSize: '11px' }}>{schemeOpt}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {mounted && createPortal(
+        <AnimatePresence>
           {isSchemeMenuOpen && (
             <div className={styles.modalOverlay} onClick={() => setIsSchemeMenuOpen(false)}>
               <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className={styles.schemeMenuContent} onClick={(e) => e.stopPropagation()}>
@@ -1018,6 +1146,19 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                 </button>
                 <div className={styles.modalHeader}>
                   <h2 className={styles.modalTitle}>Generated Lineups</h2>
+                  <a 
+                    href={`https://grandarena.gg/contests/${selectedContest.id}/lineup`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className={styles.contestLinkBtn}
+                  >
+                    CONTEST
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </a>
                 </div>
                 <div className={styles.lineupsList}>
                   {generatedLineups.length > 0 ? (
@@ -1068,7 +1209,9 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                                 <img src={schemeImage} alt="Scheme" className={styles.mokiCardImg} />
                               </div>
                               <div className={styles.mokiCardScoreBadge}>
-                                <span className={styles.mokiCardScoreValue}>SCHEME</span>
+                                <span className={styles.mokiCardScoreValue}>
+                                  {Math.round(lineup.totalEffectiveScore - lineup.mokis.reduce((s, m) => s + (m.baseScore * getRarityMultiplier(m.rarity)), 0)).toLocaleString()} PTS
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -1169,197 +1312,243 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                 </div>
                 
                 <div className={styles.expandedTableWrapper}>
-                  <table className={styles.expandedTable}>
-                    <thead>
-                      <tr>
-                        <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '65px' }}>Rank</th>
-                        <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '80px' }}>Moki ID</th>
-                        <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '150px' }}>Name</th>
-                        <th className={styles.filterHeaderCell} style={{ width: '120px' }}>
-                          <div className={styles.modalFilterDropdown}>
-                            <button 
-                              className={`${styles.modalFilterBtn} ${modalFilters.class !== 'ALL' ? styles.activeFilter : ''}`}
-                              onClick={() => setOpenModalDropdown(openModalDropdown === 'class' ? null : 'class')}
-                            >
-                              CLASS
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'class' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                              </svg>
+                  {/* PC VIEW: TABLE */}
+                  <div className={styles.pcOnlyRanking}>
+                    <table className={styles.expandedTable}>
+                      <thead>
+                        <tr>
+                          <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '65px' }}>Rank</th>
+                          <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '80px' }}>Moki ID</th>
+                          <th className={styles.modalHeaderLabel} style={{ cursor: 'default', width: '150px' }}>Name</th>
+                          <th className={styles.filterHeaderCell} style={{ width: '120px' }}>
+                            <div className={styles.modalFilterDropdown}>
+                              <button 
+                                className={`${styles.modalFilterBtn} ${modalFilters.class !== 'ALL' ? styles.activeFilter : ''}`}
+                                onClick={() => setOpenModalDropdown(openModalDropdown === 'class' ? null : 'class')}
+                              >
+                                CLASS
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'class' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                                  <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                              </button>
+                              {openModalDropdown === 'class' && (
+                                <ul className={styles.modalFilterMenu}>
+                                  {availClasses.map(c => (
+                                    <li key={c} onClick={() => { setModalFilters(p => ({...p, class: c})); setOpenModalDropdown(null); }}>{c}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Score')}>
+                              Score 
                             </button>
-                            {openModalDropdown === 'class' && (
-                              <ul className={styles.modalFilterMenu}>
-                                {availClasses.map(c => (
-                                  <li key={c} onClick={() => { setModalFilters(p => ({...p, class: c})); setOpenModalDropdown(null); }}>{c}</li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          className={styles.sortableHeader} 
-                          onClick={() => handleModalSort('Score')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            Score 
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Score' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Score' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
-                        <th 
-                          className={styles.sortableHeader} 
-                          onClick={() => handleModalSort('WinRate')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            WinRate
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'WinRate' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'WinRate' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
-                        <th 
-                          className={styles.sortableHeader} 
-                          onClick={() => handleModalSort('Wart Closer')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            Wart Closer
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Wart Closer' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Wart Closer' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
-                        <th 
-                          className={styles.sortableHeader} 
-                          onClick={() => handleModalSort('Losses')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            Losses
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Losses' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Losses' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
-                        <th 
-                          className={styles.sortableHeader} 
-                          onClick={() => handleModalSort('Gacha Pts')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            Gacha Pts
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Gacha Pts' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Gacha Pts' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
-                        <th 
-                          className={styles.sortableHeader} 
-                          onClick={() => handleModalSort('Deaths')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            Deaths
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Deaths' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Deaths' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
-                        <th
-                          className={styles.sortableHeader}
-                          onClick={() => handleModalSort('Kills')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            Kills
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Kills' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Kills' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('WinRate')}>
+                              WinRate
+                            </button>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Losses')}>
+                              Losses
+                            </button>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Wart Closer')}>
+                              Wart Closer
+                            </button>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Gacha Pts')}>
+                              Gacha Pts
+                            </button>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Kills')}>
+                              Kills
+                            </button>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Deaths')}>
+                              Deaths
+                            </button>
+                          </th>
 
-                        <th 
-                          className={styles.sortableHeader} 
-                          onClick={() => handleModalSort('Win By Combat')}
-                          style={{ width: '100px' }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                            Win combat
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: modalSortKey === 'Win By Combat' && modalSortDirection === 'asc' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', opacity: modalSortKey === 'Win By Combat' ? 1 : 0.3 }}>
-                              <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                          </div>
-                        </th>
-                        <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
-                          <div className={styles.modalFilterDropdown}>
-                            <button 
-                              className={`${styles.modalFilterBtn} ${modalFilters.fur !== 'ALL' ? styles.activeFilter : ''}`}
-                              onClick={() => setOpenModalDropdown(openModalDropdown === 'fur' ? null : 'fur')}
-                            >
-                              FUR
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'fur' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                              </svg>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Win By Combat')}>
+                              Win combat
                             </button>
-                            {openModalDropdown === 'fur' && (
-                              <ul className={styles.modalFilterMenu}>
-                                {availFurs.map(f => (
-                                  <li key={f} onClick={() => { setModalFilters(p => ({...p, fur: f})); setOpenModalDropdown(null); }}>{f}</li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        </th>
-                        <th className={styles.filterHeaderCell} style={{ width: '250px' }}>
-                          <div className={styles.modalFilterDropdown}>
-                            <button 
-                              className={`${styles.modalFilterBtn} ${modalFilters.trait !== 'ALL' ? styles.activeFilter : ''}`}
-                              onClick={() => setOpenModalDropdown(openModalDropdown === 'trait' ? null : 'trait')}
-                            >
-                              TRAITS (SCHEME)
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'trait' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                              </svg>
-                            </button>
-                            {openModalDropdown === 'trait' && (
-                              <ul className={`${styles.modalFilterMenu} ${styles.rightMenu}`}>
-                                {availTraits.map(t => (
-                                  <li key={t} onClick={() => { setModalFilters(p => ({...p, trait: t})); setOpenModalDropdown(null); }}>{t}</li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {modalSortedRanking.map((moki: any) => (
-                        <tr key={moki['Moki ID']}>
-                          <td><strong>#{moki._originalRank}</strong></td>
-                          <td><strong>{moki['Moki ID']}</strong></td>
-                          <td>{moki.Name}</td>
-                          <td style={{textTransform: 'uppercase'}}><strong>{moki.Class}</strong></td>
-                          <td style={{ color: '#ffd753', fontWeight: 'bold' }}>{moki._displayScore}</td>
-                          <td style={{ color: '#1abf9e', fontWeight: 'bold' }}>{moki.WinRate}%</td>
-                          <td>{moki['Wart Closer'] ? Number(moki['Wart Closer']).toFixed(2) : '0'}</td>
-                          <td style={{ color: '#ff6b6b' }}>{moki.Losses}</td>
-                          <td>{moki['Gacha Pts']}</td>
-                          <td>{moki.Deaths ? Number(moki.Deaths).toFixed(2) : '0'}</td>
-                          <td>{moki.Kills ? Number(moki.Kills).toFixed(2) : '0'}</td>
-                          <td>{moki['Win By Combat'] ? Number(moki['Win By Combat']).toFixed(2) : '0'}</td>
-                          <td>{moki.Fur}</td>
-                          <td className={styles.traitsCell}>
-                            {moki.Traits.split(',')
-                              .map((t: string) => t.trim())
-                              .filter((t: string) => isSchemeTrait(t))
-                              .join(', ')}
-                          </td>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
+                            <div className={styles.modalFilterDropdown}>
+                              <button 
+                                className={`${styles.modalFilterBtn} ${modalFilters.fur !== 'ALL' ? styles.activeFilter : ''}`}
+                                onClick={() => setOpenModalDropdown(openModalDropdown === 'fur' ? null : 'fur')}
+                              >
+                                FUR
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'fur' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                                  <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                              </button>
+                              {openModalDropdown === 'fur' && (
+                                <ul className={styles.modalFilterMenu}>
+                                  {availFurs.map(f => (
+                                    <li key={f} onClick={() => { setModalFilters(p => ({...p, fur: f})); setOpenModalDropdown(null); }}>{f}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          </th>
+                          <th className={styles.filterHeaderCell} style={{ width: '250px' }}>
+                            <div className={styles.modalFilterDropdown}>
+                              <button 
+                                className={`${styles.modalFilterBtn} ${modalFilters.trait !== 'ALL' ? styles.activeFilter : ''}`}
+                                onClick={() => setOpenModalDropdown(openModalDropdown === 'trait' ? null : 'trait')}
+                              >
+                                TRAITS (SCHEME)
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px', transform: openModalDropdown === 'trait' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                                  <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                              </button>
+                              {openModalDropdown === 'trait' && (
+                                <ul className={`${styles.modalFilterMenu} ${styles.rightMenu}`}>
+                                  {availTraits.map(t => (
+                                    <li key={t} onClick={() => { setModalFilters(p => ({...p, trait: t})); setOpenModalDropdown(null); }}>{t}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {modalSortedRanking.map((moki: any) => (
+                          <tr key={moki['Moki ID']}>
+                            <td><strong>#{moki._originalRank}</strong></td>
+                            <td><strong>{moki['Moki ID']}</strong></td>
+                            <td>{moki.Name}</td>
+                            <td style={{textTransform: 'uppercase'}}><strong>{moki.Class}</strong></td>
+                            <td style={{ color: '#ffd753', fontWeight: 'bold' }}>{moki._displayScore}</td>
+                            <td style={{ color: '#1abf9e', fontWeight: 'bold' }}>{moki.WinRate}%</td>
+                            <td style={{ color: '#ff6b6b' }}>{moki.Losses}</td>
+                            <td>{moki['Wart Closer'] ? Number(moki['Wart Closer']).toFixed(2) : '0'}</td>
+                            <td>{moki['Gacha Pts']}</td>
+                            <td>{moki.Kills ? Number(moki.Kills).toFixed(2) : '0'}</td>
+                            <td>{moki.Deaths ? Number(moki.Deaths).toFixed(2) : '0'}</td>
+                            <td>{moki['Win By Combat'] ? Number(moki['Win By Combat']).toFixed(2) : '0'}</td>
+                            <td>{moki.Fur}</td>
+                            <td className={styles.traitsCell}>
+                              {moki.Traits.split(',')
+                                .map((t: string) => t.trim())
+                                .filter((t: string) => isSchemeTrait(t))
+                                .join(', ')}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* MOBILE VIEW: CARDS */}
+                  <div className={styles.mobileOnlyRanking}>
+                    {/* Mobile Controls */}
+                    <div className={styles.mobileModalControls}>
+                       <select 
+                         className={styles.mobileSortSelect}
+                         onChange={(e) => handleModalSort(e.target.value)}
+                         value={modalSortKey || ''}
+                       >
+                         <option value="Score">SORT BY SCORE</option>
+                         <option value="WinRate">SORT BY WINRATE</option>
+                         <option value="Losses">SORT BY LOSSES</option>
+                         <option value="Wart Closer">SORT BY WART CLOSER</option>
+                         <option value="Gacha Pts">SORT BY GACHA PTS</option>
+                         <option value="Kills">SORT BY KILLS</option>
+                         <option value="Deaths">SORT BY DEATHS</option>
+                         <option value="Win By Combat">SORT BY WIN COMBAT</option>
+                       </select>
+
+                       <div className={styles.mobileFilterRow}>
+                          <select value={modalFilters.class} onChange={(e) => setModalFilters(p => ({...p, class: e.target.value}))}>
+                            <option value="ALL">ALL CLASSES</option>
+                            {availClasses.filter(c => c !== 'ALL').map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                          <select value={modalFilters.fur} onChange={(e) => setModalFilters(p => ({...p, fur: e.target.value}))}>
+                            <option value="ALL">ALL FURS</option>
+                            {availFurs.filter(f => f !== 'ALL').map(f => <option key={f} value={f}>{f}</option>)}
+                          </select>
+                          <select value={modalFilters.trait} onChange={(e) => setModalFilters(p => ({...p, trait: e.target.value}))}>
+                            <option value="ALL">ALL SCHEMES</option>
+                            {availTraits.filter(t => t !== 'ALL').map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                       </div>
+                    </div>
+
+                    {modalSortedRanking.map((moki: any) => (
+                      <div key={moki['Moki ID']} className={styles.mobileRankCard}>
+                        <div className={styles.mobileRankHeader}>
+                          <span className={styles.mobileRankId}>#{moki._originalRank} - {moki['Moki ID']}</span>
+                          <span className={styles.mobileRankName}>{moki.Name}</span>
+                          <span className={styles.mobileRankClass}>{moki.Class}</span>
+                        </div>
+
+                        <div className={styles.mobileMainStats}>
+                          <div className={styles.mobileStatBox}>
+                            <span className={styles.mobileStatLabel}>Score</span>
+                            <span className={`${styles.mobileStatValue} ${styles.mobileScoreValue}`}>{moki._displayScore}</span>
+                          </div>
+                          <div className={styles.mobileStatBox}>
+                            <span className={styles.mobileStatLabel}>WinRate</span>
+                            <span className={`${styles.mobileStatValue} ${moki.WinRate >= 50 ? styles.mobileWRValPos : styles.mobileWRValNeg}`}>
+                              {moki.WinRate}%
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className={styles.mobileStatsGrid}>
+                          <div className={styles.mobileGridItem}>
+                            <span className={styles.mobileGridLabel}>Losses</span>
+                            <span className={styles.mobileGridValue}>{moki.Losses}</span>
+                          </div>
+                          <div className={styles.mobileGridItem}>
+                            <span className={styles.mobileGridLabel}>Wart Closer</span>
+                            <span className={styles.mobileGridValue}>{moki['Wart Closer'] ? Number(moki['Wart Closer']).toFixed(1) : '0'}</span>
+                          </div>
+                          <div className={styles.mobileGridItem}>
+                            <span className={styles.mobileGridLabel}>Gacha Pts</span>
+                            <span className={styles.mobileGridValue}>{moki['Gacha Pts']}</span>
+                          </div>
+                          <div className={styles.mobileGridItem}>
+                            <span className={styles.mobileGridLabel}>Kills</span>
+                            <span className={styles.mobileGridValue}>{moki.Kills ? Number(moki.Kills).toFixed(1) : '0'}</span>
+                          </div>
+                          <div className={styles.mobileGridItem}>
+                            <span className={styles.mobileGridLabel}>Deaths</span>
+                            <span className={styles.mobileGridValue}>{moki.Deaths ? Number(moki.Deaths).toFixed(1) : '0'}</span>
+                          </div>
+                          <div className={styles.mobileGridItem}>
+                            <span className={styles.mobileGridLabel}>Win Combat</span>
+                            <span className={styles.mobileGridValue}>{moki['Win By Combat'] ? Number(moki['Win By Combat']).toFixed(1) : '0'}</span>
+                          </div>
+                        </div>
+
+                        <div className={styles.mobileRowFooter}>
+                           <div className={styles.mobileFooterItem}>
+                             <span className={styles.mobileFooterLabel}>Fur:</span> {moki.Fur}
+                           </div>
+                           <div className={styles.mobileFooterItem}>
+                             <span className={styles.mobileFooterLabel}>Traits:</span> 
+                             {moki.Traits.split(',')
+                                .map((t: string) => t.trim())
+                                .filter((t: string) => isSchemeTrait(t))
+                                .join(', ')}
+                           </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </motion.div>

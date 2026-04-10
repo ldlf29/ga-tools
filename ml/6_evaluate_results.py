@@ -153,17 +153,16 @@ def main():
         df_feat = pd.DataFrame(features_list)
         
         # FASE 1: Auxiliares (necesario para el Stacking de la Fase 2)
-        df_feat["pred_deaths"]     = model_deaths.predict(df_feat)
-        df_feat["pred_kills"]      = model_kills.predict(df_feat)
-        df_feat["pred_deposits"]   = model_deposits.predict(df_feat)
+        df_feat["pred_deaths"]     = model_deaths.predict(df_feat).clip(min=0)
+        df_feat["pred_kills"]      = model_kills.predict(df_feat).clip(min=0)
+        df_feat["pred_deposits"]   = model_deposits.predict(df_feat).clip(min=0)
         df_feat["pred_wartcloser"] = model_wartcloser.predict_proba(df_feat)[:, 1]
-        
+
         # FASE 2: Predicciones principales (con cascade features)
         pred_win_probs = model_winrate.predict_proba(df_feat)[:, 1]
-        pred_scores = model_score.predict(df_feat)
-        pred_deaths_main = model_deaths.predict(df_feat)
-        pred_deposits_main = model_deposits.predict(df_feat)
-        
+        pred_scores = model_score.predict(df_feat).clip(min=0)
+        pred_deaths_main = model_deaths.predict(df_feat).clip(min=0)
+        pred_deposits_main = model_deposits.predict(df_feat).clip(min=0)        
         # Aggregates (10 matches)
         total_pred_score = sum(pred_scores)
         total_actual_score = sum(actual_scores)

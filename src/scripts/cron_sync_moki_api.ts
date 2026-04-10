@@ -187,6 +187,66 @@ async function run() {
         );
       }
 
+      // Update upcoming matches JSONB before re-ranking
+      console.log(`[Cron Sync Moki] Updating upcoming_matches_ga with new classes...`);
+      try {
+        const { data: upcomingMatches, error: upcomingErr } = await supabaseAdmin
+          .from('upcoming_matches_ga')
+          .select('id, team_red, team_blue');
+
+        if (upcomingErr) {
+          console.error('[Cron Sync Moki] Error fetching upcoming matches:', upcomingErr);
+        } else if (upcomingMatches && upcomingMatches.length > 0) {
+          const classChangeMap = new Map(classChanges.map(c => [c.moki_id, c.new_class]));
+          const matchesToUpdate: any[] = [];
+
+          for (const match of upcomingMatches) {
+            let modified = false;
+
+            const processTeam = (team: any[]) => {
+              if (!team || !Array.isArray(team)) return team;
+              return team.map(player => {
+                const tokenId = player.mokiTokenId || player.tokenId;
+                const tokenIdNum = typeof tokenId === 'number' ? tokenId : parseInt(tokenId, 10);
+                if (classChangeMap.has(tokenIdNum) && player.class !== classChangeMap.get(tokenIdNum)) {
+                  modified = true;
+                  return { ...player, class: classChangeMap.get(tokenIdNum) };
+                }
+                return player;
+              });
+            };
+
+            const newTeamRed = processTeam(match.team_red);
+            const newTeamBlue = processTeam(match.team_blue);
+
+            if (modified) {
+              matchesToUpdate.push({
+                id: match.id,
+                team_red: newTeamRed,
+                team_blue: newTeamBlue
+              });
+            }
+          }
+
+          if (matchesToUpdate.length > 0) {
+            console.log(`[Cron Sync Moki] Modifying ${matchesToUpdate.length} upcoming matches...`);
+            // Batch update using upsert
+            const DB_CHUNK_SIZE = 100;
+            for (let i = 0; i < matchesToUpdate.length; i += DB_CHUNK_SIZE) {
+              const chunk = matchesToUpdate.slice(i, i + DB_CHUNK_SIZE);
+              const { error: upsertErr } = await supabaseAdmin
+                .from('upcoming_matches_ga')
+                .upsert(chunk, { onConflict: 'id' });
+              if (upsertErr) {
+                console.error('[Cron Sync Moki] Error updating upcoming matches chunk:', upsertErr);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[Cron Sync Moki] Failed to update upcoming matches:', err);
+      }
+
       // Trigger ML Re-Ranking (solo regenerar predicciones con las clases actualizadas)
       console.log(`[Cron Sync Moki] Class change detected (${classChanges.length} changes). Triggering ML re-ranking...`);
       try {
@@ -264,7 +324,15 @@ async function run() {
       .from('moki_stats')
       .upsert(updatesToSupabase, { onConflict: 'moki_id' });
 
-    if (upsertErr) console.error('[Cron Sync Moki] Upsert Error:', upsertErr);
+    if (upsertErr) {
+      console.error('[Cron Sync Moki] Upsert Error:', upsertErr);
+      await supabaseAdmin.from('sync_logs').insert({
+        job_type: 'MOKI_STATS',
+        status: 'error',
+        details: `Upsert Error: ${upsertErr.message}`,
+      });
+      throw upsertErr;
+    }
   }
 
   console.log(

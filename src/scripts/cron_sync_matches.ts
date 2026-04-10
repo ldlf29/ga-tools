@@ -204,12 +204,16 @@ async function run() {
     `[Cron Matches] Sync Complete. Upserted ${recordsUpserted}. Duration: ${Date.now() - startTime}ms`
   );
 
-  await supabaseAdmin.from('sync_logs').insert({
+  const { error: logErr } = await supabaseAdmin.from('sync_logs').insert({
     job_type: 'MATCH_HISTORY',
     status: 'success',
     cards_updated: recordsUpserted,
     details: `GitHub Action Matches: Processed ${allTokenIds.length} mokis. Upserted ${recordsUpserted}.`,
   });
+
+  if (logErr) {
+    console.error('[Cron Matches] Failed to log to sync_logs:', logErr);
+  }
 }
 
 run().catch((e) => {

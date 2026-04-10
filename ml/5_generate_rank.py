@@ -47,13 +47,14 @@ with open(Path(__file__).parent.parent / "src" / "data" / "mokiMetadata.json", "
 CLASSES = ["Anchor", "Bruiser", "Center", "Defender", "Flanker", "Forward", "Grinder", "Sprinter", "Striker", "Support"]
 
 def get_moki_stats_overrides():
-    """Retorna dict {name_lower: class} con la clase ACTUAL de cada Moki desde Supabase."""
-    url = f"{SUPABASE_URL}/rest/v1/moki_stats?select=name,class"
+    """Retorna dict {moki_id: class} con la clase ACTUAL de cada Moki desde Supabase."""
+    url = f"{SUPABASE_URL}/rest/v1/moki_stats?select=moki_id,class"
     headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
     try:
         res = requests.get(url, headers=headers).json()
-        return {str(row["name"]).strip().lower(): row["class"] for row in res if row.get("name")}
-    except:
+        return {row["moki_id"]: row["class"] for row in res if row.get("moki_id")}
+    except Exception as e:
+        print("[WARN] Error fetching class overrides:", e)
         return {}
 
 def build_features_for_moki(moki_id, matches, moki_details, class_overrides):
@@ -69,11 +70,11 @@ def build_features_for_moki(moki_id, matches, moki_details, class_overrides):
         my_team    = team_red if moki_id in red_ids else team_blue
         enemy_team = team_blue if moki_id in red_ids else team_red
 
-        # Aplicar overrides de clase
+        # Aplicar overrides de clase usando moki_id
         for m in my_team + enemy_team:
-            nk = str(m.get("name", "")).strip().lower()
-            if nk in class_overrides:
-                m["class"] = class_overrides[nk]
+            mid = m.get("mokiTokenId")
+            if mid and mid in class_overrides:
+                m["class"] = class_overrides[mid]
 
         my_moki = next((m for m in my_team if m.get("mokiTokenId") == moki_id), None)
         if not my_moki:
@@ -115,14 +116,14 @@ def predict_for_features(features_list):
     df_feat = pd.DataFrame(features_list)
 
     # FASE 1: Auxiliares
-    df_feat["pred_deaths"]     = model_deaths.predict(df_feat)
-    df_feat["pred_kills"]      = model_kills.predict(df_feat)
-    df_feat["pred_deposits"]   = model_deposits.predict(df_feat)
+    df_feat["pred_deaths"]     = model_deaths.predict(df_feat).clip(min=0)
+    df_feat["pred_kills"]      = model_kills.predict(df_feat).clip(min=0)
+    df_feat["pred_deposits"]   = model_deposits.predict(df_feat).clip(min=0)
     df_feat["pred_wartcloser"] = model_wartcloser.predict_proba(df_feat)[:, 1]
 
     # FASE 2: Principales (con cascade features)
     win_probs  = model_winrate.predict_proba(df_feat)[:, 1]
-    scores     = model_score.predict(df_feat)
+    scores     = model_score.predict(df_feat).clip(min=0)
     cond_probs = model_cond.predict_proba(df_feat).mean(axis=0) * 100
 
     return df_feat, win_probs, scores, cond_probs

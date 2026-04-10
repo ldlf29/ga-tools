@@ -133,7 +133,7 @@ def train_models():
         if cfg["class"] == CatBoostClassifier:
             df[f"pred_{cfg['name'].lower()}"] = model.predict_proba(X_base)[:, 1]
         else:
-            df[f"pred_{cfg['name'].lower()}"] = model.predict(X_base)
+            df[f"pred_{cfg['name'].lower()}"] = np.maximum(0, model.predict(X_base))
 
     # ── FASE 2: Modelos Principales (Stacking) ────────────────────────────────
     print("\n" + "="*55)

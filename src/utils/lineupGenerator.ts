@@ -74,10 +74,11 @@ export interface GenerateParams {
   lineupCount: number;
   allowRepeated: boolean;
   maxRepeated: number;
-  excludeStrikers: boolean;
+  excludedClasses: string[];
   avoidMatchupConflicts: boolean;
   useOnlyMySchemes?: boolean;
   cardSource: 'ALL' | 'MY';
+  selectedScheme?: string;
 }
 
 // ─── Scheme Definitions ──────────────────────────────────────────────────────
@@ -294,7 +295,8 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup): MokiCa
   const pool: MokiCandidate[] = [];
 
   for (const row of params.rankingData) {
-    if (params.excludeStrikers && (row.Class || '').toLowerCase() === 'striker') continue;
+    const mokiClass = (row.Class || '').toUpperCase();
+    if (params.excludedClasses.includes(mokiClass)) continue;
 
     const name = row.Name;
     if (!name) continue;
@@ -477,7 +479,8 @@ function generateOneOfEach(
           const stockKey = `${name}:${targetRarity.toUpperCase()}`;
           if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
           
-          if (params.excludeStrikers && String(row.Class).toLowerCase() === 'striker') continue;
+          const mokiClass = String(row.Class).toUpperCase();
+          if (params.excludedClasses.includes(mokiClass)) continue;
 
           const ownedEntry = params.userCards.find(
             c => c.cardType === 'MOKI' &&
@@ -631,6 +634,17 @@ function generateStandard(
     relegatedSchemes = RELEGATED_SCHEMES.filter(s => ownedSchemeNames.has(s.name.toUpperCase().trim()));
   }
 
+  // User forced scheme selection
+  const filterScheme = params.selectedScheme?.toUpperCase();
+  if (filterScheme && filterScheme !== 'ALL') {
+    if (filterScheme === 'TRAIT') {
+      relegatedSchemes = [];
+    } else {
+      traitSchemes = [];
+      relegatedSchemes = relegatedSchemes.filter(s => s.name.toUpperCase() === filterScheme);
+    }
+  }
+
   const getAvailablePool = () => pool.filter(m => (stockMap.get(`${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`) ?? 0) > 0);
 
   for (const scheme of traitSchemes) {
@@ -682,7 +696,7 @@ function generateStandard(
   for (const schemeDef of relegatedSchemes) {
     if (traitPool.length + specPool.length >= SAFETY_LIMIT) break;
 
-    if (params.excludeStrikers && (schemeDef.scoreType === 'dive' || schemeDef.scoreType === 'gacha')) continue;
+    if (params.excludedClasses.includes('STRIKER') && (schemeDef.scoreType === 'dive' || schemeDef.scoreType === 'gacha')) continue;
 
     let canBuildAnother = true;
     while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT)) {
