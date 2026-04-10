@@ -51,6 +51,7 @@
   "overrides": {
     "elliptic": "^6.6.1",
     "lodash": "^4.18.0",
-    "@stablelib/ed25519": "^2.0.3"
+    "@stablelib/ed25519": "^2.0.3",
+    "axios": "^1.15.0"
   }
 }
