@@ -138,7 +138,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     distribution: 'All',
     price: 'All',
     time: 'All',
-    type: 'All'
+    type: 'All',
+    mode: 'All'
   });
 
   interface MokiRanking {
@@ -631,11 +632,15 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     if (filters.distribution !== 'All') {
       const split = contest.prizeSplitConfig.defaultSplit.toLowerCase();
       const target = filters.distribution.toLowerCase();
-      if (target === '50/50' && !split.includes('50') && !split.includes('fifty')) return false;
-      if (target === 'top 20%' && !split.includes('20')) return false;
-      if (target === 'top 10%' && !split.includes('10')) return false;
-      if (target === 'winner take all' && !split.includes('winner')) return false;
-      if (target === 'free' && !split.includes('free')) return false;
+      const contestName = contest.name.toLowerCase();
+
+      if (target === 'sponsored') {
+        if (!contestName.includes('sponsored')) return false;
+      } else if (target === '50/50' && !split.includes('50') && !split.includes('fifty')) return false;
+      else if (target === 'top 20%' && !split.includes('20')) return false;
+      else if (target === 'top 10%' && !split.includes('10')) return false;
+      else if (target === 'winner take all' && !split.includes('winner')) return false;
+      else if (target === 'free' && !split.includes('free')) return false;
     }
     if (filters.price !== 'All') {
       const amount = contest.entryPrice.amount;
@@ -678,10 +683,6 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         const has = (r: string) => champions.some(s => s.minRarity.toLowerCase() === r && s.maxRarity.toLowerCase() === r);
         const isOneOfEach = has('basic') && has('rare') && has('epic') && has('legendary');
         if (!isOneOfEach) return false;
-      } else if (type === 'sponsored') {
-        if (!contestName.includes('sponsored')) return false;
-      } else if (type === 'no win') {
-        if (!contestName.includes('no win')) return false;
       } else if (type === 'mix') {
         const championsConfigs = champions.map(s => `${s.minRarity}-${s.maxRarity}`);
         const uniqueConfigs = new Set(championsConfigs);
@@ -691,6 +692,16 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         const has = (r: string) => champions.some(s => s.minRarity.toLowerCase() === r && s.maxRarity.toLowerCase() === r);
         const isOneOfEach = champions.length === 4 && has('basic') && has('rare') && has('epic') && has('legendary');
         if (isOneOfEach && contestName.includes('one of each')) return false;
+      }
+    }
+    if (filters.mode !== 'All') {
+      const contestName = contest.name.toLowerCase();
+      const targetMode = filters.mode.toLowerCase();
+      
+      if (targetMode === 'no win bonus') {
+        if (!contestName.includes('no win')) return false;
+      } else {
+        if (!contestName.includes(targetMode)) return false;
       }
     }
     return true;
@@ -722,7 +733,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                   </button>
                   {openFilter === 'distribution' && (
                     <ul className={styles.orderByMenu}>
-                      {['All', '50/50', 'Top 20%', 'Top 10%', 'Winner Take All', 'Free'].map(opt => (
+                      {['All', '50/50', 'Top 20%', 'Top 10%', 'Winner Take All', 'Free', 'Sponsored'].map(opt => (
                         <li key={opt} onClick={() => handleFilterChange('distribution', opt)} className={filters.distribution === opt ? styles.activeSort : ''}>{opt}</li>
                       ))}
                     </ul>
@@ -769,9 +780,25 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                     </svg>
                   </button>
                   {openFilter === 'type' && (
-                    <ul className={`${styles.orderByMenu} ${styles.rightMenu}`}>
-                      {['All', 'Open', 'Only Epic', 'Only Rare', 'Only Basic', 'One-Of-Each', 'Up To Epic', 'Up To Rare', 'Mix', 'Sponsored', 'No Win'].map(opt => (
+                    <ul className={`${styles.orderByMenu}`}>
+                      {['All', 'Open', 'Only Epic', 'Only Rare', 'Only Basic', 'One-Of-Each', 'Up To Epic', 'Up To Rare', 'Mix'].map(opt => (
                         <li key={opt} onClick={() => handleFilterChange('type', opt)} className={filters.type === opt ? styles.activeSort : ''}>{opt}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div className={styles.orderByContainer}>
+                  <button className={styles.orderByButton} onClick={() => toggleFilter('mode')}>
+                    {filters.mode === 'All' ? 'MODE' : filters.mode}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: openFilter === 'mode' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+                  {openFilter === 'mode' && (
+                    <ul className={`${styles.orderByMenu} ${styles.rightMenu}`}>
+                      {['All', 'No Win Bonus', 'No Scheme', 'Best Objective', 'Median Cap', 'Drop Worst Moki', 'Lowest Score', 'Class Diversity'].map(opt => (
+                        <li key={opt} onClick={() => handleFilterChange('mode', opt)} className={filters.mode === opt ? styles.activeSort : ''}>{opt}</li>
                       ))}
                     </ul>
                   )}
