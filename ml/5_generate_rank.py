@@ -144,9 +144,9 @@ def predict_for_features(features_list):
     df_feat["pred_deposits"]   = model_deposits.predict(df_feat).clip(min=0)
     df_feat["pred_wartcloser"] = model_wartcloser.predict_proba(df_feat)[:, 1]
     if model_wart_distance:
-        df_feat["pred_wart_distance"] = model_wart_distance.predict(df_feat).clip(min=0)
+        df_feat["pred_wartdistance"] = model_wart_distance.predict(df_feat).clip(min=0)
     else:
-        df_feat["pred_wart_distance"] = 0.0  # Placeholder hasta tener el modelo entrenado
+        df_feat["pred_wartdistance"] = 0.0  # Placeholder hasta tener el modelo entrenado
 
     # FASE 2: Principales (con cascade features)
     win_probs  = model_winrate.predict_proba(df_feat)[:, 1]
@@ -265,7 +265,7 @@ def main():
             "Gacha Pts":     round(df_feat["pred_deposits"].sum() * 50, 1),
             "Deaths":        round(df_feat["pred_deaths"].sum(), 1),
             "Kills":         round(df_feat["pred_kills"].sum(), 1),
-            "Wart Distance": round(df_feat["pred_wart_distance"].sum(), 1),
+            "Wart Distance": round(df_feat["pred_wartdistance"].sum(), 1),
             "Win By Combat": round(len(matches) * (avg_wr / 100) * (cond_probs[0] / 100), 2),
             "Fur":           fur,
             "Traits":        traits,

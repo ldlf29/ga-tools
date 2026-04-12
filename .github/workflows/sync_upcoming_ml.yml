@@ -32,7 +32,9 @@ jobs:
           find . -name requirements.txt -maxdepth 2 -exec pip install -r {} +
 
       - name: Install Node Dependencies
-        run: npm ci
+        run: |
+          npm install -g tsx
+          npm install @supabase/supabase-js dotenv
 
       - name: Sync Upcoming Matches (Node)
         env:
