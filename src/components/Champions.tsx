@@ -162,7 +162,7 @@ export default function Champions({
       const { data, error } = await supabase
         .from('moki_match_history')
         .select('*')
-        .eq('token_id', tokenId)
+        .eq('moki_id', tokenId)
         .order('match_id', { ascending: false })
         .limit(historyLimit);
       if (!error && data) setMatchHistory(data);
@@ -1162,9 +1162,12 @@ export default function Champions({
                               <div className={`${styles.modalTeamsGrid} ${gridEdgeClass}`}>
                                 <div className={styles.playersRow}>
                                   {leftTeam.map((m: any, i: number) => {
+                                    const normalizedName = m.name.trim().toUpperCase();
                                     const portrait = (mokiMetadata as any)[m.name.toUpperCase()]?.portraitUrl || m.imageUrl;
-                                    const fc = allCards.find((c) => c.name.trim().toUpperCase() === m.name.trim().toUpperCase());
-                                    const actualClass = fc?.custom?.class || m.class;
+                                    const fc = allCards.find((c) => c.name.trim().toUpperCase() === normalizedName);
+                                    const metadata = (mokiMetadata as any)[normalizedName] || (mokiMetadata as any)[normalizedName.replace(/ /g, '_')];
+                                    const dbStat = mokiStats.find((s: any) => s.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || s.name.toUpperCase() === normalizedName);
+                                    const actualClass = dbStat?.class || fc?.custom?.class || m.class;
                                     return (
                                       <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                         <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
@@ -1177,9 +1180,12 @@ export default function Champions({
                                 <div className={styles.modalVsBadge}>VS</div>
                                 <div className={styles.playersRow}>
                                   {rightTeam.map((m: any, i: number) => {
+                                    const normalizedName = m.name.trim().toUpperCase();
                                     const portrait = (mokiMetadata as any)[m.name.toUpperCase()]?.portraitUrl || m.imageUrl;
-                                    const fc = allCards.find((c) => c.name.trim().toUpperCase() === m.name.trim().toUpperCase());
-                                    const actualClass = fc?.custom?.class || m.class;
+                                    const fc = allCards.find((c) => c.name.trim().toUpperCase() === normalizedName);
+                                    const metadata = (mokiMetadata as any)[normalizedName] || (mokiMetadata as any)[normalizedName.replace(/ /g, '_')];
+                                    const dbStat = mokiStats.find((s: any) => s.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || s.name.toUpperCase() === normalizedName);
+                                    const actualClass = dbStat?.class || fc?.custom?.class || m.class;
                                     return (
                                       <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                         <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
