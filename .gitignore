@@ -62,6 +62,7 @@ desktop.ini
 
 # Machine Learning & Python
 .venv/
+ml/venv/
 __pycache__/
 ml/catboost_info/
 !ml/models/*.cbm
@@ -74,6 +75,7 @@ ml/*.txt
 !ml/requirements.txt
 ml/tmp_*.py
 *.pyc
+ml/data/*.jsonl
 
 # Heavy Data
 *.csv

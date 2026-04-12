@@ -31,7 +31,7 @@ def objective_score(trial):
     
     target_cols = ["is_win", "total_points", "win_condition", "res_deaths", "res_deposits", "res_wart_closer", "match_date"]
     feature_cols = [c for c in df.columns if c not in target_cols]
-    cat_features = ["moki_token_id", "enemy_champ_token_id", "moki_vs_enemy", "champ_class", "enemy_champ_class"]
+    cat_features = ["champ_class", "enemy_champ_class", "team_comp", "enemy_comp"]
     
     X_train = train_df[feature_cols].astype(str)
     y_train = train_df["total_points"].astype(float)
@@ -68,7 +68,7 @@ def objective_winrate(trial):
     
     target_cols = ["is_win", "total_points", "win_condition", "res_deaths", "res_deposits", "res_wart_closer", "match_date"]
     feature_cols = [c for c in df.columns if c not in target_cols]
-    cat_features = ["moki_token_id", "enemy_champ_token_id", "moki_vs_enemy", "champ_class", "enemy_champ_class"]
+    cat_features = ["champ_class", "enemy_champ_class", "team_comp", "enemy_comp"]
     
     X_train = train_df[feature_cols].astype(str)
     y_train = train_df["is_win"].astype(int)

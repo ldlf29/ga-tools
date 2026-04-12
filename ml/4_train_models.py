@@ -46,23 +46,23 @@ def load_best_params(model_name):
 
 def calculate_time_weights(dates_series):
     """
-    Pondera más los matches recientes:
-      ≤ 3 días  → x1.50
-      ≤ 7 días  → x1.25
-      > 7 días  → x1.00
+    Ponderación por meta del juego (fechas absolutas):
+      - Antes del 29 de Marzo -> x0.0 (Fuera del meta, no entra en el seed masivo pero por las dudas)
+      - 29 de Marzo al 5 de Abril -> x1.00 (Primeros 180 Mokis)
+      - 6 de Abril en adelante    -> x1.25 (Nuevos 60 Mokis ingresados, meta actual)
     """
     try:
         dates = pd.to_datetime(dates_series).dt.date
-        today = datetime.now().date()
+        meta_start = datetime(2026, 3, 29).date()
+        new_mokis_meta = datetime(2026, 4, 6).date()
         weights = []
         for d in dates:
-            diff = (today - d).days
-            if diff <= 3:
-                weights.append(1.5)
-            elif diff <= 7:
-                weights.append(1.25)
-            else:
+            if d < meta_start:
+                weights.append(0.5) # Fallback penalty just in case
+            elif d < new_mokis_meta:
                 weights.append(1.0)
+            else:
+                weights.append(1.25)
         return np.array(weights)
     except Exception as e:
         print(f"[WARN] Error calculando pesos temporales: {e}. Usando peso 1.0.")

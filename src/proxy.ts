@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // ─── MAINTENANCE MODE ─────────────────────────────────────────────────────────
 // Para desactivar: cambiar a false y hacer push
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function proxy(request: NextRequest) {

@@ -52,6 +52,12 @@ model_deposits.load_model(str(MODELS_DIR / "model_deposits.cbm"))
 model_wartcloser = cb.CatBoostClassifier()
 model_wartcloser.load_model(str(MODELS_DIR / "model_wartcloser.cbm"))
 
+try:
+    model_wart_distance = cb.CatBoostRegressor()
+    model_wart_distance.load_model(str(MODELS_DIR / "model_wart_distance.cbm"))
+except:
+    model_wart_distance = None
+
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def calculate_points(is_win, elims, deposits, wart_dist):
@@ -102,7 +108,9 @@ def identify_roles_and_features(row):
     }
 
     for cls in CLASSES:
-        feat[f"ally_{cls}_count"]       = ally_classes.count(cls)
+        feat[f"ally_{cls}_count"] = ally_classes.count(cls)
+        
+    for cls in CLASSES:
         feat[f"enemy_ally_{cls}_count"] = enemy_ally_classes.count(cls)
 
     return feat
@@ -157,6 +165,11 @@ def main():
         df_feat["pred_kills"]      = model_kills.predict(df_feat).clip(min=0)
         df_feat["pred_deposits"]   = model_deposits.predict(df_feat).clip(min=0)
         df_feat["pred_wartcloser"] = model_wartcloser.predict_proba(df_feat)[:, 1]
+        
+        if model_wart_distance:
+            df_feat["pred_wartdistance"] = model_wart_distance.predict(df_feat).clip(min=0)
+        else:
+            df_feat["pred_wartdistance"] = 0.0
 
         # FASE 2: Predicciones principales (con cascade features)
         pred_win_probs = model_winrate.predict_proba(df_feat)[:, 1]
