@@ -6,7 +6,7 @@ import type { NextRequest } from 'next/server';
 const MAINTENANCE_MODE = true;
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (!MAINTENANCE_MODE) return NextResponse.next();
 
   const { pathname } = request.nextUrl;
