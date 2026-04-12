@@ -1,10 +1,12 @@
 """
 Script 10 - Incremental Retraining from Supabase
 ================================================
-1. Downloads recent match history from Supabase.
+1. Downloads ALL match history from Supabase (single source of truth).
 2. Extracts raw performance rows (matching Script 1 format).
-3. Merges with local raw_matches.csv (deduplicating).
-4. Preprocesses, prepares features, and retrains models with Time Weighting.
+3. Preprocesses, prepares features, and retrains models with Time Weighting.
+
+NOTE: Ya no depende de raw_matches.csv local.
+Supabase es la única fuente de verdad para el entrenamiento.
 """
 
 import pandas as pd
@@ -54,7 +56,7 @@ GENERIC_NAME_RE = re.compile(r"^Moki\s*#\d+$", re.IGNORECASE)
 def download_recent_matches():
     print("[INFO] Fetching matches from Supabase (moki_match_history) with pagination...")
     
-    url = f"{SUPABASE_URL}/rest/v1/moki_match_history?select=match_data,token_id&order=match_date.desc"
+    url = f"{SUPABASE_URL}/rest/v1/moki_match_history?select=match_data,moki_id&order=match_date.desc"
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}"
@@ -184,9 +186,9 @@ def main():
     new_rows = []
     for entry in supabase_data:
         match_json = entry.get("match_data")
-        token_id = entry.get("token_id")
-        if match_json and token_id:
-            row = extract_raw_row_v2(match_json, token_id)
+        moki_id = entry.get("moki_id")
+        if match_json and moki_id:
+            row = extract_raw_row_v2(match_json, moki_id)
             if row:
                 new_rows.append(row)
 
@@ -198,26 +200,12 @@ def main():
         print("[WARNING] Skipping retrain — se usará el modelo previo.")
         return
 
-    # 2. Merge with local
-    if RAW_PATH.exists():
-        try:
-            df_old = pd.read_csv(RAW_PATH)
-            if df_old.empty:
-                df_combined = df_new
-            else:
-                df_combined = pd.concat([df_old, df_new], ignore_index=True)
-        except Exception:
-            print("[WARN] No se pudo leer raw_matches.csv existente, usando solo data de Supabase.")
-            df_combined = df_new
-    else:
-        df_combined = df_new
+    before = len(df_new)
+    df_new.drop_duplicates(subset=["match_id", "moki_token_id"], inplace=True)
+    print(f"[INFO] Deduplicación: {before} -> {len(df_new)} filas totales (fuente: Supabase).")
 
-    before = len(df_combined)
-    df_combined.drop_duplicates(subset=["match_id", "moki_token_id"], inplace=True)
-    print(f"[INFO] Deduplicación: {before} -> {len(df_combined)} filas totales.")
-
-    df_combined.to_csv(RAW_PATH, index=False)
-    print(f"[OK] raw_matches.csv actualizado.")
+    df_new.to_csv(RAW_PATH, index=False)
+    print(f"[OK] raw_matches.csv generado desde Supabase ({len(df_new)} filas).")
 
     # 3. Retrain (Llamar a los scripts de preprocesamiento y entrenamiento)
     print("\n" + "="*50)

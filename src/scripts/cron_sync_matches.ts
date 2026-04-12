@@ -110,8 +110,8 @@ async function run() {
 
             records.push({
               match_id: match.id,
-              moki_id: targetMokiHash,
-              token_id: parseInt(tokenId, 10),
+              ga_moki_hash: targetMokiHash,
+              moki_id: parseInt(tokenId, 10),
               moki_name: metaEntry?.name || playerInfo?.name || 'Unknown',
               moki_class: playerInfo?.class || '',
               moki_image_url: playerInfo?.imageUrl || '',
@@ -167,7 +167,7 @@ async function run() {
       const chunk = matchHistoryRecords.slice(i, i + DB_CHUNK_SIZE);
       const { error: upsertErr } = await supabaseAdmin
         .from('moki_match_history')
-        .upsert(chunk, { onConflict: 'moki_id, match_id' });
+        .upsert(chunk, { onConflict: 'ga_moki_hash, match_id' });
 
       if (upsertErr) {
         console.error('[Cron Matches] Upsert error for chunk:', chunk.length);

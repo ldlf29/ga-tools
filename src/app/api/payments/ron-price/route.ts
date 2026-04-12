@@ -24,6 +24,8 @@ export async function GET() {
   try {
     const ronPrice = await getRonPrice();
     const plans: Record<string, object> = {};
+    const discountedPlans: Record<string, object> = {};
+    
     for (const [plan, usd] of Object.entries(PLAN_USD)) {
       const ronAmount = usd / ronPrice;
       plans[plan] = {
@@ -33,8 +35,21 @@ export async function GET() {
         usdcDisplay: usd.toFixed(2),
         usdcSmallest: (usd * 10 ** USDC_DECIMALS).toString(),
       };
+      
+      // Calculate 10% discount for SEASON
+      if (plan === 'SEASON') {
+        const discountedUsd = usd * 0.9;
+        const discountedRon = discountedUsd / ronPrice;
+        discountedPlans[plan] = {
+          usd: discountedUsd,
+          ronDisplay: discountedRon.toFixed(3),
+          ronWei: BigInt(Math.ceil(discountedRon * 1e18)).toString(),
+          usdcDisplay: discountedUsd.toFixed(2),
+          usdcSmallest: (discountedUsd * 10 ** USDC_DECIMALS).toString(),
+        };
+      }
     }
-    return NextResponse.json({ ronUsdRate: ronPrice, plans, cachedAt: new Date(cacheTime).toISOString() });
+    return NextResponse.json({ ronUsdRate: ronPrice, plans, discountedPlans, cachedAt: new Date(cacheTime).toISOString() });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch RON price' }, { status: 503 });
   }

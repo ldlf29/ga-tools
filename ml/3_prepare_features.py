@@ -1,15 +1,23 @@
 """
-Script 5 — Preparación de Features para CatBoost
+Script 3 — Preparación de Features para CatBoost
 ================================================
 Lee `processed_matches.csv` y genera el dataset final `ml_features.csv`.
 
-El modelo aprende 100% de composición de clases:
-  - champ_class: clase del Moki consultado
-  - enemy_champ_class: clase del campeón enemigo
-  - team_comp: composición completa del equipo (ej: "STRIKER_DEFENDER_GRINDER")
-  - enemy_comp: composición del equipo enemigo
+Features (X):
+  - champ_class, enemy_champ_class, team_comp, enemy_comp (categóricas)
   - ally_*_count (x10): cuántos aliados de cada clase
   - enemy_ally_*_count (x10): cuántos enemigos aliados de cada clase
+
+Targets (y) — uno por cada modelo de la cascada:
+  - is_win, total_points, win_condition   → modelos principales
+  - res_deaths, res_eliminations          → auxiliares Fase 1
+  - res_deposits, res_wart_closer         → auxiliares Fase 1
+  - res_wart_distance                     → nuevo modelo Fase 1 (wart distance esperada)
+  - res_wart_ride_seconds                 → Scheme: Wart Rodeo (+3.5 pts/seg)
+  - res_buff_time_seconds                 → Scheme: Flexing (+3.5 pts/seg)
+  - res_eaten_by_wart                     → Scheme: Saccing (+100 pts/vez)
+  - res_loose_ball_pickups                → Scheme: Litter Collection (+75 pts/bola)
+  - res_eating_while_riding               → Scheme: Cursed Dinner (+75 pts/vez)
 
 Sin IDs individuales de Moki — el modelo generaliza por clase,
 no por identidad de cada NFT.
@@ -55,8 +63,19 @@ def prepare_features():
     enemy_cols = [f"enemy_ally_{cls}_count" for cls in CLASSES]
 
     target_cols = [
+        # ── Targets principales ──────────────────────────────────────────────
         "is_win", "total_points", "win_condition",
+        # ── Auxiliares Fase 1 (stacking) ─────────────────────────────────────
         "res_deaths", "res_eliminations", "res_deposits", "res_wart_closer",
+        # ── Nuevo modelo: wart distance esperada ──────────────────────────────
+        "res_wart_distance",
+        # ── Stats para simulación de Schemes de rendimiento ──────────────────
+        "res_wart_ride_seconds",      # Scheme: Wart Rodeo (+3.5 pts/seg)
+        "res_buff_time_seconds",      # Scheme: Flexing (+3.5 pts/seg)
+        "res_eaten_by_wart",          # Scheme: Saccing (+100 pts/vez)
+        "res_loose_ball_pickups",     # Scheme: Litter Collection (+75 pts/bola)
+        "res_eating_while_riding",    # Scheme: Cursed Dinner (+75 pts/vez)
+        # ── Temporal (para time-weighting en entrenamiento) ───────────────────
         "match_date"
     ]
 

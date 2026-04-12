@@ -2,9 +2,6 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import * as fs from 'fs';
-import { execSync } from 'child_process';
-import { parse } from 'csv-parse/sync';
 
 dotenv.config({ path: path.join(__dirname, '../../.env.local') });
 
@@ -169,10 +166,20 @@ async function run() {
       const teamRed  = sortChampFirst(match.players.filter((p: any) => p.team === 'red').map(overrideClass));
       const teamBlue = sortChampFirst(match.players.filter((p: any) => p.team === 'blue').map(overrideClass));
 
+      // Extraer los campeones (posición 0 tras ordenar con sortChampFirst)
+      const redChamp  = teamRed[0];
+      const blueChamp = teamBlue[0];
+
       upcomingInserts.push({
         id: match.id,
         contest_id: contestId,
         match_date: contest.startDate ? new Date(contest.startDate).toISOString() : new Date().toISOString(),
+        // Columnas relacionales para queries rápidas
+        red_champ_id:    redChamp?.mokiTokenId  ?? null,
+        red_champ_class: redChamp?.class        ?? null,
+        blue_champ_id:   blueChamp?.mokiTokenId ?? null,
+        blue_champ_class: blueChamp?.class      ?? null,
+        // JSONB completo para el pipeline de Python
         team_red:  teamRed,
         team_blue: teamBlue,
       });
@@ -235,157 +242,6 @@ async function run() {
       details: `Processed ${recordsUpserted} matches for contest ${contestId}.`,
     });
 
-    // 4. Trigger Automático para el ML Ranking de Python
-    console.log('[Cron Upcoming] Disparando script de generación de Ranking ML...');
-    try {
-      const projectRoot = path.resolve(__dirname, '../../');
-      
-      // Intentar encontrar la carpeta ml/ML de forma robusta para Linux
-      let mlDir = path.join(projectRoot, 'ml');
-      if (!fs.existsSync(mlDir)) {
-        mlDir = path.join(projectRoot, 'ML');
-      }
-
-      if (!fs.existsSync(mlDir)) {
-        throw new Error(`Could not find 'ml' or 'ML' directory in ${projectRoot}`);
-      }
-
-      console.log(`[Cron Upcoming] Usando directorio ML: ${mlDir}`);
-      
-      // Borrar CSV anterior si existe antes de generar el nuevo
-      const csvPath = path.join(mlDir, 'data', 'upcoming_180_ranking.csv');
-      if (fs.existsSync(csvPath)) {
-        console.log('[Cron Upcoming] Borrando CSV anterior para asegurar frescura...');
-        fs.unlinkSync(csvPath);
-      }
-
-      // Determinar el comando de Python: 
-      let pythonCommand = process.platform === 'win32' 
-        ? '.\\venv\\Scripts\\python.exe' 
-        : './venv/bin/python';
-
-      if (process.env.GITHUB_ACTIONS === 'true') {
-        pythonCommand = 'python3';
-      }
-
-      console.log(`[Cron Upcoming] Usando comando: ${pythonCommand}`);
-      
-      // 4a. Feedback Loop: Retrain with latest historical matches from Supabase
-      console.log('[Cron Upcoming] Ejecutando Retraining (Feedback Loop)...');
-      try {
-        const retrainOutput = execSync(`${pythonCommand} 7_retrain_from_supabase.py`, { 
-          cwd: mlDir,
-          env: { ...process.env }
-        });
-        console.log(`[Cron Upcoming] Retraining completado:\n${retrainOutput.toString()}`);
-        
-        await supabaseAdmin.from('sync_logs').insert({
-          job_type: 'ML_RETRAIN',
-          status: 'success',
-          details: 'Retrained models using fresh history from Supabase.'
-        });
-      } catch (retrainErr: any) {
-        console.warn('[Cron Upcoming] Advertencia: El re-entrenamiento falló, se usará el modelo previo.', retrainErr.message);
-        await supabaseAdmin.from('sync_logs').insert({
-          job_type: 'ML_RETRAIN',
-          status: 'error',
-          details: `Retraining failed: ${retrainErr.message}`
-        });
-      }
-
-      // 4b. Ranking Generation
-      console.log('[Cron Upcoming] Ejecutando Generación de Ranking (Cascade IA)...');
-      const mlOutput = execSync(`${pythonCommand} 5_generate_rank.py`, { 
-        cwd: mlDir,
-        env: { ...process.env }
-      });
-      console.log(`[Cron Upcoming] Ranking exitoso. Output completo:\n${mlOutput.toString()}`);
-
-      // 5. Sync Generated CSV to Supabase
-      console.log(`[Cron Upcoming] Verificando CSV en: ${csvPath}`);
-
-      if (fs.existsSync(csvPath)) {
-        console.log('[Cron Upcoming] Reading Ranking CSV for Supabase Sync...');
-        const fileContent = fs.readFileSync(csvPath, 'utf8');
-        const records = parse(fileContent, {
-          columns: true,
-          skip_empty_lines: true,
-          trim: true,
-          bom: true
-        });
-
-        console.log(`[Cron Upcoming] Found ${records.length} ranking records. Mapping and Refreshing Table...`);
-
-        const rankingUpserts = records.map((r: any) => ({
-          moki_id: parseInt(r['Moki ID']),
-          name: r['Name'],
-          class: r['Class'],
-          score: parseFloat(r['Score']),
-          win_rate: parseFloat(r['WinRate']),
-          wart_closer: parseFloat(r['Wart Closer']),
-          losses: parseFloat(r['Losses']),
-          gacha_pts: parseFloat(r['Gacha Pts']),
-          deaths: parseFloat(r['Deaths']),
-          kills: parseFloat(r['Kills'] || '0'),
-          win_by_combat: parseFloat(r['Win By Combat']),
-          fur: r['Fur'],
-          traits: r['Traits'],
-          eliminations_pct: parseFloat(r['Win Cond: Eliminations (%)']),
-          wart_pct: parseFloat(r['Win Cond: Wart (%)']),
-          gacha_pct: parseFloat(r['Win Cond: Gacha (%)']),
-          effective_date: contest.startDate,
-          updated_at: new Date().toISOString()
-        }));
-
-        // 5a. Clear Old Ranking
-        const { error: clearErr } = await supabaseAdmin
-          .from('moki_predictions_ranking')
-          .delete()
-          .neq('id', 0); // Workaround to delete all rows
-
-        if (clearErr) {
-          console.error('[Cron Upcoming] Error clearing old rankings:', clearErr);
-        }
-
-        // 5b. Insert Fresh Ranking
-        console.log(`[Cron Upcoming] Insertando ${rankingUpserts.length} registros en Supabase...`);
-        const { error: rankErr } = await supabaseAdmin
-          .from('moki_predictions_ranking')
-          .insert(rankingUpserts);
-
-        if (rankErr) {
-          console.error('[Cron Upcoming] ERROR FATAL DE INSERCIÓN:', JSON.stringify(rankErr, null, 2));
-          await supabaseAdmin.from('sync_logs').insert({
-            job_type: 'ML_RANKING',
-            status: 'error',
-            details: `CSV parse/insert failed: ${JSON.stringify(rankErr)}`
-          });
-        } else {
-          console.log('[Cron Upcoming] Successfully synced ranking records to Supabase.');
-          await supabaseAdmin.from('sync_logs').insert({
-            job_type: 'ML_RANKING',
-            status: 'success',
-            cards_updated: rankingUpserts.length,
-            details: `Ranking regenerated and synced for contest ${contestId}.`
-          });
-        }
-
-      } else {
-        console.warn('[Cron Upcoming] Ranking CSV not found at', csvPath);
-        await supabaseAdmin.from('sync_logs').insert({
-          job_type: 'ML_RANKING',
-          status: 'error',
-          details: 'Ranking CSV was not generated by the Python script.'
-        });
-      }
-    } catch (mlErr: any) {
-      console.error('[Cron Upcoming] Error corriendo la IA o sincronizando rankings:', mlErr.message);
-      await supabaseAdmin.from('sync_logs').insert({
-        job_type: 'ML_RANKING',
-        status: 'error',
-        details: `Python 5_generate_rank.py failed: ${mlErr.message}`
-      });
-    }
   } else {
     console.log('[Cron Upcoming] No hay partidos válidos para insertar.');
   }

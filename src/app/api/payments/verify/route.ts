@@ -122,7 +122,10 @@ export async function POST(req: Request) {
   }
 
   // 6. Validate amount
-  const usdValue = PLAN_USD[plan];
+  let usdValue = PLAN_USD[plan];
+  if (finalizedReferral && plan === 'SEASON') {
+    usdValue = usdValue * 0.9;
+  }
   const withTolerance = (n: bigint) => ({
     min: (n * BigInt(85)) / BigInt(100),
     max: (n * BigInt(115)) / BigInt(100),
@@ -182,7 +185,15 @@ export async function POST(req: Request) {
   const baseTime = currentSub?.expires_at
     ? Math.max(Date.now(), new Date(currentSub.expires_at).getTime())
     : Date.now();
-  const expiresAt = new Date(baseTime + PLAN_DURATIONS_MS[plan]).toISOString();
+  let totalDurationMs = PLAN_DURATIONS_MS[plan];
+  if (finalizedReferral) {
+    if (plan === 'DAILY') {
+      totalDurationMs += 24 * 3600 * 1000; // +1 day
+    } else if (plan === 'WEEKLY') {
+      totalDurationMs += 2 * 24 * 3600 * 1000; // +2 days
+    }
+  }
+  const expiresAt = new Date(baseTime + totalDurationMs).toISOString();
 
   const { error: dbError } = await supabaseAdmin.from('predictions_subscriptions').insert({
     wallet_address: walletAddress,

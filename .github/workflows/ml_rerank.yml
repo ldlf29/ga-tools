@@ -1,0 +1,58 @@
+name: ML Re-Rank (Class Change)
+
+permissions:
+  contents: read
+
+on:
+  # Disparado programáticamente desde cron_sync_moki_api.ts cuando detecta un class change
+  repository_dispatch:
+    types: [class_change_ml]
+
+  # También permite ejecución manual desde la UI de GitHub Actions
+  workflow_dispatch:
+
+jobs:
+  ml-rerank:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/requirements.txt'
+
+      - name: Install Python Dependencies
+        run: |
+          pip install --upgrade pip
+          find . -name requirements.txt -maxdepth 2 -exec pip install -r {} +
+
+      # Solo Node para subir resultados a Supabase después del ranking
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Generate ML Ranking with Updated Classes (Python)
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GITHUB_ACTIONS: 'true'
+        run: |
+          echo "Re-generating ranking post class-change..."
+          cd ml && python3 5_generate_rank.py
+
+      - name: Upload Ranking to Supabase (Node)
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "Uploading ranking results to Supabase..."
+          npx tsx src/scripts/upload_ranking.ts

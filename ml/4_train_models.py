@@ -15,8 +15,12 @@ Time Weighting:
   - > 7 días: x1.0  (data histórica base)
 
 Arquitectura de Cascada (Stacking):
-  Fase 1 — Modelos Auxiliares: Deaths, Kills, Deposits, WartCloser
+  Fase 1 — Modelos Auxiliares: Deaths, Kills, Deposits, WartCloser, WartDistance
   Fase 2 — Modelos Principales: WinRate, Score, WinCondition
+
+Targets adicionales (sin modelos, solo para Scheme simulator):
+  res_wart_ride_seconds, res_buff_time_seconds, res_eaten_by_wart,
+  res_loose_ball_pickups, res_eating_while_riding
 """
 
 import pandas as pd
@@ -82,6 +86,12 @@ def train_models():
     target_cols = [
         "is_win", "total_points", "win_condition",
         "res_deaths", "res_eliminations", "res_deposits", "res_wart_closer",
+        "res_wart_distance",        # Nuevo modelo Fase 1
+        "res_wart_ride_seconds",    # Scheme: Wart Rodeo
+        "res_buff_time_seconds",    # Scheme: Flexing
+        "res_eaten_by_wart",        # Scheme: Saccing
+        "res_loose_ball_pickups",   # Scheme: Litter Collection
+        "res_eating_while_riding",  # Scheme: Cursed Dinner
         "match_date"
     ]
 
@@ -100,10 +110,13 @@ def train_models():
     print("="*55)
 
     aux_configs = [
-        {"name": "Deaths",     "class": CatBoostRegressor,  "target": "res_deaths",      "file": "model_deaths.cbm",     "metric": "RMSE"},
-        {"name": "Kills",      "class": CatBoostRegressor,  "target": "res_eliminations", "file": "model_kills.cbm",      "metric": "RMSE"},
-        {"name": "Deposits",   "class": CatBoostRegressor,  "target": "res_deposits",    "file": "model_deposits.cbm",   "metric": "RMSE"},
-        {"name": "WartCloser", "class": CatBoostClassifier, "target": "res_wart_closer",  "file": "model_wartcloser.cbm", "metric": "Accuracy"},
+        {"name": "Deaths",       "class": CatBoostRegressor,  "target": "res_deaths",        "file": "model_deaths.cbm",        "metric": "RMSE"},
+        {"name": "Kills",        "class": CatBoostRegressor,  "target": "res_eliminations",  "file": "model_kills.cbm",         "metric": "RMSE"},
+        {"name": "Deposits",     "class": CatBoostRegressor,  "target": "res_deposits",      "file": "model_deposits.cbm",      "metric": "RMSE"},
+        {"name": "WartCloser",   "class": CatBoostClassifier, "target": "res_wart_closer",   "file": "model_wartcloser.cbm",    "metric": "Accuracy"},
+        # Nuevo modelo: predice la wart distance esperada para mejorar el score y habilitar
+        # simulaciones de Schemes que dependen de wart distance (Rodeo, Baiting the Trap).
+        {"name": "WartDistance", "class": CatBoostRegressor,  "target": "res_wart_distance", "file": "model_wart_distance.cbm", "metric": "RMSE"},
     ]
 
     for cfg in aux_configs:

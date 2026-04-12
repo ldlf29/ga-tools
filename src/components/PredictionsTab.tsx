@@ -635,7 +635,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       const contestName = contest.name.toLowerCase();
 
       if (target === 'sponsored') {
-        if (!contestName.includes('sponsored')) return false;
+        if (!contestName.includes('sponsored') && !contestName.includes('bron')) return false;
       } else if (target === '50/50' && !split.includes('50') && !split.includes('fifty')) return false;
       else if (target === 'top 20%' && !split.includes('20')) return false;
       else if (target === 'top 10%' && !split.includes('10')) return false;

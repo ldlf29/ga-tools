@@ -2,9 +2,6 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import * as fs from 'fs';
-import { execSync } from 'child_process';
-import { parse } from 'csv-parse/sync';
 import mokiMetadataRaw from '../data/mokiMetadata.json';
 
 // Carga de variables de entorno
@@ -187,128 +184,90 @@ async function run() {
         );
       }
 
-      // Update upcoming matches JSONB before re-ranking
-      console.log(`[Cron Sync Moki] Updating upcoming_matches_ga with new classes...`);
+      // Actualizar clases en upcoming_matches_ga con UPDATEs relacionales directos
+      // Columnas red_champ_class / blue_champ_class son indexadas por moki_id → O(1) por cambio
+      console.log(`[Cron Sync Moki] Updating upcoming_matches_ga classes via relational UPDATE...`);
       try {
-        const { data: upcomingMatches, error: upcomingErr } = await supabaseAdmin
-          .from('upcoming_matches_ga')
-          .select('id, team_red, team_blue');
+        for (const change of classChanges) {
+          const { moki_id: changedMokiId, new_class: newClass } = change;
 
-        if (upcomingErr) {
-          console.error('[Cron Sync Moki] Error fetching upcoming matches:', upcomingErr);
-        } else if (upcomingMatches && upcomingMatches.length > 0) {
-          const classChangeMap = new Map(classChanges.map(c => [c.moki_id, c.new_class]));
-          const matchesToUpdate: any[] = [];
+          // Actualizar partidas donde el champion rojo cambió de clase
+          const { error: redErr } = await supabaseAdmin
+            .from('upcoming_matches_ga')
+            .update({ red_champ_class: newClass })
+            .eq('red_champ_id', changedMokiId);
 
-          for (const match of upcomingMatches) {
-            let modified = false;
-
-            const processTeam = (team: any[]) => {
-              if (!team || !Array.isArray(team)) return team;
-              return team.map(player => {
-                const tokenId = player.mokiTokenId || player.tokenId;
-                const tokenIdNum = typeof tokenId === 'number' ? tokenId : parseInt(tokenId, 10);
-                if (classChangeMap.has(tokenIdNum) && player.class !== classChangeMap.get(tokenIdNum)) {
-                  modified = true;
-                  return { ...player, class: classChangeMap.get(tokenIdNum) };
-                }
-                return player;
-              });
-            };
-
-            const newTeamRed = processTeam(match.team_red);
-            const newTeamBlue = processTeam(match.team_blue);
-
-            if (modified) {
-              matchesToUpdate.push({
-                id: match.id,
-                team_red: newTeamRed,
-                team_blue: newTeamBlue
-              });
-            }
+          if (redErr) {
+            console.warn(`[Cron Sync Moki] Error updating red_champ_class for moki ${changedMokiId}:`, redErr);
           }
 
-          if (matchesToUpdate.length > 0) {
-            console.log(`[Cron Sync Moki] Modifying ${matchesToUpdate.length} upcoming matches...`);
-            // Batch update using upsert
-            const DB_CHUNK_SIZE = 100;
-            for (let i = 0; i < matchesToUpdate.length; i += DB_CHUNK_SIZE) {
-              const chunk = matchesToUpdate.slice(i, i + DB_CHUNK_SIZE);
-              const { error: upsertErr } = await supabaseAdmin
-                .from('upcoming_matches_ga')
-                .upsert(chunk, { onConflict: 'id' });
-              if (upsertErr) {
-                console.error('[Cron Sync Moki] Error updating upcoming matches chunk:', upsertErr);
-              }
-            }
+          // Actualizar partidas donde el champion azul cambió de clase
+          const { error: blueErr } = await supabaseAdmin
+            .from('upcoming_matches_ga')
+            .update({ blue_champ_class: newClass })
+            .eq('blue_champ_id', changedMokiId);
+
+          if (blueErr) {
+            console.warn(`[Cron Sync Moki] Error updating blue_champ_class for moki ${changedMokiId}:`, blueErr);
           }
         }
+        console.log(`[Cron Sync Moki] Class overrides applied to upcoming matches for ${classChanges.length} Mokis.`);
       } catch (err) {
-        console.error('[Cron Sync Moki] Failed to update upcoming matches:', err);
+        console.error('[Cron Sync Moki] Failed to update upcoming match classes:', err);
       }
 
-      // Trigger ML Re-Ranking (solo regenerar predicciones con las clases actualizadas)
-      console.log(`[Cron Sync Moki] Class change detected (${classChanges.length} changes). Triggering ML re-ranking...`);
+      // Disparar ML Re-Ranking via GitHub Repository Dispatch (asíncrono, sin bloquear este job)
+      console.log(`[Cron Sync Moki] Class change detected (${classChanges.length} changes). Dispatching ML re-rank workflow...`);
       try {
-        const projectRoot = path.resolve(__dirname, '../../');
-        let mlDir = path.join(projectRoot, 'ml');
-        if (!fs.existsSync(mlDir)) mlDir = path.join(projectRoot, 'ML');
+        const ghToken   = process.env.TOKEN_GITHUB;
+        const ghOwner   = process.env.GH_REPO_OWNER;
+        const ghRepo    = process.env.GH_REPO_NAME;
 
-        let pythonCommand = process.platform === 'win32'
-          ? '.\\venv\\Scripts\\python.exe'
-          : './venv/bin/python';
-        if (process.env.GITHUB_ACTIONS === 'true') pythonCommand = 'python3';
-
-        const mlOutput = execSync(`${pythonCommand} 5_generate_rank.py`, {
-          cwd: mlDir,
-          env: { ...process.env },
-        });
-        console.log(`[Cron Sync Moki] Ranking regenerated:\n${mlOutput.toString()}`);
-
-        // Sync Global Ranking CSV
-        const csvPath = path.join(mlDir, 'data', 'upcoming_180_ranking.csv');
-        if (fs.existsSync(csvPath)) {
-          const records = parse(fs.readFileSync(csvPath, 'utf8'), {
-            columns: true, skip_empty_lines: true, trim: true, bom: true,
+        if (!ghToken || !ghOwner || !ghRepo) {
+          console.warn('[Cron Sync Moki] TOKEN_GITHUB / GH_REPO_OWNER / GH_REPO_NAME not set — skipping dispatch.');
+        } else {
+          const dispatchUrl = `https://api.github.com/repos/${ghOwner}/${ghRepo}/dispatches`;
+          const dispatchRes = await fetch(dispatchUrl, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/vnd.github+json',
+              Authorization: `Bearer ${ghToken}`,
+              'X-GitHub-Api-Version': '2022-11-28',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              event_type: 'class_change_ml',
+              client_payload: {
+                changed_mokis: classChanges.length,
+                triggered_at: new Date().toISOString(),
+              },
+            }),
           });
 
-          const rankingUpserts = records.map((r: any) => ({
-            moki_id: parseInt(r['Moki ID']),
-            name: r['Name'],
-            class: r['Class'],
-            score: parseFloat(r['Score']),
-            win_rate: parseFloat(r['WinRate']),
-            wart_closer: parseFloat(r['Wart Closer']),
-            losses: parseFloat(r['Losses']),
-            gacha_pts: parseFloat(r['Gacha Pts']),
-            deaths: parseFloat(r['Deaths']),
-            kills: parseFloat(r['Kills'] || '0'),
-            win_by_combat: parseFloat(r['Win By Combat']),
-            fur: r['Fur'],
-            traits: r['Traits'],
-            eliminations_pct: parseFloat(r['Win Cond: Eliminations (%)']),
-            wart_pct: parseFloat(r['Win Cond: Wart (%)']),
-            gacha_pct: parseFloat(r['Win Cond: Gacha (%)']),
-            updated_at: new Date().toISOString(),
-          }));
-
-          await supabaseAdmin.from('moki_predictions_ranking').delete().neq('id', 0);
-          await supabaseAdmin.from('moki_predictions_ranking').insert(rankingUpserts);
-          console.log(`[Cron Sync Moki] Global ranking refreshed: ${rankingUpserts.length} records.`);
-          
-          await supabaseAdmin.from('sync_logs').insert({
-            job_type: 'ML_RANKING_CLASS_CHANGE',
-            status: 'success',
-            cards_updated: rankingUpserts.length,
-            details: `Regenerated ranking due to ${classChanges.length} class changes.`,
-          });
+          if (dispatchRes.status === 204) {
+            console.log('[Cron Sync Moki] ML re-rank workflow dispatched successfully.');
+            await supabaseAdmin.from('sync_logs').insert({
+              job_type: 'ML_RANKING_CLASS_CHANGE',
+              status: 'dispatched',
+              cards_updated: classChanges.length,
+              details: `Dispatched re-rank workflow for ${classChanges.length} class changes.`,
+            });
+          } else {
+            const body = await dispatchRes.text();
+            console.error(`[Cron Sync Moki] Dispatch failed (${dispatchRes.status}):`, body);
+            await supabaseAdmin.from('sync_logs').insert({
+              job_type: 'ML_RANKING_CLASS_CHANGE',
+              status: 'error',
+              details: `Dispatch failed (${dispatchRes.status}): ${body}`,
+            });
+          }
         }
-      } catch (reRankErr: any) {
-        console.error('[Cron Sync Moki] Re-ranking failed (non-fatal):', reRankErr.message);
+      } catch (dispatchErr: any) {
+        console.error('[Cron Sync Moki] Failed to dispatch re-rank workflow:', dispatchErr.message);
         await supabaseAdmin.from('sync_logs').insert({
           job_type: 'ML_RANKING_CLASS_CHANGE',
           status: 'error',
-          details: `Re-ranking failed: ${reRankErr.message}`,
+          details: `Dispatch error: ${dispatchErr.message}`,
         });
       }
     }

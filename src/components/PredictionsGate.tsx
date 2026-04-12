@@ -16,7 +16,7 @@ type Token = 'RON' | 'USDC';
 type GateState = 'loading' | 'unauthenticated' | 'signing' | 'no-access' | 'paying' | 'verifying' | 'active';
 
 interface PlanInfo { usd: number; ronDisplay: string; ronWei: string; usdcDisplay: string; usdcSmallest: string; }
-interface PriceData { ronUsdRate: number; plans: Record<Plan, PlanInfo>; }
+interface PriceData { ronUsdRate: number; plans: Record<Plan, PlanInfo>; discountedPlans?: Record<Plan, PlanInfo>; }
 
 const PLAN_LABELS: Record<Plan, { title: string; duration: string; badge?: string }> = {
   DAILY: { title: '3-DAYS', duration: '72 hours' },
@@ -262,7 +262,8 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
     if (!priceData || !address) return;
     setError('');
     setGateState('paying');
-    const planInfo = priceData.plans[selectedPlan];
+    const useDiscount = appliedReferral && selectedPlan === 'SEASON';
+    const planInfo = useDiscount && priceData.discountedPlans ? priceData.discountedPlans[selectedPlan] : priceData.plans[selectedPlan];
     try {
       let txHash: `0x${string}`;
       if (selectedToken === 'RON') {
@@ -402,7 +403,8 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
   }
 
   if (gateState === 'no-access') {
-    const planInfo = priceData?.plans[selectedPlan];
+    const useDiscount = appliedReferral && selectedPlan === 'SEASON';
+    const planInfo = useDiscount && priceData?.discountedPlans ? priceData.discountedPlans[selectedPlan] : priceData?.plans[selectedPlan];
     return (
       <div className={styles.gate}>
         <div className={styles.gateCard} style={{ position: 'relative' }}>
@@ -423,14 +425,41 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
           <h2 className={styles.gateTitle}>CHOOSE YOUR PLAN</h2>
           <p className={styles.gateSubtitle}>Unlock AI-powered Score Prediction and Auto Meta-Lineup Builder for any Contest.</p>
           <div className={styles.planGrid}>
-            {(Object.keys(PLAN_LABELS) as Plan[]).map(plan => (
-              <button key={plan} className={`${styles.planCard} ${selectedPlan === plan ? styles.planCardActive : ''}`} onClick={() => setSelectedPlan(plan)}>
-                {PLAN_LABELS[plan].badge && <span className={styles.planBadge}>{PLAN_LABELS[plan].badge}</span>}
-                <span className={styles.planTitle}>{PLAN_LABELS[plan].title}</span>
-                <span className={styles.planDuration}>{PLAN_LABELS[plan].duration}</span>
-                <span className={styles.planPrice}>${PLAN_USD[plan]}</span>
-              </button>
-            ))}
+            {(Object.keys(PLAN_LABELS) as Plan[]).map(plan => {
+              let title = PLAN_LABELS[plan].title;
+              let duration = PLAN_LABELS[plan].duration;
+              let priceStr = `$${PLAN_USD[plan]}`;
+              
+              if (appliedReferral) {
+                if (plan === 'DAILY') {
+                  title = '4-DAYS';
+                  duration = '96 hours';
+                } else if (plan === 'WEEKLY') {
+                  title = 'WEEKLY (+2)';
+                  duration = '9 days';
+                } else if (plan === 'SEASON') {
+                  priceStr = '$22.50';
+                }
+              }
+
+              return (
+                <button key={plan} className={`${styles.planCard} ${selectedPlan === plan ? styles.planCardActive : ''}`} onClick={() => setSelectedPlan(plan)}>
+                  {PLAN_LABELS[plan].badge && <span className={styles.planBadge}>{PLAN_LABELS[plan].badge}</span>}
+                  <span className={styles.planTitle}>{title}</span>
+                  <span className={styles.planDuration}>{duration}</span>
+                  <span className={styles.planPrice}>
+                    {appliedReferral && plan === 'SEASON' ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', lineHeight: '1' }}>
+                        <span style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '0.7em' }}>${PLAN_USD[plan]}</span>
+                        <span>{priceStr}</span>
+                      </div>
+                    ) : (
+                      priceStr
+                    )}
+                  </span>
+                </button>
+              );
+            })}
           </div>
           <div className={styles.tokenToggle}>
             <button className={`${styles.tokenBtn} ${selectedToken === 'USDC' ? styles.tokenActive : ''}`} onClick={() => setSelectedToken('USDC')}>USDC</button>
