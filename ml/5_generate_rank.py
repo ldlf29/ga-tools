@@ -125,7 +125,9 @@ def build_features_for_moki(moki_id, matches, moki_details, class_overrides):
             "enemy_comp":        enemy_comp,
         }
         for cls in CLASSES:
-            feat[f"ally_{cls}_count"]       = ally_classes.count(cls)
+            feat[f"ally_{cls}_count"] = ally_classes.count(cls)
+            
+        for cls in CLASSES:
             feat[f"enemy_ally_{cls}_count"] = enemy_ally_classes.count(cls)
 
         features_list.append(feat)
