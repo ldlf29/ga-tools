@@ -22,8 +22,8 @@ Object.entries(mokiMetadata).forEach(([key, meta]) => {
   }
 });
 
-const CONCURRENCY_LIMIT = 20;
-const DELAY_BETWEEN_BATCHES = 2000;
+const CONCURRENCY_LIMIT = 10;      // Reducido para evitar 429
+const DELAY_BETWEEN_BATCHES = 5000; // 5s entre batches
 
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -63,87 +63,106 @@ async function run() {
       `[Cron Matches] Fetching Chunk ${i / CONCURRENCY_LIMIT + 1}...`
     );
 
-    const fetchPromises = chunkTokenIds.map(async (tokenId) => {
+    const fetchWithRetry = async (tokenId: string, retries = 4): Promise<any[]> => {
       const apiUrl = `https://api.grandarena.gg/api/v1/mokis/${tokenId}/performances?page=1&limit=20`;
-      try {
-        const response = await fetch(apiUrl, {
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${GA_API_KEY}`,
-          },
-        });
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Bearer ${GA_API_KEY}`,
+            },
+          });
 
-        if (!response.ok) {
-          console.error(
-            `[Cron Matches] API Error for tokenId ${tokenId}: ${response.status}`
-          );
-          return [];
-        }
+          if (response.ok) {
+            // Parsed below — break out and return records
+            const json = (await response.json()) as any;
+            const performances = json.data;
+            const records: any[] = [];
 
-        const json = (await response.json()) as any;
-        const performances = json.data;
-        const records: any[] = [];
+            if (performances && Array.isArray(performances)) {
+              for (const perf of performances) {
+                const match = perf.match;
+                if (!match || !match.result) continue;
 
-        if (performances && Array.isArray(performances)) {
-          for (const perf of performances) {
-            const match = perf.match;
-            if (!match || !match.result) continue;
+                if (match.players) {
+                  match.players = match.players.map((p: any) => ({
+                    ...p,
+                    team: mapTeamToNumber(p.team),
+                  }));
+                }
+                if (match.result) {
+                  match.result.teamWon = mapTeamToNumber(match.result.teamWon);
+                }
 
-            if (match.players) {
-              match.players = match.players.map((p: any) => ({
-                ...p,
-                team: mapTeamToNumber(p.team),
-              }));
+                const targetMokiHash = perf.mokiId;
+                const playerInfo = match.players?.find(
+                  (p: any) => p.mokiId === targetMokiHash
+                );
+                const perfResults = perf.results || {};
+                const metaEntry = tokenIdToMeta.get(parseInt(tokenId, 10));
+
+                records.push({
+                  match_id: match.id,
+                  ga_moki_hash: targetMokiHash,
+                  moki_id: parseInt(tokenId, 10),
+                  moki_name: metaEntry?.name || playerInfo?.name || 'Unknown',
+                  moki_class: playerInfo?.class || '',
+                  moki_image_url: playerInfo?.imageUrl || '',
+                  moki_team: playerInfo?.team || 0,
+                  eliminations: perfResults.eliminations || 0,
+                  deposits: perfResults.deposits || 0,
+                  wart_distance: perfResults.wartDistance || 0,
+                  ended_game: !!perfResults.endedGame,
+                  deaths: perfResults.deaths || 0,
+                  eating_while_riding: perfResults.eatingWhileRiding || 0,
+                  buff_time_seconds: perfResults.buffTimeSeconds || 0,
+                  wart_ride_time_seconds: perfResults.wartTimeSeconds || perfResults.wartRideTimeSeconds || 0,
+                  loose_ball_pickups: perfResults.looseBallPickups || 0,
+                  eaten_by_wart: perfResults.eatenByWart || perfResults.eatenbyWart || 0,
+                  wart_closer: !!perfResults.wartCloser,
+                  win_type:
+                    match.result.winType === 'Eliminations'
+                      ? 'Combat'
+                      : match.result.winType || 'unknown',
+                  team_won: match.result.teamWon || 0,
+                  duration: match.result.duration || 0,
+                  match_date:
+                    perf.matchDate ||
+                    match.matchDate ||
+                    new Date().toISOString().split('T')[0],
+                  match_data: match,
+                });
+              }
             }
-            if (match.result) {
-              match.result.teamWon = mapTeamToNumber(match.result.teamWon);
-            }
-
-            const targetMokiHash = perf.mokiId;
-            const playerInfo = match.players?.find(
-              (p: any) => p.mokiId === targetMokiHash
-            );
-            const perfResults = perf.results || {};
-
-            // Use canonical name from mokiMetadata, NOT from API
-            const metaEntry = tokenIdToMeta.get(parseInt(tokenId, 10));
-
-            records.push({
-              match_id: match.id,
-              ga_moki_hash: targetMokiHash,
-              moki_id: parseInt(tokenId, 10),
-              moki_name: metaEntry?.name || playerInfo?.name || 'Unknown',
-              moki_class: playerInfo?.class || '',
-              moki_image_url: playerInfo?.imageUrl || '',
-              moki_team: playerInfo?.team || 0,
-              eliminations: perfResults.eliminations || 0,
-              deposits: perfResults.deposits || 0,
-              wart_distance: perfResults.wartDistance || 0,
-              ended_game: !!perfResults.endedGame,
-              deaths: perfResults.deaths || 0,
-              eating_while_riding: perfResults.eatingWhileRiding || 0,
-              buff_time_seconds: perfResults.buffTimeSeconds || 0,
-              wart_ride_time_seconds: perfResults.wartTimeSeconds || perfResults.wartRideTimeSeconds || 0,
-              loose_ball_pickups: perfResults.looseBallPickups || 0,
-              eaten_by_wart: perfResults.eatenByWart || perfResults.eatenbyWart || 0,
-              wart_closer: !!perfResults.wartCloser,
-              win_type:
-                match.result.winType === 'Eliminations'
-                  ? 'Combat'
-                  : match.result.winType || 'unknown',
-              team_won: match.result.teamWon || 0,
-              duration: match.result.duration || 0,
-              match_date:
-                perf.matchDate ||
-                match.matchDate ||
-                new Date().toISOString().split('T')[0],
-              match_data: match,
-            });
+            return records;
           }
+
+          // 429 Rate Limit — backoff
+          if (response.status === 429) {
+            const retryAfter = response.headers.get('Retry-After');
+            const waitMs = retryAfter ? parseInt(retryAfter) * 1000 : Math.min(8000 * attempt, 40000);
+            console.warn(`[Cron Matches] tokenId ${tokenId} rate limited (429). Esperando ${waitMs / 1000}s... (intento ${attempt}/${retries})`);
+            await delay(waitMs);
+            continue;
+          }
+
+          console.error(`[Cron Matches] API Error for tokenId ${tokenId}: ${response.status}`);
+          return [];
+
+        } catch (err) {
+          console.error(`[Cron Matches] Failed tokenId ${tokenId} (intento ${attempt}):`, err);
+          if (attempt < retries) await delay(3000);
         }
-        return records;
+      }
+      return [];
+    };
+
+    const fetchPromises = chunkTokenIds.map(async (tokenId) => {
+      try {
+        return await fetchWithRetry(tokenId);
       } catch (err) {
-        console.error(`[Cron Matches] Failed tokenId ${tokenId}:`, err);
+        console.error(`[Cron Matches] Fatal error for tokenId ${tokenId}:`, err);
         return [];
       }
     });
@@ -177,28 +196,6 @@ async function run() {
       recordsUpserted += chunk.length;
     }
   }
-
-  // Housekeeping
-  let recordsDeleted = 0;
-  try {
-    const { data: deletedData, error: cleanupErr } = await supabaseAdmin.rpc(
-      'cleanup_old_matches',
-      { keep_count: 20 }  // 20 matches por Moki × 240 Mokis = ~4800 filas máx en la tabla
-    );
-
-    if (cleanupErr) {
-      console.error(`[Cron Matches] Housekeeping SQL error:`, cleanupErr);
-    } else {
-      recordsDeleted = deletedData ?? 0;
-      console.log(
-        `[Cron Matches] Housekeeping: deleted ${recordsDeleted} old matches.`
-      );
-    }
-  } catch (err) {
-    console.error(`[Cron Matches] Housekeeping failed:`, err);
-  }
-
-
 
   console.log(
     `[Cron Matches] Sync Complete. Upserted ${recordsUpserted}. Duration: ${Date.now() - startTime}ms`

@@ -96,13 +96,12 @@ async function run() {
   // 2. Extraer Partidos Secuencialmente con Reintentos (Evita 524 timeouts)
   console.log('[Cron Upcoming] Extrayendo partidos (Paginado dinámico con reintentos)...');
   
-  const fetchPageWithRetry = async (page: number, retries = 3): Promise<any[]> => {
+  const fetchPageWithRetry = async (page: number, retries = 5): Promise<any[]> => {
     const url = `${API_BASE_URL}/contests/${contestId}/matches?page=${page}&limit=100&state=scheduled`;
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const response = await fetch(url, { 
           headers,
-          // Signal para timeout local de 60s
           signal: AbortSignal.timeout(60000) 
         });
         
@@ -111,6 +110,16 @@ async function run() {
           return json.data || [];
         }
 
+        // 429 Rate Limit — respetar Retry-After si existe, sino backoff exponencial
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After');
+          const waitMs = retryAfter ? parseInt(retryAfter) * 1000 : Math.min(5000 * attempt, 30000);
+          console.warn(`[Cron Upcoming] Página ${page} rate limited (429). Esperando ${waitMs / 1000}s... (intento ${attempt}/${retries})`);
+          await new Promise(resolve => setTimeout(resolve, waitMs));
+          continue;
+        }
+
+        // 5xx y 524 — reintentar con espera fija
         if (response.status === 524 || response.status >= 500) {
           console.warn(`[Cron Upcoming] Página ${page} intento ${attempt} falló (${response.status}). Reintentando en 3s...`);
           await new Promise(resolve => setTimeout(resolve, 3000));
@@ -190,6 +199,8 @@ async function run() {
       hasMore = false;
     } else {
       page++;
+      // Pausa de 1s entre páginas para no saturar el API
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 
