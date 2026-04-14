@@ -262,6 +262,7 @@ def main():
             "WinRate":       round(avg_wr, 1),
             "Wart Closer":   round(len(matches) * df_feat["pred_wartcloser"].mean(), 1),
             "Losses":        round(len(matches) * ((100 - avg_wr) / 100), 1),
+            "Deposits":      round(df_feat["pred_deposits"].sum(), 1),
             "Gacha Pts":     round(df_feat["pred_deposits"].sum() * 50, 1),
             "Deaths":        round(df_feat["pred_deaths"].sum(), 1),
             "Kills":         round(df_feat["pred_kills"].sum(), 1),

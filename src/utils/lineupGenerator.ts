@@ -797,7 +797,8 @@ function generateStandard(
 
 function isOneOfEachContest(contest: Contest): boolean {
   if (contest.name.toLowerCase().includes('one of each') ||
-    contest.name.toLowerCase().includes('one-of-each')) return true;
+    contest.name.toLowerCase().includes('one-of-each') ||
+    contest.name.toLowerCase().includes('ooe')) return true;
 
   const championSlots = contest.lineupConfig.slots.filter(s => s.cardType === 'champion');
   if (championSlots.length !== 4) return false;

@@ -56,9 +56,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <TantoProvider theme="dark">
               {children}
             </TantoProvider>
-          ) : (
-            <>{children}</>
-          )}
+          ) : null}
         </QueryClientProvider>
       </WagmiProvider>
     </LazyMotion>

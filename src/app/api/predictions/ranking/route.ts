@@ -66,6 +66,8 @@ export async function GET(req: NextRequest) {
       'Wart Closer': r.wart_closer,
       'Losses': r.losses,
       'Gacha Pts': r.gacha_pts,
+      'Deposits': r.deposits || 0,
+      'Wart Distance': r.wart_distance || 0,
       'Deaths': r.deaths,
       'Kills': r.kills,
       'Win By Combat': r.win_by_combat,

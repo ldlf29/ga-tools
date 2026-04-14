@@ -669,17 +669,17 @@
   justify-content: center;
   gap: 10px;
   margin-top: 12px;
+  margin-bottom: 5px;
+  /* Add safety margin for hover scale effects */
 }
 
-.rankingPageBtn {
+.rankingPageBtn,
+.rankingPageBtnText {
   background: #1abf9e;
   border: 2px solid #333333;
   border-radius: 8px;
   color: white;
   font-weight: 900;
-  font-size: 18px;
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -689,12 +689,27 @@
   line-height: 1;
 }
 
-.rankingPageBtn:disabled {
+.rankingPageBtn {
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+}
+
+.rankingPageBtnText {
+  font-size: 9px;
+  padding: 0 8px;
+  height: 32px;
+  text-transform: uppercase;
+}
+
+.rankingPageBtn:disabled,
+.rankingPageBtnText:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-.rankingPageBtn:not(:disabled):hover {
+.rankingPageBtn:not(:disabled):hover,
+.rankingPageBtnText:not(:disabled):hover {
   transform: scale(1.1);
 }
 
@@ -1279,7 +1294,8 @@
   animation: spin 1s linear infinite;
 }
 
-.loadingInner, .errorInner {
+.loadingInner,
+.errorInner {
   grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
@@ -1441,12 +1457,36 @@
   margin-right: 30px;
 }
 
-.contestLinkBtn:hover {
+.backBtnPink {
+  position: absolute;
+  top: 10px;
+  left: 1.5rem;
+  background: #ff66cc;
+  color: white;
+  border: 2px solid #333333;
+  border-bottom-width: 3px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.contestLinkBtn:hover,
+.backBtnPink:hover {
   transform: translateY(-2px);
   background: #ff85d5;
 }
 
-.contestLinkBtn:active {
+.contestLinkBtn:active,
+.backBtnPink:active {
   transform: translateY(0);
   border-bottom-width: 2px;
 }
@@ -2284,6 +2324,8 @@
   .rankingPagination {
     gap: 8px;
     margin-top: 10px;
+    margin-bottom: 12px;
+    /* Prevent cutoff on mobile */
   }
 
   .rankingPageBtn {
@@ -2579,6 +2621,16 @@
   font-weight: 700;
 }
 
+.pcOnlyDropdown {
+  display: block;
+}
+
+@media (max-width: 1000px) {
+  .pcOnlyDropdown {
+    display: none !important;
+  }
+}
+
 .expandedHeader {
   display: flex;
   justify-content: flex-start;
@@ -2601,6 +2653,13 @@
   overflow-x: hidden;
   padding: 0;
   background: #ffffff;
+  /* Hide scrollbar visually */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.expandedTableWrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .pcOnlyRanking {
@@ -2615,14 +2674,14 @@
   .pcOnlyRanking {
     display: none;
   }
-  
+
   .mobileOnlyRanking {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 12px;
+    padding: 0 12px 12px 12px;
   }
-  
+
   .expandedTableWrapper {
     background: #f0f2f5;
   }
@@ -2636,7 +2695,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    border-bottom: 2px solid rgba(0,0,0,0.05);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
   }
 
   .mobileSortSelect {
@@ -2660,24 +2719,45 @@
   .mobileFilterRow {
     display: flex;
     gap: 8px;
+    width: 100%;
   }
 
-  .mobileFilterRow select {
+  .mobileFilterDropdownWrapper {
     flex: 1;
-    padding: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobileCustomSelectBtn {
+    width: 100%;
+    padding: 10px 8px;
     border-radius: 10px;
-    border: 2px solid #333333;
+    border: 3px solid #333333;
     background: #ffffff;
     color: #333333;
-    font-weight: 800;
-    font-size: 0.72rem;
+    font-weight: 900;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 12px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+    height: 42px;
+    text-align: center;
+    font-family: var(--font-display, "Inter", sans-serif);
+  }
+
+  .activeFilter {
+    background: rgba(58, 128, 239, 0.15) !important;
+    border-color: #3a80ef !important;
+    color: #3a80ef !important;
+  }
+
+  .mobileSortSelect {
+    display: none;
+    /* Replaced by custom btn */
   }
 }
 
@@ -2691,7 +2771,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .mobileRankHeader {
@@ -2740,8 +2820,8 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .mobileStatLabel {
@@ -2759,7 +2839,7 @@
 
 .mobileScoreValue {
   color: #f1c40f;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
 }
 
 .mobileWRValPos {
@@ -2935,8 +3015,8 @@
   padding: 0.75rem 0;
   margin: 0.5rem 0 0 0;
   z-index: 10000;
-  max-height: 400px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
 }
 
 .modalFilterMenu li {

@@ -51,6 +51,7 @@ async function run() {
     wart_closer:      parseFloat(r['Wart Closer']),
     losses:           parseFloat(r['Losses']),
     gacha_pts:        parseFloat(r['Gacha Pts']),
+    deposits:         parseFloat(r['Deposits'] || '0'),
     deaths:           parseFloat(r['Deaths']),
     kills:            parseFloat(r['Kills'] || '0'),
     wart_distance:    parseFloat(r['Wart Distance'] || '0'),

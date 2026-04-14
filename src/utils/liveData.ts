@@ -97,7 +97,7 @@ export const fetchLiveData = async (): Promise<LiveDataMap | null> => {
     try {
       // console.log("[LiveData] Fetching cached stats from backend...");
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      const timeoutId = setTimeout(() => controller.abort('Timeout fetching stats'), 30000) as ReturnType<typeof setTimeout>; // 30s timeout
 
       const response = await fetch(STATS_API_URL, {
         signal: controller.signal,
