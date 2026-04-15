@@ -215,7 +215,7 @@ function getBestOwnedRarityForSlot(
   // Strict check: if contest says Epic, and I only have Basic, return null to avoid "weak" fallback.
   const valid = owned.filter(o => o.rarity === maxRarity.toLowerCase());
   if (valid.length === 0) return null;
-  
+
   // Aggregate copies from all items of this rarity
   return {
     rarity: valid[0].rarity,
@@ -360,9 +360,9 @@ function buildGreedyLineup(
     for (const candidate of candidates) {
       const nameKey = String(candidate.name).toUpperCase();
       const stockKey = `${nameKey}:${candidate.rarity.toUpperCase()}`;
-      
+
       if (usedNames.has(nameKey) || localUsedNames.has(nameKey)) continue;
-      
+
       // Stock check: LITERAL check for this specific rarity in the inventory
       if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
 
@@ -461,7 +461,7 @@ function generateOneOfEach(
 
     for (const targetRarity of raritySlots) {
       let slotCandidates: MokiCandidate[] = [];
-      
+
       if (params.cardMode === 'ALL') {
         slotCandidates = pool
           .filter(m => !usedNamesInLineup.has(String(m.name).toUpperCase()))
@@ -475,10 +475,10 @@ function generateOneOfEach(
         for (const row of params.rankingData) {
           const name = String(row.Name).toUpperCase();
           if (usedNamesInLineup.has(name)) continue;
-          
+
           const stockKey = `${name}:${targetRarity.toUpperCase()}`;
           if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
-          
+
           const mokiClass = String(row.Class).toUpperCase();
           if (params.excludedClasses.includes(mokiClass)) continue;
 
@@ -501,12 +501,12 @@ function generateOneOfEach(
             winRate: parseFloat(String(row.WinRate || '0').replace('%', '')),
             rarity: targetRarity,
             cardImage: ownedEntry.image,
-            copies: 1, 
+            copies: 1,
           });
         }
       }
 
-      slotCandidates.sort((a,b) => calcRankingScore(b, 'one-of-each') - calcRankingScore(a, 'one-of-each'));
+      slotCandidates.sort((a, b) => calcRankingScore(b, 'one-of-each') - calcRankingScore(a, 'one-of-each'));
 
       let chosen: MokiCandidate | null = null;
       for (const candidate of slotCandidates) {
@@ -532,7 +532,7 @@ function generateOneOfEach(
         if (!seenFingerprints.has(fingerprint)) {
           const totalEffectiveScore = lineupTotalEffective(selected, 'one-of-each');
           const totalBaseScore = lineupBaseOnly(selected);
-          
+
           // Consume "Collect Em All" scheme card stock if it exists
           const current = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
           const hasSchemeCard = current > 0;
@@ -572,11 +572,11 @@ function generateOneOfEach(
 
       const physicalCopies = params.cardMode === 'USER'
         ? Math.min(...original.mokis.map(m => {
-            const entry = params.userCards.find(c => String(c.name).toUpperCase() === String(m.name).toUpperCase() && String(c.rarity).toLowerCase() === String(m.rarity).toLowerCase());
-            return entry?.stackCount ?? 1;
-          }))
+          const entry = params.userCards.find(c => String(c.name).toUpperCase() === String(m.name).toUpperCase() && String(c.rarity).toLowerCase() === String(m.rarity).toLowerCase());
+          return entry?.stackCount ?? 1;
+        }))
         : 999;
-      
+
       const toAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
       for (let i = 0; i < toAdd; i++) {
         // Repeated lineups also consume scheme stock if available
@@ -586,8 +586,8 @@ function generateOneOfEach(
           schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), currentStock - 1);
         }
 
-        finalResults.push({ 
-          ...original, 
+        finalResults.push({
+          ...original,
           id: `${original.id}-rep-${i + 1}`,
           hasScheme: hasSchemeCard
         });
@@ -681,7 +681,7 @@ function generateStandard(
           traitPool.push(lineupWithOwnership);
           globalSeenFingerprints.add(fingerprint);
         }
-        
+
         lineup.mokis.forEach(m => {
           // ALWAYS consume stock specifically for the Moki:Rarity used
           const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
@@ -709,7 +709,7 @@ function generateStandard(
       }
 
       let currentPool = getAvailablePool();
-      
+
       if (schemeDef.scoreType === 'wart') {
         currentPool = currentPool.filter(m => m.wartCloser > 5 && (m.class.toLowerCase() !== 'striker'));
       } else if (schemeDef.scoreType === 'dive') {
@@ -738,7 +738,7 @@ function generateStandard(
           specPool.push(lineupWithOwnership);
           globalSeenFingerprints.add(fingerprint);
         }
-        
+
         lineup.mokis.forEach(m => {
           // ALWAYS consume stock specifically for the Moki:Rarity used
           const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
@@ -756,7 +756,7 @@ function generateStandard(
   const uniqueMasterList = [...traitPool, ...specPool].sort((a, b) => b.totalEffectiveScore - a.totalEffectiveScore);
 
   const finalResults: GeneratedLineup[] = [];
-  
+
   for (const lineup of uniqueMasterList) {
     finalResults.push({ ...lineup, id: `${lineup.id}-unique` });
   }
@@ -767,11 +767,11 @@ function generateStandard(
 
       const physicalCopies = params.cardMode === 'USER'
         ? Math.min(...original.mokis.map(m => {
-            const entry = params.userCards.find(c => String(c.name).toUpperCase() === String(m.name).toUpperCase() && String(c.rarity).toLowerCase() === String(m.rarity).toLowerCase());
-            return entry?.stackCount ?? 1;
-          }))
+          const entry = params.userCards.find(c => String(c.name).toUpperCase() === String(m.name).toUpperCase() && String(c.rarity).toLowerCase() === String(m.rarity).toLowerCase());
+          return entry?.stackCount ?? 1;
+        }))
         : 999;
-      
+
       const remainingToAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
 
       for (let i = 0; i < remainingToAdd; i++) {
@@ -781,8 +781,8 @@ function generateStandard(
           schemeStockMap.set(original.schemeName.toUpperCase(), currentStock - 1);
         }
 
-        finalResults.push({ 
-          ...original, 
+        finalResults.push({
+          ...original,
           id: `${original.id}-rep-${i + 1}`,
           hasScheme: hasSchemeCard
         });

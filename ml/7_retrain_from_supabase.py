@@ -62,33 +62,56 @@ def download_recent_matches():
         "Authorization": f"Bearer {SUPABASE_KEY}"
     }
     
+    import time
     all_data = []
     from_idx = 0
-    to_idx = 999
+    chunk_size = 1000
     has_more = True
     
     while has_more:
+        to_idx = from_idx + chunk_size - 1
         headers_page = {**headers, "Range": f"{from_idx}-{to_idx}", "Prefer": "count=exact"}
-        r = requests.get(url, headers=headers_page)
-        if r.status_code not in [200, 206]:
-            print(f"[ERROR] API error fetching matches: {r.status_code}")
+        
+        max_retries = 5
+        success = False
+        batch = []
+        for attempt in range(1, max_retries + 1):
+            try:
+                r = requests.get(url, headers=headers_page, timeout=30)
+                if r.status_code in [200, 206]:
+                    batch = r.json()
+                    success = True
+                    break
+                
+                print(f"[WARN] Supabase respondió {r.status_code} en fila {from_idx}. Intento {attempt}/{max_retries}...")
+                if r.status_code == 500 and chunk_size > 100:
+                    chunk_size = chunk_size // 2
+                    print(f"[INFO] Reduciendo tamaño de chunk a {chunk_size} por error 500.")
+                    break # Salimos del FOR para reintentar el WHILE con un Range (to_idx) más chico
+                
+                time.sleep(2 * attempt)
+            except Exception as e:
+                print(f"[WARN] Error de red: {e}. Intento {attempt}/{max_retries}...")
+                time.sleep(2 * attempt)
+        
+        if not success and chunk_size == (to_idx - from_idx + 1):
+            print(f"[ERROR] API error irrecuperable fetching matches después de {max_retries} intentos.")
             break
             
-        batch = r.json()
+        if not success:
+            continue # Si se redujo el chunk_size, vuelve a evaluar el while con el nuevo To_idx
+            
         if not batch:
             has_more = False
             break
             
         all_data.extend(batch)
-        print(f"[Supabase Pagination] Descargadas filas {from_idx}-{to_idx}. Total acumulado: {len(all_data)}")
+        print(f"[Supabase Pagination] Descargadas filas {from_idx}-{to_idx} (Tamaño batch: {chunk_size}). Total acumulado: {len(all_data)}")
         
-        if len(batch) < 1000:
+        if len(batch) < chunk_size:
             has_more = False
         else:
-            from_idx += 1000
-            to_idx += 1000
-            
-    return all_data
+            from_idx += chunk_size
 
 # ─── Extract Raw Logic (from Script 1) ────────────────────────────────────────
 

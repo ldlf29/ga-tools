@@ -42,21 +42,11 @@ async function run() {
     return;
   }
 
-  console.log('[Cron Upcoming] Buscando el contest principal (SOLO 10-round)...');
+  console.log('[Cron Upcoming] Buscando el contest principal que comience más pronto...');
   const now = Date.now();
   
-  // 1. Filtrar solo por contests que tengan '10-round' en su nombre
-  const relevantContests = activeContests.filter((c: any) => 
-    c.name?.toLowerCase().includes('10-round')
-  );
-
-  if (relevantContests.length === 0) {
-    console.warn('[Cron Upcoming] No se encontró ningún contest "10-round" en la lista de activos.');
-    return;
-  }
-
-  // 2. Encontrar el contest que empieza en el futuro más cercano
-  const futureContests = relevantContests
+  // Encontrar el contest que empieza en el futuro más cercano (hacia adelante)
+  const futureContests = activeContests
     .map((c: any) => ({
       ...c,
       diff: c.startDate ? new Date(c.startDate).getTime() - now : -Infinity
@@ -67,7 +57,7 @@ async function run() {
   const contest = futureContests[0];
 
   if (!contest) {
-    console.log('[Cron Upcoming] No se encontró ningún contest "10-round" futuro. Probablemente ya empezaron todos.');
+    console.log('[Cron Upcoming] No se encontró ningún contest futuro. Probablemente ya empezaron todos.');
     return;
   }
 

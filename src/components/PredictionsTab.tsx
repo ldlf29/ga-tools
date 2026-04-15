@@ -118,6 +118,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [isExpandedRankingOpen, setIsExpandedRankingOpen] = useState(false);
   const [modalSortKey, setModalSortKey] = useState<string | null>(null);
   const [modalSortDirection, setModalSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [modalSearchQuery, setModalSearchQuery] = useState('');
   const handleModalSort = (key: string) => {
     if (modalSortKey === key) {
       setModalSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
@@ -572,6 +573,12 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       }
     }
 
+    // Apply Name Search Filter
+    if (modalSearchQuery.trim()) {
+      const q = modalSearchQuery.toLowerCase().trim();
+      filtered = filtered.filter(m => (m.Name || '').toLowerCase().includes(q));
+    }
+
     if (!modalSortKey) return filtered;
 
     return [...filtered].sort((a: any, b: any) => {
@@ -588,7 +595,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       const diff = Number(valB || 0) - Number(valA || 0);
       return modalSortDirection === 'desc' ? diff : -diff;
     });
-  }, [rankingData, mokiStats, modalSortKey, modalSortDirection, modalFilters, metadataByName]);
+  }, [rankingData, mokiStats, modalSortKey, modalSortDirection, modalFilters, metadataByName, modalSearchQuery]);
 
   const deferredModalSortedRanking = React.useDeferredValue(modalSortedRanking);
 
@@ -600,10 +607,11 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       <td style={{ color: '#ffd753', fontWeight: 'bold' }}>{moki._displayScore}</td>
       <td style={{ color: '#1abf9e', fontWeight: 'bold' }}>{moki.WinRate}%</td>
       <td style={{ color: '#ff6b6b' }}>{moki.Losses}</td>
-      <td>{moki.Deposits ? Number(moki.Deposits).toFixed(1) : '0'}</td>
-      <td>{moki['Wart Distance'] ? Number(moki['Wart Distance']).toFixed(1) : '0'}</td>
+      <td>{moki.Deposits ?? moki.deposits ?? '0'}</td>
+      <td>{moki['Wart Distance'] ?? moki.wart_distance ?? '0'}</td>
       <td>{moki.Kills ? Number(moki.Kills).toFixed(2) : '0'}</td>
       <td>{moki['Wart Closer'] ? Number(moki['Wart Closer']).toFixed(2) : '0'}</td>
+      <td>{moki.Deaths ? Number(moki.Deaths).toFixed(1) : '0'}</td>
       <td>{moki['Win By Combat'] ? Number(moki['Win By Combat']).toFixed(2) : '0'}</td>
       <td>{moki.Fur}</td>
       <td className={styles.traitsCell}>
@@ -640,31 +648,27 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
           <span className={styles.mobileGridValue}>{moki.Losses}</span>
         </div>
         <div className={styles.mobileGridItem}>
-          <span className={styles.mobileGridLabel}>Wart Closer</span>
-          <span className={styles.mobileGridValue}>{moki['Wart Closer'] ? Number(moki['Wart Closer']).toFixed(1) : '0'}</span>
+          <span className={styles.mobileGridLabel}>Balls</span>
+          <span className={styles.mobileGridValue}>{moki.Deposits ?? moki.deposits ?? '0'}</span>
         </div>
         <div className={styles.mobileGridItem}>
-          <span className={styles.mobileGridLabel}>Gacha Pts</span>
-          <span className={styles.mobileGridValue}>{moki['Gacha Pts']}</span>
-        </div>
-        <div className={styles.mobileGridItem}>
-          <span className={styles.mobileGridLabel}>Deposits</span>
-          <span className={styles.mobileGridValue}>{moki.Deposits ? Number(moki.Deposits).toFixed(1) : '0'}</span>
-        </div>
-        <div className={styles.mobileGridItem}>
-          <span className={styles.mobileGridLabel}>Wart Dist.</span>
+          <span className={styles.mobileGridLabel}>WART</span>
           <span className={styles.mobileGridValue}>{moki['Wart Distance'] ? Number(moki['Wart Distance']).toFixed(1) : '0'}</span>
         </div>
         <div className={styles.mobileGridItem}>
-          <span className={styles.mobileGridLabel}>Kills</span>
+          <span className={styles.mobileGridLabel}>ELIMS</span>
           <span className={styles.mobileGridValue}>{moki.Kills ? Number(moki.Kills).toFixed(1) : '0'}</span>
+        </div>
+        <div className={styles.mobileGridItem}>
+          <span className={styles.mobileGridLabel}>Wart Closer</span>
+          <span className={styles.mobileGridValue}>{moki['Wart Closer'] ? Number(moki['Wart Closer']).toFixed(1) : '0'}</span>
         </div>
         <div className={styles.mobileGridItem}>
           <span className={styles.mobileGridLabel}>Deaths</span>
           <span className={styles.mobileGridValue}>{moki.Deaths ? Number(moki.Deaths).toFixed(1) : '0'}</span>
         </div>
         <div className={styles.mobileGridItem}>
-          <span className={styles.mobileGridLabel}>Win Combat</span>
+          <span className={styles.mobileGridLabel}>Win By Combat</span>
           <span className={styles.mobileGridValue}>{moki['Win By Combat'] ? Number(moki['Win By Combat']).toFixed(1) : '0'}</span>
         </div>
       </div>
@@ -833,6 +837,9 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
 
       if (targetMode === 'no win bonus') {
         if (!contestName.includes('no win')) return false;
+      } else if (targetMode === 'class coverage') {
+        // Class Coverage matches both "Class Coverage" and "Class Diversity"
+        if (!contestName.includes('class coverage') && !contestName.includes('class diversity')) return false;
       } else {
         if (!contestName.includes(targetMode)) return false;
       }
@@ -930,7 +937,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                     </button>
                     {openFilter === 'mode' && (
                       <ul className={`${styles.orderByMenu} ${styles.rightMenu}`}>
-                        {['All', 'No Win Bonus', 'No Scheme', 'Best Objective', 'Median Cap', 'Drop Worst Moki', 'Lowest Score', 'Class Coverage', 'Class Diversity'].map(opt => (
+                        {['All', 'No Win Bonus', 'No Scheme', 'Best Objective', 'Median Cap', 'Drop Worst Moki', 'Lowest Score', 'Class Coverage'].map(opt => (
                           <li key={opt} onClick={() => handleFilterChange('mode', opt)} className={filters.mode === opt ? styles.activeSort : ''}>{opt}</li>
                         ))}
                       </ul>
@@ -1476,7 +1483,18 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                     </svg>
                   </button>
                   <div className={styles.expandedHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 2rem' }}>
-                    <h2 className={styles.resultsTitle} style={{ margin: 0 }}>FULL RANKING DATA</h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
+                      <h2 className={styles.resultsTitle} style={{ margin: 0 }}>FULL RANKING DATA</h2>
+                      <div className={styles.modalSearchWrapper}>
+                        <input
+                          type="text"
+                          className={`${styles.searchInput} ${styles.desktopSearch}`}
+                          placeholder="Search Champion..."
+                          value={modalSearchQuery}
+                          onChange={(e) => setModalSearchQuery(e.target.value)}
+                        />
+                      </div>
+                    </div>
 
                     <div className={`${styles.modalFilterDropdown} ${styles.pcOnlyDropdown}`} style={{ position: 'relative', width: 'fit-content', marginRight: '45px' }}>
                       <button
@@ -1572,6 +1590,11 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                                 Wart Closer
                               </button>
                             </th>
+                            <th className={styles.filterHeaderCell} style={{ width: '80px' }}>
+                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Deaths')}>
+                                Deaths
+                              </button>
+                            </th>
                             <th className={styles.filterHeaderCell} style={{ width: '120px' }}>
                               <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Win By Combat')}>
                                 Win By Combat
@@ -1620,15 +1643,31 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                           </tr>
                         </thead>
                         <tbody>
-                          {pcRows}
+                          {pcRows.length > 0 ? pcRows : (
+                            <tr>
+                              <td colSpan={14} className={`${styles.noResultsMessage} ${styles.pcNoResults}`}>
+                                No Champions found matching these filters.
+                              </td>
+                            </tr>
+                          )}
                         </tbody>
-                        </table>
-                      </div>
+                      </table>
+                    </div>
 
                     {/* MOBILE VIEW: CARDS */}
                     <div className={styles.mobileOnlyRanking}>
                       {/* Mobile Controls */}
                       <div className={styles.mobileModalControls}>
+                        {/* SEARCH ROW */}
+                        <div className={styles.mobileFilterRow}>
+                          <input
+                            type="text"
+                            className={styles.searchInput}
+                            placeholder="Search Champion..."
+                            value={modalSearchQuery}
+                            onChange={(e) => setModalSearchQuery(e.target.value)}
+                          />
+                        </div>
                         {/* ROW 1: SORT BY & SCHEMES */}
                         <div className={styles.mobileFilterRow}>
                           <div className={styles.mobileFilterDropdownWrapper}>
@@ -1720,8 +1759,12 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                         </div>
                       </div>
 
-                      <div style={{ opacity: modalSortedRanking !== deferredModalSortedRanking ? 0.6 : 1, transition: 'opacity 0.2s', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {mobileCards}
+                      <div style={{ opacity: modalSortedRanking !== deferredModalSortedRanking ? 0.6 : 1, transition: 'opacity 0.2s', display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+                        {mobileCards.length > 0 ? mobileCards : (
+                          <div className={styles.noResultsMessage}>
+                            No Champions found matching these filters.
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

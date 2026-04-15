@@ -82,3 +82,6 @@ ml/data/*.jsonl
 *.db
 /analytics/
 !src/data/*.json
+
+# Tests and temporary experiments
+/test_future_ranking/
