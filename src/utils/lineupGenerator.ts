@@ -11,12 +11,15 @@ export interface MokiRankingRow {
   Name: string;
   Class: string;
   Score: number;
-  WinRate: number;
+  WinRate: number | string;
   'Wart Closer': number;
   Losses: number;
   'Gacha Pts': number;
+  Kills: number;
   Deaths: number;
-  'Win By Combat': number;
+  Deposits: number;
+  'Wart Distance': number;
+  'Matches Played'?: number;
   Fur: string;
   Traits: string;
 }
@@ -31,9 +34,15 @@ export interface MokiCandidate {
   wartCloser: number;
   gachaPts: number;
   winRate: number;
+  kills: number;
+  deaths: number;
+  deposits: number;
+  wartDistance: number;
   rarity: string;
   cardImage: string;
   copies: number;
+  dropped?: boolean;
+  modeBaseScore?: number;
 }
 
 export interface GeneratedLineup {
@@ -64,6 +73,16 @@ export interface CatalogEntry {
   market: string;
 }
 
+export interface GameModes {
+  noWinBonus: boolean;
+  noScheme: boolean;
+  bestObjective: boolean;
+  medianCap: boolean;
+  dropWorst: boolean;
+  lowestScore: boolean;
+  classCoverage: boolean;
+}
+
 export interface GenerateParams {
   rankingData: MokiRankingRow[];
   catalog: CatalogEntry[];
@@ -79,6 +98,7 @@ export interface GenerateParams {
   useOnlyMySchemes?: boolean;
   cardSource: 'ALL' | 'MY';
   selectedScheme?: string;
+  modes?: GameModes;
 }
 
 // ─── Scheme Definitions ──────────────────────────────────────────────────────
@@ -246,47 +266,117 @@ function mokiMatchesScheme(moki: any, scheme: SchemeDef): boolean {
 
 // ─── Score Calculators ───────────────────────────────────────────────────────
 
-function getSchemeBonus(moki: MokiCandidate, scoreType: ScoreType): number {
+// We delete the old getSchemeBonus here since we merged it below.
+
+export function parseGameModes(contest: Contest): GameModes {
+  const n = String(contest.name || '').toLowerCase();
+
+  // Detección mejorada de NO SCHEME: Si no hay un slot de 'scheme' en el contest, entonces es No Scheme.
+  const hasSchemeSlot = contest.lineupConfig.slots.some((s: any) => s.cardType === 'scheme');
+  const isNoScheme = !hasSchemeSlot || n.includes('no scheme');
+
+  return {
+    noWinBonus: n.includes('no win bonus') || n.includes('no win'),
+    noScheme: isNoScheme,
+    bestObjective: n.includes('best objective'),
+    medianCap: n.includes('median cap'),
+    dropWorst: n.includes('drop worst') || n.includes('drop worst moki'),
+    lowestScore: n.includes('lowest score'),
+    classCoverage: n.includes('class coverage') || n.includes('class diversity'),
+  };
+}
+
+function calculateMokiBaseForMode(moki: MokiCandidate, modes: GameModes | undefined): number {
+  if (!modes) return moki.baseScore;
+
+  if (modes.noScheme && !modes.bestObjective && !modes.medianCap && !modes.noWinBonus) {
+    return moki.baseScore;
+  }
+
+  const scoreDep = moki.deposits * 50;
+  const scoreKills = moki.kills * 80;
+  const scoreWart = Math.floor(moki.wartDistance / 80) * 40;
+  const rawScore = scoreDep + scoreKills + scoreWart;
+  const winBonus = modes.noWinBonus ? 0 : (moki.winRate / 100) * 200;
+
+  if (modes.medianCap) {
+    const arr = [scoreDep, scoreKills, scoreWart].sort((a, b) => a - b);
+    return arr[1]; // Mediana
+  }
+
+  if (modes.bestObjective) {
+    return Math.max(scoreDep, scoreKills, scoreWart) + winBonus;
+  }
+
+  if (modes.noWinBonus || modes.lowestScore) {
+    return rawScore;
+  }
+
+  return moki.baseScore;
+}
+
+function getSchemeBonus(moki: MokiCandidate, scoreType: ScoreType, modes?: GameModes): number {
+  if (modes?.noScheme) return 0;
+
   switch (scoreType) {
     case 'wart': return moki.wartCloser * 175;
     case 'dive': return moki.losses * 175;
-    case 'gacha': return (moki.gachaPts * 0.5); // The extra bonus part
+    case 'gacha': return (moki.deposits * 25); // Deposits bonus instead of gachaPts
     case 'one-of-each': return 1450;
-    default: return 1000; // Trait/Fur bonus
+    default:
+      return modes?.classCoverage ? 1000 + 100 : 1000; // Trait bonus + Class Coverage bonus
   }
 }
 
-function calcValidationScore(moki: MokiCandidate, scoreType: ScoreType): number {
-  // Validation Score: (Base Score) + Bonuses (NO Rarity Multiplier)
+function calcMokiBaseScore(moki: MokiCandidate, scoreType: ScoreType, modes?: GameModes): number {
+  let base = calculateMokiBaseForMode(moki, modes);
   if (scoreType === 'gacha') {
-    return (moki.gachaPts + (moki.winRate / 10) * 200) + (moki.gachaPts * 0.5);
+    const winBonus = modes?.noWinBonus ? 0 : ((moki.winRate / 100) * 200);
+    base = moki.deposits * 50 + winBonus;
   }
-  return moki.baseScore + getSchemeBonus(moki, scoreType);
+  return base * getRarityMultiplier(moki.rarity);
 }
 
-function calcRankingScore(moki: MokiCandidate, scoreType: ScoreType): number {
-  // Ranking Score (Effective): (Base Score * Multiplier) + Bonuses
-  const multiplier = getRarityMultiplier(moki.rarity);
+function calcValidationScore(moki: MokiCandidate, scoreType: ScoreType, modes?: GameModes): number {
+  const base = calculateMokiBaseForMode(moki, modes);
   if (scoreType === 'gacha') {
-    return (moki.gachaPts + (moki.winRate / 10) * 200) * multiplier + (moki.gachaPts * 0.5);
+    const winBonus = modes?.noWinBonus ? 0 : ((moki.winRate / 100) * 200);
+    return (moki.deposits * 50 + winBonus) + getSchemeBonus(moki, scoreType, modes);
   }
-  return (moki.baseScore * multiplier) + getSchemeBonus(moki, scoreType);
+  return base + getSchemeBonus(moki, scoreType, modes);
 }
 
-function calcEffective(moki: MokiCandidate, scoreType: ScoreType): number {
-  return calcRankingScore(moki, scoreType);
+function calcRankingScore(moki: MokiCandidate, scoreType: ScoreType, modes?: GameModes): number {
+  return calcMokiBaseScore(moki, scoreType, modes) + getSchemeBonus(moki, scoreType, modes);
 }
 
-function lineupTotalEffective(mokis: MokiCandidate[], scoreType: ScoreType): number {
-  return mokis.reduce((sum, m) => sum + calcRankingScore(m, scoreType), 0);
+function calcEffective(moki: MokiCandidate, scoreType: ScoreType, modes?: GameModes): number {
+  return calcRankingScore(moki, scoreType, modes);
 }
 
-function lineupTotalValidation(mokis: MokiCandidate[], scoreType: ScoreType): number {
-  return mokis.reduce((sum, m) => sum + calcValidationScore(m, scoreType), 0);
+function lineupTotalEffective(mokis: MokiCandidate[], scoreType: ScoreType, modes?: GameModes): number {
+  mokis.forEach(m => {
+    m.modeBaseScore = calcMokiBaseScore(m, scoreType, modes);
+  });
+
+  if (modes?.dropWorst && mokis.length === 4) {
+    const scores = mokis.map(m => calcRankingScore(m, scoreType, modes));
+    const minVal = Math.min(...scores);
+    const total = scores.reduce((a, b) => a + b, 0);
+    // Mark dropped
+    const worstIdx = scores.indexOf(minVal);
+    if (worstIdx !== -1) mokis[worstIdx].dropped = true;
+    return total - minVal;
+  }
+  return mokis.reduce((sum, m) => sum + calcRankingScore(m, scoreType, modes), 0);
 }
 
-function lineupBaseOnly(mokis: MokiCandidate[]): number {
-  return mokis.reduce((sum, m) => sum + m.baseScore * getRarityMultiplier(m.rarity), 0);
+function lineupTotalValidation(mokis: MokiCandidate[], scoreType: ScoreType, modes?: GameModes): number {
+  return mokis.reduce((sum, m) => sum + calcValidationScore(m, scoreType, modes), 0);
+}
+
+function lineupBaseOnly(mokis: MokiCandidate[], modes?: GameModes): number {
+  return mokis.reduce((sum, m) => sum + (m.dropped ? 0 : (m.modeBaseScore ?? (calculateMokiBaseForMode(m, modes) * getRarityMultiplier(m.rarity)))), 0);
 }
 
 // ─── Pool Builder ────────────────────────────────────────────────────────────
@@ -314,6 +404,10 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup): MokiCa
       wartCloser: typeof row['Wart Closer'] === 'number' ? row['Wart Closer'] : parseFloat(String(row['Wart Closer'] || '0')),
       gachaPts: typeof row['Gacha Pts'] === 'number' ? row['Gacha Pts'] : parseFloat(String(row['Gacha Pts'] || '0')),
       winRate: typeof row.WinRate === 'number' ? row.WinRate : parseFloat(String(row.WinRate || '0').replace('%', '')),
+      kills: typeof row.Kills === 'number' ? row.Kills : parseFloat(String(row.Kills || '0')),
+      deaths: typeof row.Deaths === 'number' ? row.Deaths : parseFloat(String(row.Deaths || '0')),
+      deposits: typeof row.Deposits === 'number' ? row.Deposits : parseFloat(String(row.Deposits || '0')),
+      wartDistance: typeof row['Wart Distance'] === 'number' ? row['Wart Distance'] : parseFloat(String(row['Wart Distance'] || '0')),
     };
 
     if (params.cardMode === 'ALL') {
@@ -346,11 +440,18 @@ function buildGreedyLineup(
   scoreType: ScoreType,
   slots: any[],
   stockMap: Map<string, number>,
+  modes?: GameModes,
 ): MokiCandidate[] | null {
   const selected: MokiCandidate[] = [];
   const localUsedNames = new Set<string>();
+  const localUsedClasses = new Set<string>();
 
-  for (const slot of slots) {
+  // Sort slots: For lowest score, process lowest valid rarities first. For normal, process max valid rarities first.
+  const sortedSlots = modes?.lowestScore
+    ? [...slots].sort((a, b) => getRarityRank(a.minRarity) - getRarityRank(b.minRarity))
+    : [...slots].sort((a, b) => getRarityRank(b.maxRarity) - getRarityRank(a.maxRarity));
+
+  for (const slot of sortedSlots) {
     const minR = slot.minRarity.toLowerCase();
     const maxR = slot.maxRarity.toLowerCase();
 
@@ -363,18 +464,37 @@ function buildGreedyLineup(
 
       if (usedNames.has(nameKey) || localUsedNames.has(nameKey)) continue;
 
+      // Class Coverage restriction: force unique classes
+      if (modes?.classCoverage) {
+        const cClass = String(candidate.class).toUpperCase();
+        if (localUsedClasses.has(cClass)) continue;
+
+        // "Y siempre los slots de la mayor rareza, si los hay, ocupadas por defender/striker"
+        if (selected.length === 0) {
+          if (cClass !== 'DEFENDER' && cClass !== 'STRIKER') continue;
+        } else if (selected.length === 1) {
+          const firstClass = String(selected[0].class).toUpperCase();
+          if (firstClass === 'DEFENDER' && cClass !== 'STRIKER') continue;
+          if (firstClass === 'STRIKER' && cClass !== 'DEFENDER') continue;
+        }
+      }
+
       // Stock check: LITERAL check for this specific rarity in the inventory
       if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
 
-      // Verify rarity: LITERAL check to always use the maxRarity allowed for the slot
-      if (candidate.rarity.toLowerCase() !== maxR.toLowerCase()) continue;
+      // Rarity enforcement:
+      // For Normal modes, strictly enforce the highest possible rarity allowed (maxR).
+      // For Lowest Score, strictly enforce the lowest possible rarity allowed (minR).
+      const targetedRarity = modes?.lowestScore ? minR.toLowerCase() : maxR.toLowerCase();
+      if (candidate.rarity.toLowerCase() !== targetedRarity) continue;
 
       if (avoidConflicts && selected.length > 0) {
         if (selected.some(s => hasConflict(candidate.name, s.name, conflictSet))) continue;
       }
 
-      selected.push(candidate);
+      selected.push({ ...candidate }); // Clone to prevent mutation leaks (dropped, modeBaseScore)
       localUsedNames.add(nameKey);
+      localUsedClasses.add(String(candidate.class).toUpperCase());
       foundForSlot = true;
       break;
     }
@@ -405,28 +525,24 @@ function buildLineup(
   schemeType: 'trait-fur' | 'relegated' | 'one-of-each',
   id: string,
   stockMap: Map<string, number>,
+  modes?: GameModes,
 ): GeneratedLineup | null {
+
+  // Sort descending normally (1), or ascending if Lowest Score (-1)
+  const sortDirection = modes?.lowestScore ? -1 : 1;
   const sorted = [...candidates].sort(
-    (a, b) => calcRankingScore(b, scoreType) - calcRankingScore(a, scoreType)
+    (a, b) => sortDirection * (calcRankingScore(b, scoreType, modes) - calcRankingScore(a, scoreType, modes))
   );
 
-  const mokis = buildGreedyLineup(sorted, usedNames, conflictSet, avoidConflicts, scoreType, slots, stockMap);
+  const mokis = buildGreedyLineup(sorted, usedNames, conflictSet, avoidConflicts, scoreType, slots, stockMap, modes);
   if (!mokis) return null;
 
-  if (schemeType === 'trait-fur') {
-    const rawSum = mokis.reduce((s, m) => s + m.baseScore, 0);
-    // Ajustado al nuevo meta (Promedios de 2600-2700 pts * 4 = 10400)
-    if (rawSum < 10000) return null;
-  } else if (schemeType === 'relegated') {
-    const valScore = lineupTotalValidation(mokis, scoreType);
-    // Ajustado al nuevo meta (Base 10400 + 4000 en bonos)
-    if (valScore < 13000) return null;
-  }
+  // Thresholds removed for testing and debugging.
 
-  const totalEffectiveScore = lineupTotalEffective(mokis, scoreType);
-  const totalBaseScore = lineupBaseOnly(mokis);
+  const totalEffectiveScore = lineupTotalEffective(mokis, scoreType, modes);
+  const totalBaseScore = lineupBaseOnly(mokis, modes);
 
-  return { id, schemeName, schemeImage, schemeType, mokis, totalBaseScore, totalEffectiveScore, hasScheme: true };
+  return { id, schemeName, schemeImage, schemeType, mokis, totalBaseScore, totalEffectiveScore, hasScheme: !modes?.noScheme };
 }
 
 // ─── One-Of-Each Generator ───────────────────────────────────────────────────
@@ -446,18 +562,19 @@ function generateOneOfEach(
 
   const uniqueLineups: GeneratedLineup[] = [];
   const seenFingerprints = new Set<string>();
-  const SAFETY_LIMIT = 100;
+  const SAFETY_LIMIT = 20;
   const raritySlots = ['legendary', 'epic', 'rare', 'basic'];
 
   while (uniqueLineups.length < SAFETY_LIMIT) {
     // If using only my schemes, check if we have "Collect Em All" cards left
-    if (params.useOnlyMySchemes) {
+    if (params.useOnlyMySchemes && !params.modes?.noScheme) {
       const stock = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
       if (stock <= 0) break;
     }
 
     const selected: MokiCandidate[] = [];
     const usedNamesInLineup = new Set<string>();
+    const usedClassesInLineup = new Set<string>();
 
     for (const targetRarity of raritySlots) {
       let slotCandidates: MokiCandidate[] = [];
@@ -465,6 +582,7 @@ function generateOneOfEach(
       if (params.cardMode === 'ALL') {
         slotCandidates = pool
           .filter(m => !usedNamesInLineup.has(String(m.name).toUpperCase()))
+          .filter(m => (stockMap.get(`${String(m.name).toUpperCase()}:${targetRarity.toUpperCase()}`) ?? 0) > 0)
           .map(m => ({
             ...m,
             rarity: targetRarity,
@@ -502,17 +620,40 @@ function generateOneOfEach(
             rarity: targetRarity,
             cardImage: ownedEntry.image,
             copies: 1,
+            kills: parseFloat(String(row.Kills || '0')),
+            deaths: parseFloat(String(row.Deaths || '0')),
+            deposits: parseFloat(String(row.Deposits || '0')),
+            wartDistance: parseFloat(String(row['Wart Distance'] || '0')),
           });
         }
       }
 
-      slotCandidates.sort((a, b) => calcRankingScore(b, 'one-of-each') - calcRankingScore(a, 'one-of-each'));
+      slotCandidates.sort((a, b) => {
+        // Sort descending normally (1), or ascending if Lowest Score (-1)
+        const sortDirection = params.modes?.lowestScore ? -1 : 1;
+        return sortDirection * (calcRankingScore(b, 'one-of-each', params.modes) - calcRankingScore(a, 'one-of-each', params.modes));
+      });
 
       let chosen: MokiCandidate | null = null;
       for (const candidate of slotCandidates) {
         if (params.avoidMatchupConflicts && selected.length > 0) {
           if (selected.some(s => hasConflict(candidate.name, s.name, conflictSet))) continue;
         }
+
+        const cClass = String(candidate.class).toUpperCase();
+        if (params.modes?.classCoverage) {
+          if (usedClassesInLineup.has(cClass)) continue;
+
+          // "Y siempre los slots de la mayor rareza, si los hay, ocupadas por defender/striker"
+          if (selected.length === 0) { // Legendary (in OOE, raritySlots goes legendary -> basic)
+            if (cClass !== 'DEFENDER' && cClass !== 'STRIKER') continue;
+          } else if (selected.length === 1) { // Epic
+            const firstClass = String(selected[0].class).toUpperCase();
+            if (firstClass === 'DEFENDER' && cClass !== 'STRIKER') continue;
+            if (firstClass === 'STRIKER' && cClass !== 'DEFENDER') continue;
+          }
+        }
+
         chosen = candidate;
         break;
       }
@@ -520,50 +661,60 @@ function generateOneOfEach(
       if (chosen) {
         selected.push(chosen);
         usedNamesInLineup.add(String(chosen.name).toUpperCase());
+        usedClassesInLineup.add(String(chosen.class).toUpperCase());
+
+        // FIX DEFAULT INFINITE LOOP: In 'ALL' mode, we MUST consume stockMap internally during sim
+        if (params.cardMode === 'ALL') {
+          const key = `${String(chosen.name).toUpperCase()}:${chosen.rarity.toUpperCase()}`;
+          stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 1) - 1));
+        }
+
       } else {
         break;
       }
     }
 
     if (selected.length === 4) {
-      const valScore = lineupTotalValidation(selected, 'one-of-each');
-      if (valScore >= 13000) {
-        const fingerprint = getLineupFingerprint(selected);
-        if (!seenFingerprints.has(fingerprint)) {
-          const totalEffectiveScore = lineupTotalEffective(selected, 'one-of-each');
-          const totalBaseScore = lineupBaseOnly(selected);
+      // Thresholds removed for testing
+      const fingerprint = getLineupFingerprint(selected);
+      if (!seenFingerprints.has(fingerprint)) {
+        const totalEffectiveScore = lineupTotalEffective(selected, 'one-of-each', params.modes);
+        const totalBaseScore = lineupBaseOnly(selected, params.modes);
 
-          // Consume "Collect Em All" scheme card stock if it exists
-          const current = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
-          const hasSchemeCard = current > 0;
-          if (hasSchemeCard) {
-            schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), current - 1);
-          }
-
-          uniqueLineups.push({
-            id: `ooe-u-${uniqueLineups.length}`,
-            schemeName: COLLECT_EM_ALL.name,
-            schemeImage: COLLECT_EM_ALL.image,
-            schemeType: 'one-of-each',
-            mokis: selected,
-            totalBaseScore,
-            totalEffectiveScore,
-            hasScheme: hasSchemeCard
-          });
-          seenFingerprints.add(fingerprint);
+        // If noScheme, don't use COLLECT_EM_ALL
+        const useScheme = !params.modes?.noScheme;
+        const current = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
+        const hasSchemeCard = useScheme && (current > 0);
+        if (hasSchemeCard) {
+          schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), current - 1);
         }
 
+        uniqueLineups.push({
+          id: `ooe-u-${uniqueLineups.length}`,
+          schemeName: useScheme ? COLLECT_EM_ALL.name : '',
+          schemeImage: useScheme ? COLLECT_EM_ALL.image : '',
+          schemeType: 'one-of-each',
+          mokis: selected,
+          totalBaseScore,
+          totalEffectiveScore,
+          hasScheme: hasSchemeCard
+        });
+        seenFingerprints.add(fingerprint);
+      }
+
+      if (params.cardMode === 'USER') {
         selected.forEach(m => {
           const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
           stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 0) - 1));
         });
-      } else {
-        break;
       }
     } else {
       break;
     }
   }
+
+  const sortDirection = params.modes?.lowestScore ? -1 : 1;
+  uniqueLineups.sort((a, b) => sortDirection * (b.totalEffectiveScore - a.totalEffectiveScore));
 
   const finalResults: GeneratedLineup[] = [...uniqueLineups];
   if (params.allowRepeated && finalResults.length < params.lineupCount) {
@@ -580,20 +731,31 @@ function generateOneOfEach(
       const toAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
       for (let i = 0; i < toAdd; i++) {
         // Repeated lineups also consume scheme stock if available
-        const currentStock = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
-        const hasSchemeCard = currentStock > 0;
-        if (hasSchemeCard) {
-          schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), currentStock - 1);
+        let hasSchemeCard = false;
+        if (!params.modes?.noScheme) {
+          const currentStock = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
+          hasSchemeCard = currentStock > 0;
+          if (hasSchemeCard) {
+            schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), currentStock - 1);
+          }
         }
 
         finalResults.push({
           ...original,
           id: `${original.id}-rep-${i + 1}`,
+          mokis: original.mokis.map(m => ({ ...m, dropped: false })), // DEEP CLONE and reset dropped
           hasScheme: hasSchemeCard
         });
       }
     }
   }
+
+  // Final sort to ensure absolute lowest score is first if Lowest Score mode is on
+  finalResults.sort((a, b) => {
+    return params.modes?.lowestScore 
+      ? (a.totalEffectiveScore - b.totalEffectiveScore) 
+      : (b.totalEffectiveScore - a.totalEffectiveScore);
+  });
 
   return finalResults;
 }
@@ -619,10 +781,18 @@ function generateStandard(
   const traitPool: GeneratedLineup[] = [];
   const specPool: GeneratedLineup[] = [];
   const globalSeenFingerprints = new Set<string>();
-  const SAFETY_LIMIT = 100;
+  const SAFETY_LIMIT = 20;
+
+  let traitLimit = SAFETY_LIMIT;
+  let specLimit = SAFETY_LIMIT;
+
+  if (params.modes?.classCoverage) {
+    traitLimit = 10;
+    specLimit = 10;
+  }
 
   let traitSchemes = TRAIT_FUR_SCHEMES;
-  let relegatedSchemes = RELEGATED_SCHEMES;
+  let relegatedSchemes: any[] = RELEGATED_SCHEMES;
 
   if (params.useOnlyMySchemes) {
     const ownedSchemeNames = new Set(
@@ -645,15 +815,34 @@ function generateStandard(
     }
   }
 
+  // Modifiers Unchained
+  if (params.modes?.lowestScore) {
+    traitSchemes = [];
+    relegatedSchemes = [
+      { name: 'Enforcing The Naughty List', image: '/scheme/enforcing the naughty list.webp', scoreType: 'lowest-naughty' as any },
+      { name: 'Gacha Hoarding', image: '/scheme/gacha hoarding.webp', scoreType: 'lowest-gacha' as any }
+    ];
+  }
+  
+  if (params.modes?.classCoverage) {
+    relegatedSchemes = [{ name: 'Taking A Dive', image: '/scheme/taking a dive.webp', scoreType: 'dive' as any }];
+  }
+
+  if (params.modes?.noScheme) {
+    traitSchemes = [];
+    relegatedSchemes = [{ name: 'No Scheme', image: '', scoreType: 'trait-fur' as any }];
+  }
+
   const getAvailablePool = () => pool.filter(m => (stockMap.get(`${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`) ?? 0) > 0);
 
   for (const scheme of traitSchemes) {
     if (traitPool.length + specPool.length >= SAFETY_LIMIT) break;
+    if (traitPool.length >= traitLimit) break;
 
     let canBuildAnother = true;
-    while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT)) {
+    while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT) && (traitPool.length < traitLimit)) {
       // Check scheme stock if "Only My Schemes" is on
-      if (params.useOnlyMySchemes) {
+      if (params.useOnlyMySchemes && !params.modes?.noScheme) {
         if ((schemeStockMap.get(scheme.name.toUpperCase()) ?? 0) <= 0) {
           canBuildAnother = false;
           break;
@@ -665,7 +854,7 @@ function generateStandard(
         currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
         'trait-fur', championSlots, 14000,
         scheme.name, scheme.image, 'trait-fur', `tf-${scheme.name}-${traitPool.length}`,
-        stockMap
+        stockMap, params.modes
       );
 
       if (lineup) {
@@ -695,13 +884,14 @@ function generateStandard(
 
   for (const schemeDef of relegatedSchemes) {
     if (traitPool.length + specPool.length >= SAFETY_LIMIT) break;
+    if (specPool.length >= specLimit) break;
 
     if (params.excludedClasses.includes('STRIKER') && (schemeDef.scoreType === 'dive' || schemeDef.scoreType === 'gacha')) continue;
 
     let canBuildAnother = true;
-    while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT)) {
+    while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT) && (specPool.length < specLimit)) {
       // Check scheme stock if "Only My Schemes" is on
-      if (params.useOnlyMySchemes) {
+      if (params.useOnlyMySchemes && !params.modes?.noScheme) {
         if ((schemeStockMap.get(schemeDef.name.toUpperCase()) ?? 0) <= 0) {
           canBuildAnother = false;
           break;
@@ -715,14 +905,18 @@ function generateStandard(
       } else if (schemeDef.scoreType === 'dive') {
         currentPool = currentPool.filter(m => m.losses > 5);
       } else if (schemeDef.scoreType === 'gacha') {
-        currentPool = currentPool.filter(m => m.gachaPts > 2000);
+        currentPool = currentPool.filter(m => m.deposits >= 38);
+      } else if (schemeDef.scoreType === ('lowest-naughty' as any)) {
+        currentPool = currentPool.filter(m => m.class.toUpperCase() === 'STRIKER');
+      } else if (schemeDef.scoreType === ('lowest-gacha' as any)) {
+        currentPool = currentPool.filter(m => m.class.toUpperCase() === 'DEFENDER');
       }
 
       const lineup = buildLineup(
         currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
         schemeDef.scoreType, championSlots, 18000,
         schemeDef.name, schemeDef.image, 'relegated', `rel-${schemeDef.name}-${specPool.length}`,
-        stockMap
+        stockMap, params.modes
       );
 
       if (lineup) {
@@ -750,10 +944,11 @@ function generateStandard(
     }
   }
 
-  traitPool.sort((a, b) => b.totalEffectiveScore - a.totalEffectiveScore);
-  specPool.sort((a, b) => b.totalEffectiveScore - a.totalEffectiveScore);
+  const sortDirection = params.modes?.lowestScore ? -1 : 1;
+  traitPool.sort((a, b) => sortDirection * (b.totalEffectiveScore - a.totalEffectiveScore));
+  specPool.sort((a, b) => sortDirection * (b.totalEffectiveScore - a.totalEffectiveScore));
 
-  const uniqueMasterList = [...traitPool, ...specPool].sort((a, b) => b.totalEffectiveScore - a.totalEffectiveScore);
+  const uniqueMasterList = [...traitPool, ...specPool].sort((a, b) => sortDirection * (b.totalEffectiveScore - a.totalEffectiveScore));
 
   const finalResults: GeneratedLineup[] = [];
 
@@ -784,18 +979,26 @@ function generateStandard(
         finalResults.push({
           ...original,
           id: `${original.id}-rep-${i + 1}`,
+          mokis: original.mokis.map(m => ({ ...m, dropped: false })), // DEEP CLONE and reset dropped
           hasScheme: hasSchemeCard
         });
       }
     }
   }
 
+  // Final sort to ensure absolute lowest score is first if Lowest Score mode is on
+  finalResults.sort((a, b) => {
+    return params.modes?.lowestScore 
+      ? (a.totalEffectiveScore - b.totalEffectiveScore) 
+      : (b.totalEffectiveScore - a.totalEffectiveScore);
+  });
+
   return finalResults;
 }
 
 // ─── Detect One-Of-Each ──────────────────────────────────────────────────────
 
-function isOneOfEachContest(contest: Contest): boolean {
+export function isOneOfEachContest(contest: Contest): boolean {
   if (contest.name.toLowerCase().includes('one of each') ||
     contest.name.toLowerCase().includes('one-of-each') ||
     contest.name.toLowerCase().includes('ooe')) return true;
@@ -815,6 +1018,16 @@ function isOneOfEachContest(contest: Contest): boolean {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 
 export function generateLineups(params: GenerateParams): GeneratedLineup[] {
+  // FORCE OVERRIDE FOR DEBUGGING
+  params.lineupCount = Math.min(params.lineupCount, 20);
+
+  params.modes = parseGameModes(params.contest);
+
+  if (params.modes.medianCap) {
+    if (!params.excludedClasses.includes('STRIKER')) params.excludedClasses.push('STRIKER');
+    if (!params.excludedClasses.includes('BRUISER')) params.excludedClasses.push('BRUISER');
+  }
+
   const catalogLookup = buildCatalogLookup(params.catalog);
   const conflictSet = buildConflictSet(params.upcomingMatches);
 

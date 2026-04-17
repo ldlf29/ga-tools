@@ -749,7 +749,6 @@
 :global(html.modal-open),
 :global(body.modal-open) {
   overflow: hidden !important;
-  height: 100vh !important;
   scrollbar-width: none;
   /* Firefox */
   -ms-overflow-style: none;
@@ -3115,4 +3114,11 @@
   margin-left: 1rem;
 }
 
-
+.droppedMoki {
+  border: 3px solid #ff4b4b !important;
+  opacity: 0.6;
+  box-shadow: 0 0 15px rgba(255, 75, 75, 0.4);
+}
+.droppedMoki img {
+  filter: grayscale(80%);
+}

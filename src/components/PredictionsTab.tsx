@@ -14,6 +14,9 @@ import {
   UpcomingMatchData,
   CatalogEntry,
   getRarityMultiplier,
+  isOneOfEachContest,
+  parseGameModes,
+  GameModes
 } from '@/utils/lineupGenerator';
 import { EnhancedCard } from '@/types';
 import { isSchemeTrait } from '@/data/traitMapping';
@@ -108,6 +111,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [avoidMatchupConflicts, setAvoidMatchupConflicts] = useState(false);
   const [useOnlyMySchemes, setUseOnlyMySchemes] = useState(false);
   const [cardSource, setCardSource] = useState<'ALL' | 'MY'>('ALL');
+  const [generatedLineups, setGeneratedLineups] = useState<GeneratedLineup[]>([]);
+  const [showResultsModal, setShowResultsModal] = useState(false);
   const [hideFull, setHideFull] = useState(false);
   const [useLocalTime, setUseLocalTime] = useState(false);
   const [openFilter, setOpenFilter] = useState<string | null>(null);
@@ -130,8 +135,6 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
 
   useEffect(() => {
     if (isExpandedRankingOpen) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setIsExpandedRankingOpen(false);
@@ -139,13 +142,8 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       };
       window.addEventListener('keydown', handleEscape);
       return () => {
-        document.body.style.overflow = 'unset';
-        document.documentElement.style.overflow = 'unset';
         window.removeEventListener('keydown', handleEscape);
       };
-    } else {
-      document.body.style.overflow = 'unset';
-      document.documentElement.style.overflow = 'unset';
     }
   }, [isExpandedRankingOpen]);
 
@@ -354,20 +352,37 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     };
   }, [selectedContest]);
 
-  // Block body scroll when modal is open
+  // Block body scroll when any modal or expanded view is open
   useEffect(() => {
-    if (selectedContest) {
+    const shouldLock = !!(
+      selectedContest || 
+      showResultsModal || 
+      isExpandedRankingOpen || 
+      zoomedImage || 
+      isExcludeClassesModalOpen || 
+      isSchemeSelectModalOpen || 
+      isSchemeMenuOpen || 
+      mobileRankingOpen
+    );
+
+    if (shouldLock) {
       document.body.classList.add('modal-open');
-      document.documentElement.classList.add('modal-open');
     } else {
       document.body.classList.remove('modal-open');
-      document.documentElement.classList.remove('modal-open');
     }
     return () => {
       document.body.classList.remove('modal-open');
-      document.documentElement.classList.remove('modal-open');
     };
-  }, [selectedContest]);
+  }, [
+    selectedContest, 
+    showResultsModal, 
+    isExpandedRankingOpen, 
+    zoomedImage, 
+    isExcludeClassesModalOpen, 
+    isSchemeSelectModalOpen, 
+    isSchemeMenuOpen,
+    mobileRankingOpen
+  ]);
 
   // Helper: check if a trait string from CSV contains any of the target trait substrings
   const hasTrait = (traitsStr: string, targets: string[]) => {
@@ -687,14 +702,29 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   )), [deferredModalSortedRanking]);
 
   const handleCardClick = (contest: Contest) => {
+    const modes = parseGameModes(contest);
+    
+    // 1. Initialize Excluded Classes based on Mode
+    let initialExclusions: string[] = [];
+    if (modes.medianCap) {
+      initialExclusions = ['STRIKER', 'BRUISER'];
+    }
+    setExcludedClasses(initialExclusions);
+
+    // 2. Reset Scheme Selection
+    setSelectedGenerateScheme('ALL');
+
+    // 3. Reset Repeated Lineup settings
+    setAllowRepeated(false);
+    setMaxRepeated(1);
+
+    // 4. Set Contest and Entry Count
     setSelectedContest(contest);
     setLineupCount(contest.maxEntriesPerUser);
   };
 
   const [upcomingMatchesCache, setUpcomingMatchesCache] = useState<UpcomingMatchData[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedLineups, setGeneratedLineups] = useState<GeneratedLineup[]>([]);
-  const [showResultsModal, setShowResultsModal] = useState(false);
 
   const handleGenerate = async () => {
     if (!selectedContest || rankingData.length === 0) return;
@@ -812,23 +842,14 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       } else if (type === 'up to rare') {
         if (!champions.every(s => s.minRarity === 'basic' && s.maxRarity === 'rare')) return false;
       } else if (type === 'one-of-each') {
-        // Must have "one of each" in name
-        if (!contestName.includes('one of each')) return false;
-        // Must have exactly 4 champions
-        if (champions.length !== 4) return false;
-        // Must have exactly one of each rarity
-        const has = (r: string) => champions.some(s => s.minRarity.toLowerCase() === r && s.maxRarity.toLowerCase() === r);
-        const isOneOfEach = has('basic') && has('rare') && has('epic') && has('legendary');
-        if (!isOneOfEach) return false;
+        if (!isOneOfEachContest(contest)) return false;
       } else if (type === 'mix') {
         const championsConfigs = champions.map(s => `${s.minRarity}-${s.maxRarity}`);
         const uniqueConfigs = new Set(championsConfigs);
         if (uniqueConfigs.size < 2) return false;
 
         // Exclude One-Of-Each from Mix
-        const has = (r: string) => champions.some(s => s.minRarity.toLowerCase() === r && s.maxRarity.toLowerCase() === r);
-        const isOneOfEach = champions.length === 4 && has('basic') && has('rare') && has('epic') && has('legendary');
-        if (isOneOfEach && contestName.includes('one of each')) return false;
+        if (isOneOfEachContest(contest)) return false;
       }
     }
     if (filters.mode !== 'All') {
@@ -840,6 +861,9 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       } else if (targetMode === 'class coverage') {
         // Class Coverage matches both "Class Coverage" and "Class Diversity"
         if (!contestName.includes('class coverage') && !contestName.includes('class diversity')) return false;
+      } else if (targetMode === 'no scheme') {
+        const hasSchemeSlot = contest.lineupConfig.slots.some(s => s.cardType === 'scheme');
+        if (hasSchemeSlot && !contestName.includes('no scheme')) return false;
       } else {
         if (!contestName.includes(targetMode)) return false;
       }
@@ -1065,12 +1089,14 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                         {excludedClasses.length > 0 ? `${excludedClasses.length} SELECTED` : 'NONE'}
                       </button>
                     </div>
-                    <div className={styles.modalRow} style={{ marginBottom: '8px' }}>
-                      <span className={styles.rowLabel}>SELECT SCHEME</span>
-                      <button className={styles.filterBtnSmall} onClick={() => setIsSchemeSelectModalOpen(true)}>
-                        {selectedGenerateScheme}
-                      </button>
-                    </div>
+                    {!isOneOfEachContest(selectedContest) && (
+                      <div className={styles.modalRow} style={{ marginBottom: '8px' }}>
+                        <span className={styles.rowLabel}>SELECT SCHEME</span>
+                        <button className={styles.filterBtnSmall} onClick={() => setIsSchemeSelectModalOpen(true)}>
+                          {selectedGenerateScheme}
+                        </button>
+                      </div>
+                    )}
 
                     <div className={styles.checkboxGroup}>
                       <div className={styles.checkboxWrapper} onClick={() => setAvoidMatchupConflicts(!avoidMatchupConflicts)}>
@@ -1354,9 +1380,9 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                             </div>
                             <div className={styles.lineupMokisGrid}>
                               {lineup.mokis.map((moki) => {
-                                const mokiEffective = moki.baseScore * getRarityMultiplier(moki.rarity);
+                                const mokiEffective = moki.modeBaseScore ?? (moki.baseScore * getRarityMultiplier(moki.rarity));
                                 return (
-                                  <div key={`${lineup.id}-${moki.name}`} className={styles.mokiSlotCard}>
+                                  <div key={`${lineup.id}-${moki.name}`} className={`${styles.mokiSlotCard} ${moki.dropped ? styles.droppedMoki : ''}`}>
                                     <div
                                       className={styles.mokiCardImgWrapper}
                                       onClick={() => moki.cardImage && setZoomedImage(moki.cardImage)}
@@ -1376,16 +1402,25 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                               })}
 
                               <div className={`${styles.mokiSlotCard} ${styles.schemeSlotCard}`}>
-                                <div
-                                  className={`${styles.mokiCardImgWrapper} ${!lineup.hasScheme ? styles.nonOwnedSchemeCard : ''}`}
-                                  onClick={() => schemeImage && setZoomedImage(schemeImage)}
-                                  style={{ cursor: schemeImage ? 'zoom-in' : 'default' }}
-                                >
-                                  <img src={schemeImage} alt="Scheme" className={styles.mokiCardImg} />
-                                </div>
+                                {(!lineup.schemeName || lineup.schemeName === 'No Scheme') ? (
+                                  <div
+                                    className={styles.mokiCardImgWrapper}
+                                    style={{ background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'default' }}
+                                  >
+                                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '14px', textAlign: 'center', padding: '0 10px' }}>NO SCHEME</span>
+                                  </div>
+                                ) : (
+                                  <div
+                                    className={`${styles.mokiCardImgWrapper} ${!lineup.hasScheme ? styles.nonOwnedSchemeCard : ''}`}
+                                    onClick={() => schemeImage && setZoomedImage(schemeImage)}
+                                    style={{ cursor: schemeImage ? 'zoom-in' : 'default' }}
+                                  >
+                                    <img src={schemeImage} alt="Scheme" className={styles.mokiCardImg} />
+                                  </div>
+                                )}
                                 <div className={styles.mokiCardScoreBadge}>
                                   <span className={styles.mokiCardScoreValue}>
-                                    {Math.round(lineup.totalEffectiveScore - lineup.mokis.reduce((s, m) => s + (m.baseScore * getRarityMultiplier(m.rarity)), 0)).toLocaleString()} PTS
+                                    {Math.round(lineup.totalEffectiveScore - lineup.totalBaseScore).toLocaleString()} PTS
                                   </span>
                                 </div>
                               </div>

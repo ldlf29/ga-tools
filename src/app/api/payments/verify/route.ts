@@ -56,22 +56,28 @@ async function getRonUsdPrice(): Promise<number> {
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
-  // 1. Authenticate via session cookie
-  let walletAddress: string;
+  // 1. Parse body first
+  const body = await req.json().catch(() => ({}));
+  const { txHash, plan, token, referralCode, walletAddress: bodyWallet } = body as { txHash: string; plan: string; token: 'RON' | 'USDC'; referralCode?: string; walletAddress?: string };
+
+  // 2. Try to get wallet from session, fallback to body
+  let sessionWallet: string | null = null;
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('ga_predictions_session')?.value;
-    if (!token) throw new Error('No session');
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    walletAddress = payload.wallet as string;
-    if (!walletAddress) throw new Error('No wallet in token');
+    const authToken = cookieStore.get('ga_predictions_session')?.value;
+    if (authToken) {
+      const { payload } = await jwtVerify(authToken, JWT_SECRET);
+      sessionWallet = payload.wallet as string;
+    }
   } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Session invalid or expired – we will fallback to the body wallet
   }
 
-  // 2. Parse body
-  const body = await req.json().catch(() => ({}));
-  const { txHash, plan, token, referralCode } = body as { txHash: string; plan: string; token: 'RON' | 'USDC'; referralCode?: string };
+  const walletAddress = sessionWallet || bodyWallet?.toLowerCase();
+
+  if (!walletAddress) {
+    return NextResponse.json({ error: 'Wallet address required (unauthorized)' }, { status: 401 });
+  }
 
   const VALID_REFERRALS = ['LUNA', 'WIL', 'ZEKI', 'KENSHI', 'ANTOO'];
   const finalizedReferral = (referralCode && VALID_REFERRALS.includes(referralCode.toUpperCase())) 
@@ -197,7 +203,7 @@ export async function POST(req: Request) {
 
   const { error: dbError } = await supabaseAdmin.from('predictions_subscriptions').insert({
     wallet_address: walletAddress,
-    plan_type: plan,
+    plan_type: plan === 'DAILY' ? '3-DAYS' : plan,
     token_used: token,
     tx_hash: txHash,
     amount_paid: amountPaid,

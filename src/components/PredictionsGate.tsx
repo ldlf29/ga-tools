@@ -292,7 +292,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       const res = await fetch('/api/payments/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ txHash, plan: selectedPlan, token: selectedToken, referralCode: appliedReferral }),
+        body: JSON.stringify({ txHash, plan: selectedPlan, token: selectedToken, referralCode: appliedReferral, walletAddress: address }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed');
