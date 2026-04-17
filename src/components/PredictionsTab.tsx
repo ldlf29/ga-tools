@@ -125,7 +125,15 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [modalSortDirection, setModalSortDirection] = useState<'asc' | 'desc'>('desc');
   const [modalSearchQuery, setModalSearchQuery] = useState('');
 
-  
+  const handleModalSort = (key: string) => {
+    if (modalSortKey === key) {
+      setModalSortDirection(modalSortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setModalSortKey(key);
+      setModalSortDirection('desc');
+    }
+  };
+
   const [selectedMokiUpcoming, setSelectedMokiUpcoming] = useState<MokiRanking | null>(null);
   const [upcomingMatches, setUpcomingMatches] = useState<UpcomingMatchData[]>([]);
   const [isUpcomingLoading, setIsUpcomingLoading] = useState(false);

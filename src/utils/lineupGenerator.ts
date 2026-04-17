@@ -321,7 +321,7 @@ function getSchemeBonus(moki: MokiCandidate, scoreType: ScoreType, modes?: GameM
   switch (scoreType) {
     case 'wart': return moki.wartCloser * 175;
     case 'dive': return moki.losses * 175;
-    case 'gacha': return (moki.deposits * 25); // Deposits bonus instead of gachaPts
+    case 'gacha': return 0; // Handled directly in base score
     case 'one-of-each': return 1450;
     default:
       return modes?.classCoverage ? 1000 + 100 : 1000; // Trait bonus + Class Coverage bonus
@@ -331,8 +331,9 @@ function getSchemeBonus(moki: MokiCandidate, scoreType: ScoreType, modes?: GameM
 function calcMokiBaseScore(moki: MokiCandidate, scoreType: ScoreType, modes?: GameModes): number {
   let base = calculateMokiBaseForMode(moki, modes);
   if (scoreType === 'gacha') {
-    const winBonus = modes?.noWinBonus ? 0 : ((moki.winRate / 100) * 200);
-    base = moki.deposits * 50 + winBonus;
+    const wins = moki.winRate / 10;
+    const winBonus = modes?.noWinBonus ? 0 : (wins * 200);
+    base = (moki.deposits * 75) + winBonus;
   }
   return base * getRarityMultiplier(moki.rarity);
 }
@@ -340,8 +341,9 @@ function calcMokiBaseScore(moki: MokiCandidate, scoreType: ScoreType, modes?: Ga
 function calcValidationScore(moki: MokiCandidate, scoreType: ScoreType, modes?: GameModes): number {
   const base = calculateMokiBaseForMode(moki, modes);
   if (scoreType === 'gacha') {
-    const winBonus = modes?.noWinBonus ? 0 : ((moki.winRate / 100) * 200);
-    return (moki.deposits * 50 + winBonus) + getSchemeBonus(moki, scoreType, modes);
+    const wins = moki.winRate / 10;
+    const winBonus = modes?.noWinBonus ? 0 : (wins * 200);
+    return (moki.deposits * 75) + winBonus;
   }
   return base + getSchemeBonus(moki, scoreType, modes);
 }
