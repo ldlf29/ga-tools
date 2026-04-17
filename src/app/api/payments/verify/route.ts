@@ -176,6 +176,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Amount validation failed', detail: err?.message }, { status: 400 });
   }
 
+  // 6.5. Upsert user to ensure foreign key constraint is met
+  await supabaseAdmin.from('predictions_users').upsert(
+    { wallet_address: walletAddress, waypoint_sub: `siwe-${walletAddress}`, last_login_at: new Date().toISOString() },
+    { onConflict: 'wallet_address' }
+  );
+
   // 7. Grant subscription – stack duration on top of existing active subscription
   // If the user has an active plan, start counting from where it ends (not from now)
   const { data: currentSub } = await supabaseAdmin
@@ -203,7 +209,7 @@ export async function POST(req: Request) {
 
   const { error: dbError } = await supabaseAdmin.from('predictions_subscriptions').insert({
     wallet_address: walletAddress,
-    plan_type: plan === 'DAILY' ? '3-DAYS' : plan,
+    plan_type: plan,
     token_used: token,
     tx_hash: txHash,
     amount_paid: amountPaid,
@@ -214,8 +220,15 @@ export async function POST(req: Request) {
   });
 
   if (dbError) {
-    console.error('[PaymentVerify] DB error:', dbError.message);
-    return NextResponse.json({ error: 'Failed to record subscription' }, { status: 500 });
+    if (dbError.code === '23505') {
+      // 23505 is Postgres unique_violation error code.
+      // This means a concurrent request already successfully processed this transaction.
+      console.log(`[PaymentVerify] Tx ${txHash} already recorded via concurrent request.`);
+      return NextResponse.json({ success: true, expiresAt, plan });
+    }
+    console.error('[PaymentVerify] DB error:', dbError);
+    // Explicitly return dbError to frontend for precise debugging
+    return NextResponse.json({ error: `DB Error: ${dbError.message || dbError.code}` }, { status: 500 });
   }
 
   // 8. Record Referral Commission if applicable

@@ -21,7 +21,7 @@ interface PriceData { ronUsdRate: number; plans: Record<Plan, PlanInfo>; discoun
 const PLAN_LABELS: Record<Plan, { title: string; duration: string; badge?: string }> = {
   DAILY: { title: '3-DAYS', duration: '72 hours' },
   WEEKLY: { title: 'WEEKLY', duration: '7 days', badge: 'POPULAR' },
-  SEASON: { title: 'SEASON', duration: '6 WEEKS', badge: 'BEST VALUE' },
+  SEASON: { title: 'SEASON', duration: '5 WEEKS', badge: 'BEST VALUE' },
 };
 const PLAN_USD: Record<Plan, number> = { DAILY: 3, WEEKLY: 5, SEASON: 25 };
 
@@ -69,9 +69,9 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
   // Track if we came to the payment screen via the EXTEND button
   const [isExtending, setIsExtending] = useState(false);
 
-  const { isSuccess: txConfirmed } = useWaitForTransactionReceipt({ hash: pendingTxHash });
+  const { isSuccess: txConfirmed, isError: txError } = useWaitForTransactionReceipt({ hash: pendingTxHash });
 
-  // On mount: check existing paid session
+  // On mount: check existing paid session and recover any pending transactions
   useEffect(() => {
     fetch('/api/auth/session')
       .then(r => r.json())
@@ -83,18 +83,47 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
           if (d.walletAddress) setSessionWallet(d.walletAddress);
           if (d.planType) setCurrentPlan(d.planType);
           setGateState('active');
+          // If they have access, clear any stale pending tx
+          localStorage.removeItem('ga_pending_tx');
         } else if (d.isSigned && d.walletAddress) {
           // Valid JWT but no subscription → already signed, go to payment
-          // No need to request SIWE again
           setSiweCompleted(true);
           setSessionWallet(d.walletAddress);
-          setGateState('no-access');
+          
+          // RECOVERY LOGIC
+          const savedTx = localStorage.getItem('ga_pending_tx');
+          if (savedTx) {
+            setPendingTxHash(savedTx as `0x${string}`);
+            const savedPlan = localStorage.getItem('ga_pending_plan') as Plan;
+            const savedToken = localStorage.getItem('ga_pending_token') as Token;
+            const savedRef = localStorage.getItem('ga_pending_ref');
+            if (savedPlan) setSelectedPlan(savedPlan);
+            if (savedToken) setSelectedToken(savedToken);
+            if (savedRef) setAppliedReferral(savedRef);
+            setGateState('verifying');
+            setStatusMsg('Recovering pending payment…');
+          } else {
+            setGateState('no-access');
+          }
         } else {
           setGateState('unauthenticated');
         }
       })
       .catch(() => setGateState('unauthenticated'));
   }, []);
+
+  // Handle blockchain transaction failure/drop
+  useEffect(() => {
+    if (txError) {
+      localStorage.removeItem('ga_pending_tx');
+      localStorage.removeItem('ga_pending_plan');
+      localStorage.removeItem('ga_pending_token');
+      localStorage.removeItem('ga_pending_ref');
+      setPendingTxHash(undefined);
+      setGateState('no-access');
+      setError('Transaction failed on the network. Please try again.');
+    }
+  }, [txError]);
 
   // Track when user actively initiated a wallet connection (went through 'connecting' state)
   useEffect(() => {
@@ -142,6 +171,22 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
         setGateState(reconnectData.hasAccess ? 'active' : 'no-access');
         setStatusMsg('');
         authInProgress.current = false;
+        
+        // Recover pending tx if any
+        if (!reconnectData.hasAccess) {
+          const savedTx = localStorage.getItem('ga_pending_tx');
+          if (savedTx) {
+            setPendingTxHash(savedTx as `0x${string}`);
+            const savedPlan = localStorage.getItem('ga_pending_plan') as Plan;
+            const savedToken = localStorage.getItem('ga_pending_token') as Token;
+            const savedRef = localStorage.getItem('ga_pending_ref');
+            if (savedPlan) setSelectedPlan(savedPlan);
+            if (savedToken) setSelectedToken(savedToken);
+            if (savedRef) setAppliedReferral(savedRef);
+            setGateState('verifying');
+            setStatusMsg('Recovering pending payment…');
+          }
+        }
         return;
       }
 
@@ -276,6 +321,17 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       setGateState('verifying');
       setStatusMsg('Waiting for confirmation…');
       setPendingTxHash(txHash);
+
+      // Save to localStorage for recovery if page is refreshed
+      localStorage.setItem('ga_pending_tx', txHash);
+      localStorage.setItem('ga_pending_plan', selectedPlan);
+      localStorage.setItem('ga_pending_token', selectedToken);
+      if (appliedReferral) {
+        localStorage.setItem('ga_pending_ref', appliedReferral);
+      } else {
+        localStorage.removeItem('ga_pending_ref');
+      }
+
     } catch (err: unknown) {
       const raw = err instanceof Error ? err.message : '';
       // Detect user rejection (viem surfaces this as a verbose message)
@@ -284,9 +340,13 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       setGateState('no-access');
       setStatusMsg('');
     }
-  }, [priceData, address, selectedPlan, selectedToken, sendTransactionAsync, writeContractAsync]);
+  }, [priceData, address, selectedPlan, selectedToken, appliedReferral, sendTransactionAsync, writeContractAsync]);
+
+  const isVerifying = React.useRef(false);
 
   const verifyPayment = useCallback(async (txHash: string) => {
+    if (isVerifying.current) return;
+    isVerifying.current = true;
     setStatusMsg('Verifying payment on-chain…');
     try {
       const res = await fetch('/api/payments/verify', {
@@ -296,6 +356,13 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed');
+      
+      // Cleanup localStorage on success
+      localStorage.removeItem('ga_pending_tx');
+      localStorage.removeItem('ga_pending_plan');
+      localStorage.removeItem('ga_pending_token');
+      localStorage.removeItem('ga_pending_ref');
+      
       setExpiresAt(data.expiresAt);
       if (data.plan) setCurrentPlan(data.plan);
       setIsTestMode(false);
@@ -309,9 +376,18 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
       setError(isRejected ? 'Payment cancelled.' : (raw || 'Verification failed. Please try again.'));
       setGateState('no-access');
       setStatusMsg('');
-      setPendingTxHash(undefined);
+      
+      // We don't remove from localStorage here unless we know it's a hard rejection/failure,
+      // so that they can refresh and try again. 
+      // But if it's user rejected, we clear it.
+      if (isRejected) {
+        localStorage.removeItem('ga_pending_tx');
+        setPendingTxHash(undefined);
+      }
+    } finally {
+      isVerifying.current = false;
     }
-  }, [selectedPlan, selectedToken, appliedReferral]);
+  }, [selectedPlan, selectedToken, appliedReferral, address]);
 
   // Inject isTestMode into children (→ PredictionsTab) via cloneElement
   const childrenWithProps = React.Children.map(children, child =>
@@ -398,6 +474,15 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
         <div className={styles.spinner} />
         <p className={styles.statusMsg}>{statusMsg}</p>
         <p className={styles.statusSubMsg}>Do not close this window</p>
+        {gateState === 'verifying' && pendingTxHash && (
+          <button 
+            className={styles.backBtn} 
+            style={{ marginTop: '20px', backgroundColor: 'transparent', color: '#888', border: '1px solid #555', padding: '8px 16px', borderRadius: '4px' }}
+            onClick={() => verifyPayment(pendingTxHash)}
+          >
+            Click here if taking too long
+          </button>
+        )}
       </div>
     );
   }
@@ -534,6 +619,20 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
           <p className={styles.disclaimer}>
             Payment sent to {PAYMENT_RECIPIENT.slice(0, 6)}…{PAYMENT_RECIPIENT.slice(-4)} on Ronin Network
           </p>
+          
+          {/* Recovery button if the user previously paid but it didn't verify */}
+          {pendingTxHash && (
+            <button 
+              className={styles.testModeBtn} 
+              style={{ marginTop: '15px' }}
+              onClick={() => {
+                setGateState('verifying');
+                verifyPayment(pendingTxHash);
+              }}
+            >
+              Verify Pending Transaction
+            </button>
+          )}
         </div>
       </div>
     );

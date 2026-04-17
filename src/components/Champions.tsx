@@ -48,6 +48,7 @@ export default function Champions({
   // Upcoming matches data
   const [matches, setMatches] = useState<UpcomingMatchData[]>([]);
   const [mokiStats, setMokiStats] = useState<any[]>([]);
+  const [mokiAverages, setMokiAverages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Modal state
@@ -105,8 +106,12 @@ export default function Champions({
       // Load moki_stats for real-time class verification
       const { data: statsData } = await supabase
         .from('moki_stats')
-        .select('moki_id, name, class');
+        .select('moki_id, name, class, eliminations, deposits, wart_distance, score, win_rate');
       if (statsData) setMokiStats(statsData);
+
+      // Load averages (10/20 matches)
+      const { data: avgData } = await supabase.rpc('get_moki_match_averages');
+      if (avgData) setMokiAverages(avgData);
 
       if (cachedMatchesData.length > 0) {
         setMatches(cachedMatchesData);
@@ -244,30 +249,89 @@ export default function Champions({
     });
 
     const list = Array.from(map.values()).map((champ) => {
-      const fullCard = allCards.find((c) => c.name.trim().toUpperCase() === champ.name.trim().toUpperCase());
-      const normalizedName = champ.name.trim().toUpperCase();
-      let metadata = (mokiMetadata as any)[normalizedName];
+      // Robust Name Matching (Insensitive to underscores/spaces)
+      const normalizeName = (name: string) => name?.trim().toUpperCase().replace(/_/g, ' ');
+      const normalizedName = normalizeName(champ.name);
 
+      // Find Catalog Card (Optional fallback for base stats)
+      const fullCard = allCards.find((c) => normalizeName(c.name) === normalizedName);
+      
+      let metadata = (mokiMetadata as any)[normalizedName];
       if (!metadata && normalizedName.includes(' ')) {
         const withUnderscores = normalizedName.replace(/ /g, '_');
         metadata = (mokiMetadata as any)[withUnderscores];
       }
 
-      // Real-time class override from moki_stats
-      const dbStat = mokiStats.find(s => s.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || s.name.toUpperCase() === normalizedName);
+      // Real-time class and performances from Supabase (Primary Source)
+      const dbStat = mokiStats.find(s => 
+        s.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || 
+        normalizeName(s.name) === normalizedName
+      );
+      
+      const dbAvg = mokiAverages.find(a => 
+        a.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || 
+        normalizeName(a.moki_name) === normalizedName
+      );
+
       const currentClass = dbStat?.class || fullCard?.custom?.class || champ.class;
+
+      // Create a localized card with Supabase overrides for real-time accuracy
+      let mergedCard = fullCard || { id: metadata?.id || champ.id, name: champ.name, custom: {} } as any;
+      if (!mergedCard.custom) mergedCard.custom = {};
+      
+      const mappedCustom = { ...mergedCard.custom };
+
+      // Global Stats Override
+      if (dbStat) {
+        mappedCustom.eliminations = dbStat.eliminations ?? mappedCustom.eliminations;
+        mappedCustom.deposits = dbStat.deposits ?? mappedCustom.deposits;
+        mappedCustom.wartDistance = dbStat.wart_distance ?? mappedCustom.wartDistance;
+        mappedCustom.score = dbStat.score ?? mappedCustom.score;
+        mappedCustom.winRate = dbStat.win_rate ?? mappedCustom.winRate;
+      }
+
+      // Averages Overrides (L10/L20)
+      if (dbAvg) {
+        // L10
+        mappedCustom.avgWinRate10 = dbAvg.avg_win_rate_10 ?? mappedCustom.avgWinRate10;
+        mappedCustom.avgScore10 = dbAvg.avg_score_10 ?? mappedCustom.avgScore10;
+        mappedCustom.avgEliminations10 = dbAvg.avg_eliminations_10 ?? mappedCustom.avgEliminations10;
+        mappedCustom.avgDeposits10 = dbAvg.avg_deposits_10 ?? mappedCustom.avgDeposits10;
+        mappedCustom.avgWartDistance10 = dbAvg.avg_wart_distance_10 ?? mappedCustom.avgWartDistance10;
+        mappedCustom.avgDeaths10 = dbAvg.avg_deaths_10 ?? mappedCustom.avgDeaths10;
+        mappedCustom.avgBuffTime10 = dbAvg.avg_buff_time_10 ?? mappedCustom.avgBuffTime10;
+        mappedCustom.avgWartTime10 = dbAvg.avg_wart_time_10 ?? mappedCustom.avgWartTime10;
+        mappedCustom.avgLooseBallPickups10 = dbAvg.avg_loose_ball_pickups_10 ?? mappedCustom.avgLooseBallPickups10;
+        mappedCustom.avgEatenByWart10 = dbAvg.avg_eaten_by_wart_10 ?? mappedCustom.avgEatenByWart10;
+        mappedCustom.avgWartCloser10 = dbAvg.avg_wart_closer_10 ?? mappedCustom.avgWartCloser10;
+
+        // L20
+        mappedCustom.avgWinRate20 = dbAvg.avg_win_rate_20 ?? mappedCustom.avgWinRate20;
+        mappedCustom.avgScore20 = dbAvg.avg_score_20 ?? mappedCustom.avgScore20;
+        mappedCustom.avgEliminations20 = dbAvg.avg_eliminations_20 ?? mappedCustom.avgEliminations20;
+        mappedCustom.avgDeposits20 = dbAvg.avg_deposits_20 ?? mappedCustom.avgDeposits20;
+        mappedCustom.avgWartDistance20 = dbAvg.avg_wart_distance_20 ?? mappedCustom.avgWartDistance20;
+        mappedCustom.avgDeaths20 = dbAvg.avg_deaths_20 ?? mappedCustom.avgDeaths20;
+        mappedCustom.avgBuffTime20 = dbAvg.avg_buff_time_20 ?? mappedCustom.avgBuffTime20;
+        mappedCustom.avgWartTime20 = dbAvg.avg_wart_time_20 ?? mappedCustom.avgWartTime20;
+        mappedCustom.avgLooseBallPickups20 = dbAvg.avg_loose_ball_pickups_20 ?? mappedCustom.avgLooseBallPickups20;
+        mappedCustom.avgEatenByWart20 = dbAvg.avg_eaten_by_wart_20 ?? mappedCustom.avgEatenByWart20;
+        mappedCustom.avgWartCloser20 = dbAvg.avg_wart_closer_20 ?? mappedCustom.avgWartCloser20;
+      }
+
+      mergedCard = { ...mergedCard, custom: mappedCustom };
 
       return {
         ...champ,
-        id: metadata?.id ?? fullCard?.id ?? champ.id,
+        id: metadata?.id ?? mergedCard?.id ?? champ.id,
         tokenId: metadata?.id ? parseInt(metadata.id, 10) : null,
         class: currentClass,
-        score: fullCard ? getStatValueByLimit(fullCard, 'score', filters.matchLimit) : 0,
-        globalScore: fullCard ? getStatValueByLimit(fullCard, 'score', 'ALL') : 0,
-        imageUrl: metadata?.portraitUrl || fullCard?.custom?.imageUrl || champ.imageUrl,
+        score: mergedCard ? getStatValueByLimit(mergedCard, 'score', filters.matchLimit) : 0,
+        globalScore: mergedCard ? getStatValueByLimit(mergedCard, 'score', 'ALL') : 0,
+        imageUrl: metadata?.portraitUrl || mergedCard?.custom?.imageUrl || champ.imageUrl,
         marketLink: metadata?.marketLink || null,
-        fur: fullCard?.custom?.fur || metadata?.fur || null,
-        fullCard,
+        fur: mergedCard?.custom?.fur || metadata?.fur || null,
+        fullCard: mergedCard,
       };
     });
 
@@ -276,20 +340,25 @@ export default function Champions({
     const rankMap = new Map();
     defaultSorted.forEach((c, i) => rankMap.set(c.name, i + 1));
 
-    return list.sort((a, b) => {
-      const fA = a.fullCard;
-      const fB = b.fullCard;
-      if (filters.extraSort && fA && fB) {
-        const valA = getStatValueByLimit(fA, filters.extraSort, filters.matchLimit);
-        const valB = getStatValueByLimit(fB, filters.extraSort, filters.matchLimit);
+    // Secondary sort: if scores are equal, sort by name to avoid "random" look
+    const sortedList = [...list].sort((a, b) => {
+      if (filters.extraSort) {
+        const valA = getStatValueByLimit(a.fullCard, filters.extraSort, filters.matchLimit);
+        const valB = getStatValueByLimit(b.fullCard, filters.extraSort, filters.matchLimit);
         if (valB !== valA) return valB - valA;
       }
-      return (b.score || 0) - (a.score || 0);
+      
+      const scoreA = a.score || 0;
+      const scoreB = b.score || 0;
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      return a.name.localeCompare(b.name);
     }).map(champ => ({
       ...champ,
       rank: rankMap.get(champ.name)
     }));
-  }, [matches, allCards, filters.extraSort, filters.matchLimit, mokiStats]);
+
+    return sortedList;
+  }, [matches, allCards, filters.extraSort, filters.matchLimit, mokiStats, mokiAverages]);
 
   // ─── Filtered champions ───────────────────────────────────────────────────
   const filteredChampions = useMemo(() => {
@@ -297,9 +366,9 @@ export default function Champions({
       if (searchQuery.trim()) {
         if (!champ.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       }
-      const fullCard = allCards.find((c) => c.name.trim().toUpperCase() === champ.name.trim().toUpperCase());
-      if (fullCard) {
-        if (!matchesFilter(fullCard, filters)) return false;
+      // Use the newly constructed fullCard from uniqueChampions for filtering
+      if (champ.fullCard) {
+        if (!matchesFilter(champ.fullCard, filters)) return false;
       }
       return true;
     });
@@ -316,7 +385,7 @@ export default function Champions({
         case 'total': return custom.totalStats || 0;
         case 'train': return custom.train || 0;
         case 'win_rate':
-          if (filters.matchLimit && filters.matchLimit !== 'ALL' && champ.fullCard) {
+          if (filters.matchLimit && filters.matchLimit !== 'ALL') {
             return getStatValueByLimit(champ.fullCard, 'winRate', filters.matchLimit);
           }
           return custom.winRate || 0;
@@ -377,7 +446,8 @@ export default function Champions({
       sorted.sort((a, b) => {
         const valA = getStatValueByLimit(a.fullCard, filters.extraSort as string, filters.matchLimit as any);
         const valB = getStatValueByLimit(b.fullCard, filters.extraSort as string, filters.matchLimit as any);
-        return valB - valA;
+        if (valB !== valA) return valB - valA;
+        return a.name.localeCompare(b.name);
       });
     }
     // Priority 2: Manual dropdown sorting (name, total, spd, etc.) - Only if no sidebar sort is active or if it was cleared
@@ -392,7 +462,8 @@ export default function Champions({
       sorted.sort((a, b) => {
         const valA = getStatValueByLimit(a.fullCard, filters.extraSort as string, filters.matchLimit as any);
         const valB = getStatValueByLimit(b.fullCard, filters.extraSort as string, filters.matchLimit as any);
-        return valB - valA;
+        if (valB !== valA) return valB - valA;
+        return a.name.localeCompare(b.name);
       });
     }
     else if (filters.specialization && filters.specialization.length > 0) {
@@ -434,7 +505,12 @@ export default function Champions({
         return b.score - a.score;
       });
     } else {
-      sorted.sort((a, b) => b.score - a.score);
+      sorted.sort((a, b) => {
+        const scoreB = b.score || 0;
+        const scoreA = a.score || 0;
+        if (scoreB !== scoreA) return scoreB - scoreA;
+        return a.name.localeCompare(b.name);
+      });
     }
 
     return sorted;

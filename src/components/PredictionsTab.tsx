@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import useSWR from 'swr';
@@ -124,15 +124,50 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const [modalSortKey, setModalSortKey] = useState<string | null>(null);
   const [modalSortDirection, setModalSortDirection] = useState<'asc' | 'desc'>('desc');
   const [modalSearchQuery, setModalSearchQuery] = useState('');
-  const handleModalSort = (key: string) => {
-    if (modalSortKey === key) {
-      setModalSortDirection(prev => prev === 'desc' ? 'asc' : 'desc');
-    } else {
-      setModalSortKey(key);
-      setModalSortDirection('desc');
-    }
+
+  
+  const [selectedMokiUpcoming, setSelectedMokiUpcoming] = useState<MokiRanking | null>(null);
+  const [upcomingMatches, setUpcomingMatches] = useState<UpcomingMatchData[]>([]);
+  const [isUpcomingLoading, setIsUpcomingLoading] = useState(false);
+
+  const handleMokiClick = (moki: MokiRanking) => {
+    setSelectedMokiUpcoming(moki);
   };
 
+  // Unified effect for body scroll locking when any modal is open
+  useEffect(() => {
+    const anyModalOpen = 
+      !!isExpandedRankingOpen || 
+      !!selectedContest || 
+      !!showResultsModal || 
+      !!isExcludeClassesModalOpen || 
+      !!isSchemeSelectModalOpen || 
+      !!isSchemeMenuOpen ||
+      !!selectedMokiUpcoming;
+
+    if (anyModalOpen) {
+      document.body.classList.add('modal-open');
+      document.documentElement.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+      document.documentElement.classList.remove('modal-open');
+    }
+
+    return () => {
+      document.body.classList.remove('modal-open');
+      document.documentElement.classList.remove('modal-open');
+    };
+  }, [
+    isExpandedRankingOpen, 
+    selectedContest, 
+    showResultsModal, 
+    isExcludeClassesModalOpen, 
+    isSchemeSelectModalOpen, 
+    isSchemeMenuOpen,
+    selectedMokiUpcoming
+  ]);
+
+  // ESC key handler for the expanded ranking modal
   useEffect(() => {
     if (isExpandedRankingOpen) {
       const handleEscape = (e: KeyboardEvent) => {
@@ -147,8 +182,35 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     }
   }, [isExpandedRankingOpen]);
 
+  // Fetch all upcoming matches on mount for the Moki modal
+  useEffect(() => {
+    async function fetchAllUpcoming() {
+      setIsUpcomingLoading(true);
+      const { data } = await supabase.from('upcoming_matches_ga').select('*').limit(2000);
+      if (data) setUpcomingMatches(data as UpcomingMatchData[]);
+      setIsUpcomingLoading(false);
+    }
+    fetchAllUpcoming();
+  }, []);
+
   const [modalFilters, setModalFilters] = useState({ class: 'ALL', fur: 'ALL', trait: 'ALL', strategicScheme: 'ALL' });
   const [openModalDropdown, setOpenModalDropdown] = useState<string | null>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!openModalDropdown) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Check if click is outside of any element with modalFilterDropdown class
+      if (!target.closest(`[class*="modalFilterDropdown"]`)) {
+        setOpenModalDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openModalDropdown]);
   const [filters, setFilters] = useState({
     distribution: 'All',
     price: 'All',
@@ -617,7 +679,13 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   const pcRows = React.useMemo(() => deferredModalSortedRanking.map((moki: any) => (
     <tr key={moki['Moki ID']}>
       <td><strong>#{moki._originalRank}</strong></td>
-      <td>{moki.Name}</td>
+      <td 
+        onClick={() => handleMokiClick(moki)} 
+        style={{ cursor: 'pointer', color: '#ffd753', fontWeight: '800', textDecoration: 'underline' }}
+        title="View Upcoming Matches"
+      >
+        {moki.Name}
+      </td>
       <td style={{ textTransform: 'uppercase' }}><strong>{moki.Class}</strong></td>
       <td style={{ color: '#ffd753', fontWeight: 'bold' }}>{moki._displayScore}</td>
       <td style={{ color: '#1abf9e', fontWeight: 'bold' }}>{moki.WinRate}%</td>
@@ -642,7 +710,13 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     <div key={moki['Moki ID']} className={styles.mobileRankCard}>
       <div className={styles.mobileRankHeader}>
         <span className={styles.mobileRankId}>#{moki._originalRank}</span>
-        <span className={styles.mobileRankName}>{moki.Name}</span>
+        <span 
+          className={styles.mobileRankName} 
+          onClick={() => handleMokiClick(moki)}
+          style={{ cursor: 'pointer', textDecoration: 'underline', color: '#ffd753' }}
+        >
+          {moki.Name}
+        </span>
         <span className={styles.mobileRankClass}>{moki.Class}</span>
       </div>
       <div className={styles.mobileMainStats}>
@@ -1026,6 +1100,11 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                   <button className={`${styles.metaSchemesBtn} ${activeSort === 'META' ? styles.activeMeta : ''}`} onClick={() => setIsSchemeMenuOpen(true)}>SCHEME</button>
                 </div>
               </div>
+              {selectedMetaScheme && (
+                <div className={styles.selectedSchemeIndicator}>
+                  {selectedMetaScheme} SELECTED
+                </div>
+              )}
               <div className={styles.rankingList}>
                 {rankingLoading ? (
                   <div className={styles.rankingStatus}>Loading ranking...</div>
@@ -1038,7 +1117,13 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                     const imageUrl = mMeta?.portraitUrl ?? '';
                     const globalRank = rankingPage * RANKING_PAGE_SIZE + i + 1;
                     return (
-                      <div key={`${moki['Moki ID']}-${moki.Name}-${globalRank}`} className={styles.rankingPlaceholder}>
+                      <div 
+                        key={`${moki['Moki ID']}-${moki.Name}-${globalRank}`} 
+                        className={styles.rankingPlaceholder}
+                        onClick={() => handleMokiClick(moki as any)}
+                        style={{ cursor: 'pointer' }}
+                        title="View Upcoming Matches"
+                      >
                         <span className={styles.rankNum}>#{globalRank}</span>
                         {imageUrl && <img src={imageUrl} alt={moki.Name} className={styles.rankMokiImage} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
                         <div className={styles.rankInfo}><span className={styles.rankName}>{moki.Name}</span><span className={styles.rankClass}>{moki.Class}</span></div>
@@ -1519,7 +1604,14 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                   </button>
                   <div className={styles.expandedHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
-                      <h2 className={styles.resultsTitle} style={{ margin: 0 }}>FULL RANKING DATA</h2>
+                      <div>
+                        <h2 className={styles.resultsTitle} style={{ margin: 0 }}>FULL RANKING DATA</h2>
+                        {(modalFilters.strategicScheme !== 'ALL' || modalFilters.trait !== 'ALL') && (
+                          <div className={styles.selectedSchemeIndicator}>
+                            {modalFilters.trait !== 'ALL' ? modalFilters.trait : modalFilters.strategicScheme} SELECTED
+                          </div>
+                        )}
+                      </div>
                       <div className={styles.modalSearchWrapper}>
                         <input
                           type="text"
@@ -1591,47 +1683,47 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                               </div>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Score')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Score' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Score')}>
                                 Score
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '80px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('WinRate')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'WinRate' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('WinRate')}>
                                 W/R
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '80px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Losses')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Losses' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Losses')}>
                                 Losses
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Deposits')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Deposits' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Deposits')}>
                                 Balls
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Wart Distance')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Wart Distance' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Wart Distance')}>
                                 Wart
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '100px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Kills')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Kills' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Kills')}>
                                 Elims
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '110px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Wart Closer')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Wart Closer' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Wart Closer')}>
                                 Wart Closer
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '80px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Deaths')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Deaths' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Deaths')}>
                                 Deaths
                               </button>
                             </th>
                             <th className={styles.filterHeaderCell} style={{ width: '120px' }}>
-                              <button className={styles.modalFilterBtn} onClick={() => handleModalSort('Win By Combat')}>
+                              <button className={`${styles.modalFilterBtn} ${modalSortKey === 'Win By Combat' ? styles.activeFilter : ''}`} onClick={() => handleModalSort('Win By Combat')}>
                                 Win By Combat
                               </button>
                             </th>
@@ -1667,7 +1759,18 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                                   </svg>
                                 </button>
                                 {openModalDropdown === 'trait' && (
-                                  <ul className={`${styles.modalFilterMenu} ${styles.rightMenu}`}>
+                                  <ul className={styles.modalFilterMenu} style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: '100%',
+                                    transform: 'translateX(-100%)',
+                                    marginTop: '8px',
+                                    zIndex: 1000,
+                                    width: 'max-content',
+                                    minWidth: '220px',
+                                    maxWidth: '350px',
+                                    display: 'block'
+                                  }}>
                                     {availTraits.map(t => (
                                       <li key={t} onClick={() => { setModalFilters(p => ({ ...p, trait: t })); setOpenModalDropdown(null); }}>{t}</li>
                                     ))}
@@ -1806,6 +1909,109 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                 </motion.div>
               </motion.div>
             )}
+          </AnimatePresence>,
+          document.body
+        )}
+        {mounted && selectedMokiUpcoming && createPortal(
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={styles.expandedRankingOverlay}
+              onClick={() => setSelectedMokiUpcoming(null)}
+              style={{ zIndex: 100000 }}
+            >
+              <motion.div
+                initial={{ y: 20, opacity: 0, scale: 0.95 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                exit={{ y: 20, opacity: 0, scale: 0.95 }}
+                className={styles.mokiUpcomingModal}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button className={styles.modalCloseButton} onClick={() => setSelectedMokiUpcoming(null)} style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 100 }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+                
+                <div className={styles.mokiModalHeader}>
+                  <h2 className={styles.mokiModalTitle}>UPCOMING MATCHES</h2>
+                  <span className={styles.mokiModalSubName}>{selectedMokiUpcoming.Name}</span>
+                </div>
+
+                <div className={styles.mokiModalContent}>
+                  {(() => {
+                    const champUpcoming = upcomingMatches.filter((m) =>
+                      m.team_red.some((p: any) => p.name.toUpperCase() === selectedMokiUpcoming.Name.toUpperCase()) ||
+                      m.team_blue.some((p: any) => p.name.toUpperCase() === selectedMokiUpcoming.Name.toUpperCase())
+                    );
+                    const nextMatchDate = champUpcoming[0]?.match_date;
+                    const formattedDate = nextMatchDate ? formatContestDate(nextMatchDate) : '';
+
+                    return (
+                      <div className={styles.upcomingContainer}>
+                        {formattedDate && (
+                          <p className={styles.upcomingDate}>Next block: {formattedDate}</p>
+                        )}
+                        <p className={styles.upcomingNote}>The data is updated 1 hour after the contests end.</p>
+                        
+                        {isUpcomingLoading ? (
+                          <div className={styles.loadingWrapper}>Loading matches...</div>
+                        ) : champUpcoming.length === 0 ? (
+                          <div className={styles.emptyResults}>No upcoming matches found for this champion.</div>
+                        ) : (
+                          <div className={styles.modalRows}>
+                            {champUpcoming.map((match) => {
+                              const isRedTeam = match.team_red.some((p: any) => p.name.toUpperCase() === selectedMokiUpcoming.Name.toUpperCase());
+                              const leftTeam = isRedTeam ? match.team_red : match.team_blue;
+                              const rightTeam = isRedTeam ? match.team_blue : match.team_red;
+                              const leftMokiClass = isRedTeam ? styles.redMoki : styles.blueMoki;
+                              const rightMokiClass = isRedTeam ? styles.blueMoki : styles.redMoki;
+                              const gridEdgeClass = isRedTeam ? styles.redOnLeft : styles.blueOnLeft;
+
+                              return (
+                                <div key={match.id} className={styles.modalMatchRow}>
+                                  <div className={`${styles.modalTeamsGrid} ${gridEdgeClass}`}>
+                                    <div className={styles.playersRow}>
+                                      {leftTeam.map((m: any, i: number) => {
+                                        const normalizedName = m.name.trim().toUpperCase();
+                                        const portrait = (mokiMetadata as any)[normalizedName]?.portraitUrl || m.imageUrl;
+                                        return (
+                                          <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
+                                            <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
+                                            <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${leftMokiClass}`} />
+                                            <span className={styles.miniMokiClassBadge}>{m.class}</span>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                    <div className={styles.modalVsBadge}>VS</div>
+                                    <div className={styles.playersRow}>
+                                      {rightTeam.map((m: any, i: number) => {
+                                        const normalizedName = m.name.trim().toUpperCase();
+                                        const portrait = (mokiMetadata as any)[normalizedName]?.portraitUrl || m.imageUrl;
+                                        return (
+                                          <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
+                                            <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
+                                            <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${rightMokiClass}`} />
+                                            <span className={styles.miniMokiClassBadge}>{m.class}</span>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </motion.div>
+            </motion.div>
           </AnimatePresence>,
           document.body
         )}
