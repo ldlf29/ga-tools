@@ -12,10 +12,30 @@ const nextConfig: NextConfig = {
       encoding: '',
     },
   },
-  // Webpack (production build) — same fix via externals
-  webpack: (config) => {
+  // Webpack configuration
+  webpack: (config, { isServer, dev }) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
+
+    // ─── STOP 100% CPU USAGE IN DEV ──────────────────────────────────────────
+    // Tell Next.js to ignore the ML and Supabase folders in the file watcher.
+    // This prevents constant recompilation when the Python optimizer writes data.
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: [
+          '**/ml/**',
+          '**/supabase/**',
+          '**/node_modules/**',
+          '**/.next/**',
+          '**/catboost_info/**',
+          '**/test_future_ranking/**',
+          '**/analytics/**'
+        ],
+      };
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     return config;
   },
   images: {

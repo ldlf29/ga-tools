@@ -85,3 +85,6 @@ ml/data/*.jsonl
 
 # Tests and temporary experiments
 /test_future_ranking/
+/catboost_info/
+
+ml_commands.txt

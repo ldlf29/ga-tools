@@ -1,8 +1,8 @@
 """
 Script 11 - Hyperparameter Optimization with Optuna
 ===================================================
-Optimizes CatBoost parameters for Score and WinRate models using Bayesian Search.
-Uses a time-based split for validation.
+Optimizes CatBoost parameters for Phase 1 (Auxiliary) and Phase 2 (Main) models
+using Bayesian Search. Uses a time-based split for validation.
 """
 
 import pandas as pd
@@ -11,35 +11,53 @@ import optuna
 import catboost as cb
 import json
 from pathlib import Path
-from datetime import datetime
 from sklearn.metrics import mean_absolute_error, accuracy_score
+import argparse
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 DATA_DIR    = Path(__file__).parent / "data"
 INPUT_PATH  = DATA_DIR / "ml_features.csv"
 
-def objective_score(trial):
-    # Load and prepare data
+def prepare_data(target_col, is_classifier=False):
     df = pd.read_csv(INPUT_PATH)
     df["match_date"] = pd.to_datetime(df["match_date"])
     
-    # Time-based split (Last 20% matches for validation)
+    # Drop rows where target is NaN
+    if target_col in df.columns:
+        df = df.dropna(subset=[target_col])
+    else:
+        raise ValueError(f"Target column {target_col} not found in data.")
+
     df = df.sort_values("match_date")
     split_idx = int(len(df) * 0.8)
     train_df = df.iloc[:split_idx]
     test_df = df.iloc[split_idx:]
     
-    target_cols = ["is_win", "total_points", "win_condition", "res_deaths", "res_deposits", "res_wart_closer", "match_date"]
+    target_cols = [
+        "is_win", "total_points", "win_condition", 
+        "res_deaths", "res_eliminations", "res_deposits", 
+        "res_wart_closer", "res_wart_distance", "match_date",
+        "res_wart_ride_seconds", "res_buff_time_seconds", 
+        "res_eaten_by_wart", "res_loose_ball_pickups", 
+        "res_eating_while_riding"
+    ]
+    
     feature_cols = [c for c in df.columns if c not in target_cols]
     cat_features = ["champ_class", "enemy_champ_class", "team_comp", "enemy_comp"]
     
     X_train = train_df[feature_cols].astype(str)
-    y_train = train_df["total_points"].astype(float)
+    y_train = train_df[target_col].astype(int if is_classifier else float)
+    
     X_test = test_df[feature_cols].astype(str)
-    y_test = test_df["total_points"].astype(float)
+    y_test = test_df[target_col].astype(int if is_classifier else float)
+    
+    return X_train, y_train, X_test, y_test, cat_features
+
+def objective_regressor(trial, target_col):
+    X_train, y_train, X_test, y_test, cat_features = prepare_data(target_col, is_classifier=False)
     
     params = {
-        "iterations": 1000,
+        "iterations": trial.suggest_int("iterations", 500, 1500, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 0.3, log=True),
         "depth": trial.suggest_int("depth", 4, 10),
         "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 1, 10),
@@ -58,25 +76,11 @@ def objective_score(trial):
     preds = model.predict(X_test)
     return mean_absolute_error(y_test, preds)
 
-def objective_winrate(trial):
-    df = pd.read_csv(INPUT_PATH)
-    df["match_date"] = pd.to_datetime(df["match_date"])
-    df = df.sort_values("match_date")
-    split_idx = int(len(df) * 0.8)
-    train_df = df.iloc[:split_idx]
-    test_df = df.iloc[split_idx:]
-    
-    target_cols = ["is_win", "total_points", "win_condition", "res_deaths", "res_deposits", "res_wart_closer", "match_date"]
-    feature_cols = [c for c in df.columns if c not in target_cols]
-    cat_features = ["champ_class", "enemy_champ_class", "team_comp", "enemy_comp"]
-    
-    X_train = train_df[feature_cols].astype(str)
-    y_train = train_df["is_win"].astype(int)
-    X_test = test_df[feature_cols].astype(str)
-    y_test = test_df["is_win"].astype(int)
+def objective_classifier(trial, target_col):
+    X_train, y_train, X_test, y_test, cat_features = prepare_data(target_col, is_classifier=True)
     
     params = {
-        "iterations": 1000,
+        "iterations": trial.suggest_int("iterations", 500, 1500, step=100),
         "learning_rate": trial.suggest_float("learning_rate", 1e-3, 0.3, log=True),
         "depth": trial.suggest_int("depth", 4, 10),
         "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 1, 10),
@@ -94,10 +98,15 @@ def objective_winrate(trial):
     preds = model.predict(X_test)
     return accuracy_score(y_test, preds)
 
-def run_study(name, obj_func, direction="minimize"):
-    print(f"\n[INFO] Optimizing {name}...")
+def run_study(name, target_col, is_classifier=False, n_trials=20):
+    print(f"\n[INFO] Optimizing {name} (Target: {target_col})...")
+    direction = "maximize" if is_classifier else "minimize"
     study = optuna.create_study(direction=direction)
-    study.optimize(obj_func, n_trials=20)
+    
+    if is_classifier:
+        study.optimize(lambda trial: objective_classifier(trial, target_col), n_trials=n_trials)
+    else:
+        study.optimize(lambda trial: objective_regressor(trial, target_col), n_trials=n_trials)
     
     print(f"Best Value for {name}: {study.best_value:.4f}")
     
@@ -107,8 +116,37 @@ def run_study(name, obj_func, direction="minimize"):
     print(f"[OK] Params saved to {out_path}")
 
 def main():
-    run_study("Score Model", objective_score, "minimize")
-    run_study("WinRate Model", objective_winrate, "maximize")
+    parser = argparse.ArgumentParser(description="Hyperparameter Optimizer")
+    parser.add_argument("--phase", choices=["all", "phase1", "phase2"], default="phase2", help="Which models to optimize")
+    parser.add_argument("--trials", type=int, default=20, help="Number of optuna trials per model")
+    parser.add_argument("--models", type=str, default="", help="Comma-separated list of specific models to run (e.g., 'WartDistance,WartCloser')")
+    args = parser.parse_args()
+
+    phase1_models = [
+        {"name": "Deaths", "target": "res_deaths", "is_classifier": False},
+        {"name": "Kills", "target": "res_eliminations", "is_classifier": False},
+        {"name": "Deposits", "target": "res_deposits", "is_classifier": False},
+        {"name": "WartDistance", "target": "res_wart_distance", "is_classifier": False},
+        {"name": "WartCloser", "target": "res_wart_closer", "is_classifier": True},
+    ]
+
+    phase2_models = [
+        {"name": "Score Model", "target": "total_points", "is_classifier": False},
+        {"name": "WinRate Model", "target": "is_win", "is_classifier": True},
+    ]
+
+    models_to_run = []
+    if args.phase in ["all", "phase1"]:
+        models_to_run.extend(phase1_models)
+    if args.phase in ["all", "phase2"]:
+        models_to_run.extend(phase2_models)
+
+    if args.models:
+        specific_models = [m.strip().lower() for m in args.models.split(",")]
+        models_to_run = [m for m in phase1_models + phase2_models if m["name"].lower() in specific_models]
+
+    for cfg in models_to_run:
+        run_study(cfg["name"], cfg["target"], cfg["is_classifier"], args.trials)
 
 if __name__ == "__main__":
     main()

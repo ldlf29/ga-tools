@@ -54,9 +54,9 @@ GENERIC_NAME_RE = re.compile(r"^Moki\s*#\d+$", re.IGNORECASE)
 # ─── Supabase Download ────────────────────────────────────────────────────────
 
 def download_recent_matches():
-    print("[INFO] Fetching matches from Supabase (moki_match_history) with pagination...")
+    print("[INFO] Fetching matches from Supabase (moki_match_history) using date-based pagination...")
     
-    url = f"{SUPABASE_URL}/rest/v1/moki_match_history?select=match_data,moki_id&order=match_date.desc"
+    base_url = f"{SUPABASE_URL}/rest/v1/moki_match_history?select=match_data,moki_id"
     headers = {
         "apikey": SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}"
@@ -64,51 +64,75 @@ def download_recent_matches():
     
     import time
     all_data = []
-    from_idx = 0
-    chunk_size = 1000
-    has_more = True
     
-    while has_more:
-        to_idx = from_idx + chunk_size - 1
-        headers_page = {**headers, "Range": f"{from_idx}-{to_idx}", "Prefer": "count=exact"}
+    # Empezamos desde mañana por si hay diferencias de zona horaria
+    current_date = datetime.now() + timedelta(days=1)
+    
+    consecutive_empty_days = 0
+    max_empty_days = 15 # Si pasamos 15 días sin datos, asumimos que llegamos al principio
+    
+    while True:
+        date_str = current_date.strftime("%Y-%m-%d")
         
-        max_retries = 5
-        success = False
-        batch = []
-        for attempt in range(1, max_retries + 1):
-            try:
-                r = requests.get(url, headers=headers_page, timeout=30)
-                if r.status_code in [200, 206]:
-                    batch = r.json()
-                    success = True
-                    break
-                
-                print(f"[WARN] Supabase respondió {r.status_code} en fila {from_idx}. Intento {attempt}/{max_retries}...")
-                
-                if r.status_code == 500:
-                    print(f"[INFO] Error 500 detectado. Pausando de forma forzada por 30 segundos para dejar respirar a Supabase...")
-                    time.sleep(30)
-                else:
-                    time.sleep(2 * attempt)
-            except Exception as e:
-                print(f"[WARN] Error de red: {e}. Intento {attempt}/{max_retries}...")
-                time.sleep(5)
+        from_idx = 0
+        chunk_size = 1000
+        has_more_in_day = True
+        day_total = 0
         
-        if not success:
-            print(f"[ERROR] API error irrecuperable fetching matches después de {max_retries} intentos. (fila {from_idx})")
-            break
+        while has_more_in_day:
+            to_idx = from_idx + chunk_size - 1
+            headers_page = {**headers, "Range": f"{from_idx}-{to_idx}", "Prefer": "count=exact"}
             
-        if not batch:
-            has_more = False
-            break
+            url = f"{base_url}&match_date=eq.{date_str}"
             
-        all_data.extend(batch)
-        print(f"[Supabase Pagination] Descargadas filas {from_idx}-{to_idx}. Total acumulado: {len(all_data)}")
+            max_retries = 5
+            success = False
+            batch = []
+            for attempt in range(1, max_retries + 1):
+                try:
+                    r = requests.get(url, headers=headers_page, timeout=30)
+                    if r.status_code in [200, 206]:
+                        batch = r.json()
+                        success = True
+                        break
+                    
+                    print(f"[WARN] Supabase respondió {r.status_code} en fecha {date_str} fila {from_idx}. Intento {attempt}/{max_retries}...")
+                    
+                    if r.status_code == 500:
+                        time.sleep(30)
+                    else:
+                        time.sleep(2 * attempt)
+                except Exception as e:
+                    print(f"[WARN] Error de red: {e}. Intento {attempt}/{max_retries}...")
+                    time.sleep(5)
+            
+            if not success:
+                print(f"[ERROR] API error en {date_str} fila {from_idx}. Saltando al siguiente día...")
+                break
+                
+            if not batch or len(batch) == 0:
+                has_more_in_day = False
+                break
+                
+            all_data.extend(batch)
+            day_total += len(batch)
+            from_idx += len(batch)
+            
+        print(f"[Supabase] {date_str}: {day_total} matches descargados. (Total acumulado: {len(all_data)})")
         
-        if len(batch) < chunk_size:
-            has_more = False
+        if day_total == 0:
+            consecutive_empty_days += 1
         else:
-            from_idx += chunk_size
+            consecutive_empty_days = 0
+            
+        if consecutive_empty_days >= max_empty_days:
+            print(f"[INFO] Se alcanzaron {max_empty_days} días consecutivos sin datos. Asumiendo fin del historial.")
+            break
+            
+        current_date -= timedelta(days=1)
+        
+    print(f"[INFO] Descarga finalizada. Total acumulado: {len(all_data)}")
+    return all_data
 
 # ─── Extract Raw Logic (from Script 1) ────────────────────────────────────────
 

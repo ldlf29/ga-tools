@@ -12,7 +12,7 @@ const CLIENT_ID = process.env.NEXT_PUBLIC_WAYPOINT_CLIENT_ID || '';
 // indexedDB during configuration. Since this file is evaluated in Node during Next.js build,
 // we mock indexedDB globally so the build doesn't crash with "ReferenceError: indexedDB is not defined".
 if (typeof window === 'undefined') {
-  (globalThis as any).indexedDB = {
+  (globalThis as Record<string, unknown>).indexedDB = {
     open: () => ({
       onupgradeneeded: null,
       onsuccess: null,
@@ -46,7 +46,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   // TantoProvider uses Emotion CSS-in-JS which causes SSR hydration mismatch in Next.js App Router.
   // We only mount it client-side. WagmiProvider + QueryClientProvider are safe for SSR.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   return (
     <LazyMotion features={domAnimation}>

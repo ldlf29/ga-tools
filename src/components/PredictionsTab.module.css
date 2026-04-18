@@ -1691,6 +1691,14 @@
   display: block;
 }
 
+.lineupMokiClassBadgeWrapper {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
 .nonOwnedSchemeCard {
   border: 4px solid #ff4d4d !important;
   box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
@@ -3359,4 +3367,9 @@
   .championCard .miniMokiImg { width: 65px; height: 65px; }
   .miniMokiName { font-size: 0.55rem; max-width: 45px; }
   .championCard .miniMokiName { font-size: 0.65rem; max-width: 65px; }
-}
+  .miniMokiClassBadge {
+    font-size: 0.45rem !important;
+    padding: 1px 3px !important;
+    box-shadow: 0.5px 0.5px 0 #333333 !important;
+  }
+}

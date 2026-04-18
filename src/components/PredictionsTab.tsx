@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
@@ -49,9 +55,11 @@ interface PredictionsTabProps {
   isTestMode?: boolean;
 }
 
-export default function PredictionsTab({ allCards = [], userCards = [], cardMode = 'ALL', isTestMode = false }: PredictionsTabProps) {
+const EMPTY_ARRAY: any[] = [];
+
+export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMPTY_ARRAY, cardMode = 'ALL', isTestMode = false }: PredictionsTabProps) {
   const [mounted, setMounted] = useState(false);
-  const [mokiStats, setMokiStats] = useState<any[]>([]);
+  const [mokiStats, setMokiStats] = useState<any[]>(EMPTY_ARRAY);
 
   useEffect(() => {
     setMounted(true);
@@ -68,6 +76,16 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     loadStats();
   }, []);
 
+  // Pre-calculate a map for O(1) lookups instead of O(N) .find inside the loop
+  const mokiStatsMap = useMemo(() => {
+    const map = new Map();
+    mokiStats.forEach(s => {
+      if (s.moki_id) map.set(s.moki_id, s);
+      if (s.name) map.set(s.name.toUpperCase(), s);
+    });
+    return map;
+  }, [mokiStats]);
+
   // ─── 2. AI Ranking (using SWR) ─────────────────────────────────────────────
   const {
     data: rankingRaw,
@@ -78,7 +96,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
     dedupingInterval: 10000,
   });
 
-  const rankingData = useMemo(() => rankingRaw?.success ? rankingRaw.data : [], [rankingRaw]);
+  const rankingData = useMemo(() => rankingRaw?.success ? rankingRaw.data : EMPTY_ARRAY, [rankingRaw]);
   const rankingEffectiveDate = useMemo(() => rankingRaw?.effectiveDate || null, [rankingRaw]);
   const rankingError = rankingErrorSWR ? 'Failed to load AI ranking.' : null;
 
@@ -93,7 +111,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   });
 
   const contests = useMemo(() => {
-    if (!contestsRaw?.data) return [];
+    if (!contestsRaw?.data) return EMPTY_ARRAY;
     const now = new Date();
     return contestsRaw.data.filter(contest => new Date(contest.startDate) > now);
   }, [contestsRaw]);
@@ -194,8 +212,31 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   useEffect(() => {
     async function fetchAllUpcoming() {
       setIsUpcomingLoading(true);
-      const { data } = await supabase.from('upcoming_matches_ga').select('*').limit(2000);
-      if (data) setUpcomingMatches(data as UpcomingMatchData[]);
+      let allMatches: UpcomingMatchData[] = [];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('upcoming_matches_ga')
+          .select('*')
+          .order('match_date', { ascending: true })
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+
+        if (error || !data || data.length === 0) {
+          hasMore = false;
+        } else {
+          allMatches = [...allMatches, ...(data as UpcomingMatchData[])];
+          if (data.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        }
+      }
+
+      setUpcomingMatches(allMatches);
       setIsUpcomingLoading(false);
     }
     fetchAllUpcoming();
@@ -471,9 +512,10 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
   ) => {
     let sorted = [...rankingData];
 
-    // Real-time class override from moki_stats
+    // Real-time class override using the optimized mokiStatsMap (O(1) lookup)
     sorted = sorted.map(moki => {
-      const dbStat = mokiStats.find(s => s.moki_id === moki['Moki ID'] || s.name.toUpperCase() === moki.Name.toUpperCase());
+      // Use moki_id or name for lookup in the pre-calculated Map
+      const dbStat = mokiStatsMap.get(moki['Moki ID']) || mokiStatsMap.get(moki.Name.toUpperCase());
       return {
         ...moki,
         Class: dbStat?.class || moki.Class
@@ -617,7 +659,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       'TAKING A DIVE': 'Taking A Dive'
     };
     const sScheme = STRATEGIC_MAP[modalFilters.strategicScheme] || null;
-    let baseData = getProcessedRanking('SCORE', sScheme).map((m, i) => ({ ...m, _originalRank: i + 1 }));
+    const baseData = getProcessedRanking('SCORE', sScheme).map((m, i) => ({ ...m, _originalRank: i + 1 }));
 
     let filtered = baseData;
 
@@ -689,7 +731,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       <td><strong>#{moki._originalRank}</strong></td>
       <td 
         onClick={() => handleMokiClick(moki)} 
-        style={{ cursor: 'pointer', color: '#ffd753', fontWeight: '800', textDecoration: 'underline' }}
+        style={{ cursor: 'pointer', color: '#333333', fontWeight: '800', textDecoration: 'underline' }}
         title="View Upcoming Matches"
       >
         {moki.Name}
@@ -721,7 +763,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         <span 
           className={styles.mobileRankName} 
           onClick={() => handleMokiClick(moki)}
-          style={{ cursor: 'pointer', textDecoration: 'underline', color: '#ffd753' }}
+          style={{ cursor: 'pointer', textDecoration: 'underline', color: '#333333' }}
         >
           {moki.Name}
         </span>
@@ -814,11 +856,29 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
 
     let matches: UpcomingMatchData[] = [];
     try {
-      const { data } = await supabase.from('upcoming_matches_ga').select('*').limit(2000);
-      if (data) {
-        setUpcomingMatchesCache(data as UpcomingMatchData[]);
-        matches = data as UpcomingMatchData[];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('upcoming_matches_ga')
+          .select('*')
+          .order('match_date', { ascending: true })
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+
+        if (error || !data || data.length === 0) {
+          hasMore = false;
+        } else {
+          matches = [...matches, ...(data as UpcomingMatchData[])];
+          if (data.length < pageSize) {
+            hasMore = false;
+          } else {
+            page++;
+          }
+        }
       }
+      setUpcomingMatchesCache(matches);
     } catch (e) {
       console.error('Failed to load upcoming matches:', e);
       // Fallback to cache if request fails
@@ -905,28 +965,28 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
       if (hour !== targetHour) return false;
     }
     if (filters.type !== 'All') {
-      const champions = contest.lineupConfig.slots.filter(s => s.cardType === 'champion');
+      const champions = contest.lineupConfig.slots.filter((s: any) => s.cardType === 'champion');
       const type = filters.type.toLowerCase();
       const contestName = contest.name.toLowerCase();
 
       if (type === 'open') {
-        if (!champions.every(s => s.minRarity === 'basic' && s.maxRarity === 'legendary')) return false;
+        if (!champions.every((s: any) => s.minRarity === 'basic' && s.maxRarity === 'legendary')) return false;
       } else if (type === 'only legendary') {
-        if (!champions.every(s => s.minRarity === 'legendary' && s.maxRarity === 'legendary')) return false;
+        if (!champions.every((s: any) => s.minRarity === 'legendary' && s.maxRarity === 'legendary')) return false;
       } else if (type === 'only epic') {
-        if (!champions.every(s => s.minRarity === 'epic' && s.maxRarity === 'epic')) return false;
+        if (!champions.every((s: any) => s.minRarity === 'epic' && s.maxRarity === 'epic')) return false;
       } else if (type === 'only rare') {
-        if (!champions.every(s => s.minRarity === 'rare' && s.maxRarity === 'rare')) return false;
+        if (!champions.every((s: any) => s.minRarity === 'rare' && s.maxRarity === 'rare')) return false;
       } else if (type === 'only basic') {
-        if (!champions.every(s => s.minRarity === 'basic' && s.maxRarity === 'basic')) return false;
+        if (!champions.every((s: any) => s.minRarity === 'basic' && s.maxRarity === 'basic')) return false;
       } else if (type === 'up to epic') {
-        if (!champions.every(s => s.minRarity === 'basic' && s.maxRarity === 'epic')) return false;
+        if (!champions.every((s: any) => s.minRarity === 'basic' && s.maxRarity === 'epic')) return false;
       } else if (type === 'up to rare') {
-        if (!champions.every(s => s.minRarity === 'basic' && s.maxRarity === 'rare')) return false;
+        if (!champions.every((s: any) => s.minRarity === 'basic' && s.maxRarity === 'rare')) return false;
       } else if (type === 'one-of-each') {
         if (!isOneOfEachContest(contest)) return false;
       } else if (type === 'mix') {
-        const championsConfigs = champions.map(s => `${s.minRarity}-${s.maxRarity}`);
+        const championsConfigs = champions.map((s: any) => `${s.minRarity}-${s.maxRarity}`);
         const uniqueConfigs = new Set(championsConfigs);
         if (uniqueConfigs.size < 2) return false;
 
@@ -944,7 +1004,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
         // Class Coverage matches both "Class Coverage" and "Class Diversity"
         if (!contestName.includes('class coverage') && !contestName.includes('class diversity')) return false;
       } else if (targetMode === 'no scheme') {
-        const hasSchemeSlot = contest.lineupConfig.slots.some(s => s.cardType === 'scheme');
+        const hasSchemeSlot = contest.lineupConfig.slots.some((s: any) => s.cardType === 'scheme');
         if (hasSchemeSlot && !contestName.includes('no scheme')) return false;
       } else {
         if (!contestName.includes(targetMode)) return false;
@@ -1074,7 +1134,7 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                           <span className={styles.amount}>{contest.entryPrice.amount}</span>
                           <span className={styles.currency}>{contest.entryPrice.currency}</span>
                         </div>
-                        <div className={styles.slotsPreview}>{contest.lineupConfig.slots.map((slot, idx) => <div key={idx} className={styles.slotDot} style={getSlotStyle(slot)} title={`${slot.cardType} (${slot.minRarity}-${slot.maxRarity})`} />)}</div>
+                        <div className={styles.slotsPreview}>{contest.lineupConfig.slots.map((slot: any, idx: number) => <div key={idx} className={styles.slotDot} style={getSlotStyle(slot)} title={`${slot.cardType} (${slot.minRarity}-${slot.maxRarity})`} />)}</div>
                       </div>
                     </div>
                     <div className={styles.cardFooter}>
@@ -1486,7 +1546,11 @@ export default function PredictionsTab({ allCards = [], userCards = [], cardMode
                                       ) : (
                                         <div style={{ aspectRatio: '2/3', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>?</div>
                                       )}
+                                      <div className={styles.lineupMokiClassBadgeWrapper}>
+                                        <span className={styles.miniMokiClassBadge}>{moki.class}</span>
+                                      </div>
                                     </div>
+                                    
                                     <div className={styles.mokiCardScoreBadge}>
                                       <span className={styles.mokiCardScoreValue}>{Math.round(mokiEffective).toLocaleString()} PTS</span>
                                     </div>

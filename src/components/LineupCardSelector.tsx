@@ -47,7 +47,9 @@ export const LineupCardSelector: React.FC<LineupCardSelectorProps> = ({
     const hasExtraSort = !!selectorFilters.extraSort;
 
     if (hasSpecialization || hasExtraSort) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (selectorFilters.cardType === 'SCHEME') setSchemeSortOption('default');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       else setMokiSortOption('default');
     }
   }, [selectorFilters.specialization, selectorFilters.extraSort, selectorFilters.cardType]);

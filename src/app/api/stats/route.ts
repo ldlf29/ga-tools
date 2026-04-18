@@ -5,15 +5,26 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 // Revalidate every 1 minute (60s) to sync smoothly with the new Cron endpoints
 export const revalidate = 60;
 
-export async function GET() {
-  console.log('[API Stats] Loading data...');
-  try {
-    // ... rest of the code
+// Simple in-memory cache for development mode to prevent 100% CPU usage
+// because Next.js ignores "revalidate" during "npm run dev".
+let devCache: { data: any; timestamp: number } | null = null;
+const DEV_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+export async function GET() {
+  const isDev = process.env.NODE_ENV === 'development';
+  
+  if (isDev && devCache && Date.now() - devCache.timestamp < DEV_CACHE_DURATION) {
+    console.log('[API Stats] Serving from DEV cache to save CPU...');
+    return NextResponse.json(devCache.data);
+  }
+
+  console.log('[API Stats] Loading data from Supabase (Heavy Scan)...');
+  try {
+    // 1. Fetch main stats
     const { data: globalData, error: globalError } = await supabaseAdmin
       .from('moki_stats')
       .select('*')
-      .limit(500); // Cap at 500 rows; the moki roster never exceeds this
+      .limit(500);
 
     if (globalError) {
       console.error('[API Stats] Moki stats fetch error:', globalError);
@@ -25,6 +36,7 @@ export async function GET() {
     }
 
     // 2. Fetch match averages via SQL function
+    // WARNING: This RPC scans 100k+ rows in moki_match_history.
     const averagesByName: Record<string, any> = {};
     const { data: avgData, error: avgError } = await supabaseAdmin.rpc(
       'get_moki_match_averages'
@@ -132,6 +144,10 @@ export async function GET() {
           train: row.train,
         };
       }
+    }
+
+    if (isDev) {
+      devCache = { data: statsMap, timestamp: Date.now() };
     }
 
     return NextResponse.json(statsMap, {

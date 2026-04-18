@@ -19,14 +19,18 @@ function shuffleArray<T>(arr: T[], seed: number): T[] {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateFakeRanking(real: any[]): any[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const scores = shuffleArray(real.map((r: any) => r['Score']), 42);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const winRates = shuffleArray(real.map((r: any) => r['WinRate']), 137);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return real.map((r: any, i: number) => ({
     ...r,
     Score: scores[i],
     WinRate: winRates[i],
     'Gacha Pts': Math.floor(Math.random() * 100),
     'Win By Combat': Math.floor(Math.random() * 50),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   })).sort((a: any, b: any) => (b['Score'] ?? 0) - (a['Score'] ?? 0));
 }
 
@@ -57,6 +61,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'No ranking data found' }, { status: 404 });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mapped = records.map((r: any) => ({
       'Moki ID': r.moki_id,
       'Name': r.name,
@@ -87,7 +92,10 @@ export async function GET(req: NextRequest) {
       timestamp: new Date().toISOString(),
       isTestMode,
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: 'Failed to load ranking', details: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Failed to load ranking', details: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: 'Failed to load ranking', details: String(error) }, { status: 500 });
   }
 }

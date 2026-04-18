@@ -133,10 +133,14 @@ def train_models():
             X_base, y_aux, sample_weights, test_size=0.2, random_state=42
         )
 
-        model = cfg["class"](
-            iterations=500, learning_rate=0.05, depth=6,
-            eval_metric=cfg["metric"], random_seed=42, verbose=False
-        )
+        best_params = load_best_params(cfg["name"])
+        params = {
+            "iterations": 500, "learning_rate": 0.05, "depth": 6,
+            "eval_metric": cfg["metric"], "random_seed": 42, "verbose": False
+        }
+        params.update(best_params)
+
+        model = cfg["class"](**params)
         model.fit(X_t, y_t, cat_features=cat_features, sample_weight=w_t,
                   eval_set=(X_v, y_v), use_best_model=True)
         model.save_model(str(MODELS_DIR / cfg["file"]))

@@ -4,34 +4,34 @@ import useSWR from 'swr';
 import { fetchLiteCollection } from '@/utils/cardService';
 import { EnhancedCard } from '@/types';
 
+const EMPTY_CARDS: EnhancedCard[] = [];
+
 export function useCards(forceRefresh = false) {
   const {
-    data: allCards = [],
+    data: allCards = EMPTY_CARDS,
     isLoading,
     mutate,
   } = useSWR<EnhancedCard[]>('liteCollection', fetchLiteCollection, {
     revalidateOnFocus: false,
     revalidateIfStale: true,
-    fallbackData: [],
-    // If forceRefresh is on, we ignore deduplication
-    dedupingInterval: forceRefresh ? 0 : 2000,
+    fallbackData: EMPTY_CARDS,
+    dedupingInterval: forceRefresh ? 0 : 10000,
   });
 
-  // Handle Hydration: Load cache only if SWR hasn't fetched yet
+  // Handle Hydration
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (forceRefresh) {
       localStorage.removeItem('cachedCards_v3');
       return;
     }
-    if (allCards.length > 0) return; // SWR already has data, don't overwrite
+    if (allCards.length > 0) return;
 
     const cached = localStorage.getItem('cachedCards_v3');
     if (cached) {
       try {
         const fixed = cached.replace(/season1-launch/gi, 'season1-v2');
         const parsed = JSON.parse(fixed);
-        // Validate cache has train field (added recently)
         const hasTrainField =
           parsed.length > 0 &&
           parsed.some(
@@ -46,10 +46,13 @@ export function useCards(forceRefresh = false) {
     }
   }, [mutate, allCards.length, forceRefresh]);
 
-  // Keep localStorage in sync for next load
+  // Sync LocalStorage - only if data actually exists
   useEffect(() => {
     if (allCards && allCards.length > 0 && !forceRefresh) {
-      localStorage.setItem('cachedCards_v3', JSON.stringify(allCards));
+      const timer = setTimeout(() => {
+        localStorage.setItem('cachedCards_v3', JSON.stringify(allCards));
+      }, 1000); // Debounce to prevent CPU spikes during transitions
+      return () => clearTimeout(timer);
     }
   }, [allCards, forceRefresh]);
 

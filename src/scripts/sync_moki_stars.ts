@@ -52,7 +52,7 @@ async function fetchWithRetry(id: string, attempt = 1): Promise<{ id: string, ra
       return { id, rank: null };
     }
 
-    const json = (await response.json()) as any;
+    const json = (await response.json()) as { data?: { rank?: number }[] };
     const rank = json.data?.[0]?.rank;
     
     if (rank !== undefined) {
@@ -62,8 +62,9 @@ async function fetchWithRetry(id: string, attempt = 1): Promise<{ id: string, ra
       console.warn(`❓ ID ${id}: Rank no encontrado en la respuesta`);
       return { id, rank: null };
     }
-  } catch (err: any) {
-    console.error(`❌ Fallo crítico ID ${id}:`, err.message);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`❌ Fallo crítico ID ${id}:`, msg);
     return { id, rank: null };
   }
 }
@@ -101,8 +102,8 @@ async function run() {
   }
 
   const mokiMetadata = JSON.parse(fs.readFileSync(METADATA_PATH, 'utf-8'));
-  const allMokis = Object.values(mokiMetadata) as any[];
-  const ids = Array.from(new Set(allMokis.map((m) => m.id).filter((id) => !!id))) as string[];
+  const allMokis = Object.values(mokiMetadata) as Record<string, unknown>[];
+  const ids = Array.from(new Set(allMokis.map((m) => String(m.id)).filter((id) => !!id))) as string[];
   
   console.log(`📦 IDs únicos a procesar: ${ids.length}`);
 

@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unescaped-entities */
+ 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
@@ -394,7 +394,7 @@ export default function Champions({
       }
     };
 
-    let sorted = [...filtered];
+    const sorted = [...filtered];
 
     // Determine priority between specialization and extraSort based on insertionOrder
     const sortKeys = filters.insertionOrder?.filter(k => 

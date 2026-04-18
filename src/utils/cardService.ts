@@ -234,7 +234,9 @@ export const fetchLiteCollection = async (): Promise<EnhancedCard[]> => {
     console.log(
       `[CardService] Mapping ${catalog.length} items from catalog...`
     );
+    console.time('[Perf] cardService: map catalog');
     const cards = catalog.map((item) => normalizeLiteCard(item as any));
+    console.timeEnd('[Perf] cardService: map catalog');
     console.log(`[CardService] Mapping complete: ${cards.length} cards.`);
     return cards;
   } catch (e) {
