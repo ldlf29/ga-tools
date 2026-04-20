@@ -48,17 +48,48 @@ with open(Path(__file__).parent.parent / "src" / "data" / "mokiMetadata.json", "
 CLASSES = ["Anchor", "Bruiser", "Center", "Defender", "Flanker", "Forward", "Grinder", "Sprinter", "Striker", "Support"]
 
 def get_moki_stats_overrides():
-    """Retorna dict {moki_id: class} con la clase ACTUAL de cada Moki desde Supabase."""
-    url = f"{SUPABASE_URL}/rest/v1/moki_stats?select=moki_id,class"
+    """Retorna dos dicts: {moki_id: real_class} y {moki_id: effective_class}"""
+    url = f"{SUPABASE_URL}/rest/v1/moki_stats?select=moki_id,class,dexterity,strength,defense"
     headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+    real_overrides = {}
+    eff_overrides = {}
     try:
         res = requests.get(url, headers=headers).json()
-        return {row["moki_id"]: row["class"] for row in res if row.get("moki_id")}
+        for row in res:
+            mid = row.get("moki_id")
+            if not mid: continue
+            
+            base_cls = str(row.get("class", ""))
+            real_overrides[mid] = base_cls
+            eff_cls = base_cls
+            
+            if base_cls == "Grinder":
+                dex = float(row.get("dexterity", 0))
+                str_val = float(row.get("strength", 0))
+                if dex > str_val:
+                    eff_cls = "Striker"
+                    real_overrides[mid] = "Grinder (S)"
+                else:
+                    eff_cls = "Bruiser"
+                    real_overrides[mid] = "Grinder (B)"
+            elif base_cls == "Sprinter":
+                dex = float(row.get("dexterity", 0))
+                def_val = float(row.get("defense", 0))
+                if dex > def_val:
+                    eff_cls = "Striker"
+                    real_overrides[mid] = "Sprinter (S)"
+                else:
+                    eff_cls = "Defender"
+                    real_overrides[mid] = "Sprinter (D)"
+                
+            eff_overrides[mid] = eff_cls
+            
+        return real_overrides, eff_overrides
     except Exception as e:
         print("[WARN] Error fetching class overrides:", e)
-        return {}
+        return {}, {}
 
-def build_features_for_moki(moki_id, matches, moki_details, class_overrides):
+def build_features_for_moki(moki_id, matches, moki_details, effective_class_overrides):
     """
     Construye la lista de features de CLASE para un Moki dado a través de sus partidas.
     Retorna una lista de dicts, uno por partida.
@@ -76,12 +107,12 @@ def build_features_for_moki(moki_id, matches, moki_details, class_overrides):
         my_team    = team_red  if am_red else team_blue
         enemy_team = team_blue if am_red else team_red
 
-        # ── Aplicar class overrides usando moki_id (int) como clave ──────────
-        # class_overrides = {moki_id (int): class (str)} desde moki_stats
-        for m in my_team + enemy_team:
-            mid = m.get("mokiTokenId")
-            if mid and mid in class_overrides:
-                m["class"] = class_overrides[mid]
+        # ── Función helper para no mutar el diccionario original ──
+        def get_eff_class(m_obj):
+            mid = m_obj.get("mokiTokenId")
+            if mid and mid in effective_class_overrides:
+                return effective_class_overrides[mid]
+            return m_obj.get("class") or "Unknown"
 
         my_moki = next((m for m in my_team if m.get("mokiTokenId") == moki_id), None)
         if not my_moki:
@@ -94,9 +125,9 @@ def build_features_for_moki(moki_id, matches, moki_details, class_overrides):
         enemy_champ_id    = match.get("blue_champ_id") if am_red else match.get("red_champ_id")
         enemy_champ_class = match.get("blue_champ_class") if am_red else match.get("red_champ_class")
 
-        # Aplicar override sobre la clase relacional también, por si cambió después del sync
-        if enemy_champ_id and enemy_champ_id in class_overrides:
-            enemy_champ_class = class_overrides[enemy_champ_id]
+        # Aplicar override sobre la clase relacional también, por si cambió o es subclase
+        if enemy_champ_id and enemy_champ_id in effective_class_overrides:
+            enemy_champ_class = effective_class_overrides[enemy_champ_id]
 
         # Fallback: si las columnas relacionales no están, parsear JSONB por nombre (legacy)
         if not enemy_champ_class:
@@ -105,15 +136,15 @@ def build_features_for_moki(moki_id, matches, moki_details, class_overrides):
                 enemy_team[0] if enemy_team else None
             )
             enemy_champ_id    = enemy_champ.get("mokiTokenId") if enemy_champ else 0
-            enemy_champ_class = enemy_champ.get("class") if enemy_champ else "Unknown"
+            enemy_champ_class = get_eff_class(enemy_champ) if enemy_champ else "Unknown"
 
         enemy_allies = [e for e in enemy_team if e.get("mokiTokenId") != enemy_champ_id]
 
         # ── Composiciones ordenadas alfabéticamente (igual que en 2_preprocess.py) ──
-        champ_cls          = my_moki.get("class") or "Unknown"
-        ally_classes       = sorted([a.get("class") or "Unknown" for a in allies])
+        champ_cls          = get_eff_class(my_moki)
+        ally_classes       = sorted([get_eff_class(a) for a in allies])
         enemy_cls          = enemy_champ_class or "Unknown"
-        enemy_ally_classes = sorted([e.get("class") or "Unknown" for e in enemy_allies])
+        enemy_ally_classes = sorted([get_eff_class(e) for e in enemy_allies])
 
         team_comp  = "_".join([champ_cls.upper()] + [c.upper() for c in ally_classes])
         enemy_comp = "_".join([enemy_cls.upper()]  + [c.upper() for c in enemy_ally_classes])
@@ -199,8 +230,8 @@ def main():
         print("[WARN] No hay upcoming matches en Supabase.")
         return
 
-    class_overrides = get_moki_stats_overrides()
-    print(f"[INFO] {len(class_overrides)} class overrides cargados.")
+    real_class_overrides, effective_class_overrides = get_moki_stats_overrides()
+    print(f"[INFO] {len(real_class_overrides)} class overrides cargados.")
 
     # ── Mapear partidas por Moki ──────────────────────────────────────────────
     moki_counts    = {}
@@ -225,10 +256,10 @@ def main():
             if not mid:
                 continue
 
-            # ── Aplicar override de clase usando moki_id (int) — FIX CRÍTICO ──
-            # class_overrides es {moki_id (int): class (str)}, NO {nombre: class}
-            if mid in class_overrides:
-                champ["class"] = class_overrides[mid]
+            # ── Aplicar override de clase (REAL) para la UI usando moki_id (int) ──
+            # Se usa la clase real para moki_details, mientras feature builder usa subclase
+            if mid in real_class_overrides:
+                champ["class"] = real_class_overrides[mid]
 
             moki_counts[mid]  = moki_counts.get(mid, 0) + 1
             moki_details[mid] = champ
@@ -247,7 +278,7 @@ def main():
         current_class = moki_details[moki_id].get("class") or "Unknown"
         fur, traits   = get_metadata(champ_name)
 
-        features_list = build_features_for_moki(moki_id, matches, moki_details, class_overrides)
+        features_list = build_features_for_moki(moki_id, matches, moki_details, effective_class_overrides)
         if not features_list:
             continue
 

@@ -46,27 +46,44 @@ def load_best_params(model_name):
 
 def calculate_time_weights(dates_series):
     """
-    Ponderación por meta del juego (fechas absolutas):
-      - Antes del 29 de Marzo -> x0.0 (Fuera del meta, no entra en el seed masivo pero por las dudas)
-      - 29 de Marzo al 5 de Abril -> x1.00 (Primeros 180 Mokis)
-      - 6 de Abril en adelante    -> x1.25 (Nuevos 60 Mokis ingresados, meta actual)
+    Ponderación temporal (data ya cortada al 6 de abril):
+      - Último día:    x1.30
+      - 2-3 días:      x1.20
+      - 4-7 días:      x1.10
+      - >7 días:       x1.00
     """
     try:
         dates = pd.to_datetime(dates_series).dt.date
-        meta_start = datetime(2026, 3, 29).date()
-        new_mokis_meta = datetime(2026, 4, 6).date()
+        today = datetime.now().date()
         weights = []
         for d in dates:
-            if d < meta_start:
-                weights.append(0.5) # Fallback penalty just in case
-            elif d < new_mokis_meta:
-                weights.append(1.0)
+            days_ago = (today - d).days
+            if days_ago <= 1:
+                weights.append(1.30)
+            elif days_ago <= 3:
+                weights.append(1.20)
+            elif days_ago <= 7:
+                weights.append(1.10)
             else:
-                weights.append(1.25)
+                weights.append(1.00)
         return np.array(weights)
     except Exception as e:
         print(f"[WARN] Error calculando pesos temporales: {e}. Usando peso 1.0.")
         return np.ones(len(dates_series))
+
+CHAMP_FEATURE_WEIGHT = 1.4
+
+def build_feature_weights(columns):
+    """
+    Construye LISTA de feature_weights para CatBoost (indexada por posición).
+    champ_class y enemy_champ_class reciben 1.4x de importancia.
+    Todas las demás features reciben 1.0x.
+    CatBoost requiere lista, no dict, para que sea serializable en .cbm.
+    """
+    return [
+        CHAMP_FEATURE_WEIGHT if col in ["champ_class", "enemy_champ_class"] else 1.0
+        for col in columns
+    ]
 
 def train_models():
     print(f"[INFO] Leyendo dataset {INPUT_PATH}...")
@@ -98,9 +115,14 @@ def train_models():
     base_feature_cols = [c for c in df.columns if c not in target_cols]
     X_base = df[base_feature_cols].astype(str)
     sample_weights = calculate_time_weights(df["match_date"])
+    feat_weights = build_feature_weights(X_base.columns)
+    cols_list = list(X_base.columns)
+    champ_w = feat_weights[cols_list.index("champ_class")] if "champ_class" in cols_list else 1.0
+    enemy_w = feat_weights[cols_list.index("enemy_champ_class")] if "enemy_champ_class" in cols_list else 1.0
 
     print(f"[INFO] Shape X_base: {X_base.shape}")
     print(f"[INFO] Distribución de pesos temporales: media={sample_weights.mean():.3f}, min={sample_weights.min():.2f}, max={sample_weights.max():.2f}")
+    print(f"[INFO] Feature weights: champ_class={champ_w}, enemy_champ_class={enemy_w}, others=1.0")
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -136,7 +158,8 @@ def train_models():
         best_params = load_best_params(cfg["name"])
         params = {
             "iterations": 500, "learning_rate": 0.05, "depth": 6,
-            "eval_metric": cfg["metric"], "random_seed": 42, "verbose": False
+            "eval_metric": cfg["metric"], "random_seed": 42, "verbose": False,
+            "feature_weights": feat_weights
         }
         params.update(best_params)
 
@@ -169,10 +192,14 @@ def train_models():
             X_cascade, y, sample_weights, test_size=0.2, random_state=42
         )
 
+        # Feature weights para cascade (base + pred_* features)
+        cascade_fw = build_feature_weights(X_cascade.columns)
+
         best_params = load_best_params(params_name)
         params = {
             "iterations": 1000, "learning_rate": 0.05, "depth": 6,
-            "random_seed": 42, "verbose": 100
+            "random_seed": 42, "verbose": 100,
+            "feature_weights": cascade_fw
         }
         params.update(best_params)
 

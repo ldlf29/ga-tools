@@ -389,7 +389,7 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup): MokiCa
 
   for (const row of params.rankingData) {
     const mokiClass = (row.Class || '').toUpperCase();
-    if (params.excludedClasses.includes(mokiClass)) continue;
+    if (params.excludedClasses.some(exc => mokiClass.startsWith(exc))) continue;
 
     const name = row.Name;
     if (!name) continue;
@@ -601,7 +601,7 @@ function generateOneOfEach(
           if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
 
           const mokiClass = String(row.Class).toUpperCase();
-          if (params.excludedClasses.includes(mokiClass)) continue;
+          if (params.excludedClasses.some(exc => mokiClass.startsWith(exc))) continue;
 
           const ownedEntry = params.userCards.find(
             c => c.cardType === 'MOKI' &&

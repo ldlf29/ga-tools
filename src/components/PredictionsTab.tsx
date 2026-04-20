@@ -70,7 +70,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     async function loadStats() {
       const { data } = await supabase
         .from('moki_stats')
-        .select('moki_id, name, class');
+        .select('moki_id, name, class, dexterity, strength, defense');
       if (data) setMokiStats(data);
     }
     loadStats();
@@ -514,12 +514,22 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
 
     // Real-time class override using the optimized mokiStatsMap (O(1) lookup)
     sorted = sorted.map(moki => {
-      // Use moki_id or name for lookup in the pre-calculated Map
       const dbStat = mokiStatsMap.get(moki['Moki ID']) || mokiStatsMap.get(moki.Name.toUpperCase());
-      return {
-        ...moki,
-        Class: dbStat?.class || moki.Class
-      };
+      let displayClass = dbStat?.class || moki.Class;
+
+      // Apply subclass suffix for Grinder and Sprinter
+      if (dbStat) {
+        const dex = parseFloat(dbStat.dexterity || 0);
+        const str = parseFloat(dbStat.strength || 0);
+        const def = parseFloat(dbStat.defense || 0);
+        if (displayClass === 'Grinder') {
+          displayClass = dex > str ? 'Grinder (S)' : 'Grinder (B)';
+        } else if (displayClass === 'Sprinter') {
+          displayClass = dex > def ? 'Sprinter (S)' : 'Sprinter (D)';
+        }
+      }
+
+      return { ...moki, Class: displayClass };
     });
 
     // 1. Determine base sorting metric based on sortMode
@@ -666,7 +676,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     // Apply Class Filter
     if (modalFilters.class !== 'ALL') {
       const classFilter = modalFilters.class.toLowerCase().trim();
-      filtered = filtered.filter(m => (m.Class || '').toLowerCase().trim() === classFilter);
+      filtered = filtered.filter(m => (m.Class || '').toLowerCase().trim().startsWith(classFilter));
     }
     // Apply Fur Filter
     if (modalFilters.fur !== 'ALL') {
@@ -887,7 +897,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
 
     let currentMokiStats = mokiStats;
     try {
-      const { data } = await supabase.from('moki_stats').select('moki_id, name, class');
+      const { data } = await supabase.from('moki_stats').select('moki_id, name, class, dexterity, strength, defense');
       if (data) {
         currentMokiStats = data;
         setMokiStats(data); // update the state too for the ranking table
@@ -899,10 +909,20 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     // Real-time class override from fresh moki_stats before generating
     const rankingWithFreshClasses = (rankingData as unknown as MokiRankingRow[]).map(moki => {
       const freshStat = currentMokiStats.find(s => s.moki_id === moki['Moki ID'] || s.name.toUpperCase() === moki.Name.toUpperCase());
-      return {
-        ...moki,
-        Class: freshStat?.class || moki.Class
-      };
+      let displayClass = freshStat?.class || moki.Class;
+
+      if (freshStat) {
+        const dex = parseFloat(freshStat.dexterity || 0);
+        const str = parseFloat(freshStat.strength || 0);
+        const def = parseFloat(freshStat.defense || 0);
+        if (displayClass === 'Grinder') {
+          displayClass = dex > str ? 'Grinder (S)' : 'Grinder (B)';
+        } else if (displayClass === 'Sprinter') {
+          displayClass = dex > def ? 'Sprinter (S)' : 'Sprinter (D)';
+        }
+      }
+
+      return { ...moki, Class: displayClass };
     });
 
     const results = generateLineups({

@@ -20,6 +20,9 @@ sys.path.append(str(Path(__file__).parent))
 
 import importlib
 _preprocess = importlib.import_module("2_preprocess")
+load_moki_stats_cache = _preprocess.load_moki_stats_cache
+get_effective_class = _preprocess.get_effective_class
+calculate_role_adjusted_points = _preprocess.calculate_role_adjusted_points
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -73,11 +76,14 @@ def identify_roles_and_features(row):
     for i in range(1, 7):
         tid_col = f"p{i}_token_id"
         if tid_col not in row or pd.isna(row[tid_col]): continue
+        tid = int(row[tid_col])
+        raw_class = str(row.get(f"p{i}_class", ""))
+        eff_class = get_effective_class(tid, raw_class)
         players.append({
-            "token_id": int(row[tid_col]),
+            "token_id": tid,
             "name": str(row.get(f"p{i}_name", "")),
             "team": str(row.get(f"p{i}_team", "")),
-            "class": str(row.get(f"p{i}_class", ""))
+            "class": eff_class
         })
     
     this_player = next((p for p in players if p["token_id"] == moki_tid), None)
@@ -121,12 +127,16 @@ def main():
         return
 
     print(f"[INFO] Reading {INPUT_PATH}...")
+    load_moki_stats_cache()
     df = pd.read_csv(INPUT_PATH)
     
-    # Calculate actual points using the central formula from _preprocess
-    df["actual_points"] = df.apply(lambda r: _preprocess.calculate_points(
+    # Calculate actual points using role-adjusted formula (matches training target)
+    # The model was trained on adjusted points, so we evaluate on the same scale.
+    # We also keep raw points for reference.
+    df["actual_points_raw"] = df.apply(lambda r: _preprocess.calculate_points(
         r["res_won"], r["res_eliminations"], r["res_deposits"], r["res_wart_distance"]
     ), axis=1)
+    df["actual_points"] = df.apply(calculate_role_adjusted_points, axis=1)
     
     results = []
     moki_ids = df["moki_token_id"].unique()
@@ -138,7 +148,7 @@ def main():
         if len(moki_df) < 1: continue
         
         features_list = []
-        actual_vals = {"score": [], "win": [], "deaths": [], "deposits": []}
+        actual_vals = {"score": [], "score_raw": [], "win": [], "deaths": [], "deposits": []}
         champ_class = ""
         
         for _, row in moki_df.iterrows():
@@ -147,6 +157,7 @@ def main():
             
             features_list.append(feat)
             actual_vals["score"].append(row["actual_points"])
+            actual_vals["score_raw"].append(row["actual_points_raw"])
             actual_vals["win"].append(1 if row["res_won"] else 0)
             actual_vals["deaths"].append(row["res_deaths"])
             actual_vals["deposits"].append(row["res_deposits"])
@@ -172,7 +183,8 @@ def main():
             "class": champ_class,
             "matches": len(df_feat),
             "pred_score": sum(pred_scores),
-            "actual_score": sum(actual_vals["score"]),
+            "actual_score": sum(actual_vals["score"]),           # role-adjusted (= training target)
+            "actual_score_raw": sum(actual_vals["score_raw"]),   # raw points (for reference)
             "score_abs_error": abs(sum(pred_scores) - sum(actual_vals["score"])),
             "pred_winrate": (sum(pred_win_probs) / len(df_feat)) * 100,
             "actual_winrate": (sum(actual_vals["win"]) / len(df_feat)) * 100,
@@ -190,9 +202,9 @@ def main():
     print("\n" + "="*50)
     print("GLOBAL PERFORMANCE REPORT (10-MATCH BLOCKS)")
     print("="*50)
-    print(f"Mean Absolute Error (Score):   {mae_score:.2f} pts")
-    print(f"Mean Absolute Error (WinRate): {mae_winrate:.2f}%")
-    print(f"Total Mokis Evaluated:         {len(eval_df)}")
+    print(f"Mean Absolute Error (Score, adj):  {mae_score:.2f} pts  ← model comparison scale")
+    print(f"Mean Absolute Error (WinRate):     {mae_winrate:.2f}%")
+    print(f"Total Mokis Evaluated:             {len(eval_df)}")
     
     # Report by Class
     class_report = eval_df.groupby("class").agg({

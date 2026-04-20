@@ -21,9 +21,9 @@ interface PriceData { ronUsdRate: number; plans: Record<Plan, PlanInfo>; discoun
 const PLAN_LABELS: Record<Plan, { title: string; duration: string; badge?: string }> = {
   DAILY: { title: '3-DAYS', duration: '72 hours' },
   WEEKLY: { title: 'WEEKLY', duration: '7 days', badge: 'POPULAR' },
-  SEASON: { title: 'SEASON', duration: '5 WEEKS', badge: 'BEST VALUE' },
+  SEASON: { title: 'SEASON', duration: '4 WEEKS', badge: 'BEST VALUE' },
 };
-const PLAN_USD: Record<Plan, number> = { DAILY: 3, WEEKLY: 5, SEASON: 25 };
+const PLAN_USD: Record<Plan, number> = { DAILY: 3, WEEKLY: 5, SEASON: 15 };
 
 interface Props {
   children: React.ReactNode;
@@ -523,7 +523,7 @@ export default function PredictionsGate({ children, hasUserCards, onLoadCards, o
                   title = 'WEEKLY (+2)';
                   duration = '9 days';
                 } else if (plan === 'SEASON') {
-                  priceStr = '$22.50';
+                  priceStr = '$13.50';
                 }
               }
 

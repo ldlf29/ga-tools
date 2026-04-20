@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const PLAN_USD: Record<string, number> = { DAILY: 3, WEEKLY: 5, SEASON: 25 };
+const PLAN_USD: Record<string, number> = { DAILY: 3, WEEKLY: 5, SEASON: 15 };
 const USDC_DECIMALS = 6;
 
 let cachedPrice: number | null = null;

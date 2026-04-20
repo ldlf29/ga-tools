@@ -17,6 +17,17 @@ import { isSchemeTrait } from '@/data/traitMapping';
 // ─── Cache ────────────────────────────────────────────────────────────────────
 let cachedMatchesData: UpcomingMatchData[] = [];
 
+// ─── Subclass suffix helper ───────────────────────────────────────────────────
+function getDisplayClass(baseClass: string, dbStat?: any): string {
+  if (!dbStat) return baseClass;
+  const dex = parseFloat(dbStat.dexterity || 0);
+  const str = parseFloat(dbStat.strength || 0);
+  const def = parseFloat(dbStat.defense || 0);
+  if (baseClass === 'Grinder') return dex > str ? 'Grinder (S)' : 'Grinder (B)';
+  if (baseClass === 'Sprinter') return dex > def ? 'Sprinter (S)' : 'Sprinter (D)';
+  return baseClass;
+}
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface UpcomingMatchData {
   id: string;
@@ -106,7 +117,7 @@ export default function Champions({
       // Load moki_stats for real-time class verification
       const { data: statsData } = await supabase
         .from('moki_stats')
-        .select('moki_id, name, class, eliminations, deposits, wart_distance, score, win_rate');
+        .select('moki_id, name, class, eliminations, deposits, wart_distance, score, win_rate, dexterity, strength, defense');
       if (statsData) setMokiStats(statsData);
 
       // Load averages (10/20 matches)
@@ -273,7 +284,16 @@ export default function Champions({
         normalizeName(a.moki_name) === normalizedName
       );
 
-      const currentClass = dbStat?.class || fullCard?.custom?.class || champ.class;
+      const rawClass = dbStat?.class || fullCard?.custom?.class || champ.class;
+      const currentClass = (() => {
+        if (!dbStat) return rawClass;
+        const dex = parseFloat(dbStat.dexterity || 0);
+        const str = parseFloat(dbStat.strength || 0);
+        const def = parseFloat(dbStat.defense || 0);
+        if (rawClass === 'Grinder') return dex > str ? 'Grinder (S)' : 'Grinder (B)';
+        if (rawClass === 'Sprinter') return dex > def ? 'Sprinter (S)' : 'Sprinter (D)';
+        return rawClass;
+      })();
 
       // Create a localized card with Supabase overrides for real-time accuracy
       let mergedCard = fullCard || { id: metadata?.id || champ.id, name: champ.name, custom: {} } as any;
@@ -1243,7 +1263,7 @@ export default function Champions({
                                     const fc = allCards.find((c) => c.name.trim().toUpperCase() === normalizedName);
                                     const metadata = (mokiMetadata as any)[normalizedName] || (mokiMetadata as any)[normalizedName.replace(/ /g, '_')];
                                     const dbStat = mokiStats.find((s: any) => s.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || s.name.toUpperCase() === normalizedName);
-                                    const actualClass = dbStat?.class || fc?.custom?.class || m.class;
+                                    const actualClass = getDisplayClass(dbStat?.class || fc?.custom?.class || m.class, dbStat);
                                     return (
                                       <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                         <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
@@ -1261,7 +1281,7 @@ export default function Champions({
                                     const fc = allCards.find((c) => c.name.trim().toUpperCase() === normalizedName);
                                     const metadata = (mokiMetadata as any)[normalizedName] || (mokiMetadata as any)[normalizedName.replace(/ /g, '_')];
                                     const dbStat = mokiStats.find((s: any) => s.moki_id === (metadata?.id ? parseInt(metadata.id, 10) : null) || s.name.toUpperCase() === normalizedName);
-                                    const actualClass = dbStat?.class || fc?.custom?.class || m.class;
+                                    const actualClass = getDisplayClass(dbStat?.class || fc?.custom?.class || m.class, dbStat);
                                     return (
                                       <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                         <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>

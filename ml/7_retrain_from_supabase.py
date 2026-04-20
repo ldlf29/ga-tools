@@ -72,6 +72,10 @@ def download_recent_matches():
     max_empty_days = 15 # Si pasamos 15 días sin datos, asumimos que llegamos al principio
     
     while True:
+        if current_date.date() < datetime(2026, 4, 6).date():
+            print("[INFO] Reached April 6, 2026 cutoff. Stopping download.")
+            break
+            
         date_str = current_date.strftime("%Y-%m-%d")
         
         from_idx = 0
@@ -124,10 +128,6 @@ def download_recent_matches():
             consecutive_empty_days += 1
         else:
             consecutive_empty_days = 0
-            
-        if consecutive_empty_days >= max_empty_days:
-            print(f"[INFO] Se alcanzaron {max_empty_days} días consecutivos sin datos. Asumiendo fin del historial.")
-            break
             
         current_date -= timedelta(days=1)
         

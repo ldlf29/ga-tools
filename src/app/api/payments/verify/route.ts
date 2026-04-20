@@ -11,11 +11,11 @@ const RONIN_RPC = process.env.RONIN_RPC_URL || 'https://api.roninchain.com/rpc';
 const JWT_SECRET = new TextEncoder().encode(process.env.PREDICTIONS_JWT_SECRET!);
 const TRANSFER_TOPIC = ethers.id('Transfer(address,address,uint256)');
 
-const PLAN_USD: Record<string, number> = { DAILY: 3, WEEKLY: 5, SEASON: 25 };
+const PLAN_USD: Record<string, number> = { DAILY: 3, WEEKLY: 5, SEASON: 15 };
 const PLAN_DURATIONS_MS: Record<string, number> = {
   DAILY: 72 * 3600 * 1000,
   WEEKLY: 7 * 24 * 3600 * 1000,
-  SEASON: 70 * 24 * 3600 * 1000,
+  SEASON: 28 * 24 * 3600 * 1000,
 };
 
 /** Direct JSON-RPC call — more reliable than ethers with Ronin's public endpoint */

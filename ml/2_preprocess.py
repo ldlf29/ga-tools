@@ -41,7 +41,21 @@ import re
 from math import floor
 from pathlib import Path
 
+import os
+import requests
+from dotenv import load_dotenv
+
 import pandas as pd
+
+# ─── Variables de Entorno ────────────────────────────────────────────────────
+ENV_PATH = Path(__file__).parent.parent / ".env.local"
+if ENV_PATH.exists():
+    load_dotenv(ENV_PATH)
+else:
+    load_dotenv()
+
+SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
 
 # ─── Rutas ───────────────────────────────────────────────────────────────────
 
@@ -58,6 +72,93 @@ WIN_TYPE_MAP = {
     "deposits":     "Gacha",
     "wart":         "Wart",
 }
+
+MOKI_STATS_CACHE = {}
+
+def load_moki_stats_cache():
+    """Descarga stats globales de Supabase (class, dex, str, def)."""
+    global MOKI_STATS_CACHE
+    if not SUPABASE_URL:
+        print("[WARN] NEXT_PUBLIC_SUPABASE_URL no configurado.")
+        return
+        
+    print("[INFO] Fetching moki_stats desde Supabase...")
+    url = f"{SUPABASE_URL}/rest/v1/moki_stats?select=moki_id,class,dexterity,strength,defense"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}"
+    }
+    try:
+        res = requests.get(url, headers=headers).json()
+        MOKI_STATS_CACHE = {
+            int(row["moki_id"]): {
+                "class": str(row.get("class", "")),
+                "dexterity": float(row.get("dexterity", 0)),
+                "strength": float(row.get("strength", 0)),
+                "defense": float(row.get("defense", 0))
+            } for row in res if row.get("moki_id")
+        }
+        print(f"[OK] {len(MOKI_STATS_CACHE)} moki stats cargados (Sub-clasing habilitado).")
+    except Exception as e:
+        print("[WARN] Error al obtener moki_stats:", e)
+
+def get_effective_class(moki_id: int, fallback_class: str) -> str:
+    """
+    Subclassing Logic basado en metadata:
+    Grinder -> Striker (DEX > STR), else Bruiser
+    Sprinter -> Striker (DEX > DEF), else Defender
+    """
+    if moki_id not in MOKI_STATS_CACHE:
+        return fallback_class
+        
+    stats = MOKI_STATS_CACHE[moki_id]
+    base_class = stats.get("class", fallback_class) or fallback_class
+    
+    if base_class == "Grinder":
+        dex = stats.get("dexterity", 0)
+        str_val = stats.get("strength", 0)
+        return "Striker" if dex > str_val else "Bruiser"
+    elif base_class == "Sprinter":
+        dex = stats.get("dexterity", 0)
+        def_val = stats.get("defense", 0)
+        return "Striker" if dex > def_val else "Defender"
+        
+    return base_class
+
+OUT_OF_ROLE_DISCOUNT = 0.80
+
+def calculate_role_adjusted_points(row) -> float:
+    """
+    Aplica un descuento de 0.80x a los puntos que provienen de acciones
+    fuera del rol especializado del champion.
+    
+    Striker:  in-role = deposits.       Out-of-role = kills, wart
+    Bruiser:  in-role = kills.          Out-of-role = deposits, wart
+    Defender: in-role = wart.           Out-of-role = kills, deposits
+    Generalist (otros): sin descuento.
+    """
+    cls = str(row.get("champ_class", ""))
+    is_win = bool(row.get("res_won", False))
+    kills = int(row.get("res_eliminations", 0) or 0)
+    deposits = int(row.get("res_deposits", 0) or 0)
+    wart_dist = float(row.get("res_wart_distance", 0.0) or 0.0)
+    
+    win_pts = 200 if is_win else 0
+    kills_pts = kills * 80
+    deposits_pts = deposits * 50
+    wart_pts = floor(wart_dist / 80) * 40
+    
+    d = OUT_OF_ROLE_DISCOUNT
+    
+    if cls == "Striker":
+        return win_pts + (kills_pts * d) + deposits_pts + (wart_pts * d)
+    elif cls == "Bruiser":
+        return win_pts + kills_pts + (deposits_pts * d) + (wart_pts * d)
+    elif cls == "Defender":
+        return win_pts + kills_pts + (deposits_pts * d) + wart_pts
+    else:
+        # Generalist classes: no discount
+        return win_pts + kills_pts + deposits_pts + wart_pts
 
 # ─── Punto 1: Cálculo de puntos ───────────────────────────────────────────────
 
@@ -111,11 +212,15 @@ def identify_roles(row: pd.Series) -> pd.Series:
     for i in range(1, 7):
         if pd.isna(row.get(f"p{i}_token_id")):
             continue
+        tid = int(row.get(f"p{i}_token_id", 0) or 0)
+        raw_class = str(row.get(f"p{i}_class", "") or "")
+        eff_class = get_effective_class(tid, raw_class)
+        
         players.append({
-            "token_id": int(row.get(f"p{i}_token_id", 0) or 0),
+            "token_id": tid,
             "name":     str(row.get(f"p{i}_name",     "") or ""),
             "team":     str(row.get(f"p{i}_team",     "") or ""),
-            "class":    str(row.get(f"p{i}_class",    "") or ""),
+            "class":    eff_class,
         })
 
     if not players:
@@ -223,6 +328,7 @@ def preprocess(
 ) -> pd.DataFrame:
 
     print(f"[INFO] Leyendo {input_path}...")
+    load_moki_stats_cache()
     df = pd.read_csv(input_path, low_memory=False)
     print(f"[INFO] Shape inicial: {df.shape}")
 
@@ -242,6 +348,12 @@ def preprocess(
     print("[INFO] Identificando roles de jugadores...")
     roles = df.apply(identify_roles, axis=1)
     df = pd.concat([df, roles], axis=1)
+
+    # ── 2b. Ajuste de puntos por rol (descuento fuera-de-rol) ─────────────────
+    raw_avg = df["total_points"].mean()
+    df["total_points"] = df.apply(calculate_role_adjusted_points, axis=1)
+    adj_avg = df["total_points"].mean()
+    print(f"[INFO] Role Discount aplicado (0.80x fuera-de-rol). Promedio: {raw_avg:.1f} → {adj_avg:.1f}")
 
     # ── 3. Feature crosses ─────────────────────────────────────────────────────
     df = create_comp_features(df)
