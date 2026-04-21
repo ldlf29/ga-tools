@@ -890,116 +890,124 @@ function generateStandard(
 
   const getAvailablePool = () => pool.filter(m => (stockMap.get(`${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`) ?? 0) > 0);
 
-  for (const scheme of traitSchemes) {
-    if (traitPool.length + specPool.length >= SAFETY_LIMIT) break;
-    if (traitPool.length >= traitLimit) break;
+  let canBuildAnother = true;
+  while (canBuildAnother && (traitPool.length + specPool.length) < SAFETY_LIMIT) {
+    let bestLineup: GeneratedLineup | null = null;
+    let bestScheme: any | null = null;
+    let isTrait = false;
 
-    let canBuildAnother = true;
-    while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT) && (traitPool.length < traitLimit)) {
-      // Check scheme stock if "Only My Schemes" is on
-      if (params.useOnlyMySchemes && !params.modes?.noScheme) {
-        if ((schemeStockMap.get(scheme.name.toUpperCase()) ?? 0) <= 0) {
-          canBuildAnother = false;
-          break;
+    // Evaluate all valid trait schemes
+    if (traitPool.length < traitLimit) {
+      for (const scheme of traitSchemes) {
+        if (params.useOnlyMySchemes && !params.modes?.noScheme) {
+          if ((schemeStockMap.get(scheme.name.toUpperCase()) ?? 0) <= 0) continue;
         }
-      }
 
-      const currentPool = getAvailablePool().filter(m => mokiMatchesScheme(m as unknown as MokiRankingRow, scheme));
-      const lineup = buildLineup(
-        currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
-        'trait-fur', championSlots, 14000,
-        scheme.name, scheme.image, 'trait-fur', `tf-${scheme.name}-${traitPool.length}`,
-        stockMap, params.modes
-      );
+        const currentPool = getAvailablePool().filter(m => mokiMatchesScheme(m as unknown as MokiRankingRow, scheme));
+        const lineup = buildLineup(
+          currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
+          'trait-fur', championSlots, 14000,
+          scheme.name, scheme.image, 'trait-fur', `tf-${scheme.name}-${traitPool.length + specPool.length}`,
+          stockMap, params.modes
+        );
 
-      if (lineup) {
-        const fingerprint = getLineupFingerprint(lineup.mokis);
-        if (!globalSeenFingerprints.has(fingerprint)) {
-          const currentStock = schemeStockMap.get(scheme.name.toUpperCase()) ?? 0;
-          const hasSchemeCard = currentStock > 0;
-          if (hasSchemeCard) {
-            schemeStockMap.set(scheme.name.toUpperCase(), currentStock - 1);
+        if (lineup) {
+          if (!bestLineup) {
+            bestLineup = lineup;
+            bestScheme = scheme;
+            isTrait = true;
+          } else {
+            const isBetter = params.modes?.lowestScore 
+              ? lineup.totalEffectiveScore < bestLineup.totalEffectiveScore 
+              : lineup.totalEffectiveScore > bestLineup.totalEffectiveScore;
+            if (isBetter) {
+              bestLineup = lineup;
+              bestScheme = scheme;
+              isTrait = true;
+            }
           }
-
-          const lineupWithOwnership = { ...lineup, hasScheme: hasSchemeCard };
-          traitPool.push(lineupWithOwnership);
-          globalSeenFingerprints.add(fingerprint);
         }
-
-        lineup.mokis.forEach(m => {
-          // ALWAYS consume stock specifically for the Moki:Rarity used
-          const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
-          stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 0) - 1));
-        });
-      } else {
-        canBuildAnother = false;
       }
     }
-  }
 
-  for (const schemeDef of relegatedSchemes) {
-    if (traitPool.length + specPool.length >= SAFETY_LIMIT) break;
-    if (specPool.length >= specLimit) break;
+    // Evaluate all valid relegated schemes
+    if (specPool.length < specLimit) {
+      for (const schemeDef of relegatedSchemes) {
+        if (params.excludedClasses.includes('STRIKER') && (schemeDef.scoreType === 'dive' || schemeDef.scoreType === 'gacha')) continue;
 
-    if (params.excludedClasses.includes('STRIKER') && (schemeDef.scoreType === 'dive' || schemeDef.scoreType === 'gacha')) continue;
-
-    let canBuildAnother = true;
-    while (canBuildAnother && (traitPool.length + specPool.length < SAFETY_LIMIT) && (specPool.length < specLimit)) {
-      // Check scheme stock if "Only My Schemes" is on
-      if (params.useOnlyMySchemes && !params.modes?.noScheme) {
-        if ((schemeStockMap.get(schemeDef.name.toUpperCase()) ?? 0) <= 0) {
-          canBuildAnother = false;
-          break;
+        if (params.useOnlyMySchemes && !params.modes?.noScheme) {
+          if ((schemeStockMap.get(schemeDef.name.toUpperCase()) ?? 0) <= 0) continue;
         }
-      }
 
-      let currentPool = getAvailablePool();
+        let currentPool = getAvailablePool();
 
-      if (schemeDef.scoreType === 'wart') {
-        currentPool = currentPool.filter(m => m.wartCloser > 5 && (m.class.toLowerCase() !== 'striker'));
-      } else if (schemeDef.scoreType === 'dive') {
-        currentPool = currentPool.filter(m => m.losses > 5);
-      } else if (schemeDef.scoreType === 'gacha') {
-        currentPool = currentPool.filter(m => m.deposits >= 38);
-      } else if (schemeDef.scoreType === ('lowest-naughty' as any)) {
-        currentPool = currentPool.filter(m => m.class.toUpperCase() === 'STRIKER');
-      } else if (schemeDef.scoreType === ('lowest-gacha' as any)) {
-        currentPool = currentPool.filter(m => m.class.toUpperCase() === 'DEFENDER');
-      } else if (schemeDef.scoreType === 'aggressive') {
-        currentPool = currentPool.filter(m => m.class.toUpperCase() === 'BRUISER');
-      } else if (schemeDef.scoreType === 'smash') {
-        currentPool = currentPool.filter(m => m.class.toUpperCase() !== 'STRIKER');
-      }
+        if (schemeDef.scoreType === 'wart') {
+          currentPool = currentPool.filter(m => m.wartCloser > 5 && (m.class.toLowerCase() !== 'striker'));
+        } else if (schemeDef.scoreType === 'dive') {
+          currentPool = currentPool.filter(m => m.losses > 5);
+        } else if (schemeDef.scoreType === 'gacha') {
+          currentPool = currentPool.filter(m => m.deposits >= 38);
+        } else if (schemeDef.scoreType === ('lowest-naughty' as any)) {
+          currentPool = currentPool.filter(m => m.class.toUpperCase() === 'STRIKER');
+        } else if (schemeDef.scoreType === ('lowest-gacha' as any)) {
+          currentPool = currentPool.filter(m => m.class.toUpperCase() === 'DEFENDER');
+        } else if (schemeDef.scoreType === 'aggressive') {
+          currentPool = currentPool.filter(m => m.class.toUpperCase() === 'BRUISER');
+        } else if (schemeDef.scoreType === 'smash') {
+          currentPool = currentPool.filter(m => m.class.toUpperCase() !== 'STRIKER');
+        }
 
-      const lineup = buildLineup(
-        currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
-        schemeDef.scoreType, championSlots, 18000,
-        schemeDef.name, schemeDef.image, 'relegated', `rel-${schemeDef.name}-${specPool.length}`,
-        stockMap, params.modes
-      );
+        const lineup = buildLineup(
+          currentPool, new Set(), conflictSet, params.avoidMatchupConflicts,
+          schemeDef.scoreType, championSlots, 18000,
+          schemeDef.name, schemeDef.image, 'relegated', `rel-${schemeDef.name}-${traitPool.length + specPool.length}`,
+          stockMap, params.modes
+        );
 
-      if (lineup) {
-        const fingerprint = getLineupFingerprint(lineup.mokis);
-        if (!globalSeenFingerprints.has(fingerprint)) {
-          const currentStock = schemeStockMap.get(schemeDef.name.toUpperCase()) ?? 0;
-          const hasSchemeCard = currentStock > 0;
-          if (hasSchemeCard) {
-            schemeStockMap.set(schemeDef.name.toUpperCase(), currentStock - 1);
+        if (lineup) {
+          if (!bestLineup) {
+            bestLineup = lineup;
+            bestScheme = schemeDef;
+            isTrait = false;
+          } else {
+            const isBetter = params.modes?.lowestScore 
+              ? lineup.totalEffectiveScore < bestLineup.totalEffectiveScore 
+              : lineup.totalEffectiveScore > bestLineup.totalEffectiveScore;
+            if (isBetter) {
+              bestLineup = lineup;
+              bestScheme = schemeDef;
+              isTrait = false;
+            }
           }
+        }
+      }
+    }
 
-          const lineupWithOwnership = { ...lineup, hasScheme: hasSchemeCard };
-          specPool.push(lineupWithOwnership);
-          globalSeenFingerprints.add(fingerprint);
+    if (bestLineup && bestScheme) {
+      const fingerprint = getLineupFingerprint(bestLineup.mokis);
+      if (!globalSeenFingerprints.has(fingerprint)) {
+        const currentStock = schemeStockMap.get(bestScheme.name.toUpperCase()) ?? 0;
+        const hasSchemeCard = currentStock > 0;
+        if (hasSchemeCard) {
+          schemeStockMap.set(bestScheme.name.toUpperCase(), currentStock - 1);
         }
 
-        lineup.mokis.forEach(m => {
-          // ALWAYS consume stock specifically for the Moki:Rarity used
-          const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
-          stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 0) - 1));
-        });
-      } else {
-        canBuildAnother = false;
+        const lineupWithOwnership = { ...bestLineup, hasScheme: hasSchemeCard };
+        if (isTrait) {
+          traitPool.push(lineupWithOwnership);
+        } else {
+          specPool.push(lineupWithOwnership);
+        }
+        globalSeenFingerprints.add(fingerprint);
       }
+
+      bestLineup.mokis.forEach(m => {
+        // ALWAYS consume stock specifically for the Moki:Rarity used
+        const key = `${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`;
+        stockMap.set(key, Math.max(0, (stockMap.get(key) ?? 0) - 1));
+      });
+    } else {
+      canBuildAnother = false;
     }
   }
 
