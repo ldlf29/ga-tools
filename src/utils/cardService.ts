@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fetchLiveData, fetchCatalogData, LiveDataMap } from './liveData';
 import { EnhancedCard } from '@/types';
+import { getFromDB, setInDB } from './idb';
 
 // Cache live data in memory
 let cachedLiveData: LiveDataMap | null = null;
@@ -322,54 +323,69 @@ export const fetchUserCards = async (
 
   if (!forceRefresh && !isInitialAdd) {
     try {
-      const cachedValue = localStorage.getItem(CACHE_KEY);
+      const cachedValue = await getFromDB(CACHE_KEY);
       if (cachedValue) {
-        const fixed = cachedValue.replace(/season1-launch/gi, 'season1-v2');
-        apiCards = JSON.parse(fixed);
-        console.log(
-          `[CardService] Loaded ${apiCards.length} cards from local cache for ${walletAddress}`
-        );
+        apiCards = JSON.parse(cachedValue.replace(/season1-launch/gi, 'season1-v2'));
+        console.log(`[CardService] Loaded ${apiCards.length} cards from idb cache for ${walletAddress}`);
       }
     } catch (e) {
-      console.warn(
-        '[CardService] Failed to parse local cache for user cards',
-        e
-      );
+      console.warn('[CardService] Failed to parse idb cache for user cards', e);
     }
   }
 
   if (apiCards.length === 0) {
-    console.log(
-      `[CardService] Fetching fresh cards for ${walletAddress} from API...`
-    );
-    let fetchUrl: string;
-    if (isInitialAdd) {
-      fetchUrl = `/api/user-cards?address=${walletAddress}&initial=true`;
-    } else if (forceRefresh) {
-      fetchUrl = `/api/user-cards?address=${walletAddress}&force=true`;
-    } else {
-      fetchUrl = `/api/user-cards?address=${walletAddress}`;
+    console.log(`[CardService] Fetching fresh cards for ${walletAddress} via paginated API...`);
+    let fetching = true;
+    let pageKey = '';
+    
+    while (fetching) {
+      let fetchUrl = `/api/user-cards?address=${walletAddress}`;
+      if (isInitialAdd) fetchUrl += '&initial=true';
+      else if (forceRefresh) fetchUrl += '&force=true';
+      
+      if (pageKey) fetchUrl += `&pageKey=${encodeURIComponent(pageKey)}`;
+
+      let retries = 0;
+      let success = false;
+      let jsonResponse: any;
+
+      while (retries < 5 && !success) {
+        try {
+          const response = await fetch(fetchUrl);
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Failed to fetch user cards (${response.status})`);
+          }
+          jsonResponse = await response.json();
+          success = true;
+        } catch (err) {
+          retries++;
+          console.warn(`[CardService] Alchemy pagination failed, retrying (${retries}/5) in ${retries * 2}s...`, err);
+          if (retries >= 5) {
+            throw err;
+          }
+          await new Promise(r => setTimeout(r, retries * 2000));
+        }
+      }
+
+      const newBatch = jsonResponse.data as APICard[];
+      if (newBatch && newBatch.length > 0) {
+        apiCards = apiCards.concat(newBatch);
+      }
+
+      if (jsonResponse.nextPageKey) {
+        pageKey = jsonResponse.nextPageKey;
+      } else {
+        fetching = false;
+      }
     }
 
-    const response = await fetch(fetchUrl);
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error || `Failed to fetch user cards (${response.status})`
-      );
-    }
-
-    const jsonResponse = await response.json();
-    apiCards = jsonResponse.data as APICard[];
-
-    if (apiCards) {
+    if (apiCards.length > 0) {
       try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(apiCards));
-        console.log(
-          `[CardService] Saved ${apiCards.length} cards to local cache for ${walletAddress}`
-        );
+        await setInDB(CACHE_KEY, JSON.stringify(apiCards));
+        console.log(`[CardService] Saved ${apiCards.length} cards to idb cache for ${walletAddress}`);
       } catch (e) {
-        console.warn('[CardService] Failed to save cards to local cache', e);
+        console.warn('[CardService] Failed to save cards to idb cache', e);
       }
     }
   }
@@ -387,15 +403,46 @@ export const fetchUserCards = async (
     });
   }
 
-  return apiCards
+  // ── Diagnostic counters ─────────────────────────────────────────────────
+  let diagNoApiImage = 0;
+  let diagNoCatalogFallback = 0;
+  let diagSpecialNoImage = 0;
+  let diagNormalNoImage = 0;
+
+  const mapped = apiCards
     .map((apiCard): EnhancedCard => {
-      const normalizedName = apiCard.cardName.trim().toUpperCase();
+      let normalizedName = apiCard.cardName.trim().toUpperCase();
+      
+      // Aggressively clean up prefixes/suffixes to ensure it matches catalog strings
+      normalizedName = normalizedName
+        .replace(/GRAND\s*ARENA(\s*-\s*)?/gi, '')
+        .replace(/SCHEME(\s*-\s*)?/gi, '')
+        .replace(/\s*#\d+$/g, '') 
+        .replace(/\(.*\)/g, '')
+        .trim();
+
       const cardType = mapCardType(apiCard.cardType);
       const rarity = capitalizeRarity(apiCard.rarity);
       const isSpecial = !!apiCard.seriesInfo;
 
       const catalogKey = `${normalizedName}|${rarity.toUpperCase()}`;
-      const catalogData = catalogMap.get(catalogKey);
+      let catalogData = catalogMap.get(catalogKey);
+      
+      // Fallback try without class suffixes if still not found
+      if (!catalogData && normalizedName.includes(' - ')) {
+        const splitName = normalizedName.split(' - ')[0].trim();
+        catalogData = catalogMap.get(`${splitName}|${rarity.toUpperCase()}`);
+      }
+
+      // Diagnostic tracking
+      if (!apiCard.imageUrl) {
+        diagNoApiImage++;
+        if (!catalogData?.image) {
+          diagNoCatalogFallback++;
+          if (isSpecial) diagSpecialNoImage++;
+          else diagNormalNoImage++;
+        }
+      }
 
       const cardImage = apiCard.imageUrl || catalogData?.image || '';
 
@@ -412,6 +459,19 @@ export const fetchUserCards = async (
         catalogData?.market,
         apiCard
       );
-    })
-    .filter((card) => card.image && card.image.trim() !== '');
+    });
+
+  const filtered = mapped.filter((card) => card.image && card.image.trim() !== '' && card.image !== '/favicon.ico');
+
+  console.group('[CardService] Image Resolution Diagnostics');
+  console.log(`Total from Alchemy:       ${apiCards.length}`);
+  console.log(`After filter (displayed): ${filtered.length}`);
+  console.log(`Dropped by filter:        ${apiCards.length - filtered.length}`);
+  console.log(`  → No API imageUrl:      ${diagNoApiImage}`);
+  console.log(`  → No catalog fallback:  ${diagNoCatalogFallback}`);
+  console.log(`     → Special cards:     ${diagSpecialNoImage}`);
+  console.log(`     → Normal cards:      ${diagNormalNoImage}`);
+  console.groupEnd();
+
+  return filtered;
 };

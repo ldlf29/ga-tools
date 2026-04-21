@@ -9,6 +9,8 @@ const isValidAddress = (addr: string): boolean =>
 export async function GET(request: NextRequest) {
   const address = request.nextUrl.searchParams.get('address');
 
+  const pageKey = request.nextUrl.searchParams.get('pageKey') || undefined;
+
   if (!address) {
     return NextResponse.json(
       { error: 'Missing Wallet Address' },
@@ -27,21 +29,18 @@ export async function GET(request: NextRequest) {
 
   const CONTRACT_ADDRESS = '0x9e8ed4ff354bd11602255b3d8e1ed13a1bb26b4b';
 
-  console.log(
-    `[API] Fetching cards for wallet ${address.substring(0, 6)}...${address.slice(-4)}`
-  );
-
   try {
     const alchemy = AlchemyService.getInstance();
 
-    // 1. Fetch RAW data from Alchemy
-    const rawNfts = await alchemy.getWalletNFTs(address, CONTRACT_ADDRESS);
+    // 1. Fetch exactly ONE RAW page data from Alchemy
+    const { nfts: rawNfts, nextPageKey } = await alchemy.getWalletNFTsPage(address, CONTRACT_ADDRESS, pageKey);
 
     if (rawNfts.length === 0) {
       return NextResponse.json({
         data: [],
         total: 0,
-        message: 'No NFTs found for this address in the specified collection.',
+        nextPageKey,
+        message: 'No NFTs found in this page.',
         source: 'API (Alchemy - Empty)',
       });
     }
@@ -49,15 +48,12 @@ export async function GET(request: NextRequest) {
     // 2. Parse and format for the frontend
     const finalCards = alchemy.parseAlchemyNFTs(rawNfts);
 
-    console.log(
-      `[API] FINAL: ${finalCards.length} Cards Delivered via Alchemy Native.`
-    );
-
     return NextResponse.json({
       data: finalCards,
       total: finalCards.length,
-      message: 'Successfully retrieved NFTs from Alchemy.',
-      source: 'API (Alchemy Native)',
+      nextPageKey,
+      message: 'Successfully retrieved NFTs page from Alchemy.',
+      source: 'API (Alchemy Native Page)',
     });
   } catch (error: any) {
     console.error('[API] Error:', error);

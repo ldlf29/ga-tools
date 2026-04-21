@@ -55,6 +55,138 @@ export class AlchemyService {
   }
 
   /**
+   * Fetches a single page of NFTs from Alchemy, given an optional pageKey.
+   * This is used by the paginated server API to prevent 504 timeouts on massive whale wallets.
+   */
+  public async getWalletNFTsPage(
+    walletAddress: string,
+    contractAddress: string,
+    pageKey?: string
+  ): Promise<{ nfts: AlchemyNFT[]; nextPageKey?: string }> {
+    if (!walletAddress || !contractAddress) return { nfts: [] };
+
+    console.log(
+      `[AlchemyService] Fetching NFT Page for wallet ${walletAddress} (Contract ${contractAddress}, Key: ${pageKey || 'Start'})`
+    );
+
+    try {
+      const params = new URLSearchParams({
+        owner: walletAddress,
+        'contractAddresses[]': contractAddress,
+        withMetadata: 'true',
+      });
+
+      if (pageKey && pageKey !== 'undefined') {
+        params.append('pageKey', pageKey);
+      }
+
+      const url = `${this.baseUrl}/getNFTs/?${params.toString()}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Alchemy API error: ${response.status} ${errorText}`);
+      }
+
+      const data = (await response.json()) as AlchemyResponse;
+      const nfts = data.ownedNfts || [];
+
+      // Helper: check if an NFT is still missing image/name
+      const isBlind = (nft: AlchemyNFT): boolean => {
+        const md = nft.metadata || (nft as any).raw?.metadata;
+        const img = (nft as any).image;
+        return !(img?.cachedUrl || img?.originalUrl || md?.image) || !(md?.name || nft.title);
+      };
+
+      // Helper: run a metadata batch and merge results back into nfts[]
+      const runBatch = async (indices: number[], refreshCache: boolean): Promise<void> => {
+        const batchSize = refreshCache ? 20 : 100;
+        for (let b = 0; b < indices.length; b += batchSize) {
+          const chunk = indices.slice(b, b + batchSize);
+          const tokens = chunk
+            .map(i => ({ contractAddress, tokenId: nfts[i].id?.tokenId }))
+            .filter(t => t.tokenId !== undefined);
+          if (tokens.length === 0) continue;
+          try {
+            const res = await fetch(`${this.baseUrl}/getNFTMetadataBatch`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({ tokens, refreshCache }),
+            });
+            if (!res.ok) continue;
+            const batchData: AlchemyNFT[] = await res.json();
+            const map = new Map<string, AlchemyNFT>();
+            batchData.forEach(bn => { if (bn?.id?.tokenId) map.set(bn.id.tokenId, bn); });
+            chunk.forEach(i => {
+              const tid = nfts[i].id?.tokenId;
+              if (tid && map.has(tid)) nfts[i] = map.get(tid)!;
+            });
+          } catch { /* skip failed sub-batch silently */ }
+        }
+      };
+
+      // Pass 1: fast cached read (100/batch)
+      const pass1 = nfts.map((n, i) => isBlind(n) ? i : -1).filter(i => i !== -1);
+      if (pass1.length > 0) {
+        console.log(`[AlchemyService] Pass 1: ${pass1.length} blind — reading Alchemy cache`);
+        await runBatch(pass1, false);
+      }
+
+      // Pass 2: force re-index from blockchain for any still blind (20/batch, slower)
+      const pass2 = nfts.map((n, i) => isBlind(n) ? i : -1).filter(i => i !== -1);
+      if (pass2.length > 0) {
+        console.log(`[AlchemyService] Pass 2: ${pass2.length} still blind — forcing Alchemy re-index`);
+        await runBatch(pass2, true);
+      }
+
+      // Pass 3: Direct HTTP fetch for any still blind.
+      // 166 or so tokens are stuck on `fantasy.grandarena.gg/api...`. Alchemy
+      // caching blocks them. We can fetch these directly safely because they
+      // aren't routing through IPFS gateways.
+      const pass3 = nfts.map((n, i) => isBlind(n) ? i : -1).filter(i => i !== -1);
+      if (pass3.length > 0) {
+        console.log(`[AlchemyService] Pass 3: ${pass3.length} still blind — fetching native HTTP tokenURI direct`);
+        await Promise.allSettled(
+          pass3.map(async i => {
+            const nft = nfts[i];
+            const uri = nft.tokenUri?.raw || nft.tokenUri?.gateway;
+            if (uri && uri.startsWith('http')) {
+              try {
+                const res = await fetch(uri, { signal: AbortSignal.timeout(3000) });
+                if (res.ok) {
+                  const fetchedMd = await res.json();
+                  if (fetchedMd && (fetchedMd.name || fetchedMd.title)) {
+                    nft.metadata = fetchedMd;
+                  }
+                }
+              } catch {
+                // Silently skip Direct HTTP fail
+              }
+            }
+          })
+        );
+      }
+
+      const finalBlind = nfts.filter(isBlind);
+      if (finalBlind.length > 0) {
+        console.warn(`[AlchemyService] ${finalBlind.length} ultimately unresolvable (probably broken contract states).`);
+      }
+
+      return {
+        nfts,
+        nextPageKey: data.pageKey,
+      };
+    } catch (error) {
+      console.error('[AlchemyService] Error fetching NFT Page:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Fetches all NFTs for a given wallet address from a specific contract.
    * Automatically handles pagination to retrieve the complete collection.
    */
@@ -161,8 +293,16 @@ export class AlchemyService {
         finalCardType = 'scheme';
       }
 
-      // Get image from metadata or media array
-      let imageUrl = metadata?.image || '';
+      // Get image from metadata or Alchemy v3 image object natively
+      const alchemyImage = (nft as any).image;
+      
+      let imageUrl = 
+        alchemyImage?.cachedUrl || 
+        alchemyImage?.originalUrl || 
+        alchemyImage?.thumbnailUrl || 
+        metadata?.image || 
+        '';
+
       if (!imageUrl && nft.media && nft.media.length > 0) {
         imageUrl = nft.media[0].gateway || nft.media[0].raw || '';
       }

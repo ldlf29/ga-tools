@@ -4,7 +4,7 @@ import type { Contest } from '@/types/contest';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type ScoreType = 'trait-fur' | 'wart' | 'dive' | 'gacha' | 'one-of-each';
+export type ScoreType = 'trait-fur' | 'wart' | 'dive' | 'gacha' | 'one-of-each' | 'aggressive' | 'smash';
 
 export interface MokiRankingRow {
   'Moki ID': number;
@@ -20,6 +20,7 @@ export interface MokiRankingRow {
   Deposits: number;
   'Wart Distance': number;
   'Matches Played'?: number;
+  'Win By Combat'?: number;
   Fur: string;
   Traits: string;
 }
@@ -38,6 +39,7 @@ export interface MokiCandidate {
   deaths: number;
   deposits: number;
   wartDistance: number;
+  winByCombat: number;
   rarity: string;
   cardImage: string;
   copies: number;
@@ -98,6 +100,7 @@ export interface GenerateParams {
   useOnlyMySchemes?: boolean;
   cardSource: 'ALL' | 'MY';
   selectedScheme?: string;
+  selectedTraitScheme?: string;
   modes?: GameModes;
 }
 
@@ -130,6 +133,8 @@ const RELEGATED_SCHEMES = [
   { name: 'Touching The Wart', image: '/scheme/touching the wart.webp', scoreType: 'wart' as const },
   { name: 'Collective Specialization', image: '/scheme/collective specialization.webp', scoreType: 'gacha' as const },
   { name: 'Taking A Dive', image: '/scheme/taking a dive.webp', scoreType: 'dive' as const },
+  { name: 'Aggressive Specialization', image: '/scheme/aggressive specialization.webp', scoreType: 'aggressive' as const },
+  { name: 'Moki Smash', image: '/scheme/moki smash.webp', scoreType: 'smash' as const },
 ];
 
 const COLLECT_EM_ALL = { name: "Collect 'Em All", image: "/scheme/collect em all.webp" };
@@ -211,19 +216,40 @@ function getImageFromCatalog(name: any, rarity: string, lookup: CatalogLookup): 
 
 // ─── MY CARDS Utilities ──────────────────────────────────────────────────────
 
-function getOwnedRarities(name: any, userCards: EnhancedCard[]): { rarity: string; image: string; copies: number }[] {
-  const results: { rarity: string; image: string; copies: number }[] = [];
-  const mokiCards = userCards.filter(
-    c => c.cardType === 'MOKI' && String(c.name).toUpperCase() === String(name).toUpperCase()
-  );
-  for (const card of mokiCards) {
-    results.push({
-      rarity: card.rarity.toLowerCase(),
-      image: card.image,
-      copies: card.stackCount ?? 1,
-    });
+let lastUserCardsRef: EnhancedCard[] | null = null;
+let cachedUserCardIndex: Map<string, { rarity: string; image: string; copies: number; original: EnhancedCard }[]> = new Map();
+
+function buildUserCardIndex(userCards: EnhancedCard[]) {
+  if (userCards === lastUserCardsRef) return cachedUserCardIndex;
+  
+  cachedUserCardIndex = new Map();
+  lastUserCardsRef = userCards;
+
+  for (const card of userCards) {
+    if (card.cardType !== 'MOKI') continue;
+    const nameKey = String(card.name).toUpperCase();
+    if (!cachedUserCardIndex.has(nameKey)) cachedUserCardIndex.set(nameKey, []);
+    
+    const arr = cachedUserCardIndex.get(nameKey)!;
+    const rarityKey = card.rarity.toLowerCase();
+    const existing = arr.find(o => o.rarity === rarityKey);
+    if (existing) {
+      existing.copies += (card.stackCount ?? 1);
+    } else {
+      arr.push({
+        rarity: rarityKey,
+        image: card.image,
+        copies: card.stackCount ?? 1,
+        original: card
+      });
+    }
   }
-  return results;
+  return cachedUserCardIndex;
+}
+
+function getOwnedRarities(name: any, userCards: EnhancedCard[]): { rarity: string; image: string; copies: number }[] {
+  const index = buildUserCardIndex(userCards);
+  return index.get(String(name).toUpperCase()) || [];
 }
 
 function getBestOwnedRarityForSlot(
@@ -322,6 +348,8 @@ function getSchemeBonus(moki: MokiCandidate, scoreType: ScoreType, modes?: GameM
     case 'wart': return moki.wartCloser * 175;
     case 'dive': return moki.losses * 175;
     case 'gacha': return (moki.deposits * 25); 
+    case 'aggressive': return (moki.kills * 80) * 0.75;
+    case 'smash': return moki.winByCombat * 175;
     case 'one-of-each': return 1450;
     default:
       return modes?.classCoverage ? 1000 + 100 : 1000; // Trait bonus + Class Coverage bonus
@@ -334,6 +362,14 @@ function calcMokiBaseScore(moki: MokiCandidate, scoreType: ScoreType, modes?: Ga
     const wins = moki.winRate / 10;
     const winBonus = modes?.noWinBonus ? 0 : (wins * 200);
     base = (moki.deposits * 50) + winBonus;
+  } else if (scoreType === 'aggressive') {
+    // Aggressive Specialization: KILLS * 80 + WIN * 200
+    const wins = moki.winRate / 10;
+    const winBonus = modes?.noWinBonus ? 0 : (wins * 200);
+    base = (moki.kills * 80) + winBonus;
+  } else if (scoreType === 'smash') {
+    // Moki Smash: Base Stats
+    base = calculateMokiBaseForMode(moki, modes);
   }
   return base * getRarityMultiplier(moki.rarity);
 }
@@ -345,6 +381,14 @@ function calcValidationScore(moki: MokiCandidate, scoreType: ScoreType, modes?: 
     const winBonus = modes?.noWinBonus ? 0 : (wins * 200);
     const baseGacha = (moki.deposits * 50) + winBonus;
     return baseGacha + getSchemeBonus(moki, scoreType, modes);
+  } else if (scoreType === 'aggressive') {
+    const wins = moki.winRate / 10;
+    const winBonus = modes?.noWinBonus ? 0 : (wins * 200);
+    const baseAggressive = (moki.kills * 80) + winBonus;
+    return baseAggressive + getSchemeBonus(moki, scoreType, modes);
+  } else if (scoreType === 'smash') {
+    const baseSmash = calculateMokiBaseForMode(moki, modes);
+    return baseSmash + getSchemeBonus(moki, scoreType, modes);
   }
   return base + getSchemeBonus(moki, scoreType, modes);
 }
@@ -411,6 +455,7 @@ function buildPool(params: GenerateParams, catalogLookup: CatalogLookup): MokiCa
       deaths: typeof row.Deaths === 'number' ? row.Deaths : parseFloat(String(row.Deaths || '0')),
       deposits: typeof row.Deposits === 'number' ? row.Deposits : parseFloat(String(row.Deposits || '0')),
       wartDistance: typeof row['Wart Distance'] === 'number' ? row['Wart Distance'] : parseFloat(String(row['Wart Distance'] || '0')),
+      winByCombat: typeof row['Win By Combat'] === 'number' ? row['Win By Combat'] : parseFloat(String(row['Win By Combat'] || '0')),
     };
 
     if (params.cardMode === 'ALL') {
@@ -603,11 +648,8 @@ function generateOneOfEach(
           const mokiClass = String(row.Class).toUpperCase();
           if (params.excludedClasses.some(exc => mokiClass.startsWith(exc))) continue;
 
-          const ownedEntry = params.userCards.find(
-            c => c.cardType === 'MOKI' &&
-              String(c.name).toUpperCase() === name &&
-              String(c.rarity).toLowerCase() === targetRarity
-          );
+          const arr = buildUserCardIndex(params.userCards).get(name);
+          const ownedEntry = arr?.find(c => c.rarity === targetRarity);
           if (!ownedEntry) continue;
 
           slotCandidates.push({
@@ -627,6 +669,7 @@ function generateOneOfEach(
             deaths: parseFloat(String(row.Deaths || '0')),
             deposits: parseFloat(String(row.Deposits || '0')),
             wartDistance: parseFloat(String(row['Wart Distance'] || '0')),
+            winByCombat: parseFloat(String(row['Win By Combat'] || '0')),
           });
         }
       }
@@ -719,20 +762,25 @@ function generateOneOfEach(
   const sortDirection = params.modes?.lowestScore ? -1 : 1;
   uniqueLineups.sort((a, b) => sortDirection * (b.totalEffectiveScore - a.totalEffectiveScore));
 
-  const finalResults: GeneratedLineup[] = [...uniqueLineups];
-  if (params.allowRepeated && finalResults.length < params.lineupCount) {
-    for (const original of uniqueLineups) {
-      if (finalResults.length >= params.lineupCount) break;
+  const finalResults: GeneratedLineup[] = [];
 
+  for (const original of uniqueLineups) {
+    if (finalResults.length >= params.lineupCount) break;
+
+    finalResults.push({ ...original, id: `${original.id}-unique` });
+
+    if (params.allowRepeated) {
       const physicalCopies = params.cardMode === 'USER'
         ? Math.min(...original.mokis.map(m => {
-          const entry = params.userCards.find(c => String(c.name).toUpperCase() === String(m.name).toUpperCase() && String(c.rarity).toLowerCase() === String(m.rarity).toLowerCase());
-          return entry?.stackCount ?? 1;
+          const arr = buildUserCardIndex(params.userCards).get(String(m.name).toUpperCase());
+          const entry = arr?.find(c => c.rarity === String(m.rarity).toLowerCase());
+          return entry?.copies ?? 1;
         }))
         : 999;
 
-      const toAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
-      for (let i = 0; i < toAdd; i++) {
+      const remainingToAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
+
+      for (let i = 0; i < remainingToAdd; i++) {
         // Repeated lineups also consume scheme stock if available
         let hasSchemeCard = false;
         if (!params.modes?.noScheme) {
@@ -812,6 +860,10 @@ function generateStandard(
   if (filterScheme && filterScheme !== 'ALL') {
     if (filterScheme === 'TRAIT') {
       relegatedSchemes = [];
+      const filterTraitScheme = params.selectedTraitScheme?.toUpperCase();
+      if (filterTraitScheme && filterTraitScheme !== 'ALL') {
+        traitSchemes = traitSchemes.filter(s => s.name.toUpperCase() === filterTraitScheme);
+      }
     } else {
       traitSchemes = [];
       relegatedSchemes = relegatedSchemes.filter(s => s.name.toUpperCase() === filterScheme);
@@ -913,6 +965,10 @@ function generateStandard(
         currentPool = currentPool.filter(m => m.class.toUpperCase() === 'STRIKER');
       } else if (schemeDef.scoreType === ('lowest-gacha' as any)) {
         currentPool = currentPool.filter(m => m.class.toUpperCase() === 'DEFENDER');
+      } else if (schemeDef.scoreType === 'aggressive') {
+        currentPool = currentPool.filter(m => m.class.toUpperCase() === 'BRUISER');
+      } else if (schemeDef.scoreType === 'smash') {
+        currentPool = currentPool.filter(m => m.class.toUpperCase() !== 'STRIKER');
       }
 
       const lineup = buildLineup(
@@ -955,18 +1011,17 @@ function generateStandard(
 
   const finalResults: GeneratedLineup[] = [];
 
-  for (const lineup of uniqueMasterList) {
-    finalResults.push({ ...lineup, id: `${lineup.id}-unique` });
-  }
+  for (const original of uniqueMasterList) {
+    if (finalResults.length >= params.lineupCount) break;
 
-  if (params.allowRepeated && finalResults.length < params.lineupCount) {
-    for (const original of uniqueMasterList) {
-      if (finalResults.length >= params.lineupCount) break;
+    finalResults.push({ ...original, id: `${original.id}-unique` });
 
+    if (params.allowRepeated) {
       const physicalCopies = params.cardMode === 'USER'
         ? Math.min(...original.mokis.map(m => {
-          const entry = params.userCards.find(c => String(c.name).toUpperCase() === String(m.name).toUpperCase() && String(c.rarity).toLowerCase() === String(m.rarity).toLowerCase());
-          return entry?.stackCount ?? 1;
+          const arr = buildUserCardIndex(params.userCards).get(String(m.name).toUpperCase());
+          const entry = arr?.find(c => c.rarity === String(m.rarity).toLowerCase());
+          return entry?.copies ?? 1;
         }))
         : 999;
 
@@ -1021,9 +1076,6 @@ export function isOneOfEachContest(contest: Contest): boolean {
 // ─── Main Export ─────────────────────────────────────────────────────────────
 
 export function generateLineups(params: GenerateParams): GeneratedLineup[] {
-  // FORCE OVERRIDE FOR DEBUGGING
-  params.lineupCount = Math.min(params.lineupCount, 20);
-
   params.modes = parseGameModes(params.contest);
 
   if (params.modes.medianCap) {
@@ -1048,11 +1100,59 @@ export function generateLineups(params: GenerateParams): GeneratedLineup[] {
 
   const isOOE = isOneOfEachContest(params.contest);
 
+  let results: GeneratedLineup[] = [];
+
   if (isOOE) {
     const pool = buildPool(params, catalogLookup);
-    return generateOneOfEach(pool, catalogLookup, params, conflictSet, schemeStockMap);
+    results = generateOneOfEach(pool, catalogLookup, params, conflictSet, schemeStockMap);
+  } else {
+    const pool = buildPool(params, catalogLookup);
+    results = generateStandard(pool, params, conflictSet, schemeStockMap);
   }
 
-  const pool = buildPool(params, catalogLookup);
-  return generateStandard(pool, params, conflictSet, schemeStockMap);
+  // --- Apply dynamic 10% threshold filter ---
+  if (results.length > 0) {
+    const bestScore = results[0].totalEffectiveScore; // Array is sorted by generator
+    if (params.modes.lowestScore) {
+      // In lowest score mode, lower is better. We tolerate up to 10% HIGHER than the minimum.
+      const threshold = bestScore * 1.1; 
+      results = results.filter(l => l.totalEffectiveScore <= threshold);
+    } else {
+      // Normal mode: tolerate up to 10% LOWER than the max.
+      const threshold = bestScore * 0.9;
+      results = results.filter(l => l.totalEffectiveScore >= threshold);
+    }
+  }
+
+  // --- Enforce lineupCount limit ---
+  if (results.length > params.lineupCount) {
+    results = results.slice(0, params.lineupCount);
+  }
+
+  // --- Allocate correct distinct images if cardMode === 'USER' ---
+  if (params.cardMode === 'USER') {
+    const imageQueue = new Map<string, string[]>();
+    for (const card of params.userCards) {
+      if (card.cardType === 'MOKI') {
+        const key = `${String(card.name).toUpperCase()}:${String(card.rarity).toUpperCase()}`;
+        const q = imageQueue.get(key) ?? [];
+        for (let i = 0; i < (card.stackCount ?? 1); i++) {
+          q.push(card.image);
+        }
+        imageQueue.set(key, q);
+      }
+    }
+
+    for (const lineup of results) {
+      for (const moki of lineup.mokis) {
+        const key = `${String(moki.name).toUpperCase()}:${String(moki.rarity).toUpperCase()}`;
+        const q = imageQueue.get(key);
+        if (q && q.length > 0) {
+          moki.cardImage = q.shift()!;
+        }
+      }
+    }
+  }
+
+  return results;
 }

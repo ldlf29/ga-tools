@@ -124,8 +124,11 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
   const [maxRepeated, setMaxRepeated] = useState<number>(1);
   const [excludedClasses, setExcludedClasses] = useState<string[]>([]);
   const [isExcludeClassesModalOpen, setIsExcludeClassesModalOpen] = useState(false);
-  const [selectedGenerateScheme, setSelectedGenerateScheme] = useState('ALL');
+  const [selectedGenerateScheme, setSelectedGenerateScheme] = useState('');
   const [isSchemeSelectModalOpen, setIsSchemeSelectModalOpen] = useState(false);
+  const [selectedTraitScheme, setSelectedTraitScheme] = useState('ALL');
+  const [isTraitSchemeModalOpen, setIsTraitSchemeModalOpen] = useState(false);
+  const [schemeErrorMsg, setSchemeErrorMsg] = useState('');
   const [avoidMatchupConflicts, setAvoidMatchupConflicts] = useState(false);
   const [useOnlyMySchemes, setUseOnlyMySchemes] = useState(false);
   const [cardSource, setCardSource] = useState<'ALL' | 'MY'>('ALL');
@@ -168,6 +171,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       !!showResultsModal || 
       !!isExcludeClassesModalOpen || 
       !!isSchemeSelectModalOpen || 
+      !!isTraitSchemeModalOpen ||
       !!isSchemeMenuOpen ||
       !!selectedMokiUpcoming;
 
@@ -189,6 +193,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     showResultsModal, 
     isExcludeClassesModalOpen, 
     isSchemeSelectModalOpen, 
+    isTraitSchemeModalOpen,
     isSchemeMenuOpen,
     selectedMokiUpcoming
   ]);
@@ -354,6 +359,8 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     { name: 'Dungaree Duel', image: '/scheme/dungaree duel.webp' },
     { name: 'Collective Specialization', image: '/scheme/collective specialization.webp' },
     { name: 'Taking A Dive', image: '/scheme/taking a dive.webp' },
+    { name: 'Aggressive Specialization', image: '/scheme/aggressive specialization.webp' },
+    { name: 'Moki Smash', image: '/scheme/moki smash.webp' },
   ];
 
   const getSlotLabel = (utcTime: string) => {
@@ -472,6 +479,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       zoomedImage || 
       isExcludeClassesModalOpen || 
       isSchemeSelectModalOpen || 
+      isTraitSchemeModalOpen ||
       isSchemeMenuOpen || 
       mobileRankingOpen
     );
@@ -491,6 +499,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     zoomedImage, 
     isExcludeClassesModalOpen, 
     isSchemeSelectModalOpen, 
+    isTraitSchemeModalOpen,
     isSchemeMenuOpen,
     mobileRankingOpen
   ]);
@@ -587,11 +596,19 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       }
     }
 
+    if (metaScheme === 'Aggressive Specialization') {
+      sorted = sorted.filter(m => (m.Class || '').toUpperCase().includes('BRUISER'));
+    } else if (metaScheme === 'Moki Smash') {
+      sorted = sorted.filter(m => !(m.Class || '').toUpperCase().includes('STRIKER'));
+    }
+
     // Compute sorting metric and apply scheme-based bonuses
     sorted = sorted.map(moki => {
       const baseScore = typeof moki.Score === 'number' ? moki.Score : parseFloat(String(moki.Score || '0'));
       const winRateRaw = typeof moki.WinRate === 'number' ? moki.WinRate : parseFloat(String(moki.WinRate || '0').replace('%', ''));
       const losses = parseFloat(String(moki.Losses || '0'));
+      const kills = parseFloat(String(moki.Kills || '0'));
+      const winByCombat = parseFloat(String(moki['Win By Combat'] || '0'));
       const wartCloser = parseFloat(String(moki['Wart Closer'] || '0'));
       const gachaPts = parseFloat(String(moki['Gacha Pts'] || '0'));
 
@@ -623,6 +640,13 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
         const calculatedScore = (gachaPts + (winRateRaw / 10) * 200) + (gachaPts * 0.5);
         displayScore = Math.round(calculatedScore);
         metric = displayScore;
+      } else if (metaScheme === 'Aggressive Specialization') {
+        const winBonus = (winRateRaw / 10) * 200;
+        metric = (kills * 80) * 1.75 + winBonus;
+        displayScore = Math.round(metric);
+      } else if (metaScheme === 'Moki Smash') {
+        metric = baseScore + (winByCombat * 175);
+        displayScore = Math.round(metric);
       }
 
       return {
@@ -635,7 +659,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
 
     sorted.sort((a: any, b: any) => (b._metric || 0) - (a._metric || 0));
 
-    if (metaScheme === 'Taking A Dive' || metaScheme === 'Touching The Wart') {
+    if (metaScheme === 'Taking A Dive' || metaScheme === 'Touching The Wart' || metaScheme === 'Aggressive Specialization' || metaScheme === 'Moki Smash') {
       return sorted.slice(0, 50);
     }
 
@@ -646,9 +670,18 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     return sorted;
   };
 
+  const globalRankMap = useMemo(() => {
+    const map = new Map();
+    // We get the default ranking (no scheme) to define original positions
+    getProcessedRanking('SCORE', null).forEach((m, i) => {
+      map.set(m['Moki ID'], i + 1);
+    });
+    return map;
+  }, [rankingData, mokiStats, metadataByName]);
+
   const allSidebarRanking = useMemo(() => {
-    return getProcessedRanking(activeSort, selectedMetaScheme).map((m, i) => ({ ...m, _originalRank: i + 1 }));
-  }, [rankingData, mokiStats, activeSort, selectedMetaScheme, metadataByName]);
+    return getProcessedRanking(activeSort, selectedMetaScheme).map((m) => ({ ...m, _originalRank: globalRankMap.get(m['Moki ID']) || '?' }));
+  }, [rankingData, mokiStats, activeSort, selectedMetaScheme, metadataByName, globalRankMap]);
 
   const allGlobalRanking = useMemo(() => {
     return getProcessedRanking('SCORE', null).map((m, i) => ({ ...m, _originalRank: i + 1 }));
@@ -657,19 +690,23 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
   const currentRanking = allSidebarRanking.slice(rankingPage * RANKING_PAGE_SIZE, (rankingPage + 1) * RANKING_PAGE_SIZE);
   const totalRankingPages = Math.ceil(allSidebarRanking.length / RANKING_PAGE_SIZE);
 
+
+
   const availClasses = ["ALL", "DEFENDER", "STRIKER", "SPRINTER", "BRUISER", "GRINDER", "ANCHOR", "CENTER", "FLANKER", "FORWARD", "SUPPORT"];
   const availFurs = ["ALL", "COMMON", "RAINBOW", "GOLD", "SHADOW", "SPIRIT", "1 OF 1"];
-  const availStrategicSchemes = ["ALL", "TOUCHING THE WART", "COLLECTIVE SPECIALIZATION", "TAKING A DIVE"];
+  const availStrategicSchemes = ["ALL", "TOUCHING THE WART", "COLLECTIVE SPECIALIZATION", "TAKING A DIVE", "AGGRESSIVE SPECIALIZATION", "MOKI SMASH"];
   const availTraits = ["ALL", "Shapeshifting", "Tear jerking", "Costume party", "Dress To Impress", "Call To Arms", "Malicious Intent", "Housekeeping", "Dungaree Duel"];
 
   const modalSortedRanking = React.useMemo(() => {
     const STRATEGIC_MAP: Record<string, string> = {
       'TOUCHING THE WART': 'Touching The Wart',
       'COLLECTIVE SPECIALIZATION': 'Collective Specialization',
-      'TAKING A DIVE': 'Taking A Dive'
+      'TAKING A DIVE': 'Taking A Dive',
+      'AGGRESSIVE SPECIALIZATION': 'Aggressive Specialization',
+      'MOKI SMASH': 'Moki Smash'
     };
     const sScheme = STRATEGIC_MAP[modalFilters.strategicScheme] || null;
-    const baseData = getProcessedRanking('SCORE', sScheme).map((m, i) => ({ ...m, _originalRank: i + 1 }));
+    const baseData = getProcessedRanking('SCORE', sScheme).map((m) => ({ ...m, _originalRank: globalRankMap.get(m['Moki ID']) || '?' }));
 
     let filtered = baseData;
 
@@ -846,7 +883,9 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     setExcludedClasses(initialExclusions);
 
     // 2. Reset Scheme Selection
-    setSelectedGenerateScheme('ALL');
+    setSelectedGenerateScheme('');
+    setSelectedTraitScheme('ALL');
+    setSchemeErrorMsg('');
 
     // 3. Reset Repeated Lineup settings
     setAllowRepeated(false);
@@ -862,6 +901,12 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
 
   const handleGenerate = async () => {
     if (!selectedContest || rankingData.length === 0) return;
+    const modes = parseGameModes(selectedContest);
+    if (!modes.noScheme && !selectedGenerateScheme) {
+      setSchemeErrorMsg('Please, select a scheme to filter.');
+      return;
+    }
+    setSchemeErrorMsg('');
     setIsGenerating(true);
 
     let matches: UpcomingMatchData[] = [];
@@ -940,6 +985,8 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       useOnlyMySchemes: useOnlyMySchemes,
       cardSource: cardSource,
       selectedScheme: selectedGenerateScheme,
+      selectedTraitScheme: selectedTraitScheme,
+      modes: parseGameModes(selectedContest),
     });
 
     setGeneratedLineups(results);
@@ -1263,11 +1310,30 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                       </button>
                     </div>
                     {!isOneOfEachContest(selectedContest) && (
-                      <div className={styles.modalRow} style={{ marginBottom: '8px' }}>
-                        <span className={styles.rowLabel}>SELECT SCHEME</span>
-                        <button className={styles.filterBtnSmall} onClick={() => setIsSchemeSelectModalOpen(true)}>
-                          {selectedGenerateScheme}
-                        </button>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div className={styles.modalRow} style={{ marginBottom: '0' }}>
+                          <span className={styles.rowLabel}>SELECT SCHEME</span>
+                          <button
+                            className={styles.filterBtnSmall}
+                            style={!selectedGenerateScheme ? { borderColor: '#ff4444', boxShadow: '0 0 0 2px rgba(255,68,68,0.3)' } : {}}
+                            onClick={() => setIsSchemeSelectModalOpen(true)}
+                          >
+                            {selectedGenerateScheme || 'SELECT...'}
+                          </button>
+                        </div>
+                        {schemeErrorMsg && (
+                          <p style={{ color: '#ff4444', fontSize: '11px', fontWeight: 800, margin: '0 0 0 4px', textTransform: 'uppercase' }}>
+                            ⚠ {schemeErrorMsg}
+                          </p>
+                        )}
+                        {selectedGenerateScheme === 'TRAIT' && (
+                          <div className={styles.modalRow} style={{ marginBottom: '0', background: 'rgba(255,215,83,0.15)', borderColor: '#ffd753' }}>
+                            <span className={styles.rowLabel} style={{ fontSize: '11px' }}>TRAIT SCHEME</span>
+                            <button className={styles.filterBtnSmall} onClick={() => setIsTraitSchemeModalOpen(true)}>
+                              {selectedTraitScheme}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -1440,22 +1506,84 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                   </div>
-                  <p className={styles.modalDesc} style={{ marginBottom: '10px' }}>Select the main strategy for lineage generation.</p>
+                  <p className={styles.modalDesc} style={{ marginBottom: '10px' }}>Select the main strategy for lineup generation. A scheme is required.</p>
                   <div className={styles.classGrid} style={{ gridTemplateColumns: '1fr' }}>
-                    {['ALL', 'TRAIT', 'COLLECTIVE SPECIALIZATION', 'TOUCHING THE WART', 'TAKING A DIVE'].map((schemeOpt) => {
+                    {['TRAIT', 'COLLECTIVE SPECIALIZATION', 'TOUCHING THE WART', 'TAKING A DIVE', 'AGGRESSIVE SPECIALIZATION', 'MOKI SMASH'].map((schemeOpt) => {
                       const isSelected = selectedGenerateScheme === schemeOpt;
                       return (
                         <div key={schemeOpt} className={styles.checkboxWrapper} onClick={() => {
                           setSelectedGenerateScheme(schemeOpt);
+                          setSchemeErrorMsg('');
                           setIsSchemeSelectModalOpen(false);
                         }}>
                           <div className={`${styles.customCheckbox} ${isSelected ? styles.checked : ''}`}>
                             {isSelected && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                           </div>
-                          <span className={styles.checkboxLabel} style={{ fontSize: '11px' }}>{schemeOpt}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span className={styles.checkboxLabel} style={{ fontSize: '11px' }}>{schemeOpt}</span>
+                          </div>
                         </div>
                       );
                     })}
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+
+        {mounted && createPortal(
+          <AnimatePresence>
+            {isTraitSchemeModalOpen && (
+              <div className={styles.modalOverlay} onClick={() => setIsTraitSchemeModalOpen(false)}>
+                <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className={styles.schemeMenuContent} onClick={(e) => e.stopPropagation()}>
+                  <div className={styles.modalHeader}>
+                    <h2 className={styles.modalTitle}>SELECT TRAIT SCHEME</h2>
+                    <button className={styles.modalCloseButton} onClick={() => setIsTraitSchemeModalOpen(false)}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+                  <p className={styles.modalDesc} style={{ marginBottom: '10px' }}>Filter by a specific trait or fur. Select ALL to use every trait scheme.</p>
+                  <div className={styles.schemeGrid}>
+                    {[
+                      { name: 'ALL', image: '' },
+                      { name: 'Whale Watching', image: '/scheme/whale watching.webp' },
+                      { name: 'Divine Intervention', image: '/scheme/divine intervention.webp' },
+                      { name: 'Midnight Strike', image: '/scheme/midnight strike.webp' },
+                      { name: 'Golden Shower', image: '/scheme/golden shower.webp' },
+                      { name: 'Rainbow Riot', image: '/scheme/rainbow riot.webp' },
+                      { name: 'Shapeshifting', image: '/scheme/shapeshifting.webp' },
+                      { name: 'Tear jerking', image: '/scheme/tear jerking.webp' },
+                      { name: 'Costume party', image: '/scheme/costume party.webp' },
+                      { name: 'Dress To Impress', image: '/scheme/dress to impress.webp' },
+                      { name: 'Call To Arms', image: '/scheme/call to arms.webp' },
+                      { name: 'Malicious Intent', image: '/scheme/malicious intent.webp' },
+                      { name: 'Housekeeping', image: '/scheme/housekeeping.webp' },
+                      { name: 'Dungaree Duel', image: '/scheme/dungaree duel.webp' },
+                    ].map((trait) => (
+                      <div
+                        key={trait.name}
+                        className={`${styles.schemeCard} ${selectedTraitScheme === trait.name ? styles.selectedScheme : ''}`}
+                        onClick={() => {
+                          setSelectedTraitScheme(trait.name);
+                          setIsTraitSchemeModalOpen(false);
+                        }}
+                      >
+                        <div className={styles.schemeIconWrapper}>
+                          {trait.name === 'ALL' ? (
+                            <span style={{ fontSize: '14px', fontWeight: 800, color: '#333' }}>ALL</span>
+                          ) : trait.image ? (
+                            <img src={trait.image} alt={trait.name} className={styles.schemeImg} />
+                          ) : (
+                            <span style={{ fontSize: '22px' }}>🎴</span>
+                          )}
+                        </div>
+                        <span className={styles.schemeNameLabel}>
+                          {trait.name === 'ALL' ? 'ALL TRAIT SCHEMES' : trait.name.toUpperCase()}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
               </div>
@@ -2069,11 +2197,25 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                                       {leftTeam.map((m: any, i: number) => {
                                         const normalizedName = m.name.trim().toUpperCase();
                                         const portrait = (mokiMetadata as any)[normalizedName]?.portraitUrl || m.imageUrl;
+                                        
+                                        const dbStat = mokiStatsMap.get(normalizedName);
+                                        let displayClass = dbStat?.class || m.class;
+                                        if (dbStat) {
+                                          const dex = parseFloat(dbStat.dexterity || 0);
+                                          const str = parseFloat(dbStat.strength || 0);
+                                          const def = parseFloat(dbStat.defense || 0);
+                                          if (displayClass === 'Grinder') {
+                                            displayClass = dex > str ? 'Grinder (S)' : 'Grinder (B)';
+                                          } else if (displayClass === 'Sprinter') {
+                                            displayClass = dex > def ? 'Sprinter (S)' : 'Sprinter (D)';
+                                          }
+                                        }
+
                                         return (
                                           <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                             <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
                                             <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${leftMokiClass}`} />
-                                            <span className={styles.miniMokiClassBadge}>{m.class}</span>
+                                            <span className={styles.miniMokiClassBadge}>{displayClass}</span>
                                           </div>
                                         );
                                       })}
@@ -2083,11 +2225,25 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                                       {rightTeam.map((m: any, i: number) => {
                                         const normalizedName = m.name.trim().toUpperCase();
                                         const portrait = (mokiMetadata as any)[normalizedName]?.portraitUrl || m.imageUrl;
+
+                                        const dbStat = mokiStatsMap.get(normalizedName);
+                                        let displayClass = dbStat?.class || m.class;
+                                        if (dbStat) {
+                                          const dex = parseFloat(dbStat.dexterity || 0);
+                                          const str = parseFloat(dbStat.strength || 0);
+                                          const def = parseFloat(dbStat.defense || 0);
+                                          if (displayClass === 'Grinder') {
+                                            displayClass = dex > str ? 'Grinder (S)' : 'Grinder (B)';
+                                          } else if (displayClass === 'Sprinter') {
+                                            displayClass = dex > def ? 'Sprinter (S)' : 'Sprinter (D)';
+                                          }
+                                        }
+
                                         return (
                                           <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                             <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
                                             <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${rightMokiClass}`} />
-                                            <span className={styles.miniMokiClassBadge}>{m.class}</span>
+                                            <span className={styles.miniMokiClassBadge}>{displayClass}</span>
                                           </div>
                                         );
                                       })}
