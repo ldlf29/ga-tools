@@ -1,4 +1,4 @@
-export const setInDB = async (key: string, val: any): Promise<void> => {
+export const setInDB = async (key: string, val: unknown): Promise<void> => {
   return new Promise((resolve, reject) => {
     const req = window.indexedDB.open('ga-cache', 1);
     req.onupgradeneeded = () => {
@@ -12,7 +12,6 @@ export const setInDB = async (key: string, val: any): Promise<void> => {
       const store = tx.objectStore('cache');
       store.put(val, key);
       tx.oncomplete = () => {
-        db.close();
         resolve();
       };
       tx.onerror = () => reject(tx.error);
@@ -21,7 +20,7 @@ export const setInDB = async (key: string, val: any): Promise<void> => {
   });
 };
 
-export const getFromDB = async (key: string): Promise<any> => {
+export const getFromDB = async (key: string): Promise<unknown> => {
   return new Promise((resolve, reject) => {
     const req = window.indexedDB.open('ga-cache', 1);
     req.onupgradeneeded = () => {
@@ -31,14 +30,13 @@ export const getFromDB = async (key: string): Promise<any> => {
     };
     req.onsuccess = () => {
       const db = req.result;
-      // Safety check: if somehow it upgraded and there's no data yet, tx will still succeed
+      if (!db.objectStoreNames.contains('cache')) {
+        return resolve(null);
+      }
       const tx = db.transaction('cache', 'readonly');
       const store = tx.objectStore('cache');
       const getReq = store.get(key);
-      getReq.onsuccess = () => {
-        db.close();
-        resolve(getReq.result);
-      };
+      getReq.onsuccess = () => resolve(getReq.result);
       getReq.onerror = () => reject(getReq.error);
     };
     req.onerror = () => reject(req.error);

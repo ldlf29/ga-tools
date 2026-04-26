@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState, useMemo, useRef } from 'react';
@@ -130,6 +128,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
   const [isTraitSchemeModalOpen, setIsTraitSchemeModalOpen] = useState(false);
   const [schemeErrorMsg, setSchemeErrorMsg] = useState('');
   const [avoidMatchupConflicts, setAvoidMatchupConflicts] = useState(false);
+  const [notRepeatChampion, setNotRepeatChampion] = useState(false);
   const [useOnlyMySchemes, setUseOnlyMySchemes] = useState(false);
   const [cardSource, setCardSource] = useState<'ALL' | 'MY'>('ALL');
   const [generatedLineups, setGeneratedLineups] = useState<GeneratedLineup[]>([]);
@@ -664,7 +663,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     }
 
     if (metaScheme === 'Collective Specialization') {
-      return sorted.slice(0, 30);
+      return sorted.slice(0, 50);
     }
 
     return sorted;
@@ -872,21 +871,51 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     </div>
   )), [deferredModalSortedRanking]);
 
+  const getAvailableSchemeOptions = () => {
+    if (!selectedContest) return [];
+    const modes = parseGameModes(selectedContest);
+
+    if (modes.noScheme) {
+      return ['NO SCHEME'];
+    }
+
+    if (modes.lowestScore) {
+      return ['ENFORCING THE NAUGHTY LIST', 'GACHA HOARDING'];
+    }
+    if (modes.bestObjective && !isOneOfEachContest(selectedContest)) {
+      return ['COLLECTIVE SPECIALIZATION'];
+    }
+    if (modes.medianCap) {
+      return ['TRAIT', 'TOUCHING THE WART'];
+    }
+    if (modes.classCoverage) {
+      return ['TRAIT', 'TAKING A DIVE'];
+    }
+    return ['TRAIT', 'COLLECTIVE SPECIALIZATION', 'TOUCHING THE WART', 'TAKING A DIVE', 'AGGRESSIVE SPECIALIZATION', 'MOKI SMASH'];
+  };
+
   const handleCardClick = (contest: Contest) => {
     const modes = parseGameModes(contest);
-    
+
     // 1. Initialize Excluded Classes based on Mode
     let initialExclusions: string[] = [];
     if (modes.medianCap) {
       initialExclusions = ['STRIKER', 'BRUISER'];
+    } else if (modes.bestObjective && !isOneOfEachContest(contest)) {
+      initialExclusions = ['DEFENDER', 'SPRINTER', 'BRUISER', 'GRINDER', 'ANCHOR', 'CENTER', 'FLANKER', 'FORWARD', 'SUPPORT'];
     }
     setExcludedClasses(initialExclusions);
 
     // 2. Reset Scheme Selection
-    setSelectedGenerateScheme('');
+    if (modes.noScheme) {
+      setSelectedGenerateScheme('NO SCHEME');
+    } else if (modes.bestObjective && !isOneOfEachContest(contest)) {
+      setSelectedGenerateScheme('COLLECTIVE SPECIALIZATION');
+    } else {
+      setSelectedGenerateScheme('');
+    }
     setSelectedTraitScheme('ALL');
     setSchemeErrorMsg('');
-
     // 3. Reset Repeated Lineup settings
     setAllowRepeated(false);
     setMaxRepeated(1);
@@ -902,7 +931,9 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
   const handleGenerate = async () => {
     if (!selectedContest || rankingData.length === 0) return;
     const modes = parseGameModes(selectedContest);
-    if (!modes.noScheme && !selectedGenerateScheme) {
+    const isOOE = isOneOfEachContest(selectedContest);
+    
+    if (!modes.noScheme && !isOOE && !selectedGenerateScheme) {
       setSchemeErrorMsg('Please, select a scheme to filter.');
       return;
     }
@@ -982,6 +1013,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       maxRepeated,
       excludedClasses,
       avoidMatchupConflicts,
+      notRepeatChampion,
       useOnlyMySchemes: useOnlyMySchemes,
       cardSource: cardSource,
       selectedScheme: selectedGenerateScheme,
@@ -1303,13 +1335,15 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                       </div>
                     </div>
 
-                    <div className={styles.modalRow} style={{ marginBottom: '4px' }}>
-                      <span className={styles.rowLabel}>EXCLUDE CLASSES</span>
-                      <button className={styles.filterBtnSmall} onClick={() => setIsExcludeClassesModalOpen(true)}>
-                        {excludedClasses.length > 0 ? `${excludedClasses.length} SELECTED` : 'NONE'}
-                      </button>
-                    </div>
-                    {!isOneOfEachContest(selectedContest) && (
+                    {!(parseGameModes(selectedContest).bestObjective) && (
+                      <div className={styles.modalRow} style={{ marginBottom: '4px' }}>
+                        <span className={styles.rowLabel}>EXCLUDE CLASSES</span>
+                        <button className={styles.filterBtnSmall} onClick={() => setIsExcludeClassesModalOpen(true)}>
+                          {excludedClasses.length > 0 ? `${excludedClasses.length} SELECTED` : 'NONE'}
+                        </button>
+                      </div>
+                    )}
+                    {!(isOneOfEachContest(selectedContest) || parseGameModes(selectedContest).bestObjective || parseGameModes(selectedContest).noScheme) && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         <div className={styles.modalRow} style={{ marginBottom: '0' }}>
                           <span className={styles.rowLabel}>SELECT SCHEME</span>
@@ -1343,6 +1377,12 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                           {avoidMatchupConflicts && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                         </div>
                         <span className={styles.checkboxLabel}>Avoid match up conflicts</span>
+                      </div>
+                      <div className={styles.checkboxWrapper} onClick={() => setNotRepeatChampion(!notRepeatChampion)}>
+                        <div className={`${styles.customCheckbox} ${notRepeatChampion ? styles.checked : ''}`}>
+                          {notRepeatChampion && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                        </div>
+                        <span className={styles.checkboxLabel}>NOT REPEAT THE SAME CHAMPION ACROSS LINEUPS</span>
                       </div>
                       <div className={styles.checkboxWrapper} onClick={() => cardSource !== 'ALL' && setUseOnlyMySchemes(!useOnlyMySchemes)} style={{ opacity: cardSource === 'ALL' ? 0.5 : 1 }}>
                         <div className={`${styles.customCheckbox} ${useOnlyMySchemes ? styles.checked : ''}`}>
@@ -1508,7 +1548,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                   </div>
                   <p className={styles.modalDesc} style={{ marginBottom: '10px' }}>Select the main strategy for lineup generation. A scheme is required.</p>
                   <div className={styles.classGrid} style={{ gridTemplateColumns: '1fr' }}>
-                    {['TRAIT', 'COLLECTIVE SPECIALIZATION', 'TOUCHING THE WART', 'TAKING A DIVE', 'AGGRESSIVE SPECIALIZATION', 'MOKI SMASH'].map((schemeOpt) => {
+                    {getAvailableSchemeOptions().map((schemeOpt) => {
                       const isSelected = selectedGenerateScheme === schemeOpt;
                       return (
                         <div key={schemeOpt} className={styles.checkboxWrapper} onClick={() => {

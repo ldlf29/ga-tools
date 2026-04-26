@@ -97,6 +97,7 @@ export interface GenerateParams {
   maxRepeated: number;
   excludedClasses: string[];
   avoidMatchupConflicts: boolean;
+  notRepeatChampion?: boolean;
   useOnlyMySchemes?: boolean;
   cardSource: 'ALL' | 'MY';
   selectedScheme?: string;
@@ -290,6 +291,25 @@ function mokiMatchesScheme(moki: any, scheme: SchemeDef): boolean {
   return hasTrait(String(traitsVal || ''), scheme.values);
 }
 
+// ─── Detect One-Of-Each ──────────────────────────────────────────────────────
+
+export function isOneOfEachContest(contest: Contest): boolean {
+  if (contest.name.toLowerCase().includes('one of each') ||
+    contest.name.toLowerCase().includes('one-of-each') ||
+    contest.name.toLowerCase().includes('ooe')) return true;
+
+  const championSlots = contest.lineupConfig.slots.filter(s => s.cardType === 'champion');
+  if (championSlots.length !== 4) return false;
+
+  const rarities = championSlots.map(s => s.minRarity.toLowerCase());
+  const maxRarities = championSlots.map(s => s.maxRarity.toLowerCase());
+  const allExact = rarities.every((r, i) => r === maxRarities[i]);
+  const hasAllFour = ['basic', 'rare', 'epic', 'legendary'].every(
+    r => rarities.includes(r)
+  );
+  return allExact && hasAllFour;
+}
+
 // ─── Score Calculators ───────────────────────────────────────────────────────
 
 // We delete the old getSchemeBonus here since we merged it below.
@@ -299,7 +319,8 @@ export function parseGameModes(contest: Contest): GameModes {
 
   // Detección mejorada de NO SCHEME: Si no hay un slot de 'scheme' en el contest, entonces es No Scheme.
   const hasSchemeSlot = contest.lineupConfig.slots.some((s: any) => s.cardType === 'scheme');
-  const isNoScheme = !hasSchemeSlot || n.includes('no scheme');
+  // One of Each NO usa el slot explícito en su config en la API, pero el algoritmo aplica Collect Em All como un scheme, a menos que el nombre diga 'no scheme'.
+  const isNoScheme = (!hasSchemeSlot && !isOneOfEachContest(contest)) || n.includes('no scheme');
 
   return {
     noWinBonus: n.includes('no win bonus') || n.includes('no win'),
@@ -350,7 +371,7 @@ function getSchemeBonus(moki: MokiCandidate, scoreType: ScoreType, modes?: GameM
     case 'gacha': return (moki.deposits * 25); 
     case 'aggressive': return (moki.kills * 80) * 0.75;
     case 'smash': return moki.winByCombat * 175;
-    case 'one-of-each': return 1450;
+    case 'one-of-each': return 1450 / 4; // 1450 distributed across 4 mokis
     default:
       return modes?.classCoverage ? 1000 + 100 : 1000; // Trait bonus + Class Coverage bonus
   }
@@ -610,6 +631,7 @@ function generateOneOfEach(
 
   const uniqueLineups: GeneratedLineup[] = [];
   const seenFingerprints = new Set<string>();
+  const globalUsedNames = new Set<string>();
   const SAFETY_LIMIT = 20;
   const raritySlots = ['legendary', 'epic', 'rare', 'basic'];
 
@@ -629,7 +651,7 @@ function generateOneOfEach(
 
       if (params.cardMode === 'ALL') {
         slotCandidates = pool
-          .filter(m => !usedNamesInLineup.has(String(m.name).toUpperCase()))
+          .filter(m => !usedNamesInLineup.has(String(m.name).toUpperCase()) && (!params.notRepeatChampion || !globalUsedNames.has(String(m.name).toUpperCase())))
           .filter(m => (stockMap.get(`${String(m.name).toUpperCase()}:${targetRarity.toUpperCase()}`) ?? 0) > 0)
           .map(m => ({
             ...m,
@@ -641,6 +663,7 @@ function generateOneOfEach(
         for (const row of params.rankingData) {
           const name = String(row.Name).toUpperCase();
           if (usedNamesInLineup.has(name)) continue;
+          if (params.notRepeatChampion && globalUsedNames.has(name)) continue;
 
           const stockKey = `${name}:${targetRarity.toUpperCase()}`;
           if ((stockMap.get(stockKey) ?? 0) <= 0) continue;
@@ -687,6 +710,12 @@ function generateOneOfEach(
         }
 
         const cClass = String(candidate.class).toUpperCase();
+        
+        // For One Of Each + Best Objective: always strikers
+        if (params.modes?.bestObjective && cClass !== 'STRIKER') {
+          continue;
+        }
+
         if (params.modes?.classCoverage) {
           if (usedClassesInLineup.has(cClass)) continue;
 
@@ -727,11 +756,11 @@ function generateOneOfEach(
         const totalEffectiveScore = lineupTotalEffective(selected, 'one-of-each', params.modes);
         const totalBaseScore = lineupBaseOnly(selected, params.modes);
 
-        // If noScheme, don't use COLLECT_EM_ALL
-        const useScheme = !params.modes?.noScheme;
+        // If noScheme or lowestScore, don't use COLLECT_EM_ALL
+        const useScheme = !params.modes?.noScheme && !params.modes?.lowestScore;
         const current = schemeStockMap.get(COLLECT_EM_ALL.name.toUpperCase()) ?? 0;
-        const hasSchemeCard = useScheme && (current > 0);
-        if (hasSchemeCard) {
+        const hasSchemeCard = useScheme && (params.cardMode === 'ALL' || current > 0);
+        if (hasSchemeCard && params.cardMode === 'USER') {
           schemeStockMap.set(COLLECT_EM_ALL.name.toUpperCase(), current - 1);
         }
 
@@ -746,6 +775,10 @@ function generateOneOfEach(
           hasScheme: hasSchemeCard
         });
         seenFingerprints.add(fingerprint);
+
+        if (params.notRepeatChampion) {
+          selected.forEach(m => globalUsedNames.add(String(m.name).toUpperCase()));
+        }
       }
 
       if (params.cardMode === 'USER') {
@@ -765,11 +798,9 @@ function generateOneOfEach(
   const finalResults: GeneratedLineup[] = [];
 
   for (const original of uniqueLineups) {
-    if (finalResults.length >= params.lineupCount) break;
-
     finalResults.push({ ...original, id: `${original.id}-unique` });
 
-    if (params.allowRepeated) {
+    if (params.allowRepeated && !params.notRepeatChampion) {
       const physicalCopies = params.cardMode === 'USER'
         ? Math.min(...original.mokis.map(m => {
           const arr = buildUserCardIndex(params.userCards).get(String(m.name).toUpperCase());
@@ -778,7 +809,7 @@ function generateOneOfEach(
         }))
         : 999;
 
-      const remainingToAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
+      const remainingToAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1);
 
       for (let i = 0; i < remainingToAdd; i++) {
         // Repeated lineups also consume scheme stock if available
@@ -832,6 +863,7 @@ function generateStandard(
   const traitPool: GeneratedLineup[] = [];
   const specPool: GeneratedLineup[] = [];
   const globalSeenFingerprints = new Set<string>();
+  const globalUsedNames = new Set<string>();
   const SAFETY_LIMIT = 20;
 
   let traitLimit = SAFETY_LIMIT;
@@ -855,21 +887,6 @@ function generateStandard(
     relegatedSchemes = RELEGATED_SCHEMES.filter(s => ownedSchemeNames.has(s.name.toUpperCase().trim()));
   }
 
-  // User forced scheme selection
-  const filterScheme = params.selectedScheme?.toUpperCase();
-  if (filterScheme && filterScheme !== 'ALL') {
-    if (filterScheme === 'TRAIT') {
-      relegatedSchemes = [];
-      const filterTraitScheme = params.selectedTraitScheme?.toUpperCase();
-      if (filterTraitScheme && filterTraitScheme !== 'ALL') {
-        traitSchemes = traitSchemes.filter(s => s.name.toUpperCase() === filterTraitScheme);
-      }
-    } else {
-      traitSchemes = [];
-      relegatedSchemes = relegatedSchemes.filter(s => s.name.toUpperCase() === filterScheme);
-    }
-  }
-
   // Modifiers Unchained
   if (params.modes?.lowestScore) {
     traitSchemes = [];
@@ -888,7 +905,25 @@ function generateStandard(
     relegatedSchemes = [{ name: 'No Scheme', image: '', scoreType: 'trait-fur' as any }];
   }
 
-  const getAvailablePool = () => pool.filter(m => (stockMap.get(`${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`) ?? 0) > 0);
+  // User forced scheme selection
+  const filterScheme = params.selectedScheme?.toUpperCase();
+  if (filterScheme && filterScheme !== 'ALL') {
+    if (filterScheme === 'TRAIT') {
+      relegatedSchemes = [];
+      const filterTraitScheme = params.selectedTraitScheme?.toUpperCase();
+      if (filterTraitScheme && filterTraitScheme !== 'ALL') {
+        traitSchemes = traitSchemes.filter(s => s.name.toUpperCase() === filterTraitScheme);
+      }
+    } else {
+      traitSchemes = [];
+      relegatedSchemes = relegatedSchemes.filter(s => s.name.toUpperCase() === filterScheme);
+    }
+  }
+
+  const getAvailablePool = () => pool.filter(m => {
+    if (params.notRepeatChampion && globalUsedNames.has(String(m.name).toUpperCase())) return false;
+    return (stockMap.get(`${String(m.name).toUpperCase()}:${m.rarity.toUpperCase()}`) ?? 0) > 0;
+  });
 
   let canBuildAnother = true;
   while (canBuildAnother && (traitPool.length + specPool.length) < SAFETY_LIMIT) {
@@ -987,8 +1022,8 @@ function generateStandard(
       const fingerprint = getLineupFingerprint(bestLineup.mokis);
       if (!globalSeenFingerprints.has(fingerprint)) {
         const currentStock = schemeStockMap.get(bestScheme.name.toUpperCase()) ?? 0;
-        const hasSchemeCard = currentStock > 0;
-        if (hasSchemeCard) {
+        const hasSchemeCard = params.cardMode === 'ALL' || currentStock > 0;
+        if (hasSchemeCard && params.cardMode === 'USER') {
           schemeStockMap.set(bestScheme.name.toUpperCase(), currentStock - 1);
         }
 
@@ -999,6 +1034,10 @@ function generateStandard(
           specPool.push(lineupWithOwnership);
         }
         globalSeenFingerprints.add(fingerprint);
+        
+        if (params.notRepeatChampion) {
+          bestLineup.mokis.forEach(m => globalUsedNames.add(String(m.name).toUpperCase()));
+        }
       }
 
       bestLineup.mokis.forEach(m => {
@@ -1020,11 +1059,9 @@ function generateStandard(
   const finalResults: GeneratedLineup[] = [];
 
   for (const original of uniqueMasterList) {
-    if (finalResults.length >= params.lineupCount) break;
-
     finalResults.push({ ...original, id: `${original.id}-unique` });
 
-    if (params.allowRepeated) {
+    if (params.allowRepeated && !params.notRepeatChampion) {
       const physicalCopies = params.cardMode === 'USER'
         ? Math.min(...original.mokis.map(m => {
           const arr = buildUserCardIndex(params.userCards).get(String(m.name).toUpperCase());
@@ -1033,7 +1070,7 @@ function generateStandard(
         }))
         : 999;
 
-      const remainingToAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1, params.lineupCount - finalResults.length);
+      const remainingToAdd = Math.min(physicalCopies - 1, params.maxRepeated - 1);
 
       for (let i = 0; i < remainingToAdd; i++) {
         const currentStock = schemeStockMap.get(original.schemeName.toUpperCase()) ?? 0;
@@ -1060,25 +1097,6 @@ function generateStandard(
   });
 
   return finalResults;
-}
-
-// ─── Detect One-Of-Each ──────────────────────────────────────────────────────
-
-export function isOneOfEachContest(contest: Contest): boolean {
-  if (contest.name.toLowerCase().includes('one of each') ||
-    contest.name.toLowerCase().includes('one-of-each') ||
-    contest.name.toLowerCase().includes('ooe')) return true;
-
-  const championSlots = contest.lineupConfig.slots.filter(s => s.cardType === 'champion');
-  if (championSlots.length !== 4) return false;
-
-  const rarities = championSlots.map(s => s.minRarity.toLowerCase());
-  const maxRarities = championSlots.map(s => s.maxRarity.toLowerCase());
-  const allExact = rarities.every((r, i) => r === maxRarities[i]);
-  const hasAllFour = ['basic', 'rare', 'epic', 'legendary'].every(
-    r => rarities.includes(r)
-  );
-  return allExact && hasAllFour;
 }
 
 // ─── Main Export ─────────────────────────────────────────────────────────────
@@ -1133,9 +1151,10 @@ export function generateLineups(params: GenerateParams): GeneratedLineup[] {
   }
 
   // --- Enforce lineupCount limit ---
-  if (results.length > params.lineupCount) {
-    results = results.slice(0, params.lineupCount);
-  }
+  // The 10% threshold rule is the primary threshold, overriding the lineupCount limit.
+  // if (results.length > params.lineupCount) {
+  //   results = results.slice(0, params.lineupCount);
+  // }
 
   // --- Allocate correct distinct images if cardMode === 'USER' ---
   if (params.cardMode === 'USER') {

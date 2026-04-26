@@ -324,7 +324,7 @@ export const fetchUserCards = async (
   if (!forceRefresh && !isInitialAdd) {
     try {
       const cachedValue = await getFromDB(CACHE_KEY);
-      if (cachedValue) {
+      if (cachedValue && typeof cachedValue === 'string') {
         apiCards = JSON.parse(cachedValue.replace(/season1-launch/gi, 'season1-v2'));
         console.log(`[CardService] Loaded ${apiCards.length} cards from idb cache for ${walletAddress}`);
       }
