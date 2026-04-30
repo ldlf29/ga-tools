@@ -30,6 +30,17 @@ const fetcher = (url: string) => fetch(url).then((res) => {
   return res.json();
 });
 
+const getBadgeBgColor = (cls: string) => {
+  if (!cls) return '#1abf9e';
+  const upper = cls.toUpperCase();
+  if (['STRIKER', 'SPRINTER (S)', 'GRINDER (S)'].includes(upper)) return '#ff4b4b'; // RED
+  if (['DEFENDER', 'SPRINTER (D)'].includes(upper)) return '#84bcff'; // BLUE
+  if (['BRUISER', 'GRINDER (B)'].includes(upper)) return '#ffd753'; // YELLOW
+  if (upper === 'GRINDER') return '#f39c12'; // ORANGE
+  if (upper === 'SPRINTER') return '#9b59b6'; // VIOLET
+  return '#1abf9e'; // GREEN
+};
+
 const ChevronDown = ({ size = 16, style = {} }) => (
   <svg
     width={size}
@@ -172,7 +183,8 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       !!isSchemeSelectModalOpen || 
       !!isTraitSchemeModalOpen ||
       !!isSchemeMenuOpen ||
-      !!selectedMokiUpcoming;
+      !!selectedMokiUpcoming ||
+      !!mobileRankingOpen;
 
     if (anyModalOpen) {
       document.body.classList.add('modal-open');
@@ -194,7 +206,8 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     isSchemeSelectModalOpen, 
     isTraitSchemeModalOpen,
     isSchemeMenuOpen,
-    selectedMokiUpcoming
+    selectedMokiUpcoming,
+    mobileRankingOpen
   ]);
 
   // ESC key handler for the expanded ranking modal
@@ -2232,7 +2245,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
 
                               return (
                                 <div key={match.id} className={styles.modalMatchRow}>
-                                  <div className={`${styles.modalTeamsGrid} ${gridEdgeClass}`}>
+                                  <div className={`${styles.modalTeamsGrid} ${gridEdgeClass} ${styles.upcomingEnlarged}`}>
                                     <div className={styles.playersRow}>
                                       {leftTeam.map((m: any, i: number) => {
                                         const normalizedName = m.name.trim().toUpperCase();
@@ -2255,7 +2268,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                                           <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                             <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
                                             <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${leftMokiClass}`} />
-                                            <span className={styles.miniMokiClassBadge}>{displayClass}</span>
+                                            <span className={styles.miniMokiClassBadge} style={{ backgroundColor: getBadgeBgColor(displayClass) }}>{displayClass}</span>
                                           </div>
                                         );
                                       })}
@@ -2283,7 +2296,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                                           <div key={i} className={`${styles.miniMokiCard} ${i === 0 ? styles.championCard : ''}`}>
                                             <div className={styles.miniMokiNameWrapper}><span className={styles.miniMokiName}>{m.name}</span></div>
                                             <img src={portrait} alt={m.name} className={`${styles.miniMokiImg} ${rightMokiClass}`} />
-                                            <span className={styles.miniMokiClassBadge}>{displayClass}</span>
+                                            <span className={styles.miniMokiClassBadge} style={{ backgroundColor: getBadgeBgColor(displayClass) }}>{displayClass}</span>
                                           </div>
                                         );
                                       })}

@@ -222,7 +222,7 @@
 .drawerToggleButton {
   display: none;
   position: fixed;
-  top: 55dvh;
+  top: 50%;
   right: 0;
   transform: translateY(-50%);
   width: 38px;
@@ -247,7 +247,7 @@
 /* Close Button on Drawer Edge */
 .drawerCloseButton {
   position: absolute;
-  top: 55dvh;
+  top: 50%;
   left: -29px;
   /* Outside on left edge */
   transform: translateY(-50%);
@@ -2193,25 +2193,29 @@
     max-width: 85vw;
     background: #5097ff;
     z-index: 1000;
-    transform: translateX(110%);
+    transform: translate3d(110%, 0, 0);
+    -webkit-transform: translate3d(110%, 0, 0);
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.5);
     border-left: 4px solid #333333;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0;
     overflow: visible;
-    /* Important: Allow close button to stick out */
     display: flex;
     flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
   }
 
   .sidebarOpen {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
   }
 
   .drawerOverlay {
     display: block;
-    z-index: 1000;
-    /* Behind drawer but above content */
+    z-index: 999;
+    /* Behind drawer (1000) but above content */
   }
 
   .drawerToggleButton {
@@ -2221,14 +2225,17 @@
   .rankingBox {
     background: none;
     border: none;
-    height: 100%;
+    height: 100dvh; /* Use dynamic viewport height */
+    max-height: none; 
     width: 100%;
     padding: 1.25rem;
     overflow-y: auto;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    box-sizing: border-box;
     scrollbar-width: none;
     /* Firefox */
     -ms-overflow-style: none;
@@ -2242,7 +2249,7 @@
 
   .drawerCloseButton {
     position: absolute;
-    top: 55dvh;
+    top: 50%;
     left: -29px;
     right: auto;
     transform: translateY(-50%);
@@ -2319,10 +2326,17 @@
     text-align: center;
   }
 
+  .rankingList {
+    overflow: visible !important;
+    flex: none !important;
+  }
+
   .rankingPlaceholder {
     padding: 8px 10px;
-    gap: 8px;
+    gap: 5px; /* Reducido de 8px */
     cursor: pointer;
+    display: flex;
+    align-items: center;
   }
   
   .rankingPlaceholder:active {
@@ -2332,7 +2346,7 @@
 
   .rankNum {
     font-size: 11px;
-    min-width: 20px;
+    min-width: 18px; /* Reducido de 20px */
   }
 
   .rankMokiImage {
@@ -2340,8 +2354,16 @@
     height: 32px;
   }
 
+  .rankInfo {
+    min-width: 0; /* Permitir que los hijos se trunquen */
+  }
+
   .rankName {
     font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
   }
 
   .rankClass {
@@ -3376,6 +3398,45 @@
   .miniMokiClassBadge {
     font-size: 0.45rem !important;
     padding: 1px 3px !important;
-    box-shadow: 0.5px 0.5px 0 #333333 !important;
   }
+}
+
+/* --- ENLARGED 15% UPCOMING MATCHES UI --- */
+.upcomingEnlarged .miniMokiImg {
+  width: 69px;
+  height: 69px;
+}
+.upcomingEnlarged .championCard .miniMokiImg {
+  width: 103.5px;
+  height: 103.5px;
+}
+.upcomingEnlarged .miniMokiClassBadge {
+  font-size: 0.69rem;
+  padding: 1.5px 4.6px;
+  color: #000000 !important;
+}
+.upcomingEnlarged .miniMokiNameWrapper {
+  max-width: 69px;
+}
+.upcomingEnlarged .championCard .miniMokiNameWrapper {
+  max-width: 103.5px;
+}
+.upcomingEnlarged .miniMokiName {
+  max-width: 69px;
+}
+.upcomingEnlarged .championCard .miniMokiName {
+  max-width: 103.5px;
+}
+
+@media (max-width: 650px) {
+  .upcomingEnlarged .miniMokiImg { width: 51.75px; height: 51.75px; }
+  .upcomingEnlarged .championCard .miniMokiImg { width: 74.75px; height: 74.75px; }
+  .upcomingEnlarged .miniMokiClassBadge {
+    font-size: 0.52rem !important;
+    padding: 1.15px 3.45px !important;
+  }
+  .upcomingEnlarged .miniMokiNameWrapper { max-width: 51.75px; }
+  .upcomingEnlarged .championCard .miniMokiNameWrapper { max-width: 74.75px; }
+  .upcomingEnlarged .miniMokiName { max-width: 51.75px; }
+  .upcomingEnlarged .championCard .miniMokiName { max-width: 74.75px; }
 }
