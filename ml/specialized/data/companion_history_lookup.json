@@ -1,0 +1,134 @@
+{
+  "striker": {
+    "Anchor": {
+      "wr": 0.3924791713578023,
+      "avg_kills": 1.236,
+      "avg_deposits": 1.23,
+      "avg_wart": 13.6,
+      "dominant_role": "killer",
+      "count": 4441
+    },
+    "Striker": {
+      "wr": 0.360261748958953,
+      "avg_kills": 0.053,
+      "avg_deposits": 3.472,
+      "avg_wart": 1.0,
+      "dominant_role": "depositor",
+      "count": 8405
+    },
+    "Bruiser": {
+      "wr": 0.42006925988564064,
+      "avg_kills": 1.611,
+      "avg_deposits": 0.731,
+      "avg_wart": 12.1,
+      "dominant_role": "killer",
+      "count": 12417
+    },
+    "Forward": {
+      "wr": 0.3979360165118679,
+      "avg_kills": 1.516,
+      "avg_deposits": 0.912,
+      "avg_wart": 15.1,
+      "dominant_role": "killer",
+      "count": 4845
+    },
+    "Defender": {
+      "wr": 0.36769759450171824,
+      "avg_kills": 0.753,
+      "avg_deposits": 2.118,
+      "avg_wart": 13.3,
+      "dominant_role": "depositor",
+      "count": 11349
+    },
+    "Support": {
+      "wr": 0.3528942115768463,
+      "avg_kills": 0.147,
+      "avg_deposits": 3.222,
+      "avg_wart": 8.7,
+      "dominant_role": "depositor",
+      "count": 5010
+    },
+    "Flanker": {
+      "wr": 0.4009121061359867,
+      "avg_kills": 1.334,
+      "avg_deposits": 1.193,
+      "avg_wart": 16.5,
+      "dominant_role": "killer",
+      "count": 4824
+    },
+    "Center": {
+      "wr": 0.4344535944803027,
+      "avg_kills": 1.962,
+      "avg_deposits": 0.113,
+      "avg_wart": 23.6,
+      "dominant_role": "killer",
+      "count": 4493
+    }
+  },
+  "defender": {
+    "Anchor": {
+      "wr": 0.5724355407160081,
+      "avg_kills": 1.459,
+      "avg_deposits": 0.979,
+      "avg_wart": 26.5,
+      "dominant_role": "killer",
+      "count": 5391
+    },
+    "Flanker": {
+      "wr": 0.5670630987776677,
+      "avg_kills": 1.463,
+      "avg_deposits": 1.029,
+      "avg_wart": 32.3,
+      "dominant_role": "killer",
+      "count": 6054
+    },
+    "Bruiser": {
+      "wr": 0.626082287401839,
+      "avg_kills": 1.838,
+      "avg_deposits": 0.329,
+      "avg_wart": 9.1,
+      "dominant_role": "killer",
+      "count": 14899
+    },
+    "Defender": {
+      "wr": 0.5987087517934003,
+      "avg_kills": 1.584,
+      "avg_deposits": 0.695,
+      "avg_wart": 37.3,
+      "dominant_role": "killer",
+      "count": 13940
+    },
+    "Striker": {
+      "wr": 0.588331568306537,
+      "avg_kills": 1.556,
+      "avg_deposits": 0.772,
+      "avg_wart": 22.7,
+      "dominant_role": "killer",
+      "count": 10387
+    },
+    "Center": {
+      "wr": 0.5965627214741318,
+      "avg_kills": 1.667,
+      "avg_deposits": 0.667,
+      "avg_wart": 27.8,
+      "dominant_role": "killer",
+      "count": 5644
+    },
+    "Forward": {
+      "wr": 0.59521484375,
+      "avg_kills": 1.631,
+      "avg_deposits": 0.702,
+      "avg_wart": 21.8,
+      "dominant_role": "killer",
+      "count": 6144
+    },
+    "Support": {
+      "wr": 0.5186260280599904,
+      "avg_kills": 1.091,
+      "avg_deposits": 1.657,
+      "avg_wart": 58.3,
+      "dominant_role": "depositor",
+      "count": 6201
+    }
+  }
+}

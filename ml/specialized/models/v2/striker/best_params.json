@@ -1,0 +1,38 @@
+{
+  "duration": {
+    "iterations": 1040,
+    "learning_rate": 0.14695511860213284,
+    "depth": 4,
+    "l2_leaf_reg": 1.6907407122566327,
+    "min_data_in_leaf": 34,
+    "subsample": 0.9229150938463445,
+    "colsample_bylevel": 0.75593096162906,
+    "eval_metric": "MAE",
+    "random_seed": 42,
+    "verbose": false
+  },
+  "deposits": {
+    "iterations": 1158,
+    "learning_rate": 0.18447207280636363,
+    "depth": 3,
+    "l2_leaf_reg": 1.976278424793044,
+    "min_data_in_leaf": 94,
+    "subsample": 0.9859380650978276,
+    "colsample_bylevel": 0.999663154552602,
+    "eval_metric": "MAE",
+    "random_seed": 42,
+    "verbose": false
+  },
+  "winrate": {
+    "iterations": 1001,
+    "learning_rate": 0.027314294301826667,
+    "depth": 5,
+    "l2_leaf_reg": 3.079558624649167,
+    "min_data_in_leaf": 50,
+    "subsample": 0.5035955632395781,
+    "colsample_bylevel": 0.7549962906157034,
+    "eval_metric": "Accuracy",
+    "random_seed": 42,
+    "verbose": false
+  }
+}

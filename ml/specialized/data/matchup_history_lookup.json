@@ -1,0 +1,362 @@
+{
+  "striker": {
+    "Striker_x_Anchor": {
+      "wr": 0.45,
+      "count": 20
+    },
+    "Striker_x_Bruiser": {
+      "wr": 0.3822,
+      "count": 1740
+    },
+    "Striker_x_Center": {
+      "wr": 0.3422,
+      "count": 526
+    },
+    "Striker_x_Defender": {
+      "wr": 0.2992,
+      "count": 13155
+    },
+    "Striker_x_Flanker": {
+      "wr": 0.4311,
+      "count": 979
+    },
+    "Striker_x_Forward": {
+      "wr": 0.4155,
+      "count": 438
+    },
+    "Striker_x_Striker": {
+      "wr": 0.5007,
+      "count": 10528
+    },
+    "Striker_x_Support": {
+      "wr": 0.4071,
+      "count": 506
+    }
+  },
+  "defender": {
+    "Defender_x_Anchor": {
+      "wr": 0.6111,
+      "count": 18
+    },
+    "Defender_x_Bruiser": {
+      "wr": 0.5843,
+      "count": 2052
+    },
+    "Defender_x_Center": {
+      "wr": 0.5797,
+      "count": 659
+    },
+    "Defender_x_Defender": {
+      "wr": 0.5,
+      "count": 16251
+    },
+    "Defender_x_Flanker": {
+      "wr": 0.5847,
+      "count": 1122
+    },
+    "Defender_x_Forward": {
+      "wr": 0.6178,
+      "count": 552
+    },
+    "Defender_x_Striker": {
+      "wr": 0.7015,
+      "count": 13097
+    },
+    "Defender_x_Support": {
+      "wr": 0.639,
+      "count": 579
+    }
+  },
+  "striker_pair": {
+    "Anchor_Striker": {
+      "wr": 0.3716417910447761,
+      "count": 670
+    },
+    "Bruiser_Forward": {
+      "wr": 0.4235403151065802,
+      "count": 1079
+    },
+    "Bruiser_Defender": {
+      "wr": 0.41361256544502617,
+      "count": 2483
+    },
+    "Bruiser_Striker": {
+      "wr": 0.37845010615711255,
+      "count": 1884
+    },
+    "Defender_Striker": {
+      "wr": 0.3352240499149178,
+      "count": 1763
+    },
+    "Defender_Support": {
+      "wr": 0.3333333333333333,
+      "count": 1005
+    },
+    "Bruiser_Flanker": {
+      "wr": 0.41559633027522935,
+      "count": 1090
+    },
+    "Flanker_Striker": {
+      "wr": 0.361731843575419,
+      "count": 716
+    },
+    "Center_Defender": {
+      "wr": 0.40549102428722283,
+      "count": 947
+    },
+    "Forward_Support": {
+      "wr": 0.3691931540342298,
+      "count": 409
+    },
+    "Defender_Flanker": {
+      "wr": 0.3788187372708758,
+      "count": 982
+    },
+    "Forward_Striker": {
+      "wr": 0.37534626038781166,
+      "count": 722
+    },
+    "Bruiser_Bruiser": {
+      "wr": 0.4522246535375638,
+      "count": 1371
+    },
+    "Anchor_Defender": {
+      "wr": 0.3614457831325301,
+      "count": 913
+    },
+    "Flanker_Flanker": {
+      "wr": 0.43636363636363634,
+      "count": 220
+    },
+    "Center_Striker": {
+      "wr": 0.3951219512195122,
+      "count": 615
+    },
+    "Striker_Striker": {
+      "wr": 0.3642072213500785,
+      "count": 637
+    },
+    "Striker_Support": {
+      "wr": 0.31274638633377133,
+      "count": 761
+    },
+    "Bruiser_Support": {
+      "wr": 0.3859180035650624,
+      "count": 1122
+    },
+    "Flanker_Forward": {
+      "wr": 0.4225,
+      "count": 400
+    },
+    "Anchor_Bruiser": {
+      "wr": 0.4020408163265306,
+      "count": 980
+    },
+    "Bruiser_Center": {
+      "wr": 0.4811957569913211,
+      "count": 1037
+    },
+    "Center_Support": {
+      "wr": 0.36363636363636365,
+      "count": 407
+    },
+    "Center_Flanker": {
+      "wr": 0.4092071611253197,
+      "count": 391
+    },
+    "Defender_Defender": {
+      "wr": 0.3385964912280702,
+      "count": 1140
+    },
+    "Flanker_Support": {
+      "wr": 0.35903614457831323,
+      "count": 415
+    },
+    "Anchor_Flanker": {
+      "wr": 0.46153846153846156,
+      "count": 390
+    },
+    "Center_Center": {
+      "wr": 0.5595238095238095,
+      "count": 168
+    },
+    "Center_Forward": {
+      "wr": 0.43333333333333335,
+      "count": 420
+    },
+    "Support_Support": {
+      "wr": 0.3459915611814346,
+      "count": 237
+    },
+    "Anchor_Support": {
+      "wr": 0.3597122302158273,
+      "count": 417
+    },
+    "Anchor_Forward": {
+      "wr": 0.4194373401534527,
+      "count": 391
+    },
+    "Defender_Forward": {
+      "wr": 0.3709016393442623,
+      "count": 976
+    },
+    "Forward_Forward": {
+      "wr": 0.38392857142857145,
+      "count": 224
+    },
+    "Anchor_Anchor": {
+      "wr": 0.3764705882352941,
+      "count": 170
+    },
+    "Anchor_Center": {
+      "wr": 0.43529411764705883,
+      "count": 340
+    }
+  },
+  "defender_pair": {
+    "Anchor_Flanker": {
+      "wr": 0.534020618556701,
+      "count": 485
+    },
+    "Bruiser_Bruiser": {
+      "wr": 0.6604018146467919,
+      "count": 1543
+    },
+    "Bruiser_Defender": {
+      "wr": 0.6312033733376581,
+      "count": 3083
+    },
+    "Anchor_Striker": {
+      "wr": 0.58584686774942,
+      "count": 862
+    },
+    "Bruiser_Center": {
+      "wr": 0.6643247462919594,
+      "count": 1281
+    },
+    "Defender_Striker": {
+      "wr": 0.5907794676806084,
+      "count": 2104
+    },
+    "Flanker_Forward": {
+      "wr": 0.6058931860036832,
+      "count": 543
+    },
+    "Center_Defender": {
+      "wr": 0.5996592844974447,
+      "count": 1174
+    },
+    "Forward_Support": {
+      "wr": 0.4973544973544973,
+      "count": 567
+    },
+    "Flanker_Support": {
+      "wr": 0.4773109243697479,
+      "count": 595
+    },
+    "Anchor_Forward": {
+      "wr": 0.5829694323144105,
+      "count": 458
+    },
+    "Defender_Forward": {
+      "wr": 0.612878200155159,
+      "count": 1289
+    },
+    "Anchor_Bruiser": {
+      "wr": 0.5975286849073257,
+      "count": 1133
+    },
+    "Anchor_Support": {
+      "wr": 0.48,
+      "count": 450
+    },
+    "Striker_Support": {
+      "wr": 0.5343511450381679,
+      "count": 917
+    },
+    "Bruiser_Striker": {
+      "wr": 0.6088831392841743,
+      "count": 2319
+    },
+    "Defender_Flanker": {
+      "wr": 0.5786219081272085,
+      "count": 1132
+    },
+    "Bruiser_Flanker": {
+      "wr": 0.5990922844175491,
+      "count": 1322
+    },
+    "Support_Support": {
+      "wr": 0.43729903536977494,
+      "count": 311
+    },
+    "Defender_Support": {
+      "wr": 0.53556827473426,
+      "count": 1223
+    },
+    "Center_Flanker": {
+      "wr": 0.5843137254901961,
+      "count": 510
+    },
+    "Bruiser_Support": {
+      "wr": 0.5800446760982875,
+      "count": 1343
+    },
+    "Defender_Defender": {
+      "wr": 0.5957597173144876,
+      "count": 1415
+    },
+    "Anchor_Defender": {
+      "wr": 0.6036199095022624,
+      "count": 1105
+    },
+    "Center_Center": {
+      "wr": 0.5695067264573991,
+      "count": 223
+    },
+    "Forward_Striker": {
+      "wr": 0.5884907709011944,
+      "count": 921
+    },
+    "Bruiser_Forward": {
+      "wr": 0.6253753753753754,
+      "count": 1332
+    },
+    "Center_Support": {
+      "wr": 0.49173553719008267,
+      "count": 484
+    },
+    "Flanker_Striker": {
+      "wr": 0.5530546623794212,
+      "count": 933
+    },
+    "Striker_Striker": {
+      "wr": 0.6028833551769331,
+      "count": 763
+    },
+    "Forward_Forward": {
+      "wr": 0.5854545454545454,
+      "count": 275
+    },
+    "Center_Forward": {
+      "wr": 0.6033057851239669,
+      "count": 484
+    },
+    "Center_Striker": {
+      "wr": 0.6,
+      "count": 805
+    },
+    "Anchor_Anchor": {
+      "wr": 0.5662100456621004,
+      "count": 219
+    },
+    "Flanker_Flanker": {
+      "wr": 0.5617977528089888,
+      "count": 267
+    },
+    "Anchor_Center": {
+      "wr": 0.5369565217391304,
+      "count": 460
+    }
+  }
+}

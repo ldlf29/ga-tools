@@ -46,13 +46,31 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GITHUB_ACTIONS: 'true'
         run: |
-          echo "Re-generating ranking post class-change..."
+          echo "Re-generating V1 ranking post class-change..."
           cd ml && python3 5_generate_rank.py
 
-      - name: Upload Ranking to Supabase (Node)
+      - name: Generate V2 Striker Ranking (Python)
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GITHUB_ACTIONS: 'true'
+        run: |
+          echo "Re-generating V2 Striker ranking post class-change..."
+          cd ml/specialized && python3 10_generate_striker_rank.py
+
+      - name: Upload V1 Ranking to Supabase (Node)
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          echo "Uploading ranking results to Supabase..."
+          echo "Uploading V1 ranking results to Supabase..."
           npx tsx src/scripts/upload_ranking.ts
+
+      - name: Upload V2 Striker Ranking to Supabase (Node)
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "Uploading V2 Striker ranking to Supabase..."
+          npx tsx src/scripts/upload_v2_ranking.ts
+
