@@ -1,0 +1,50 @@
+{
+  "duration": {
+    "iterations": 918,
+    "learning_rate": 0.19949536160531356,
+    "depth": 10,
+    "l2_leaf_reg": 8.337289914360781,
+    "min_data_in_leaf": 25,
+    "subsample": 0.5992180052659348,
+    "colsample_bylevel": 0.7198226538942867,
+    "eval_metric": "MAE",
+    "random_seed": 42,
+    "verbose": false
+  },
+  "kills": {
+    "iterations": 1290,
+    "learning_rate": 0.1990040572633651,
+    "depth": 4,
+    "l2_leaf_reg": 1.991267210596658,
+    "min_data_in_leaf": 83,
+    "subsample": 0.523606962197444,
+    "colsample_bylevel": 0.7152090122190378,
+    "eval_metric": "MAE",
+    "random_seed": 42,
+    "verbose": false
+  },
+  "wart": {
+    "iterations": 397,
+    "learning_rate": 0.13926885713105816,
+    "depth": 4,
+    "l2_leaf_reg": 7.53809691778862,
+    "min_data_in_leaf": 10,
+    "subsample": 0.7591199299534149,
+    "colsample_bylevel": 0.6244344811428895,
+    "eval_metric": "MAE",
+    "random_seed": 42,
+    "verbose": false
+  },
+  "winrate": {
+    "iterations": 1178,
+    "learning_rate": 0.148873757904917,
+    "depth": 10,
+    "l2_leaf_reg": 3.2609251933925494,
+    "min_data_in_leaf": 55,
+    "subsample": 0.8075073549547205,
+    "colsample_bylevel": 0.9395370594914494,
+    "eval_metric": "Accuracy",
+    "random_seed": 42,
+    "verbose": false
+  }
+}

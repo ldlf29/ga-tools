@@ -24,6 +24,7 @@ import {
 } from '@/utils/lineupGenerator';
 import { EnhancedCard } from '@/types';
 import { isSchemeTrait } from '@/data/traitMapping';
+import LabModal from './LabModal';
 
 const fetcher = (url: string) => fetch(url).then((res) => {
   if (!res.ok) throw new Error('API Error');
@@ -175,12 +176,12 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
 
   // Unified effect for body scroll locking when any modal is open
   useEffect(() => {
-    const anyModalOpen = 
-      !!isExpandedRankingOpen || 
-      !!selectedContest || 
-      !!showResultsModal || 
-      !!isExcludeClassesModalOpen || 
-      !!isSchemeSelectModalOpen || 
+    const anyModalOpen =
+      !!isExpandedRankingOpen ||
+      !!selectedContest ||
+      !!showResultsModal ||
+      !!isExcludeClassesModalOpen ||
+      !!isSchemeSelectModalOpen ||
       !!isTraitSchemeModalOpen ||
       !!isSchemeMenuOpen ||
       !!selectedMokiUpcoming ||
@@ -199,31 +200,37 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       document.documentElement.classList.remove('modal-open');
     };
   }, [
-    isExpandedRankingOpen, 
-    selectedContest, 
-    showResultsModal, 
-    isExcludeClassesModalOpen, 
-    isSchemeSelectModalOpen, 
+    isExpandedRankingOpen,
+    selectedContest,
+    showResultsModal,
+    isExcludeClassesModalOpen,
+    isSchemeSelectModalOpen,
     isTraitSchemeModalOpen,
     isSchemeMenuOpen,
     selectedMokiUpcoming,
     mobileRankingOpen
   ]);
 
-  // ESC key handler for the expanded ranking modal
+  // ESC key handler for modals
   useEffect(() => {
-    if (isExpandedRankingOpen) {
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (selectedMokiUpcoming) {
+          setSelectedMokiUpcoming(null);
+        } else if (isExpandedRankingOpen) {
           setIsExpandedRankingOpen(false);
         }
-      };
+      }
+    };
+    
+    if (isExpandedRankingOpen || selectedMokiUpcoming) {
       window.addEventListener('keydown', handleEscape);
-      return () => {
-        window.removeEventListener('keydown', handleEscape);
-      };
     }
-  }, [isExpandedRankingOpen]);
+    
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isExpandedRankingOpen, selectedMokiUpcoming]);
 
   // Fetch all upcoming matches on mount for the Moki modal
   useEffect(() => {
@@ -485,14 +492,14 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
   // Block body scroll when any modal or expanded view is open
   useEffect(() => {
     const shouldLock = !!(
-      selectedContest || 
-      showResultsModal || 
-      isExpandedRankingOpen || 
-      zoomedImage || 
-      isExcludeClassesModalOpen || 
-      isSchemeSelectModalOpen || 
+      selectedContest ||
+      showResultsModal ||
+      isExpandedRankingOpen ||
+      zoomedImage ||
+      isExcludeClassesModalOpen ||
+      isSchemeSelectModalOpen ||
       isTraitSchemeModalOpen ||
-      isSchemeMenuOpen || 
+      isSchemeMenuOpen ||
       mobileRankingOpen
     );
 
@@ -505,12 +512,12 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
       document.body.classList.remove('modal-open');
     };
   }, [
-    selectedContest, 
-    showResultsModal, 
-    isExpandedRankingOpen, 
-    zoomedImage, 
-    isExcludeClassesModalOpen, 
-    isSchemeSelectModalOpen, 
+    selectedContest,
+    showResultsModal,
+    isExpandedRankingOpen,
+    zoomedImage,
+    isExcludeClassesModalOpen,
+    isSchemeSelectModalOpen,
     isTraitSchemeModalOpen,
     isSchemeMenuOpen,
     mobileRankingOpen
@@ -788,8 +795,8 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
   const pcRows = React.useMemo(() => deferredModalSortedRanking.map((moki: any) => (
     <tr key={moki['Moki ID']}>
       <td><strong>#{moki._originalRank}</strong></td>
-      <td 
-        onClick={() => handleMokiClick(moki)} 
+      <td
+        onClick={() => handleMokiClick(moki)}
         style={{ cursor: 'pointer', color: '#333333', fontWeight: '800', textDecoration: 'underline' }}
         title="View Upcoming Matches"
       >
@@ -819,8 +826,8 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     <div key={moki['Moki ID']} className={styles.mobileRankCard}>
       <div className={styles.mobileRankHeader}>
         <span className={styles.mobileRankId}>#{moki._originalRank}</span>
-        <span 
-          className={styles.mobileRankName} 
+        <span
+          className={styles.mobileRankName}
           onClick={() => handleMokiClick(moki)}
           style={{ cursor: 'pointer', textDecoration: 'underline', color: '#333333' }}
         >
@@ -945,7 +952,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     if (!selectedContest || rankingData.length === 0) return;
     const modes = parseGameModes(selectedContest);
     const isOOE = isOneOfEachContest(selectedContest);
-    
+
     if (!modes.noScheme && !isOOE && !selectedGenerateScheme) {
       setSchemeErrorMsg('Please, select a scheme to filter.');
       return;
@@ -1297,8 +1304,8 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                     const imageUrl = mMeta?.portraitUrl ?? '';
                     const globalRank = rankingPage * RANKING_PAGE_SIZE + i + 1;
                     return (
-                      <div 
-                        key={`${moki['Moki ID']}-${moki.Name}-${globalRank}`} 
+                      <div
+                        key={`${moki['Moki ID']}-${moki.Name}-${globalRank}`}
                         className={styles.rankingPlaceholder}
                         onClick={() => handleMokiClick(moki as any)}
                         style={{ cursor: 'pointer' }}
@@ -1751,7 +1758,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                                         <span className={styles.miniMokiClassBadge}>{moki.class}</span>
                                       </div>
                                     </div>
-                                    
+
                                     <div className={styles.mokiCardScoreBadge}>
                                       <span className={styles.mokiCardScoreValue}>{Math.round(mokiEffective).toLocaleString()} PTS</span>
                                     </div>
@@ -2207,7 +2214,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                     <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
                 </button>
-                
+
                 <div className={styles.mokiModalHeader}>
                   <h2 className={styles.mokiModalTitle}>UPCOMING MATCHES</h2>
                   <span className={styles.mokiModalSubName}>{selectedMokiUpcoming.Name}</span>
@@ -2228,7 +2235,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                           <p className={styles.upcomingDate}>Next block: {formattedDate}</p>
                         )}
                         <p className={styles.upcomingNote}>The data is updated 1 hour after the contests end.</p>
-                        
+
                         {isUpcomingLoading ? (
                           <div className={styles.loadingWrapper}>Loading matches...</div>
                         ) : champUpcoming.length === 0 ? (
@@ -2250,7 +2257,7 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
                                       {leftTeam.map((m: any, i: number) => {
                                         const normalizedName = m.name.trim().toUpperCase();
                                         const portrait = (mokiMetadata as any)[normalizedName]?.portraitUrl || m.imageUrl;
-                                        
+
                                         const dbStat = mokiStatsMap.get(normalizedName);
                                         let displayClass = dbStat?.class || m.class;
                                         if (dbStat) {
@@ -2316,6 +2323,11 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
           </AnimatePresence>,
           document.body
         )}
+        
+        <LabModal 
+          onMokiClick={(name) => setSelectedMokiUpcoming({ Name: name } as any)} 
+          onCloseUpcoming={() => setSelectedMokiUpcoming(null)}
+        />
       </div>
     </>
   );

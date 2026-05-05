@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from collections import defaultdict
 
 # ID solicitado por el usuario
-TARGET_CONTEST_ID = "69eb51d763d702379f6c7b1a"
+TARGET_CONTEST_ID = "69f347a7d943c1735c932401"
 
 ENV_PATH = Path(__file__).parent.parent / ".env.local"
 if ENV_PATH.exists(): load_dotenv(ENV_PATH)

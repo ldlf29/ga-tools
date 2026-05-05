@@ -165,9 +165,25 @@ def train_models():
 
         model = cfg["class"](**params)
         model.fit(X_t, y_t, cat_features=cat_features, sample_weight=w_t,
-                  eval_set=(X_v, y_v), use_best_model=True)
+                  eval_set=(X_v, y_v), use_best_model=True, verbose=False)
         model.save_model(str(MODELS_DIR / cfg["file"]))
         print(f"[OK] {cfg['name']} guardado en {cfg['file']}")
+
+        # Calculate metrics for logs (val set)
+        if cfg["class"] == CatBoostRegressor:
+            mae = np.abs(np.maximum(0, model.predict(X_v)) - y_v).mean()
+            print(f"     MAE (val): {mae:.2f}")
+        else:
+            acc = (model.predict(X_v) == y_v).mean()
+            print(f"     Acc (val): {acc*100:.2f}%")
+
+        # Predicciones para usar como features de stacking
+        if cfg["class"] == CatBoostRegressor:
+            mae = np.abs(np.maximum(0, model.predict(X_v)) - y_v).mean()
+            print(f"     MAE (val): {mae:.2f}")
+        else:
+            acc = (model.predict(X_v) == y_v).mean()
+            print(f"     Acc (val): {acc*100:.2f}%")
 
         # Predicciones para usar como features de stacking
         if cfg["class"] == CatBoostClassifier:
@@ -208,6 +224,13 @@ def train_models():
                   eval_set=(X_v, y_v), use_best_model=True)
         model.save_model(str(MODELS_DIR / filename))
         print(f"[OK] {name} guardado en {filename}")
+        
+        if model_class == CatBoostRegressor:
+            mae = np.abs(np.maximum(0, model.predict(X_v)) - y_v).mean()
+            print(f"     MAE (val): {mae:.2f}")
+        else:
+            acc = (model.predict(X_v) == y_v).mean()
+            print(f"     Acc (val): {acc*100:.2f}%")
 
     fit_main(CatBoostClassifier, "is_win",       "Modelo WinRate",        "model_winrate.cbm", "WinRate Model")
     fit_main(CatBoostRegressor,  "total_points", "Modelo Expected Score", "model_score.cbm",   "Score Model")
@@ -228,6 +251,9 @@ def train_models():
     model_cond.fit(X_t, y_t, cat_features=cat_features, sample_weight=w_t,
                    eval_set=(X_v, y_v), use_best_model=True)
     model_cond.save_model(str(MODELS_DIR / "model_wincondition.cbm"))
+    
+    acc_cond = (model_cond.predict(X_v).flatten() == y_v.values).mean()
+    print(f"     Acc (val on wins): {acc_cond*100:.2f}%")
 
     print("\n[INFO] Entrenamiento en Cascada finalizado exitosamente.")
     print(f"[INFO] Modelos guardados en: {MODELS_DIR}")

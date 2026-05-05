@@ -1,0 +1,25 @@
+{
+  "layers": [
+    "cascade",
+    "anchor"
+  ],
+  "score_weights": {
+    "cascade": 0.7257355494998798,
+    "anchor": 0.31599124615972274
+  },
+  "score_intercept": -12.410206410159162,
+  "wr_weights": {
+    "cascade": 0.5118626520458445,
+    "anchor": 0.6259181991362306
+  },
+  "wr_intercept": -0.0758717873756527,
+  "metrics": {
+    "cascade_score_mae": 112.61390498826935,
+    "anchor_score_mae": 113.62170255723521,
+    "ensemble_score_mae": 112.5526935642539,
+    "cascade_wr_acc": 0.6334008097165992,
+    "anchor_wr_acc": 0.6340080971659919,
+    "ensemble_wr_acc": 0.6350202429149797,
+    "test_rows": 4940
+  }
+}

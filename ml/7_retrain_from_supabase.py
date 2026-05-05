@@ -253,23 +253,36 @@ def main():
 
     # 3. Retrain (Llamar a los scripts de preprocesamiento y entrenamiento)
     print("\n" + "="*50)
-    print("INICIANDO RE-ENTRENAMIENTO INCREMENTAL")
+    print("INICIANDO RE-ENTRENAMIENTO INCREMENTAL (V3 PIPELINE)")
     print("="*50)
     
-    # Importar y ejecutar preprocess (genera processed_matches.csv)
+    # Importar y ejecutar preprocess (genera processed_matches.csv - V1)
     preprocess_mod = importlib.import_module("2_preprocess")
     preprocess_mod.preprocess()
 
-    # Importar y ejecutar prepare_features (genera ml_features.csv)
-    prepare_mod = importlib.import_module("3_prepare_features")
-    prepare_mod.prepare_features()
+    # Extraer data V2 (generador de striker_matches.csv y defender_matches.csv)
+    print("\n[INFO] Extrayendo data especializada V2...")
+    import sys
+    specialized_path = str(Path(__file__).parent / "specialized")
+    if specialized_path not in sys.path:
+        sys.path.append(specialized_path)
+    extract_v2 = importlib.import_module("2_extract_class_data")
+    extract_v2.main()
 
-    # Re-entrenar con Peso de Tiempo
-    print("[INFO] Entrenando con pesos temporales (Matches recientes = mayor peso)...")
-    train_mod = importlib.import_module("4_train_models")
-    train_mod.train_models()
+    # Preparar features V3
+    print("\n[INFO] Preparando features unificados V3...")
+    v3_path = str(Path(__file__).parent / "v3")
+    if v3_path not in sys.path:
+        sys.path.append(v3_path)
+    prep_v3 = importlib.import_module("1_prepare_v3_data")
+    prep_v3.main()
+
+    # Entrenar modelos V3
+    print("\n[INFO] Entrenando modelos de Cascada V3...")
+    train_v3 = importlib.import_module("2_train_v3_models")
+    train_v3.main()
     
-    print("\n[OK] Pipeline de re-entrenamiento completado exitosamente.")
+    print("\n[OK] Pipeline de re-entrenamiento V3 completado exitosamente.")
 
 if __name__ == "__main__":
     main()
