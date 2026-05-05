@@ -24,6 +24,7 @@ import {
 } from '@/utils/lineupGenerator';
 import { EnhancedCard } from '@/types';
 import { isSchemeTrait } from '@/data/traitMapping';
+import LabModal from './LabModal';
 
 const fetcher = (url: string) => fetch(url).then((res) => {
   if (!res.ok) throw new Error('API Error');
@@ -210,20 +211,26 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
     mobileRankingOpen
   ]);
 
-  // ESC key handler for the expanded ranking modal
+  // ESC key handler for modals
   useEffect(() => {
-    if (isExpandedRankingOpen) {
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (selectedMokiUpcoming) {
+          setSelectedMokiUpcoming(null);
+        } else if (isExpandedRankingOpen) {
           setIsExpandedRankingOpen(false);
         }
-      };
+      }
+    };
+    
+    if (isExpandedRankingOpen || selectedMokiUpcoming) {
       window.addEventListener('keydown', handleEscape);
-      return () => {
-        window.removeEventListener('keydown', handleEscape);
-      };
     }
-  }, [isExpandedRankingOpen]);
+    
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isExpandedRankingOpen, selectedMokiUpcoming]);
 
   // Fetch all upcoming matches on mount for the Moki modal
   useEffect(() => {
@@ -2316,6 +2323,11 @@ export default function PredictionsTab({ allCards = EMPTY_ARRAY, userCards = EMP
           </AnimatePresence>,
           document.body
         )}
+        
+        <LabModal 
+          onMokiClick={(name) => setSelectedMokiUpcoming({ Name: name } as any)} 
+          onCloseUpcoming={() => setSelectedMokiUpcoming(null)}
+        />
       </div>
     </>
   );

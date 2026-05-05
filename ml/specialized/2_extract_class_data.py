@@ -277,10 +277,11 @@ def main():
     
     # Save
     df_striker.to_csv(STRIKER_OUTPUT, index=False)
-    # df_defender.to_csv(DEFENDER_OUTPUT, index=False)
+    df_defender.to_csv(DEFENDER_OUTPUT, index=False)
     print(f"[OK] Saved {STRIKER_OUTPUT}")
+    print(f"[OK] Saved {DEFENDER_OUTPUT}")
     
-    print(f"\n[DONE] Extraction complete. Striker: {len(df_striker)}")
+    print(f"\n[DONE] Extraction complete. Striker: {len(df_striker)} | Defender: {len(df_defender)}")
 
 if __name__ == "__main__":
     main()

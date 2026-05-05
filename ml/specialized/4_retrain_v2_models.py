@@ -99,104 +99,142 @@ def retrain_class(df, class_name):
     
     X0_tr = train[base_cols].fillna("").astype(str)
     X0_va = val[base_cols].fillna("").astype(str)
+    X0_te = test[base_cols].fillna("").astype(str)
     
     # ── Phase 0: Duration ──
     print(f"\n[TRAIN] Phase 0 (Duration)...")
     y_dur_tr = train["match_duration"].astype(float)
     y_dur_va = val["match_duration"].astype(float)
+    y_dur_te = test["match_duration"].astype(float)
     
     m_dur = CatBoostRegressor(**best_params_all["duration"])
     m_dur.fit(X0_tr, y_dur_tr, cat_features=cat_idx0, eval_set=(X0_va, y_dur_va), use_best_model=True, verbose=False)
     m_dur.save_model(str(model_dir / "optimized_duration.cbm"))
     
+    mae_dur = np.abs(np.maximum(0, m_dur.predict(X0_te)) - y_dur_te).mean()
+    print(f"     MAE (test): {mae_dur:.2f}")
+
     p_dur_tr = np.maximum(0, m_dur.predict(X0_tr))
     p_dur_va = np.maximum(0, m_dur.predict(X0_va))
+    p_dur_te = np.maximum(0, m_dur.predict(X0_te))
     
     p1_cols = base_cols + ["pred_duration"]
     cat_idx1 = get_cat_indices(p1_cols)
     X1_tr = add_predictions(X0_tr, "pred_duration", p_dur_tr)
     X1_va = add_predictions(X0_va, "pred_duration", p_dur_va)
+    X1_te = add_predictions(X0_te, "pred_duration", p_dur_te)
 
     if class_name == "Striker":
         # ── Phase 1: Deposits ──
-        print(f"[TRAIN] Phase 1 (Deposits)...")
+        print(f"\n[TRAIN] Phase 1 (Deposits)...")
         y_dep_tr = train["res_deposits"].astype(float)
         y_dep_va = val["res_deposits"].astype(float)
+        y_dep_te = test["res_deposits"].astype(float)
         
         m_dep = CatBoostRegressor(**best_params_all["deposits"])
         m_dep.fit(X1_tr, y_dep_tr, cat_features=cat_idx1, eval_set=(X1_va, y_dep_va), use_best_model=True, verbose=False)
         m_dep.save_model(str(model_dir / "optimized_deposits.cbm"))
         
+        mae_dep = np.abs(np.maximum(0, m_dep.predict(X1_te)) - y_dep_te).mean()
+        print(f"     MAE (test): {mae_dep:.2f}")
+
         p_dep_tr = np.maximum(0, m_dep.predict(X1_tr))
         p_dep_va = np.maximum(0, m_dep.predict(X1_va))
+        p_dep_te = np.maximum(0, m_dep.predict(X1_te))
         
         # ── Phase 2: Win ──
-        print(f"[TRAIN] Phase 2 (Win Rate)...")
+        print(f"\n[TRAIN] Phase 2 (Win Rate)...")
         p2_cols = p1_cols + ["pred_deposits"]
         cat_idx2 = get_cat_indices(p2_cols)
         X2_tr = add_predictions(X1_tr, "pred_deposits", p_dep_tr)
         X2_va = add_predictions(X1_va, "pred_deposits", p_dep_va)
+        X2_te = add_predictions(X1_te, "pred_deposits", p_dep_te)
         
         y_win_tr = train["is_win"].astype(int)
         y_win_va = val["is_win"].astype(int)
+        y_win_te = test["is_win"].astype(int)
         
         m_win = CatBoostClassifier(**best_params_all["winrate"])
         m_win.fit(X2_tr, y_win_tr, cat_features=cat_idx2, eval_set=(X2_va, y_win_va), use_best_model=True, verbose=False)
         m_win.save_model(str(model_dir / "optimized_winrate.cbm"))
+
+        acc_win = (m_win.predict(X2_te) == y_win_te).mean()
+        print(f"     Acc (test): {acc_win*100:.2f}%")
         
     elif class_name == "Defender":
         # ── Phase 1a: Kills ──
-        print(f"[TRAIN] Phase 1a (Kills)...")
+        print(f"\n[TRAIN] Phase 1a (Kills)...")
         y_ki_tr = train["res_eliminations"].astype(float)
         y_ki_va = val["res_eliminations"].astype(float)
+        y_ki_te = test["res_eliminations"].astype(float)
         
         m_ki = CatBoostRegressor(**best_params_all["kills"])
         m_ki.fit(X1_tr, y_ki_tr, cat_features=cat_idx1, eval_set=(X1_va, y_ki_va), use_best_model=True, verbose=False)
         m_ki.save_model(str(model_dir / "optimized_kills.cbm"))
+
+        mae_ki = np.abs(np.maximum(0, m_ki.predict(X1_te)) - y_ki_te).mean()
+        print(f"     MAE (test): {mae_ki:.2f}")
         
         p_ki_tr = np.maximum(0, m_ki.predict(X1_tr))
         p_ki_va = np.maximum(0, m_ki.predict(X1_va))
+        p_ki_te = np.maximum(0, m_ki.predict(X1_te))
         
         # ── Phase 1b: Wart ──
-        print(f"[TRAIN] Phase 1b (Wart)...")
+        print(f"\n[TRAIN] Phase 1b (Wart)...")
         y_wa_tr = train["res_wart_distance"].astype(float)
         y_wa_va = val["res_wart_distance"].astype(float)
+        y_wa_te = test["res_wart_distance"].astype(float)
         
         m_wa = CatBoostRegressor(**best_params_all["wart"])
         m_wa.fit(X1_tr, y_wa_tr, cat_features=cat_idx1, eval_set=(X1_va, y_wa_va), use_best_model=True, verbose=False)
         m_wa.save_model(str(model_dir / "optimized_wart.cbm"))
+
+        mae_wa = np.abs(np.maximum(0, m_wa.predict(X1_te)) - y_wa_te).mean()
+        print(f"     MAE (test): {mae_wa:.2f}")
         
         p_wa_tr = np.maximum(0, m_wa.predict(X1_tr))
         p_wa_va = np.maximum(0, m_wa.predict(X1_va))
+        p_wa_te = np.maximum(0, m_wa.predict(X1_te))
         
         # ── Phase 2: Win ──
-        print(f"[TRAIN] Phase 2 (Win Rate)...")
+        print(f"\n[TRAIN] Phase 2 (Win Rate)...")
         p2_cols = p1_cols + ["pred_kills", "pred_wart"]
         cat_idx2 = get_cat_indices(p2_cols)
         X2_tr = add_predictions(add_predictions(X1_tr, "pred_kills", p_ki_tr), "pred_wart", p_wa_tr)
         X2_va = add_predictions(add_predictions(X1_va, "pred_kills", p_ki_va), "pred_wart", p_wa_va)
+        X2_te = add_predictions(add_predictions(X1_te, "pred_kills", p_ki_te), "pred_wart", p_wa_te)
         
         y_win_tr = train["is_win"].astype(int)
         y_win_va = val["is_win"].astype(int)
+        y_win_te = test["is_win"].astype(int)
         
         m_win = CatBoostClassifier(**best_params_all["winrate"])
         m_win.fit(X2_tr, y_win_tr, cat_features=cat_idx2, eval_set=(X2_va, y_win_va), use_best_model=True, verbose=False)
         m_win.save_model(str(model_dir / "optimized_winrate.cbm"))
+
+        acc_win = (m_win.predict(X2_te) == y_win_te).mean()
+        print(f"     Acc (test): {acc_win*100:.2f}%")
         
-    print(f"[OK] Completed retrain for {class_name}")
+    print(f"\n[OK] Completed retrain for {class_name}")
 
 def main():
     ensure_dirs()
     
     if not STRIKER_INPUT.exists():
-        print(f"[ERROR] Missing input data. Expected {STRIKER_INPUT}")
+        print(f"[ERROR] Missing Striker input data. Expected {STRIKER_INPUT}")
+        return
+    
+    if not DEFENDER_INPUT.exists():
+        print(f"[ERROR] Missing Defender input data. Expected {DEFENDER_INPUT}")
         return
         
     df_striker = pd.read_csv(STRIKER_INPUT, low_memory=False)
+    df_defender = pd.read_csv(DEFENDER_INPUT, low_memory=False)
     
     retrain_class(df_striker, "Striker")
+    retrain_class(df_defender, "Defender")
     
-    print("\n[DONE] V2 Retrain using best parameters complete (Striker ONLY).")
+    print("\n[DONE] V2 Retrain using best parameters complete (Striker + Defender).")
 
 if __name__ == "__main__":
     main()

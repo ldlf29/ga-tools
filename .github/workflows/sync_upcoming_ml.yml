@@ -47,36 +47,23 @@ jobs:
           echo "Syncing upcoming matches..."
           npx tsx src/scripts/cron_sync_upcoming.ts
 
-      - name: Generate V1 ML Ranking (Python)
+      - name: Generate V1 & V2 ML Rankings (Python)
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GITHUB_ACTIONS: 'true'
         run: |
-          echo "Generating V1 predictions ranking..."
-          cd ml && python3 5_generate_rank.py
+          echo "Generating V1 & V2 predictions rankings..."
+          python3 ml/5_generate_rank.py
+          python3 ml/specialized/10_generate_striker_rank.py
+          python3 ml/specialized/11b_generate_defender_rank.py
 
-      - name: Generate V2 Striker Ranking (Python)
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          GITHUB_ACTIONS: 'true'
-        run: |
-          echo "Generating V2 Striker ranking..."
-          cd ml/specialized && python3 10_generate_striker_rank.py
-
-      - name: Upload V1 Ranking to Supabase (Node)
+      - name: Upload V1 & V2 Rankings to Supabase (Node)
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           echo "Uploading V1 ranking results to Supabase..."
           npx tsx src/scripts/upload_ranking.ts
-
-      - name: Upload V2 Striker Ranking to Supabase (Node)
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: |
-          echo "Uploading V2 Striker ranking to Supabase..."
-          npx tsx src/scripts/upload_v2_ranking.ts
+          echo "Uploading V2 ranking results to Supabase..."
+          npx tsx src/scripts/upload_v2_rankings.ts

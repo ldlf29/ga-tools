@@ -65,6 +65,7 @@ desktop.ini
 ml/venv/
 __pycache__/
 ml/catboost_info/
+ml/v3/
 !ml/models/*.cbm
 ml/data/*.csv
 ml/data/scheme_analysis/
