@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from collections import defaultdict
 
 # ID solicitado por el usuario
-TARGET_CONTEST_ID = "69f347a7d943c1735c932401"
+TARGET_CONTEST_ID = "69f94d0b70a1510f6a0dc0c5"
 
 ENV_PATH = Path(__file__).parent.parent / ".env.local"
 if ENV_PATH.exists(): load_dotenv(ENV_PATH)
@@ -59,6 +59,7 @@ def get_moki_stats_overrides():
     headers = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
     real_overrides = {}
     eff_overrides = {}
+    display_overrides = {}
     moki_stats_ids = set()
     try:
         res = requests.get(url, headers=headers).json()
@@ -69,17 +70,21 @@ def get_moki_stats_overrides():
             base_cls = str(row.get("class", ""))
             real_overrides[mid] = base_cls
             eff_cls = base_cls
+            disp_cls = base_cls
             if base_cls == "Grinder":
                 dex, str_val = float(row.get("dexterity", 0)), float(row.get("strength", 0))
                 eff_cls = "Striker" if dex > str_val else "Bruiser"
+                disp_cls = "Grinder (S)" if dex > str_val else "Grinder (B)"
             elif base_cls == "Sprinter":
                 dex, def_val = float(row.get("dexterity", 0)), float(row.get("defense", 0))
                 eff_cls = "Striker" if dex > def_val else "Defender"
+                disp_cls = "Sprinter (S)" if dex > def_val else "Sprinter (D)"
             eff_overrides[mid] = eff_cls
-        return real_overrides, eff_overrides, moki_stats_ids
+            display_overrides[mid] = disp_cls
+        return real_overrides, eff_overrides, display_overrides, moki_stats_ids
     except Exception as e:
         print("[WARN] Error fetching class overrides:", e)
-        return {}, {}, set()
+        return {}, {}, {}, set()
 
 def build_features_for_moki(moki_id, matches, moki_details, effective_class_overrides, moki_stats_ids):
     features_list = []
@@ -169,7 +174,7 @@ def fetch_matches_from_api(contest_id):
     return all_matches
 
 def main():
-    real_class_overrides, effective_class_overrides, moki_stats_ids = get_moki_stats_overrides()
+    real_class_overrides, effective_class_overrides, display_overrides, moki_stats_ids = get_moki_stats_overrides()
     
     # 1. Fetch matches directly from API
     matches_raw = fetch_matches_from_api(TARGET_CONTEST_ID)
@@ -234,8 +239,84 @@ def main():
     df = pd.DataFrame(results).sort_values("Score", ascending=False)
     out_path = Path(__file__).parent / "data" / f"ranking_api_contest_{TARGET_CONTEST_ID}.csv"
     df.to_csv(out_path, index=False, encoding="utf-8-sig")
-    print(f"\n[OK] Ranking del Contest {TARGET_CONTEST_ID} (via API) guardado en: {out_path}")
-    print(df.head(10).to_string(index=False))
+    print(f"\n[OK] Ranking V1 del Contest {TARGET_CONTEST_ID} (via API) guardado en: {out_path}")
+    print(df.head(5).to_string(index=False))
+
+    # ==========================================
+    # V2 RANKING GENERATION (Striker & Defender)
+    # ==========================================
+    print("\n[INFO] Iniciando generación de V2 (Striker & Defender)...")
+    
+    import sys
+    import importlib
+    specialized_dir = Path(__file__).parent / "specialized"
+    if str(specialized_dir) not in sys.path:
+        sys.path.append(str(specialized_dir))
+    
+    try:
+        striker_mod = importlib.import_module("10_generate_striker_rank")
+        defender_mod = importlib.import_module("11b_generate_defender_rank")
+    except ImportError as e:
+        print(f"[ERROR] No se pudieron cargar los scripts de V2: {e}")
+        return
+
+    comp_hist, match_hist = striker_mod.load_lookups()
+    striker_models = striker_mod.load_striker_models()
+    defender_models = defender_mod.load_defender_models()
+    
+    striker_results = []
+    defender_results = []
+    
+    for moki_id in top_mokis:
+        matches = moki_match_map[moki_id]
+        details = moki_details[moki_id]
+        champ_name = details.get("name", "Unknown")
+        fur, traits = get_metadata(champ_name)
+        
+        eff_cls = effective_class_overrides.get(moki_id, details.get("class", ""))
+        disp_cls = display_overrides.get(moki_id, details.get("class", ""))
+        
+        if eff_cls == "Striker":
+            feat_list = striker_mod.build_v2_features(moki_id, matches, effective_class_overrides, comp_hist, match_hist)
+            if feat_list:
+                df_f = pd.DataFrame(feat_list)
+                scores, win_probs, pred_deposits = striker_mod.cascade_predict_striker(df_f, striker_models)
+                striker_results.append({
+                    "Moki ID": moki_id, "Name": champ_name, "Class": disp_cls,
+                    "V2 Score": round(scores.sum(), 1), "V2 WinRate": round(win_probs.mean() * 100, 1),
+                    "Matches": len(matches), "Avg Score Per Match": round(scores.mean(), 1),
+                    "Avg Predicted Deposits": round(pred_deposits.mean(), 2),
+                    "Total Deposits": round(pred_deposits.sum(), 1),
+                    "Fur": fur, "Traits": traits
+                })
+                
+        elif eff_cls == "Defender":
+            feat_list = defender_mod.build_v2_features(moki_id, matches, effective_class_overrides, comp_hist, match_hist)
+            if feat_list:
+                df_f = pd.DataFrame(feat_list)
+                scores, win_probs, pred_kills, pred_wart = defender_mod.cascade_predict_defender(df_f, defender_models)
+                defender_results.append({
+                    "Moki ID": moki_id, "Name": champ_name, "Class": disp_cls,
+                    "V2 Score": round(scores.sum(), 1), "V2 WinRate": round(win_probs.mean() * 100, 1),
+                    "Matches": len(matches), "Avg Score Per Match": round(scores.mean(), 1),
+                    "Avg Predicted Kills": round(pred_kills.mean(), 2), "Total Predicted Kills": round(pred_kills.sum(), 1),
+                    "Avg Predicted Wart": round(pred_wart.mean(), 2), "Total Predicted Wart": round(pred_wart.sum(), 1),
+                    "Fur": fur, "Traits": traits
+                })
+
+    if striker_results:
+        df_str = pd.DataFrame(striker_results).sort_values("V2 Score", ascending=False)
+        out_str = Path(__file__).parent / "data" / f"v2_ranking_striker_api_{TARGET_CONTEST_ID}.csv"
+        df_str.to_csv(out_str, index=False, encoding="utf-8-sig")
+        print(f"\n[OK] V2 Striker guardado en: {out_str}")
+        print(df_str.head(3).to_string(index=False))
+        
+    if defender_results:
+        df_def = pd.DataFrame(defender_results).sort_values("V2 Score", ascending=False)
+        out_def = Path(__file__).parent / "data" / f"v2_ranking_defender_api_{TARGET_CONTEST_ID}.csv"
+        df_def.to_csv(out_def, index=False, encoding="utf-8-sig")
+        print(f"\n[OK] V2 Defender guardado en: {out_def}")
+        print(df_def.head(3).to_string(index=False))
 
 if __name__ == "__main__":
     main()
