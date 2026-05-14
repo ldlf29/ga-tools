@@ -31,7 +31,7 @@
     "swr": "^2.3.8",
     "viem": "^2.47.10",
     "wagmi": "^2.19.5",
-    "uuid": "^11.1.1"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
