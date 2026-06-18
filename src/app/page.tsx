@@ -67,7 +67,7 @@ export default function Home() {
   /* Global UI State */
   const [activeTab, setActiveTab] = useState<
     'builder' | 'lineups' | 'predictions' | 'champions' | 'changelog'
-  >('predictions');
+  >('builder');
   const [searchQuery, setSearchQuery] = useState('');
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const lastToastTimeRef = useRef<{ [key: string]: number }>({});
@@ -808,7 +808,8 @@ export default function Home() {
         </div>
 
         <nav className={styles.navTabs}>
-          <button
+          {/* Predictions hidden during offseason */}
+          {/* <button
             className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
             onClick={() => {
               handleMainTabChange('predictions');
@@ -816,7 +817,7 @@ export default function Home() {
             }}
           >
             Predictions
-          </button>
+          </button> */}
           <button
             className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
             onClick={() => {
@@ -988,12 +989,13 @@ export default function Home() {
             {/* Desktop Navigation */}
             <nav className={`${styles.navContainer} ${styles.desktopOnly}`}>
               <div className={styles.navTabs}>
-                <button
+                {/* Predictions hidden during offseason */}
+                {/* <button
                   className={`${styles.navTab} ${activeTab === 'predictions' ? styles.activeTab : ''}`}
                   onClick={() => handleMainTabChange('predictions')}
                 >
                   Predictions
-                </button>
+                </button> */}
                 <button
                   className={`${styles.navTab} ${activeTab === 'champions' ? styles.activeTab : ''}`}
                   onClick={() => handleMainTabChange('champions')}
